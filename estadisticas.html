@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Estadísticas Avanzadas - UltraGol</title>
+    <link rel="stylesheet" href="css/main.css?v=2024091801">
+    <link rel="stylesheet" href="css/animations.css?v=2024091801">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .stats-hero {
+            background: linear-gradient(135deg, #ff9933 0%, #ffaa44 100%);
+            padding: 120px 0 80px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="stats-pattern" patternUnits="userSpaceOnUse" width="30" height="30"><circle cx="15" cy="15" r="2" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23stats-pattern)"/></svg>');
+        }
+
+        .stats-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .stats-tabs {
+            background: white;
+            padding: 40px 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .tabs-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: 2px solid #ff9933;
+            color: #ff9933;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active,
+        .tab-btn:hover {
+            background: linear-gradient(45deg, #ff9933, #ffaa44);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 153, 51, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-widget {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid #ff9933;
+            transition: all 0.3s ease;
+        }
+
+        .stat-widget:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 153, 51, 0.2);
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .widget-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .widget-icon {
+            background: rgba(255, 153, 51, 0.1);
+            color: #ff9933;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .stat-chart {
+            height: 200px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .stat-list {
+            list-style: none;
+        }
+
+        .stat-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .stat-list li:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: #ff9933;
+        }
+
+        .leaderboard {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .leaderboard-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ff9933;
+            margin-bottom: 10px;
+        }
+
+        .leader-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .leader-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(255, 153, 51, 0.2);
+        }
+
+        .leader-rank {
+            background: linear-gradient(45deg, #ff9933, #ffaa44);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 15px;
+        }
+
+        .leader-info {
+            flex: 1;
+        }
+
+        .leader-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .leader-team {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .leader-stat {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #ff9933;
+        }
+
+        .comparison-tool {
+            background: linear-gradient(135deg, #f8f8f8 0%, #ffffff 100%);
+            padding: 40px 0;
+            margin-top: 40px;
+        }
+
+        .comparison-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .comparison-select {
+            padding: 12px 20px;
+            border: 2px solid #ff9933;
+            border-radius: 10px;
+            background: white;
+            color: #333;
+            font-weight: 600;
+            min-width: 200px;
+        }
+
+        .compare-btn {
+            background: linear-gradient(45deg, #ff9933, #ffaa44);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .compare-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 153, 51, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .stats-hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .tabs-nav {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="assets/logo.svg" alt="UltraGol" class="logo">
+                <span class="logo-text">UltraGol</span>
+                <span class="company-tag">by L3HO</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="standings.html" class="nav-link">Tabla de Posiciones</a>
+                </li>
+                <li class="nav-item">
+                    <a href="teams.html" class="nav-link">Equipos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="fixtures.html" class="nav-link">Partidos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="calendario.html" class="nav-link">Calendario</a>
+                </li>
+                <li class="nav-item">
+                    <a href="estadisticas.html" class="nav-link active">Estadísticas</a>
+                </li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Stats Hero Section -->
+    <section class="stats-hero">
+        <div class="container">
+            <h1 class="fade-in">Estadísticas Avanzadas</h1>
+            <p class="slide-up">Análisis profundo y métricas profesionales de la Liga MX</p>
+        </div>
+    </section>
+
+    <!-- Stats Tabs -->
+    <section class="stats-tabs">
+        <div class="container">
+            <div class="tabs-nav">
+                <button class="tab-btn active" data-tab="general">
+                    <i class="fas fa-chart-bar"></i>
+                    General
+                </button>
+                <button class="tab-btn" data-tab="teams">
+                    <i class="fas fa-shield-alt"></i>
+                    Equipos
+                </button>
+                <button class="tab-btn" data-tab="players">
+                    <i class="fas fa-user"></i>
+                    Jugadores
+                </button>
+                <button class="tab-btn" data-tab="advanced">
+                    <i class="fas fa-cogs"></i>
+                    Avanzadas
+                </button>
+            </div>
+
+            <!-- General Stats Tab -->
+            <div class="tab-content active" id="general">
+                <div class="stats-grid">
+                    <div class="stat-widget">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Rendimiento de Liga</h3>
+                            <div class="widget-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                        <div class="stat-chart">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-area" style="font-size: 3rem; color: #ff9933; margin-bottom: 10px;"></i>
+                                <p>Gráfico de rendimiento general</p>
+                            </div>
+                        </div>
+                        <ul class="stat-list">
+                            <li>
+                                <span class="stat-label">Promedio de goles por partido</span>
+                                <span class="stat-value">2.8</span>
+                            </li>
+                            <li>
+                                <span class="stat-label">Partidos con más de 2.5 goles</span>
+                                <span class="stat-value">68%</span>
+                            </li>
+                            <li>
+                                <span class="stat-label">Promedio de tarjetas por partido</span>
+                                <span class="stat-value">4.2</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="stat-widget">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Tendencias</h3>
+                            <div class="widget-icon">
+                                <i class="fas fa-trending-up"></i>
+                            </div>
+                        </div>
+                        <div class="stat-chart">
+                            <div class="chart-placeholder">
+                                <i class="fas fa-chart-pie" style="font-size: 3rem; color: #ff9933; margin-bottom: 10px;"></i>
+                                <p>Análisis de tendencias</p>
+                            </div>
+                        </div>
+                        <ul class="stat-list">
+                            <li>
+                                <span class="stat-label">Partidos emocionantes</span>
+                                <span class="stat-value">+15%</span>
+                            </li>
+                            <li>
+                                <span class="stat-label">Goles en tiempo añadido</span>
+                                <span class="stat-value">+8%</span>
+                            </li>
+                            <li>
+                                <span class="stat-label">Espectadores promedio</span>
+                                <span class="stat-value">35,420</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="leaderboard">
+                    <div class="leaderboard-header">
+                        <h3 class="leaderboard-title">Top Goleadores</h3>
+                        <p>Los artilleros más letales de la temporada</p>
+                    </div>
+                    <div class="leaders-list" id="topScorers">
+                        <div class="leader-item">
+                            <div class="leader-rank">1</div>
+                            <div class="leader-info">
+                                <div class="leader-name">Henry Martín</div>
+                                <div class="leader-team">Club América</div>
+                            </div>
+                            <div class="leader-stat">15</div>
+                        </div>
+                        <div class="leader-item">
+                            <div class="leader-rank">2</div>
+                            <div class="leader-info">
+                                <div class="leader-name">André-Pierre Gignac</div>
+                                <div class="leader-team">Tigres UANL</div>
+                            </div>
+                            <div class="leader-stat">13</div>
+                        </div>
+                        <div class="leader-item">
+                            <div class="leader-rank">3</div>
+                            <div class="leader-info">
+                                <div class="leader-name">Rogelio Funes Mori</div>
+                                <div class="leader-team">CF Monterrey</div>
+                            </div>
+                            <div class="leader-stat">12</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teams Stats Tab -->
+            <div class="tab-content" id="teams">
+                <div class="stats-grid">
+                    <div class="stat-widget">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Mejor Ataque</h3>
+                            <div class="widget-icon">
+                                <i class="fas fa-futbol"></i>
+                            </div>
+                        </div>
+                        <div class="leaderboard">
+                            <div class="leader-item">
+                                <div class="leader-rank">1</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">Club América</div>
+                                    <div class="leader-team">45 goles anotados</div>
+                                </div>
+                                <div class="leader-stat">2.5</div>
+                            </div>
+                            <div class="leader-item">
+                                <div class="leader-rank">2</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">Tigres UANL</div>
+                                    <div class="leader-team">42 goles anotados</div>
+                                </div>
+                                <div class="leader-stat">2.3</div>
+                            </div>
+                            <div class="leader-item">
+                                <div class="leader-rank">3</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">CF Monterrey</div>
+                                    <div class="leader-team">38 goles anotados</div>
+                                </div>
+                                <div class="leader-stat">2.1</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-widget">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Mejor Defensa</h3>
+                            <div class="widget-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                        </div>
+                        <div class="leaderboard">
+                            <div class="leader-item">
+                                <div class="leader-rank">1</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">CF Monterrey</div>
+                                    <div class="leader-team">12 goles recibidos</div>
+                                </div>
+                                <div class="leader-stat">0.7</div>
+                            </div>
+                            <div class="leader-item">
+                                <div class="leader-rank">2</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">Club León</div>
+                                    <div class="leader-team">15 goles recibidos</div>
+                                </div>
+                                <div class="leader-stat">0.8</div>
+                            </div>
+                            <div class="leader-item">
+                                <div class="leader-rank">3</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">Cruz Azul</div>
+                                    <div class="leader-team">18 goles recibidos</div>
+                                </div>
+                                <div class="leader-stat">1.0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Players Stats Tab -->
+            <div class="tab-content" id="players">
+                <div class="stats-grid">
+                    <div class="stat-widget">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Máximos Asistentes</h3>
+                            <div class="widget-icon">
+                                <i class="fas fa-hands-helping"></i>
+                            </div>
+                        </div>
+                        <div class="leaderboard">
+                            <div class="leader-item">
+                                <div class="leader-rank">1</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">Diego Valdés</div>
+                                    <div class="leader-team">Club América</div>
+                                </div>
+                                <div class="leader-stat">8</div>
+                            </div>
+                            <div class="leader-item">
+                                <div class="leader-rank">2</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">Sebastián Córdova</div>
+                                    <div class="leader-team">Tigres UANL</div>
+                                </div>
+                                <div class="leader-stat">7</div>
+                            </div>
+                            <div class="leader-item">
+                                <div class="leader-rank">3</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">Ángel Mena</div>
+                                    <div class="leader-team">Club León</div>
+                                </div>
+                                <div class="leader-stat">6</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-widget">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Mejores Porteros</h3>
+                            <div class="widget-icon">
+                                <i class="fas fa-hand-paper"></i>
+                            </div>
+                        </div>
+                        <div class="leaderboard">
+                            <div class="leader-item">
+                                <div class="leader-rank">1</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">Esteban Andrada</div>
+                                    <div class="leader-team">CF Monterrey</div>
+                                </div>
+                                <div class="leader-stat">78%</div>
+                            </div>
+                            <div class="leader-item">
+                                <div class="leader-rank">2</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">Luis Malagón</div>
+                                    <div class="leader-team">Club América</div>
+                                </div>
+                                <div class="leader-stat">75%</div>
+                            </div>
+                            <div class="leader-item">
+                                <div class="leader-rank">3</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">Nahuel Guzmán</div>
+                                    <div class="leader-team">Tigres UANL</div>
+                                </div>
+                                <div class="leader-stat">73%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Stats Tab -->
+            <div class="tab-content" id="advanced">
+                <div class="comparison-tool">
+                    <div class="container">
+                        <h3 style="text-align: center; color: #ff9933; margin-bottom: 30px;">Comparador Avanzado de Equipos</h3>
+                        <div class="comparison-controls">
+                            <select class="comparison-select" id="advancedTeam1">
+                                <option value="">Selecciona Equipo 1</option>
+                            </select>
+                            <select class="comparison-select" id="advancedTeam2">
+                                <option value="">Selecciona Equipo 2</option>
+                            </select>
+                            <button class="compare-btn" id="advancedCompareBtn">
+                                <i class="fas fa-chart-bar"></i>
+                                Comparar Equipos
+                            </button>
+                        </div>
+                        <div id="advancedComparisonResults"></div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-widget">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Métricas Avanzadas</h3>
+                            <div class="widget-icon">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                        </div>
+                        <ul class="stat-list">
+                            <li>
+                                <span class="stat-label">xG Promedio por Partido</span>
+                                <span class="stat-value">1.85</span>
+                            </li>
+                            <li>
+                                <span class="stat-label">Efectividad de Pases</span>
+                                <span class="stat-value">82.3%</span>
+                            </li>
+                            <li>
+                                <span class="stat-label">Duelos Ganados</span>
+                                <span class="stat-value">54.7%</span>
+                            </li>
+                            <li>
+                                <span class="stat-label">Posesión Promedio</span>
+                                <span class="stat-value">58.2%</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="stat-widget">
+                        <div class="widget-header">
+                            <h3 class="widget-title">Análisis Táctico</h3>
+                            <div class="widget-icon">
+                                <i class="fas fa-chess"></i>
+                            </div>
+                        </div>
+                        <ul class="stat-list">
+                            <li>
+                                <span class="stat-label">Formación más usada</span>
+                                <span class="stat-value">4-3-3</span>
+                            </li>
+                            <li>
+                                <span class="stat-label">Ataques por banda</span>
+                                <span class="stat-value">67%</span>
+                            </li>
+                            <li>
+                                <span class="stat-label">Presión alta</span>
+                                <span class="stat-value">41%</span>
+                            </li>
+                            <li>
+                                <span class="stat-label">Contraataques exitosos</span>
+                                <span class="stat-value">29%</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>UltraGol</h3>
+                    <p>Plataforma deportiva profesional by L3HO</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Enlaces</h4>
+                    <ul>
+                        <li><a href="standings.html">Tabla de Posiciones</a></li>
+                        <li><a href="teams.html">Equipos</a></li>
+                        <li><a href="fixtures.html">Partidos</a></li>
+                        <li><a href="calendario.html">Calendario</a></li>
+                        <li><a href="estadisticas.html">Estadísticas</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Información</h4>
+                    <ul>
+                        <li><a href="#">Reglamento</a></li>
+                        <li><a href="#">Noticias</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 UltraGol by L3HO. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js?v=2024091801"></script>
+    <script src="js/estadisticas.js?v=2024091801"></script>
+</body>
+</html>

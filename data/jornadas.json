@@ -1,0 +1,1179 @@
+{
+  "jornadas": [
+    {
+      "numero": 1,
+      "fechas": "11, 12, 13 DE JULIO / REPROGRAMADO 17 DE SEPTIEMBRE",
+      "partidos": [
+        {
+          "local": "Puebla",
+          "visitante": "Atlas",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "CUAUHTÉMOC"
+        },
+        {
+          "local": "Tijuana",
+          "visitante": "Querétaro",
+          "dia": "VIERNES",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "CALIENTE"
+        },
+        {
+          "local": "FC Juárez",
+          "visitante": "Club América",
+          "dia": "VIERNES",
+          "hora": "21:00",
+          "estadio": "O. BENITO JUÁREZ"
+        },
+        {
+          "local": "Santos Laguna",
+          "visitante": "Pumas UNAM",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "TSM CORONA"
+        },
+        {
+          "local": "Toluca",
+          "visitante": "Necaxa",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "NEMESIO DÍEZ"
+        },
+        {
+          "local": "Cruz Azul",
+          "visitante": "Mazatlán FC",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Pachuca",
+          "visitante": "Monterrey",
+          "dia": "DOMINGO",
+          "hora": "17:00",
+          "estadio": "HIDALGO"
+        },
+        {
+          "local": "León",
+          "visitante": "Atlético San Luis",
+          "dia": "DOMINGO",
+          "hora": "19:00",
+          "estadio": "NOU CAMP"
+        },
+        {
+          "local": "CD Guadalajara",
+          "visitante": "Tigres UANL",
+          "dia": "MIÉRCOLES 17/09",
+          "hora": "19:00",
+          "estadio": "AKRON"
+        }
+      ]
+    },
+    {
+      "numero": 2,
+      "fechas": "16, 18, 19 Y 20 DE JULIO",
+      "partidos": [
+        {
+          "local": "Club América",
+          "visitante": "Tijuana",
+          "dia": "MIÉRCOLES",
+          "hora": "19:00",
+          "estadio": "CD. DE LOS DEPORTES"
+        },
+        {
+          "local": "Santos Laguna",
+          "visitante": "Toluca",
+          "dia": "MIÉRCOLES",
+          "hora": "21:00",
+          "estadio": "TSM CORONA"
+        },
+        {
+          "local": "Necaxa",
+          "visitante": "Querétaro",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "VICTORIA"
+        },
+        {
+          "local": "Atlético San Luis",
+          "visitante": "Monterrey",
+          "dia": "VIERNES",
+          "hora": "21:00",
+          "estadio": "ALFONSO LASTRAS"
+        },
+        {
+          "local": "Mazatlán FC",
+          "visitante": "Puebla",
+          "dia": "VIERNES",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "EL ENCANTO"
+        },
+        {
+          "local": "León",
+          "visitante": "CD Guadalajara",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "NOU CAMP"
+        },
+        {
+          "local": "Tigres UANL",
+          "visitante": "FC Juárez",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "UNIVERSITARIO"
+        },
+        {
+          "local": "Atlas",
+          "visitante": "Cruz Azul",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "JALISCO"
+        },
+        {
+          "local": "Pumas UNAM",
+          "visitante": "Pachuca",
+          "dia": "DOMINGO",
+          "hora": "12:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        }
+      ]
+    },
+    {
+      "numero": 3,
+      "fechas": "25, 26, 27 DE JULIO",
+      "partidos": [
+        {
+          "local": "Querétaro",
+          "visitante": "Pumas UNAM",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "LA CORREGIDORA"
+        },
+        {
+          "local": "Puebla",
+          "visitante": "Santos Laguna",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "CUAUHTÉMOC"
+        },
+        {
+          "local": "Tijuana",
+          "visitante": "FC Juárez",
+          "dia": "VIERNES",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "CALIENTE"
+        },
+        {
+          "local": "Pachuca",
+          "visitante": "Mazatlán FC",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "HIDALGO"
+        },
+        {
+          "local": "CD Guadalajara",
+          "visitante": "Atlético San Luis",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "AKRON"
+        },
+        {
+          "local": "Cruz Azul",
+          "visitante": "León",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Toluca",
+          "visitante": "Tigres UANL",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "NEMESIO DÍEZ"
+        },
+        {
+          "local": "Necaxa",
+          "visitante": "Club América",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "VICTORIA"
+        },
+        {
+          "local": "Monterrey",
+          "visitante": "Atlas",
+          "dia": "DOMINGO",
+          "hora": "19:00",
+          "estadio": "BBVA"
+        }
+      ]
+    },
+    {
+      "numero": 4,
+      "fechas": "8, 9, 10, 11 DE AGOSTO",
+      "partidos": [
+        {
+          "local": "Tigres UANL",
+          "visitante": "Puebla",
+          "dia": "VIERNES",
+          "hora": "21:00",
+          "estadio": "UNIVERSITARIO"
+        },
+        {
+          "local": "Club América",
+          "visitante": "Querétaro",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "CD. DE LOS DEPORTES"
+        },
+        {
+          "local": "Mazatlán FC",
+          "visitante": "Tijuana",
+          "dia": "SÁBADO",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "EL ENCANTO"
+        },
+        {
+          "local": "Atlas",
+          "visitante": "Pachuca",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "JALISCO"
+        },
+        {
+          "local": "Pumas UNAM",
+          "visitante": "Necaxa",
+          "dia": "DOMINGO",
+          "hora": "18:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Santos Laguna",
+          "visitante": "CD Guadalajara",
+          "dia": "DOMINGO",
+          "hora": "20:00",
+          "estadio": "TSM CORONA"
+        },
+        {
+          "local": "León",
+          "visitante": "Monterrey",
+          "dia": "LUNES",
+          "hora": "19:00",
+          "estadio": "NOU CAMP"
+        },
+        {
+          "local": "Atlético San Luis",
+          "visitante": "Cruz Azul",
+          "dia": "LUNES",
+          "hora": "21:00",
+          "estadio": "ALFONSO LASTRAS"
+        },
+        {
+          "local": "FC Juárez",
+          "visitante": "Toluca",
+          "dia": "LUNES",
+          "hora": "21:00",
+          "estadio": "O. BENITO JUÁREZ"
+        }
+      ]
+    },
+    {
+      "numero": 5,
+      "fechas": "15, 16, 17 DE AGOSTO",
+      "partidos": [
+        {
+          "local": "Puebla",
+          "visitante": "Atlético San Luis",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "CUAUHTÉMOC"
+        },
+        {
+          "local": "Necaxa",
+          "visitante": "León",
+          "dia": "VIERNES",
+          "hora": "21:00",
+          "estadio": "VICTORIA"
+        },
+        {
+          "local": "CD Guadalajara",
+          "visitante": "FC Juárez",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "AKRON"
+        },
+        {
+          "local": "Toluca",
+          "visitante": "Pumas UNAM",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "NEMESIO DÍEZ"
+        },
+        {
+          "local": "Pachuca",
+          "visitante": "Tijuana",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "HIDALGO"
+        },
+        {
+          "local": "Tigres UANL",
+          "visitante": "Club América",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "UNIVERSITARIO"
+        },
+        {
+          "local": "Cruz Azul",
+          "visitante": "Santos Laguna",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Querétaro",
+          "visitante": "Atlas",
+          "dia": "DOMINGO",
+          "hora": "16:00",
+          "estadio": "LA CORREGIDORA"
+        },
+        {
+          "local": "Monterrey",
+          "visitante": "Mazatlán FC",
+          "dia": "DOMINGO",
+          "hora": "18:00",
+          "estadio": "BBVA"
+        }
+      ]
+    },
+    {
+      "numero": 6,
+      "fechas": "22, 23 Y 24 DE AGOSTO",
+      "partidos": [
+        {
+          "local": "FC Juárez",
+          "visitante": "Santos Laguna",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "O. BENITO JUÁREZ"
+        },
+        {
+          "local": "Querétaro",
+          "visitante": "Atlético San Luis",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "LA CORREGIDORA"
+        },
+        {
+          "local": "Mazatlán FC",
+          "visitante": "Tigres UANL",
+          "dia": "VIERNES",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "EL ENCANTO"
+        },
+        {
+          "local": "Tijuana",
+          "visitante": "CD Guadalajara",
+          "dia": "VIERNES",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "CALIENTE"
+        },
+        {
+          "local": "León",
+          "visitante": "Pachuca",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "NOU CAMP"
+        },
+        {
+          "local": "Monterrey",
+          "visitante": "Necaxa",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "BBVA"
+        },
+        {
+          "local": "Cruz Azul",
+          "visitante": "Toluca",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Pumas UNAM",
+          "visitante": "Puebla",
+          "dia": "DOMINGO",
+          "hora": "17:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Atlas",
+          "visitante": "Club América",
+          "dia": "DOMINGO",
+          "hora": "19:00",
+          "estadio": "JALISCO"
+        }
+      ]
+    },
+    {
+      "numero": 7,
+      "fechas": "29, 30, 31 DE AGOSTO",
+      "partidos": [
+        {
+          "local": "FC Juárez",
+          "visitante": "Mazatlán FC",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "O. BENITO JUÁREZ"
+        },
+        {
+          "local": "Atlético San Luis",
+          "visitante": "Toluca",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "ALFONSO LASTRAS"
+        },
+        {
+          "local": "Puebla",
+          "visitante": "Monterrey",
+          "dia": "VIERNES",
+          "hora": "21:00",
+          "estadio": "CUAUHTÉMOC"
+        },
+        {
+          "local": "León",
+          "visitante": "Querétaro",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "NOU CAMP"
+        },
+        {
+          "local": "CD Guadalajara",
+          "visitante": "Cruz Azul",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "AKRON"
+        },
+        {
+          "local": "Santos Laguna",
+          "visitante": "Tigres UANL",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "TSM CORONA"
+        },
+        {
+          "local": "Club América",
+          "visitante": "Pachuca",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "CD. DE LOS DEPORTES"
+        },
+        {
+          "local": "Pumas UNAM",
+          "visitante": "Atlas",
+          "dia": "DOMINGO",
+          "hora": "17:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Tijuana",
+          "visitante": "Necaxa",
+          "dia": "DOMINGO",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "CALIENTE"
+        }
+      ]
+    },
+    {
+      "numero": 8,
+      "fechas": "12, 13 Y 14 DE SEPTIEMBRE",
+      "partidos": [
+        {
+          "local": "Necaxa",
+          "visitante": "FC Juárez",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "VICTORIA"
+        },
+        {
+          "local": "Club América",
+          "visitante": "CD Guadalajara",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "CD. DE LOS DEPORTES"
+        },
+        {
+          "local": "Mazatlán FC",
+          "visitante": "Pumas UNAM",
+          "dia": "VIERNES",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "EL ENCANTO"
+        },
+        {
+          "local": "Pachuca",
+          "visitante": "Cruz Azul",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "HIDALGO"
+        },
+        {
+          "local": "Tigres UANL",
+          "visitante": "León",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "UNIVERSITARIO"
+        },
+        {
+          "local": "Atlas",
+          "visitante": "Santos Laguna",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "JALISCO"
+        },
+        {
+          "local": "Toluca",
+          "visitante": "Puebla",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "NEMESIO DÍEZ"
+        },
+        {
+          "local": "Querétaro",
+          "visitante": "Monterrey",
+          "dia": "DOMINGO",
+          "hora": "17:00",
+          "estadio": "LA CORREGIDORA"
+        },
+        {
+          "local": "Atlético San Luis",
+          "visitante": "Tijuana",
+          "dia": "DOMINGO",
+          "hora": "19:00",
+          "estadio": "ALFONSO LASTRAS"
+        }
+      ]
+    },
+    {
+      "numero": 9,
+      "fechas": "19, 20, 21 DE SEPTIEMBRE",
+      "partidos": [
+        {
+          "local": "Necaxa",
+          "visitante": "Puebla",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "VICTORIA"
+        },
+        {
+          "local": "Cruz Azul",
+          "visitante": "FC Juárez",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Tijuana",
+          "visitante": "León",
+          "dia": "VIERNES",
+          "hora": "21:00 HL / 20:00 HC",
+          "estadio": "CALIENTE"
+        },
+        {
+          "local": "Mazatlán FC",
+          "visitante": "Atlas",
+          "dia": "VIERNES",
+          "hora": "21:00 HL / 20:00 HC",
+          "estadio": "EL ENCANTO"
+        },
+        {
+          "local": "Pachuca",
+          "visitante": "Querétaro",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "HIDALGO"
+        },
+        {
+          "local": "CD Guadalajara",
+          "visitante": "Toluca",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "AKRON"
+        },
+        {
+          "local": "Pumas UNAM",
+          "visitante": "Tigres UANL",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Monterrey",
+          "visitante": "Club América",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "BBVA"
+        },
+        {
+          "local": "Santos Laguna",
+          "visitante": "Atlético San Luis",
+          "dia": "DOMINGO",
+          "hora": "17:00",
+          "estadio": "TSM CORONA"
+        }
+      ]
+    },
+    {
+      "numero": 10,
+      "fechas": "23, 24 DE SEPTIEMBRE",
+      "tipo": "DOBLE",
+      "partidos": [
+        {
+          "local": "CD Guadalajara",
+          "visitante": "Necaxa",
+          "dia": "MARTES",
+          "hora": "19:00",
+          "estadio": "AKRON"
+        },
+        {
+          "local": "Puebla",
+          "visitante": "Pachuca",
+          "dia": "MARTES",
+          "hora": "19:00",
+          "estadio": "CUAUHTÉMOC"
+        },
+        {
+          "local": "León",
+          "visitante": "Mazatlán FC",
+          "dia": "MARTES",
+          "hora": "21:00",
+          "estadio": "NOU CAMP"
+        },
+        {
+          "local": "FC Juárez",
+          "visitante": "Pumas UNAM",
+          "dia": "MARTES",
+          "hora": "21:00",
+          "estadio": "O. BENITO JUÁREZ"
+        },
+        {
+          "local": "Cruz Azul",
+          "visitante": "Querétaro",
+          "dia": "MIÉRCOLES",
+          "hora": "18:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Tigres UANL",
+          "visitante": "Atlas",
+          "dia": "MIÉRCOLES",
+          "hora": "19:00",
+          "estadio": "UNIVERSITARIO"
+        },
+        {
+          "local": "Toluca",
+          "visitante": "Monterrey",
+          "dia": "MIÉRCOLES",
+          "hora": "20:00",
+          "estadio": "NEMESIO DÍEZ"
+        },
+        {
+          "local": "Atlético San Luis",
+          "visitante": "Club América",
+          "dia": "MIÉRCOLES",
+          "hora": "21:00",
+          "estadio": "ALFONSO LASTRAS"
+        },
+        {
+          "local": "Santos Laguna",
+          "visitante": "Tijuana",
+          "dia": "MIÉRCOLES",
+          "hora": "21:00",
+          "estadio": "TSM CORONA"
+        }
+      ]
+    },
+    {
+      "numero": 11,
+      "fechas": "26, 27 Y 28 DE SEPTIEMBRE",
+      "partidos": [
+        {
+          "local": "FC Juárez",
+          "visitante": "León",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "O. BENITO JUÁREZ"
+        },
+        {
+          "local": "Puebla",
+          "visitante": "CD Guadalajara",
+          "dia": "VIERNES",
+          "hora": "21:00",
+          "estadio": "CUAUHTÉMOC"
+        },
+        {
+          "local": "Pachuca",
+          "visitante": "Atlético San Luis",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "HIDALGO"
+        },
+        {
+          "local": "Atlas",
+          "visitante": "Necaxa",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "JALISCO"
+        },
+        {
+          "local": "Monterrey",
+          "visitante": "Santos Laguna",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "BBVA"
+        },
+        {
+          "local": "Club América",
+          "visitante": "Pumas UNAM",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "CD. DE LOS DEPORTES"
+        },
+        {
+          "local": "Querétaro",
+          "visitante": "Tigres UANL",
+          "dia": "DOMINGO",
+          "hora": "17:00",
+          "estadio": "LA CORREGIDORA"
+        },
+        {
+          "local": "Toluca",
+          "visitante": "Mazatlán FC",
+          "dia": "DOMINGO / SÁBADO",
+          "hora": "19:00",
+          "estadio": "NEMESIO DÍEZ"
+        },
+        {
+          "local": "Tijuana",
+          "visitante": "Cruz Azul",
+          "dia": "DOMINGO",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "CALIENTE"
+        }
+      ]
+    },
+    {
+      "numero": 12,
+      "fechas": "3, 4, 5 DE OCTUBRE",
+      "partidos": [
+        {
+          "local": "Necaxa",
+          "visitante": "Pachuca",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "VICTORIA"
+        },
+        {
+          "local": "Mazatlán FC",
+          "visitante": "Atlético San Luis",
+          "dia": "VIERNES",
+          "hora": "21:00 HL / 20:00 HC",
+          "estadio": "EL ENCANTO"
+        },
+        {
+          "local": "Atlas",
+          "visitante": "FC Juárez",
+          "dia": "VIERNES",
+          "hora": "21:00",
+          "estadio": "JALISCO"
+        },
+        {
+          "local": "Querétaro",
+          "visitante": "Puebla",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "LA CORREGIDORA"
+        },
+        {
+          "local": "León",
+          "visitante": "Toluca",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "NOU CAMP"
+        },
+        {
+          "local": "Tigres UANL",
+          "visitante": "Cruz Azul",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "UNIVERSITARIO"
+        },
+        {
+          "local": "Club América",
+          "visitante": "Santos Laguna",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "CD. DE LOS DEPORTES"
+        },
+        {
+          "local": "Pumas UNAM",
+          "visitante": "CD Guadalajara",
+          "dia": "DOMINGO",
+          "hora": "19:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Tijuana",
+          "visitante": "Monterrey",
+          "dia": "DOMINGO",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "CALIENTE"
+        }
+      ]
+    },
+    {
+      "numero": 13,
+      "fechas": "17, 18, 19 DE OCTUBRE",
+      "partidos": [
+        {
+          "local": "Puebla",
+          "visitante": "Tijuana",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "CUAUHTÉMOC"
+        },
+        {
+          "local": "Atlético San Luis",
+          "visitante": "Atlas",
+          "dia": "VIERNES",
+          "hora": "21:00",
+          "estadio": "ALFONSO LASTRAS"
+        },
+        {
+          "local": "Tigres UANL",
+          "visitante": "Necaxa",
+          "dia": "VIERNES",
+          "hora": "21:00",
+          "estadio": "UNIVERSITARIO"
+        },
+        {
+          "local": "Santos Laguna",
+          "visitante": "León",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "TSM CORONA"
+        },
+        {
+          "local": "FC Juárez",
+          "visitante": "Pachuca",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "O. BENITO JUÁREZ"
+        },
+        {
+          "local": "CD Guadalajara",
+          "visitante": "Mazatlán FC",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "AKRON"
+        },
+        {
+          "local": "Monterrey",
+          "visitante": "Pumas UNAM",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "BBVA"
+        },
+        {
+          "local": "Cruz Azul",
+          "visitante": "Club América",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Toluca",
+          "visitante": "Querétaro",
+          "dia": "DOMINGO / SÁBADO",
+          "hora": "19:00",
+          "estadio": "NEMESIO DÍEZ"
+        }
+      ]
+    },
+    {
+      "numero": 14,
+      "fechas": "21, 22 DE OCTUBRE",
+      "tipo": "DOBLE",
+      "partidos": [
+        {
+          "local": "Club América",
+          "visitante": "Puebla",
+          "dia": "MARTES",
+          "hora": "19:00",
+          "estadio": "CD. DE LOS DEPORTES"
+        },
+        {
+          "local": "Necaxa",
+          "visitante": "Cruz Azul",
+          "dia": "MARTES",
+          "hora": "19:00",
+          "estadio": "VICTORIA"
+        },
+        {
+          "local": "Mazatlán FC",
+          "visitante": "Santos Laguna",
+          "dia": "MARTES",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "EL ENCANTO"
+        },
+        {
+          "local": "Monterrey",
+          "visitante": "FC Juárez",
+          "dia": "MARTES",
+          "hora": "21:00",
+          "estadio": "BBVA"
+        },
+        {
+          "local": "Querétaro",
+          "visitante": "CD Guadalajara",
+          "dia": "MIÉRCOLES",
+          "hora": "19:00",
+          "estadio": "LA CORREGIDORA"
+        },
+        {
+          "local": "Pachuca",
+          "visitante": "Tigres UANL",
+          "dia": "MIÉRCOLES",
+          "hora": "19:00",
+          "estadio": "HIDALGO"
+        },
+        {
+          "local": "Atlas",
+          "visitante": "León",
+          "dia": "MIÉRCOLES",
+          "hora": "21:00",
+          "estadio": "JALISCO"
+        },
+        {
+          "local": "Pumas UNAM",
+          "visitante": "Atlético San Luis",
+          "dia": "MIÉRCOLES",
+          "hora": "21:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Tijuana",
+          "visitante": "Toluca",
+          "dia": "MIÉRCOLES",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "CALIENTE"
+        }
+      ]
+    },
+    {
+      "numero": 15,
+      "fechas": "24, 25, 26 DE OCTUBRE",
+      "partidos": [
+        {
+          "local": "FC Juárez",
+          "visitante": "Puebla",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "O. BENITO JUÁREZ"
+        },
+        {
+          "local": "Mazatlán FC",
+          "visitante": "Club América",
+          "dia": "VIERNES",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "EL ENCANTO"
+        },
+        {
+          "local": "Tigres UANL",
+          "visitante": "Tijuana",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "UNIVERSITARIO"
+        },
+        {
+          "local": "León",
+          "visitante": "Pumas UNAM",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "NOU CAMP"
+        },
+        {
+          "local": "Toluca",
+          "visitante": "Pachuca",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "NEMESIO DÍEZ"
+        },
+        {
+          "local": "Cruz Azul",
+          "visitante": "Monterrey",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "CD Guadalajara",
+          "visitante": "Atlas",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "AKRON"
+        },
+        {
+          "local": "Santos Laguna",
+          "visitante": "Querétaro",
+          "dia": "DOMINGO",
+          "hora": "17:00",
+          "estadio": "TSM CORONA"
+        },
+        {
+          "local": "Atlético San Luis",
+          "visitante": "Necaxa",
+          "dia": "DOMINGO",
+          "hora": "19:00",
+          "estadio": "ALFONSO LASTRAS"
+        }
+      ]
+    },
+    {
+      "numero": 16,
+      "fechas": "31 DE OCTUBRE, 1, 2 DE NOVIEMBRE",
+      "partidos": [
+        {
+          "local": "Necaxa",
+          "visitante": "Santos Laguna",
+          "dia": "VIERNES",
+          "hora": "19:00",
+          "estadio": "VICTORIA"
+        },
+        {
+          "local": "Puebla",
+          "visitante": "Cruz Azul",
+          "dia": "VIERNES",
+          "hora": "21:00",
+          "estadio": "CUAUHTÉMOC"
+        },
+        {
+          "local": "Atlético San Luis",
+          "visitante": "FC Juárez",
+          "dia": "VIERNES",
+          "hora": "21:00",
+          "estadio": "ALFONSO LASTRAS"
+        },
+        {
+          "local": "Atlas",
+          "visitante": "Toluca",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "JALISCO"
+        },
+        {
+          "local": "Monterrey",
+          "visitante": "Tigres UANL",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "BBVA"
+        },
+        {
+          "local": "Club América",
+          "visitante": "León",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "CD. DE LOS DEPORTES"
+        },
+        {
+          "local": "Pumas UNAM",
+          "visitante": "Tijuana",
+          "dia": "DOMINGO",
+          "hora": "12:00",
+          "estadio": "OLÍMPICO UNIVERSITARIO"
+        },
+        {
+          "local": "Querétaro",
+          "visitante": "Mazatlán FC",
+          "dia": "DOMINGO",
+          "hora": "17:00",
+          "estadio": "LA CORREGIDORA"
+        },
+        {
+          "local": "Pachuca",
+          "visitante": "CD Guadalajara",
+          "dia": "DOMINGO",
+          "hora": "19:00",
+          "estadio": "HIDALGO"
+        }
+      ]
+    },
+    {
+      "numero": 17,
+      "fechas": "Continúa...",
+      "partidos": [
+        {
+          "local": "FC Juárez",
+          "visitante": "Querétaro",
+          "dia": "VIERNES",
+          "hora": "19:00 HC / 18:00 HL",
+          "estadio": "O. BENITO JUÁREZ"
+        },
+        {
+          "local": "Tijuana",
+          "visitante": "Atlas",
+          "dia": "VIERNES",
+          "hora": "21:00 HC / 19:00 HL",
+          "estadio": "CALIENTE"
+        },
+        {
+          "local": "Mazatlán FC",
+          "visitante": "Necaxa",
+          "dia": "VIERNES",
+          "hora": "21:00 HC / 20:00 HL",
+          "estadio": "EL ENCANTO"
+        },
+        {
+          "local": "Tigres UANL",
+          "visitante": "Atlético San Luis",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "UNIVERSITARIO"
+        },
+        {
+          "local": "CD Guadalajara",
+          "visitante": "Monterrey",
+          "dia": "SÁBADO",
+          "hora": "17:00",
+          "estadio": "AKRON"
+        },
+        {
+          "local": "León",
+          "visitante": "Puebla",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "NOU CAMP"
+        },
+        {
+          "local": "Toluca",
+          "visitante": "Club América",
+          "dia": "SÁBADO",
+          "hora": "19:00",
+          "estadio": "NEMESIO DÍEZ"
+        },
+        {
+          "local": "Cruz Azul",
+          "visitante": "Pumas UNAM",
+          "dia": "SÁBADO",
+          "hora": "21:00",
+          "estadio": "TBD"
+        },
+        {
+          "local": "Santos Laguna",
+          "visitante": "Pachuca",
+          "dia": "DOMINGO",
+          "hora": "17:00",
+          "estadio": "TSM CORONA"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Global - UltraGol</title>
+    <link rel="stylesheet" href="css/main.css?v=2024091801">
+    <link rel="stylesheet" href="css/animations.css?v=2024091801">
+    <link rel="stylesheet" href="css/firebase-features.css?v=2024091801">
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo-section">
+                <a href="index.html" class="logo-link">
+                    <img src="assets/logo.svg" alt="UltraGol" class="logo">
+                    <span class="logo-text">UltraGol</span>
+                </a>
+                <span class="version-badge">by L3HO</span>
+            </div>
+            
+            <!-- Auth Buttons -->
+            <div class="auth-buttons" id="authButtons">
+                <button class="auth-btn login-btn" onclick="openAuthModal('login')">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Iniciar Sesión
+                </button>
+                <button class="auth-btn register-btn" onclick="openAuthModal('register')">
+                    <i class="fas fa-user-plus"></i>
+                    Registrarse
+                </button>
+            </div>
+            
+            <!-- User Navigation -->
+            <div class="user-navigation" id="userNavigation" style="display: none;">
+                <div class="user-notifications">
+                    <button class="notification-btn" id="notificationBell" onclick="showNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-count" id="notificationCount">3</span>
+                    </button>
+                </div>
+                
+                <div class="user-avatar-nav" onclick="window.location.href='profile.html'">
+                    <div class="nav-avatar-placeholder" id="navAvatarPlaceholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <img class="nav-avatar-image" id="navAvatarImage" style="display: none;">
+                </div>
+                
+                <div class="user-menu">
+                    <button class="user-menu-btn" onclick="showSettings()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="user-menu-btn" onclick="signOutUser()">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="main-navigation">
+        <div class="nav-container">
+            <a href="teams.html" class="nav-tab">
+                <i class="fas fa-users"></i>
+                <span>Equipos</span>
+            </a>
+            <a href="chat-global.html" class="nav-tab active">
+                <i class="fas fa-comments"></i>
+                <span>Chat</span>
+            </a>
+            <a href="historias.html" class="nav-tab">
+                <i class="fas fa-play"></i>
+                <span>Historias</span>
+            </a>
+            <a href="fotos.html" class="nav-tab">
+                <i class="fas fa-camera"></i>
+                <span>Fotos</span>
+            </a>
+            <a href="estadisticas.html" class="nav-tab">
+                <i class="fas fa-chart-bar"></i>
+                <span>Stats</span>
+            </a>
+            <a href="live.html" class="nav-tab">
+                <i class="fas fa-broadcast-tower"></i>
+                <span>En Vivo</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content chat-main">
+        <div class="chat-container">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="chat-title">
+                    <h1>💬 Chat Global Liga MX</h1>
+                    <div class="chat-status">
+                        <span class="online-indicator"></span>
+                        <span id="globalOnlineCount">234</span> usuarios en línea
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button class="chat-action-btn" onclick="toggleChatSettings()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="chat-action-btn" onclick="toggleFullscreen()">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Room Tabs -->
+            <div class="chat-rooms">
+                <button class="room-tab active" data-room="general">
+                    <i class="fas fa-hashtag"></i>
+                    General
+                </button>
+                <button class="room-tab" data-room="america">
+                    <i class="fas fa-hashtag"></i>
+                    América
+                </button>
+                <button class="room-tab" data-room="chivas">
+                    <i class="fas fa-hashtag"></i>
+                    Chivas
+                </button>
+                <button class="room-tab" data-room="live">
+                    <i class="fas fa-hashtag"></i>
+                    En Vivo
+                </button>
+                <button class="room-tab" data-room="transfers">
+                    <i class="fas fa-hashtag"></i>
+                    Fichajes
+                </button>
+            </div>
+
+            <!-- Chat Messages Area -->
+            <div class="chat-messages-container">
+                <div class="chat-messages" id="globalChatMessages">
+                    <!-- Messages will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <div class="chat-tools">
+                    <button class="chat-tool-btn" onclick="toggleEmojiPicker()" title="Emojis">
+                        <i class="fas fa-smile"></i>
+                    </button>
+                    <button class="chat-tool-btn" onclick="toggleGifPicker()" title="GIFs">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <button class="chat-tool-btn" onclick="attachFile()" title="Adjuntar archivo">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                </div>
+                
+                <div class="chat-input-wrapper">
+                    <textarea 
+                        id="globalChatInput" 
+                        placeholder="Escribe tu mensaje..."
+                        rows="1"
+                        maxlength="500"
+                    ></textarea>
+                    <div class="chat-input-actions">
+                        <span class="char-count" id="charCount">0/500</span>
+                        <button class="send-btn" id="globalSendBtn" onclick="sendGlobalMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emoji Picker -->
+            <div class="emoji-picker" id="emojiPickerGlobal" style="display: none;">
+                <div class="emoji-categories">
+                    <button class="emoji-cat-btn active" data-category="smileys">😀</button>
+                    <button class="emoji-cat-btn" data-category="people">👥</button>
+                    <button class="emoji-cat-btn" data-category="sports">⚽</button>
+                    <button class="emoji-cat-btn" data-category="flags">🏳️</button>
+                </div>
+                <div class="emoji-grid" id="emojiGridGlobal">
+                    <!-- Emojis will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Sidebar -->
+        <div class="chat-sidebar">
+            <!-- Online Users -->
+            <div class="sidebar-section">
+                <h3>👥 Usuarios Activos</h3>
+                <div class="online-users-list" id="onlineUsersList">
+                    <!-- Online users will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Recent Conversations -->
+            <div class="sidebar-section">
+                <h3>💭 Conversaciones Recientes</h3>
+                <div class="recent-conversations" id="recentConversations">
+                    <!-- Recent conversations will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Trending Topics -->
+            <div class="sidebar-section">
+                <h3>🔥 Trending</h3>
+                <div class="trending-topics" id="chatTrendingTopics">
+                    <!-- Trending topics will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Private Message Modal -->
+    <div class="modal-overlay" id="privateMessageModal" style="display: none;">
+        <div class="modal-content private-chat-modal">
+            <div class="modal-header">
+                <h2 id="privateChatTitle">Mensaje Privado</h2>
+                <button class="close-btn" onclick="closePrivateChat()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="private-chat-messages" id="privateChatMessages">
+                    <!-- Private messages will be loaded here -->
+                </div>
+                <div class="private-chat-input">
+                    <input type="text" id="privateMessageInput" placeholder="Escribe un mensaje privado...">
+                    <button onclick="sendPrivateMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="auth-overlay" id="authModal" style="display: none;">
+        <div class="auth-modal">
+            <div class="auth-header">
+                <h2 id="authModalTitle">Iniciar Sesión</h2>
+                <button class="close-auth" onclick="closeAuthModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="loginTab" onclick="showAuthTab('login')">Iniciar Sesión</button>
+                <button class="auth-tab" id="registerTab" onclick="showAuthTab('register')">Registrarse</button>
+            </div>
+            
+            <div class="auth-content">
+                <!-- Login Form -->
+                <div class="auth-form" id="loginForm">
+                    <form id="emailLoginForm">
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <button type="submit" class="auth-submit-btn">Iniciar Sesión</button>
+                    </form>
+                    
+                    <div class="auth-divider">
+                        <span>o continúa con</span>
+                    </div>
+                    
+                    <button class="social-auth-btn google-btn" id="googleAuth">
+                        <i class="fab fa-google"></i>
+                        Continuar con Google
+                    </button>
+                </div>
+                
+                <!-- Register Form -->
+                <div class="auth-form" id="registerForm" style="display: none;">
+                    <form id="emailRegisterForm">
+                        <div class="form-group">
+                            <label>Nombre Completo</label>
+                            <input type="text" id="registerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <input type="email" id="registerEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="registerPassword" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label>Equipo Favorito</label>
+                            <select id="favoriteTeamRegister" required>
+                                <option value="">Selecciona tu equipo</option>
+                                <option value="america">Club América</option>
+                                <option value="chivas">Chivas</option>
+                                <option value="pumas">Pumas</option>
+                                <option value="cruz_azul">Cruz Azul</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="auth-submit-btn">Crear Cuenta</button>
+                    </form>
+                    
+                    <div class="auth-divider">
+                        <span>o continúa con</span>
+                    </div>
+                    
+                    <button class="social-auth-btn google-btn" id="googleRegister">
+                        <i class="fab fa-google"></i>
+                        Continuar con Google
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-storage-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Main Scripts -->
+    <script src="js/main.js?v=2024091801"></script>
+    <script src="js/chat-global.js?v=2024091801"></script>
+</body>
+</html>

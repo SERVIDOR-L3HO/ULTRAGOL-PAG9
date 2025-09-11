@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga MX - Equipos</title>
+    <link rel="stylesheet" href="css/main.css?v=2024091801">
+    <link rel="stylesheet" href="css/animations.css?v=2024091801">
+    <link rel="stylesheet" href="css/teams.css?v=2024091801">
+    <link rel="stylesheet" href="css/firebase-features.css?v=2024091801">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="assets/logo.svg" alt="Liga MX" class="logo">
+                <span class="logo-text">UltraGol</span>
+                <span class="company-tag">by L3HO</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="standings.html" class="nav-link">Tabla de Posiciones</a>
+                </li>
+                <li class="nav-item">
+                    <a href="teams.html" class="nav-link active">Equipos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="calendario.html" class="nav-link">Calendario</a>
+                </li>
+                <li class="nav-item">
+                    <a href="estadisticas.html" class="nav-link">Estadísticas</a>
+                </li>
+                <li class="nav-item">
+                    <a href="https://santrixos.github.io/ULTRAGOL-LIVE/" class="nav-link live-link" target="_blank">
+                        <i class="fas fa-play-circle"></i> UltraGol LIVE
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1 class="page-title fade-in">Equipos de Liga MX</h1>
+            <p class="page-subtitle slide-up">Conoce todos los clubes de la primera división</p>
+        </div>
+    </section>
+
+    <!-- Team Selection -->
+    <section class="team-selector">
+        <div class="container">
+            <div class="selector-controls">
+                <input type="text" id="teamSearch" placeholder="Buscar equipo..." class="search-input">
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="norte">Norte</button>
+                    <button class="filter-btn" data-filter="centro">Centro</button>
+                    <button class="filter-btn" data-filter="sur">Sur</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teams Grid -->
+    <section class="teams-grid-section">
+        <div class="container">
+            <div class="teams-grid" id="teamsGrid">
+                <!-- Dynamic content loaded via JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Selection Modal -->
+    <div class="team-modal" id="teamModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Seleccionar como Mi Equipo</h2>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="team-confirm" id="teamConfirm">
+                    <!-- Dynamic content -->
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelSelection">Cancelar</button>
+                    <button class="btn btn-primary" id="confirmSelection">Confirmar Selección</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selected Team Display -->
+    <section class="selected-team" id="selectedTeamSection" style="display: none;">
+        <div class="container">
+            <h2 class="section-title">Mi Equipo</h2>
+            <div class="selected-team-card" id="selectedTeamCard">
+                <!-- Dynamic content -->
+            </div>
+            <div class="team-actions">
+                <a href="team-profile.html" class="btn btn-primary" id="viewTeamProfile">Ver Perfil Completo</a>
+                <button class="btn btn-outline" id="changeTeam">Cambiar Equipo</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Liga MX</h3>
+                    <p>La primera división del fútbol mexicano</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Enlaces</h4>
+                    <ul>
+                        <li><a href="standings.html">Tabla de Posiciones</a></li>
+                        <li><a href="teams.html">Equipos</a></li>
+                        <li><a href="fixtures.html">Partidos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Información</h4>
+                    <ul>
+                        <li><a href="#">Reglamento</a></li>
+                        <li><a href="#">Estadísticas</a></li>
+                        <li><a href="#">Noticias</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Liga MX. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/teams.js"></script>
+</body>
+</html>

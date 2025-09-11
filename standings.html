@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga MX - Tabla de Posiciones</title>
+    <link rel="stylesheet" href="css/main.css?v=2024091801">
+    <link rel="stylesheet" href="css/animations.css?v=2024091801">
+    <link rel="stylesheet" href="css/firebase-features.css?v=2024091801">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="assets/logo.svg" alt="Liga MX" class="logo">
+                <span class="logo-text">UltraGol</span>
+                <span class="company-tag">by L3HO</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="standings.html" class="nav-link active">Tabla de Posiciones</a>
+                </li>
+                <li class="nav-item">
+                    <a href="teams.html" class="nav-link">Equipos</a>
+                </li>
+                <li class="nav-item">
+                    <a href="calendario.html" class="nav-link">Calendario</a>
+                </li>
+                <li class="nav-item">
+                    <a href="estadisticas.html" class="nav-link">Estadísticas</a>
+                </li>
+                <li class="nav-item">
+                    <a href="https://santrixos.github.io/ULTRAGOL-LIVE/" class="nav-link live-link" target="_blank">
+                        <i class="fas fa-play-circle"></i> UltraGol LIVE
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1 class="page-title fade-in">Tabla de Posiciones</h1>
+            <p class="page-subtitle slide-up">Temporada 2025 - Clausura</p>
+        </div>
+    </section>
+
+    <!-- Modern Standings Section -->
+    <section class="standings-section">
+        <div class="container">
+            <!-- Controls Panel -->
+            <div class="controls-panel">
+                <div class="panel-left">
+                    <div class="update-info">
+                        <i class="fas fa-clock"></i>
+                        <span class="last-update">Actualizado: <span id="lastUpdate">Hace 2 horas</span></span>
+                    </div>
+                </div>
+                <div class="panel-right">
+                    <div class="view-toggle">
+                        <button class="toggle-btn active" data-view="cards" id="cardsView">
+                            <i class="fas fa-th-large"></i> Tarjetas
+                        </button>
+                        <button class="toggle-btn" data-view="table" id="tableView">
+                            <i class="fas fa-table"></i> Tabla
+                        </button>
+                    </div>
+                    <div class="filter-options">
+                        <select class="filter-select" id="seasonFilter">
+                            <option value="general">General</option>
+                            <option value="home">Estadio Local</option>
+                            <option value="away">Como Visitante</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cards View (Default) -->
+            <div class="standings-cards" id="standingsCards">
+                <div class="cards-grid" id="cardsGrid">
+                    <!-- Dynamic cards content -->
+                    <div class="loading-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando posiciones...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traditional Table View -->
+            <div class="standings-table-view" id="standingsTableView" style="display: none;">
+                <div class="table-container">
+                    <div class="table-scroll">
+                        <table class="modern-table" id="standingsTable">
+                            <thead>
+                                <tr>
+                                    <th class="pos-col">#</th>
+                                    <th class="team-col">Equipo</th>
+                                    <th class="stat-col">PJ</th>
+                                    <th class="stat-col">G</th>
+                                    <th class="stat-col">E</th>
+                                    <th class="stat-col">P</th>
+                                    <th class="stat-col">GF</th>
+                                    <th class="stat-col">GC</th>
+                                    <th class="stat-col">DIF</th>
+                                    <th class="pts-col">PTS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="standingsBody">
+                                <!-- Dynamic table content -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Enhanced Legend -->
+            <div class="modern-legend">
+                <div class="legend-title">
+                    <i class="fas fa-info-circle"></i>
+                    Clasificación de Posiciones
+                </div>
+                <div class="legend-items">
+                    <div class="legend-group">
+                        <div class="legend-item">
+                            <div class="legend-indicator liguilla"></div>
+                            <span>Clasificación Directa (1-6)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-indicator play-in"></div>
+                            <span>Play-In (7-10)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-indicator eliminado"></div>
+                            <span>Eliminados (11-18)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Stats Comparison -->
+    <section class="team-comparison">
+        <div class="container">
+            <h2 class="section-title">Comparar Equipos</h2>
+            <div class="comparison-controls">
+                <select id="team1Select" class="team-select">
+                    <option value="">Seleccionar equipo 1</option>
+                </select>
+                <span class="vs-text">VS</span>
+                <select id="team2Select" class="team-select">
+                    <option value="">Seleccionar equipo 2</option>
+                </select>
+            </div>
+            <div class="comparison-result" id="comparisonResult">
+                <!-- Dynamic comparison content -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Liga MX</h3>
+                    <p>La primera división del fútbol mexicano</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Enlaces</h4>
+                    <ul>
+                        <li><a href="standings.html">Tabla de Posiciones</a></li>
+                        <li><a href="teams.html">Equipos</a></li>
+                        <li><a href="fixtures.html">Partidos</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Información</h4>
+                    <ul>
+                        <li><a href="#">Reglamento</a></li>
+                        <li><a href="#">Estadísticas</a></li>
+                        <li><a href="#">Noticias</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Liga MX. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/modern-standings.js"></script>
+</body>
+</html>

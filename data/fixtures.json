@@ -1,0 +1,737 @@
+[
+  {
+    "id": "match_001",
+    "jornada": 17,
+    "date": "2025-03-15T20:00:00Z",
+    "homeTeam": "Club América",
+    "awayTeam": "CD Guadalajara",
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "completed",
+    "stadium": "Estadio Azteca",
+    "referee": "Fernando Hernández",
+    "attendance": 85000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 23,
+        "type": "goal",
+        "player": "Henry Martín",
+        "team": "Club América",
+        "description": "Gol de cabeza tras centro de la derecha"
+      },
+      {
+        "minute": 45,
+        "type": "goal",
+        "player": "Roberto Alvarado",
+        "team": "CD Guadalajara",
+        "description": "Tiro libre directo al ángulo superior"
+      },
+      {
+        "minute": 67,
+        "type": "yellow_card",
+        "player": "Jesús Gallardo",
+        "team": "CD Guadalajara",
+        "description": "Tarjeta amarilla por falta táctica"
+      },
+      {
+        "minute": 89,
+        "type": "goal",
+        "player": "Diego Valdés",
+        "team": "Club América",
+        "description": "Gol de contraataque definiendo al primer palo"
+      }
+    ]
+  },
+  {
+    "id": "match_002",
+    "jornada": 17,
+    "date": "2025-03-16T18:00:00Z",
+    "homeTeam": "CF Monterrey",
+    "awayTeam": "Tigres UANL",
+    "homeScore": 1,
+    "awayScore": 1,
+    "status": "completed",
+    "stadium": "Estadio BBVA",
+    "referee": "Marco Ortiz",
+    "attendance": 52000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 31,
+        "type": "goal",
+        "player": "Rogelio Funes Mori",
+        "team": "CF Monterrey",
+        "description": "Remate desde fuera del área"
+      },
+      {
+        "minute": 58,
+        "type": "goal",
+        "player": "André-Pierre Gignac",
+        "team": "Tigres UANL",
+        "description": "Penal convertido con precisión"
+      },
+      {
+        "minute": 73,
+        "type": "yellow_card",
+        "player": "Luis Rodríguez",
+        "team": "CF Monterrey",
+        "description": "Tarjeta amarilla por protesta"
+      }
+    ]
+  },
+  {
+    "id": "match_003",
+    "jornada": 17,
+    "date": "2025-03-17T21:00:00Z",
+    "homeTeam": "Pumas UNAM",
+    "awayTeam": "Cruz Azul",
+    "homeScore": 3,
+    "awayScore": 0,
+    "status": "completed",
+    "stadium": "Estadio Olímpico Universitario",
+    "referee": "Adonai Escobedo",
+    "attendance": 68000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 15,
+        "type": "goal",
+        "player": "Dani Alves",
+        "team": "Pumas UNAM",
+        "description": "Tiro libre magistral"
+      },
+      {
+        "minute": 42,
+        "type": "goal",
+        "player": "Juan Dinenno",
+        "team": "Pumas UNAM",
+        "description": "Definición cruzada tras jugada individual"
+      },
+      {
+        "minute": 78,
+        "type": "goal",
+        "player": "César Huerta",
+        "team": "Pumas UNAM",
+        "description": "Remate de primera tras centro preciso"
+      }
+    ]
+  },
+  {
+    "id": "match_004",
+    "jornada": 18,
+    "date": "2025-03-22T19:00:00Z",
+    "homeTeam": "Santos Laguna",
+    "awayTeam": "Deportivo Toluca FC",
+    "homeScore": null,
+    "awayScore": null,
+    "status": "scheduled",
+    "stadium": "Estadio Corona",
+    "referee": "Luis Enrique Santander",
+    "attendance": null,
+    "minute": null,
+    "events": []
+  },
+  {
+    "id": "match_005",
+    "jornada": 18,
+    "date": "2025-03-23T20:30:00Z",
+    "homeTeam": "Atlas FC",
+    "awayTeam": "CF Pachuca",
+    "homeScore": null,
+    "awayScore": null,
+    "status": "scheduled",
+    "stadium": "Estadio Jalisco",
+    "referee": "Oscar Mejía",
+    "attendance": null,
+    "minute": null,
+    "events": []
+  },
+  {
+    "id": "match_006",
+    "jornada": 18,
+    "date": "2025-03-24T17:00:00Z",
+    "homeTeam": "Club León",
+    "awayTeam": "Club Necaxa",
+    "homeScore": null,
+    "awayScore": null,
+    "status": "scheduled",
+    "stadium": "Estadio León",
+    "referee": "Jorge Pérez",
+    "attendance": null,
+    "minute": null,
+    "events": []
+  },
+  {
+    "id": "match_007",
+    "jornada": 16,
+    "date": "2025-03-08T21:00:00Z",
+    "homeTeam": "Club Tijuana",
+    "awayTeam": "Club Puebla",
+    "homeScore": 0,
+    "awayScore": 2,
+    "status": "completed",
+    "stadium": "Estadio Caliente",
+    "referee": "Diego Montaño",
+    "attendance": 28000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 34,
+        "type": "goal",
+        "player": "Santiago Ormeño",
+        "team": "Club Puebla",
+        "description": "Cabezazo tras córner bien ejecutado"
+      },
+      {
+        "minute": 67,
+        "type": "red_card",
+        "player": "Lucas Rodríguez",
+        "team": "Club Tijuana",
+        "description": "Expulsión por doble amarilla"
+      },
+      {
+        "minute": 81,
+        "type": "goal",
+        "player": "Gustavo Ferrareis",
+        "team": "Club Puebla",
+        "description": "Aprovecha superioridad numérica"
+      }
+    ]
+  },
+  {
+    "id": "match_008",
+    "jornada": 16,
+    "date": "2025-03-09T19:00:00Z",
+    "homeTeam": "Querétaro FC",
+    "awayTeam": "Mazatlán FC",
+    "homeScore": 1,
+    "awayScore": 1,
+    "status": "completed",
+    "stadium": "Estadio La Corregidora",
+    "referee": "Jesús López",
+    "attendance": 22000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 27,
+        "type": "goal",
+        "player": "Pablo Barrera",
+        "team": "Querétaro FC",
+        "description": "Disparo desde fuera del área"
+      },
+      {
+        "minute": 73,
+        "type": "goal",
+        "player": "Gustavo del Prete",
+        "team": "Mazatlán FC",
+        "description": "Remate de cabeza tras centro lateral"
+      }
+    ]
+  },
+  {
+    "id": "match_009",
+    "jornada": 16,
+    "date": "2025-03-10T20:00:00Z",
+    "homeTeam": "FC Juárez",
+    "awayTeam": "Atlético San Luis",
+    "homeScore": 0,
+    "awayScore": 1,
+    "status": "completed",
+    "stadium": "Estadio Olímpico Benito Juárez",
+    "referee": "Roberto García",
+    "attendance": 15000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 56,
+        "type": "goal",
+        "player": "Germán Berterame",
+        "team": "Atlético San Luis",
+        "description": "Definición tras error defensivo"
+      },
+      {
+        "minute": 84,
+        "type": "yellow_card",
+        "player": "Darío Lezcano",
+        "team": "FC Juárez",
+        "description": "Tarjeta por simulación"
+      }
+    ]
+  },
+  {
+    "id": "match_010",
+    "jornada": 15,
+    "date": "2025-03-01T18:00:00Z",
+    "homeTeam": "Club América",
+    "awayTeam": "CF Monterrey",
+    "homeScore": 2,
+    "awayScore": 0,
+    "status": "completed",
+    "stadium": "Estadio Azteca",
+    "referee": "Fernando Hernández",
+    "attendance": 87000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 29,
+        "type": "goal",
+        "player": "Henry Martín",
+        "team": "Club América",
+        "description": "Remate dentro del área chica"
+      },
+      {
+        "minute": 71,
+        "type": "goal",
+        "player": "Richard Sánchez",
+        "team": "Club América",
+        "description": "Tiro de media distancia imparable"
+      }
+    ]
+  },
+  {
+    "id": "match_011",
+    "jornada": 15,
+    "date": "2025-03-02T21:00:00Z",
+    "homeTeam": "Tigres UANL",
+    "awayTeam": "Pumas UNAM",
+    "homeScore": 1,
+    "awayScore": 2,
+    "status": "completed",
+    "stadium": "Estadio Universitario",
+    "referee": "Marco Ortiz",
+    "attendance": 40000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 12,
+        "type": "goal",
+        "player": "André-Pierre Gignac",
+        "team": "Tigres UANL",
+        "description": "Penal convertido con clase"
+      },
+      {
+        "minute": 38,
+        "type": "goal",
+        "player": "Dani Alves",
+        "team": "Pumas UNAM",
+        "description": "Tiro libre directo espectacular"
+      },
+      {
+        "minute": 89,
+        "type": "goal",
+        "player": "Juan Dinenno",
+        "team": "Pumas UNAM",
+        "description": "Gol agónico en tiempo de descuento"
+      }
+    ]
+  },
+  {
+    "id": "match_012",
+    "jornada": 18,
+    "date": "2025-03-25T16:00:00Z",
+    "homeTeam": "Cruz Azul",
+    "awayTeam": "Club América",
+    "homeScore": 1,
+    "awayScore": 2,
+    "status": "live",
+    "stadium": "Estadio Azteca",
+    "referee": "Adonai Escobedo",
+    "attendance": 85000,
+    "minute": 78,
+    "events": [
+      {
+        "minute": 23,
+        "type": "goal",
+        "player": "Uriel Antuna",
+        "team": "Cruz Azul",
+        "description": "Disparo cruzado desde la izquierda"
+      },
+      {
+        "minute": 45,
+        "type": "goal",
+        "player": "Henry Martín",
+        "team": "Club América",
+        "description": "Cabezazo tras centro milimétrico"
+      },
+      {
+        "minute": 67,
+        "type": "yellow_card",
+        "player": "Carlos Rodríguez",
+        "team": "Cruz Azul",
+        "description": "Tarjeta por entrada fuerte"
+      },
+      {
+        "minute": 74,
+        "type": "goal",
+        "player": "Diego Valdés",
+        "team": "Club América",
+        "description": "Definición tras contragolpe perfecto"
+      }
+    ]
+  },
+  {
+    "id": "match_013",
+    "jornada": 14,
+    "date": "2025-02-22T20:00:00Z",
+    "homeTeam": "CD Guadalajara",
+    "awayTeam": "Santos Laguna",
+    "homeScore": 1,
+    "awayScore": 0,
+    "status": "completed",
+    "stadium": "Estadio Akron",
+    "referee": "Luis Enrique Santander",
+    "attendance": 48000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 63,
+        "type": "goal",
+        "player": "Roberto Alvarado",
+        "team": "CD Guadalajara",
+        "description": "Golazo desde fuera del área"
+      },
+      {
+        "minute": 82,
+        "type": "yellow_card",
+        "player": "Harold Preciado",
+        "team": "Santos Laguna",
+        "description": "Amonestación por protesta"
+      }
+    ]
+  },
+  {
+    "id": "match_014",
+    "jornada": 14,
+    "date": "2025-02-23T19:00:00Z",
+    "homeTeam": "Deportivo Toluca FC",
+    "awayTeam": "Atlas FC",
+    "homeScore": 3,
+    "awayScore": 1,
+    "status": "completed",
+    "stadium": "Estadio Nemesio Díez",
+    "referee": "Oscar Mejía",
+    "attendance": 28000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 18,
+        "type": "goal",
+        "player": "Alexis Canelo",
+        "team": "Deportivo Toluca FC",
+        "description": "Remate de primera tras asistencia perfecta"
+      },
+      {
+        "minute": 34,
+        "type": "goal",
+        "player": "Julio Furch",
+        "team": "Atlas FC",
+        "description": "Cabezazo tras córner"
+      },
+      {
+        "minute": 57,
+        "type": "goal",
+        "player": "Jean Meneses",
+        "team": "Deportivo Toluca FC",
+        "description": "Tiro cruzado imparable"
+      },
+      {
+        "minute": 88,
+        "type": "goal",
+        "player": "Carlos González",
+        "team": "Deportivo Toluca FC",
+        "description": "Definición en tiempo de descuento"
+      }
+    ]
+  },
+  {
+    "id": "match_015",
+    "jornada": 18,
+    "date": "2025-03-26T21:00:00Z",
+    "homeTeam": "CD Guadalajara",
+    "awayTeam": "Tigres UANL",
+    "homeScore": null,
+    "awayScore": null,
+    "status": "scheduled",
+    "stadium": "Estadio Akron",
+    "referee": "Fernando Hernández",
+    "attendance": null,
+    "minute": null,
+    "events": []
+  },
+  {
+    "id": "match_016",
+    "jornada": 18,
+    "date": "2025-03-27T18:30:00Z",
+    "homeTeam": "Pumas UNAM",
+    "awayTeam": "CF Monterrey",
+    "homeScore": null,
+    "awayScore": null,
+    "status": "scheduled",
+    "stadium": "Estadio Olímpico Universitario",
+    "referee": "Marco Ortiz",
+    "attendance": null,
+    "minute": null,
+    "events": []
+  },
+  {
+    "id": "match_017",
+    "jornada": 13,
+    "date": "2025-02-15T20:00:00Z",
+    "homeTeam": "CF Pachuca",
+    "awayTeam": "Club León",
+    "homeScore": 2,
+    "awayScore": 2,
+    "status": "completed",
+    "stadium": "Estadio Hidalgo",
+    "referee": "Jorge Pérez",
+    "attendance": 25000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 25,
+        "type": "goal",
+        "player": "Nicolás Ibáñez",
+        "team": "CF Pachuca",
+        "description": "Definición tras jugada colectiva"
+      },
+      {
+        "minute": 41,
+        "type": "goal",
+        "player": "Ángel Mena",
+        "team": "Club León",
+        "description": "Tiro libre directo al ángulo"
+      },
+      {
+        "minute": 69,
+        "type": "goal",
+        "player": "Salomón Rondón",
+        "team": "CF Pachuca",
+        "description": "Cabezazo potente tras centro"
+      },
+      {
+        "minute": 87,
+        "type": "goal",
+        "player": "Federico Viñas",
+        "team": "Club León",
+        "description": "Gol agónico de empate"
+      }
+    ]
+  },
+  {
+    "id": "match_018",
+    "jornada": 13,
+    "date": "2025-02-16T21:30:00Z",
+    "homeTeam": "Club Necaxa",
+    "awayTeam": "Club Tijuana",
+    "homeScore": 1,
+    "awayScore": 0,
+    "status": "completed",
+    "stadium": "Estadio Victoria",
+    "referee": "Diego Montaño",
+    "attendance": 18000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 72,
+        "type": "goal",
+        "player": "Rodrigo Aguirre",
+        "team": "Club Necaxa",
+        "description": "Remate desde el punto de penal"
+      },
+      {
+        "minute": 85,
+        "type": "yellow_card",
+        "player": "Kevin Balanta",
+        "team": "Club Tijuana",
+        "description": "Falta táctica en el mediocampo"
+      }
+    ]
+  },
+  {
+    "id": "match_019",
+    "jornada": 19,
+    "date": "2025-04-05T19:00:00Z",
+    "homeTeam": "Club América",
+    "awayTeam": "Santos Laguna",
+    "homeScore": null,
+    "awayScore": null,
+    "status": "scheduled",
+    "stadium": "Estadio Azteca",
+    "referee": "Fernando Hernández",
+    "attendance": null,
+    "minute": null,
+    "events": []
+  },
+  {
+    "id": "match_020",
+    "jornada": 19,
+    "date": "2025-04-06T20:30:00Z",
+    "homeTeam": "Tigres UANL",
+    "awayTeam": "Cruz Azul",
+    "homeScore": null,
+    "awayScore": null,
+    "status": "scheduled",
+    "stadium": "Estadio Universitario",
+    "referee": "Adonai Escobedo",
+    "attendance": null,
+    "minute": null,
+    "events": []
+  },
+  {
+    "id": "match_021",
+    "jornada": 12,
+    "date": "2025-02-08T18:00:00Z",
+    "homeTeam": "Club Puebla",
+    "awayTeam": "Querétaro FC",
+    "homeScore": 0,
+    "awayScore": 0,
+    "status": "completed",
+    "stadium": "Estadio Cuauhtémoc",
+    "referee": "Jesús López",
+    "attendance": 35000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 44,
+        "type": "yellow_card",
+        "player": "Diego de Buen",
+        "team": "Club Puebla",
+        "description": "Tarjeta por entrada dura"
+      },
+      {
+        "minute": 77,
+        "type": "yellow_card",
+        "player": "Omar Mendoza",
+        "team": "Querétaro FC",
+        "description": "Amonestación por pérdida de tiempo"
+      }
+    ]
+  },
+  {
+    "id": "match_022",
+    "jornada": 12,
+    "date": "2025-02-09T21:00:00Z",
+    "homeTeam": "Mazatlán FC",
+    "awayTeam": "FC Juárez",
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "completed",
+    "stadium": "Estadio El Encanto",
+    "referee": "Roberto García",
+    "attendance": 20000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 19,
+        "type": "goal",
+        "player": "Gustavo del Prete",
+        "team": "Mazatlán FC",
+        "description": "Definición tras pase filtrado"
+      },
+      {
+        "minute": 58,
+        "type": "goal",
+        "player": "Darío Lezcano",
+        "team": "FC Juárez",
+        "description": "Cabezazo tras centro preciso"
+      },
+      {
+        "minute": 84,
+        "type": "goal",
+        "player": "Brian Rubio",
+        "team": "Mazatlán FC",
+        "description": "Gol de la victoria en los últimos minutos"
+      }
+    ]
+  },
+  {
+    "id": "match_023",
+    "jornada": 12,
+    "date": "2025-02-10T17:00:00Z",
+    "homeTeam": "Atlético San Luis",
+    "awayTeam": "Club América",
+    "homeScore": 0,
+    "awayScore": 3,
+    "status": "completed",
+    "stadium": "Estadio Alfonso Lastras",
+    "referee": "Luis Enrique Santander",
+    "attendance": 24000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 21,
+        "type": "goal",
+        "player": "Henry Martín",
+        "team": "Club América",
+        "description": "Remate desde dentro del área"
+      },
+      {
+        "minute": 54,
+        "type": "goal",
+        "player": "Diego Valdés",
+        "team": "Club América",
+        "description": "Tiro colocado al primer palo"
+      },
+      {
+        "minute": 76,
+        "type": "red_card",
+        "player": "Rodrigo Dourado",
+        "team": "Atlético San Luis",
+        "description": "Expulsión por segunda amarilla"
+      },
+      {
+        "minute": 90,
+        "type": "goal",
+        "player": "Jonathan Rodríguez",
+        "team": "Club América",
+        "description": "Aprovecha la superioridad numérica"
+      }
+    ]
+  },
+  {
+    "id": "match_024",
+    "jornada": 19,
+    "date": "2025-04-07T19:30:00Z",
+    "homeTeam": "CF Monterrey",
+    "awayTeam": "CD Guadalajara",
+    "homeScore": null,
+    "awayScore": null,
+    "status": "scheduled",
+    "stadium": "Estadio BBVA",
+    "referee": "Marco Ortiz",
+    "attendance": null,
+    "minute": null,
+    "events": []
+  },
+  {
+    "id": "match_025",
+    "jornada": 11,
+    "date": "2025-02-01T20:00:00Z",
+    "homeTeam": "Santos Laguna",
+    "awayTeam": "Pumas UNAM",
+    "homeScore": 1,
+    "awayScore": 1,
+    "status": "completed",
+    "stadium": "Estadio Corona",
+    "referee": "Oscar Mejía",
+    "attendance": 28000,
+    "minute": null,
+    "events": [
+      {
+        "minute": 36,
+        "type": "goal",
+        "player": "Harold Preciado",
+        "team": "Santos Laguna",
+        "description": "Definición tras jugada individual"
+      },
+      {
+        "minute": 79,
+        "type": "goal",
+        "player": "Juan Dinenno",
+        "team": "Pumas UNAM",
+        "description": "Cabezazo tras córner bien ejecutado"
+      }
+    ]
+  }
+]
