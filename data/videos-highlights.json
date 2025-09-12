@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "partido": "Resumen Desde Cancha | Jornada 7 | Apertura 2025",
+    "tipo": "video",
+    "link": "https://www.youtube.com/watch?v=ULxpH55XFO8",
+    "embed_url": "https://www.youtube.com/embed/ULxpH55XFO8",
+    "thumbnail": "https://img.youtube.com/vi/ULxpH55XFO8/maxresdefault.jpg",
+    "equipo": "Liga MX",
+    "fecha": "Jornada 7 - 2025",
+    "descripcion": "Los mejores momentos desde el terreno de juego de la Jornada 7"
+  },
+  {
+    "id": 2,
+    "partido": "Los grandes golazos de la Jornada 7 de la Liga MX",
+    "tipo": "video",
+    "link": "https://www.youtube.com/watch?v=Vng3RJwEBHQ",
+    "embed_url": "https://www.youtube.com/embed/Vng3RJwEBHQ",
+    "thumbnail": "https://img.youtube.com/vi/Vng3RJwEBHQ/maxresdefault.jpg",
+    "equipo": "Liga MX",
+    "fecha": "Jornada 7 - 2025",
+    "descripcion": "Los goles más espectaculares de la jornada"
+  },
+  {
+    "id": 3,
+    "partido": "Los goles de la Jornada 7",
+    "tipo": "video",
+    "link": "https://www.youtube.com/watch?v=5Av1zQAgbrc",
+    "embed_url": "https://www.youtube.com/embed/5Av1zQAgbrc",
+    "thumbnail": "https://img.youtube.com/vi/5Av1zQAgbrc/maxresdefault.jpg",
+    "equipo": "Liga MX",
+    "fecha": "Jornada 7 - 2025",
+    "descripcion": "Todos los goles de la emocionante Jornada 7"
+  },
+  {
+    "id": 4,
+    "partido": "Highlights - Tijuana vs Necaxa | Jornada 7",
+    "tipo": "video",
+    "link": "https://www.youtube.com/watch?v=6i7h6OCiq8A",
+    "embed_url": "https://www.youtube.com/embed/6i7h6OCiq8A",
+    "thumbnail": "https://img.youtube.com/vi/6i7h6OCiq8A/maxresdefault.jpg",
+    "equipo": "Tijuana vs Necaxa",
+    "fecha": "Jornada 7 - 2025",
+    "descripcion": "Los mejores momentos del encuentro entre Tijuana y Necaxa"
+  },
+  {
+    "id": 5,
+    "partido": "Highlights - América vs Pachuca | Jornada 7",
+    "tipo": "video",
+    "link": "https://www.youtube.com/watch?v=Ds0FtUVp6rQ",
+    "embed_url": "https://www.youtube.com/embed/Ds0FtUVp6rQ",
+    "thumbnail": "https://img.youtube.com/vi/Ds0FtUVp6rQ/maxresdefault.jpg",
+    "equipo": "Club América vs Pachuca",
+    "fecha": "Jornada 7 - 2025",
+    "descripcion": "Destacados del partido entre las Águilas y los Tuzos"
+  },
+  {
+    "id": 6,
+    "partido": "Highlights - Puebla 2-4 Monterrey | Jornada 7",
+    "tipo": "video",
+    "link": "https://www.youtube.com/watch?v=HATNV640Bxk",
+    "embed_url": "https://www.youtube.com/embed/HATNV640Bxk",
+    "thumbnail": "https://img.youtube.com/vi/HATNV640Bxk/maxresdefault.jpg",
+    "equipo": "Puebla vs Monterrey",
+    "fecha": "Jornada 7 - 2025",
+    "descripcion": "Partido con muchos goles entre Puebla y Monterrey"
+  },
+  {
+    "id": 7,
+    "partido": "Super Extended Highlights | León vs Querétaro | Jornada 7",
+    "tipo": "video",
+    "link": "https://www.youtube.com/watch?v=WplR3md6wk8",
+    "embed_url": "https://www.youtube.com/embed/WplR3md6wk8",
+    "thumbnail": "https://img.youtube.com/vi/WplR3md6wk8/maxresdefault.jpg",
+    "equipo": "León vs Querétaro",
+    "fecha": "Jornada 7 - 2025",
+    "descripcion": "Resumen extendido del encuentro entre León y Querétaro"
+  },
+  {
+    "id": 8,
+    "partido": "Resumen general: SÚPER RESUMEN de la Jornada 7",
+    "tipo": "video",
+    "link": "https://www.youtube.com/watch?v=6BxcWcUxjTE",
+    "embed_url": "https://www.youtube.com/embed/6BxcWcUxjTE",
+    "thumbnail": "https://img.youtube.com/vi/6BxcWcUxjTE/maxresdefault.jpg",
+    "equipo": "Liga MX",
+    "fecha": "Jornada 7 - 2025",
+    "descripcion": "El súper resumen con lo mejor de la jornada"
+  },
+  {
+    "id": 9,
+    "partido": "Resumen semana completa de Jornada 7 Liga MX 2025",
+    "tipo": "video",
+    "link": "https://www.youtube.com/watch?v=o0CCDOt_BL8",
+    "embed_url": "https://www.youtube.com/embed/o0CCDOt_BL8",
+    "thumbnail": "https://img.youtube.com/vi/o0CCDOt_BL8/maxresdefault.jpg",
+    "equipo": "Liga MX",
+    "fecha": "Jornada 7 - 2025",
+    "descripcion": "Resumen completo de toda la semana de la Jornada 7"
+  },
+  {
+    "id": 10,
+    "partido": "Highlights - resumen de los mejores momentos Jornada 7",
+    "tipo": "external",
+    "link": "https://www.facebook.com/ClubTigres/videos/%EF%B8%8F-resumen-desde-cancha-jornada-7-clausura-2025-liga-mx/1025679116037178/",
+    "embed_url": null,
+    "thumbnail": "https://via.placeholder.com/640x360/ff6b35/ffffff?text=Ver+en+Facebook",
+    "equipo": "Club Tigres",
+    "fecha": "Jornada 7 - 2025",
+    "descripcion": "Resumen exclusivo de Tigres en Facebook"
+  }
+]

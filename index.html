@@ -312,120 +312,7 @@
             
             <div class="video-carousel-container">
                 <div class="video-carousel" id="videoCarousel">
-                    <!-- Video Card 1 -->
-                    <div class="video-card active">
-                        <div class="video-wrapper">
-                            <iframe 
-                                src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&modestbranding=1&rel=0&playsinline=1" 
-                                title="Gol espectacular - Liga MX" 
-                                frameborder="0" 
-                                loading="lazy"
-                                playsinline="1"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen>
-                            </iframe>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Golazo del América vs Chivas</h3>
-                            <p class="video-description">Increíble gol de larga distancia en el Clásico Nacional</p>
-                            <div class="video-meta">
-                                <span class="video-team">Club América</span>
-                                <span class="video-date">Liga MX 2024</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Video Card 2 -->
-                    <div class="video-card">
-                        <div class="video-wrapper">
-                            <iframe 
-                                src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&modestbranding=1&rel=0&playsinline=1" 
-                                title="Jugada destacada - Liga MX" 
-                                frameborder="0" 
-                                loading="lazy"
-                                playsinline="1"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen>
-                            </iframe>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Atajada Espectacular</h3>
-                            <p class="video-description">Increíble parada del portero de Pumas</p>
-                            <div class="video-meta">
-                                <span class="video-team">Pumas UNAM</span>
-                                <span class="video-date">Liga MX 2024</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Video Card 3 -->
-                    <div class="video-card">
-                        <div class="video-wrapper">
-                            <iframe 
-                                src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&modestbranding=1&rel=0&playsinline=1" 
-                                title="Gol del Cruz Azul - Liga MX" 
-                                frameborder="0" 
-                                loading="lazy"
-                                playsinline="1"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen>
-                            </iframe>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Gol de Último Minuto</h3>
-                            <p class="video-description">Cruz Azul marca en los minutos finales</p>
-                            <div class="video-meta">
-                                <span class="video-team">Cruz Azul</span>
-                                <span class="video-date">Liga MX 2024</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Video Card 4 -->
-                    <div class="video-card">
-                        <div class="video-wrapper">
-                            <iframe 
-                                src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&modestbranding=1&rel=0&playsinline=1" 
-                                title="Tigres vs Monterrey - Liga MX" 
-                                frameborder="0" 
-                                loading="lazy"
-                                playsinline="1"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen>
-                            </iframe>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Clásico Regiomontano</h3>
-                            <p class="video-description">Los mejores momentos del derbi de Monterrey</p>
-                            <div class="video-meta">
-                                <span class="video-team">Tigres vs Rayados</span>
-                                <span class="video-date">Liga MX 2024</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Video Card 5 -->
-                    <div class="video-card">
-                        <div class="video-wrapper">
-                            <iframe 
-                                src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&modestbranding=1&rel=0&playsinline=1" 
-                                title="Santos vs Toluca - Liga MX" 
-                                frameborder="0" 
-                                loading="lazy"
-                                playsinline="1"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen>
-                            </iframe>
-                        </div>
-                        <div class="video-info">
-                            <h3 class="video-title">Hat-trick de Santos</h3>
-                            <p class="video-description">Tres goles en una jugada increíble</p>
-                            <div class="video-meta">
-                                <span class="video-team">Santos Laguna</span>
-                                <span class="video-date">Liga MX 2024</span>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Videos will be loaded dynamically from JSON -->
                 </div>
 
                 <!-- Navigation Controls -->
@@ -439,12 +326,8 @@
                 </div>
 
                 <!-- Carousel Indicators -->
-                <div class="carousel-indicators">
-                    <button class="indicator active" data-index="0"></button>
-                    <button class="indicator" data-index="1"></button>
-                    <button class="indicator" data-index="2"></button>
-                    <button class="indicator" data-index="3"></button>
-                    <button class="indicator" data-index="4"></button>
+                <div class="carousel-indicators" id="carouselIndicators">
+                    <!-- Indicators will be generated dynamically -->
                 </div>
             </div>
 
@@ -1322,27 +1205,117 @@
         });
     </script>
 
-    <!-- Video Carousel 3D Functionality -->
+    <!-- Video Carousel 3D with Dynamic Data Loading -->
     <script>
         class VideoCarousel3D {
             constructor() {
                 this.carousel = document.getElementById('videoCarousel');
-                this.cards = document.querySelectorAll('.video-card');
-                this.indicators = document.querySelectorAll('.indicator');
+                this.indicatorsContainer = document.getElementById('carouselIndicators');
                 this.prevBtn = document.getElementById('prevVideo');
                 this.nextBtn = document.getElementById('nextVideo');
                 this.currentIndex = 0;
-                this.totalCards = this.cards.length;
+                this.videos = [];
+                this.totalCards = 0;
                 this.isTransitioning = false;
 
-                this.init();
+                this.loadVideos();
+            }
+
+            async loadVideos() {
+                try {
+                    const response = await fetch('data/videos-highlights.json');
+                    const videosData = await response.json();
+                    
+                    // Use first 5 videos for the carousel
+                    this.videos = videosData.slice(0, 5);
+                    this.totalCards = this.videos.length;
+                    
+                    this.generateVideoCards();
+                    this.generateIndicators();
+                    this.init();
+                    
+                    console.log('🎬 Video Carousel 3D initialized with', this.totalCards, 'Liga MX videos');
+                } catch (error) {
+                    console.error('❌ Error loading video data:', error);
+                    this.loadFallbackVideos();
+                }
+            }
+
+            generateVideoCards() {
+                const carouselHTML = this.videos.map((video, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    
+                    if (video.tipo === 'external') {
+                        // Handle Facebook video with external link
+                        return `
+                            <div class="video-card ${isActive}">
+                                <div class="video-wrapper external-video">
+                                    <div class="external-video-placeholder" onclick="window.open('${video.link}', '_blank')">
+                                        <img src="${video.thumbnail}" alt="${video.partido}" loading="lazy">
+                                        <div class="external-video-overlay">
+                                            <i class="fab fa-facebook-f"></i>
+                                            <span>Ver en Facebook</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="video-info">
+                                    <h3 class="video-title">${video.partido}</h3>
+                                    <p class="video-description">${video.descripcion}</p>
+                                    <div class="video-meta">
+                                        <span class="video-team">${video.equipo}</span>
+                                        <span class="video-date">${video.fecha}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Handle YouTube videos
+                        return `
+                            <div class="video-card ${isActive}">
+                                <div class="video-wrapper">
+                                    <iframe 
+                                        src="${video.embed_url}?enablejsapi=1&modestbranding=1&rel=0&playsinline=1" 
+                                        title="${video.partido}" 
+                                        frameborder="0" 
+                                        loading="lazy"
+                                        playsinline="1"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                        allowfullscreen>
+                                    </iframe>
+                                </div>
+                                <div class="video-info">
+                                    <h3 class="video-title">${video.partido}</h3>
+                                    <p class="video-description">${video.descripcion}</p>
+                                    <div class="video-meta">
+                                        <span class="video-team">${video.equipo}</span>
+                                        <span class="video-date">${video.fecha}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }).join('');
+
+                this.carousel.innerHTML = carouselHTML;
+            }
+
+            generateIndicators() {
+                const indicatorsHTML = this.videos.map((_, index) => {
+                    const isActive = index === 0 ? 'active' : '';
+                    return `<button class="indicator ${isActive}" data-index="${index}"></button>`;
+                }).join('');
+
+                this.indicatorsContainer.innerHTML = indicatorsHTML;
             }
 
             init() {
-                if (!this.carousel || !this.cards.length) {
-                    console.log('Video carousel elements not found');
+                if (!this.carousel) {
+                    console.log('Video carousel element not found');
                     return;
                 }
+
+                this.cards = document.querySelectorAll('.video-card');
+                this.indicators = document.querySelectorAll('.indicator');
 
                 // Add event listeners
                 this.prevBtn?.addEventListener('click', () => this.prevSlide());
@@ -1362,14 +1335,17 @@
                     if (e.key === 'ArrowRight') this.nextSlide();
                 });
 
-                // Auto-play (optional)
+                // Auto-play
                 this.startAutoPlay();
 
-                console.log('🎬 Video Carousel 3D initialized with', this.totalCards, 'videos');
+                // Initialize carousel positions
+                setTimeout(() => {
+                    this.updateCarousel();
+                }, 100);
             }
 
             updateCarousel() {
-                if (this.isTransitioning) return;
+                if (this.isTransitioning || !this.cards) return;
                 
                 this.isTransitioning = true;
 
@@ -1415,7 +1391,7 @@
                 });
 
                 // Update indicators
-                this.indicators.forEach((indicator, index) => {
+                this.indicators?.forEach((indicator, index) => {
                     indicator.classList.toggle('active', index === this.currentIndex);
                 });
 
@@ -1498,14 +1474,30 @@
                 this.stopAutoPlay();
                 this.startAutoPlay();
             }
+
+            loadFallbackVideos() {
+                // Fallback in case JSON fails to load
+                console.log('⚠️ Loading fallback videos...');
+                this.videos = [
+                    {
+                        id: 1,
+                        partido: "Liga MX - Mejores Momentos",
+                        embed_url: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+                        equipo: "Liga MX",
+                        fecha: "2025",
+                        descripcion: "Los mejores momentos del fútbol mexicano"
+                    }
+                ];
+                this.totalCards = 1;
+                this.generateVideoCards();
+                this.generateIndicators();
+                this.init();
+            }
         }
 
         // Initialize video carousel when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
-            // Wait a bit for all elements to be rendered
-            setTimeout(() => {
-                new VideoCarousel3D();
-            }, 500);
+            window.videoCarousel = new VideoCarousel3D();
         });
 
         // Pause auto-play when user hovers over carousel

@@ -1428,6 +1428,62 @@ body {
     display: block;
 }
 
+/* External Video Styles (Facebook, etc.) */
+.external-video {
+    position: relative;
+    cursor: pointer;
+}
+
+.external-video-placeholder {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.external-video-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.external-video-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(24, 119, 242, 0.9);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(24, 119, 242, 0.4);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.external-video-overlay i {
+    font-size: 1.2rem;
+}
+
+.external-video-placeholder:hover img {
+    transform: scale(1.05);
+}
+
+.external-video-placeholder:hover .external-video-overlay {
+    background: rgba(24, 119, 242, 1);
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 6px 20px rgba(24, 119, 242, 0.6);
+}
+
 .video-info {
     padding: 20px;
     color: white;
