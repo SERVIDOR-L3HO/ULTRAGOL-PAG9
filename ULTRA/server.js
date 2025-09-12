@@ -19,8 +19,17 @@ app.use((req, res, next) => {
     next();
 });
 
-// Servir archivos estáticos de ULTRA en /ULTRA path
-app.use('/ULTRA', express.static('.', {
+// Ruta específica para ULTRA - manejo exacto (antes de static middleware)
+app.get('/ULTRA', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/ULTRA/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Servir archivos estáticos de ULTRA
+app.use('/ULTRA', express.static(__dirname, {
     setHeaders: (res, path) => {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Pragma', 'no-cache');
@@ -37,7 +46,7 @@ app.use(express.static('..', {
     }
 }));
 
-// Ruta específica para ULTRA
+// Sub-rutas de ULTRA - servir SPA para rutas ULTRA
 app.get('/ULTRA/*', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -47,19 +56,24 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
-// Manejo de rutas para páginas del proyecto principal
-app.get('*', (req, res) => {
-    // Intentar servir el archivo solicitado del proyecto principal
-    const requestedFile = path.join(__dirname, '..', req.path);
-    const fs = require('fs');
+// Rutas específicas para páginas HTML del proyecto principal
+const mainPages = ['calendario.html', 'chat-global.html', 'estadisticas.html', 'fotos.html', 'historias.html', 'noticias.html', 'standings.html', 'team-profile.html', 'teams.html'];
+
+mainPages.forEach(page => {
+    app.get(`/${page}`, (req, res) => {
+        res.sendFile(path.join(__dirname, '..', page));
+    });
     
-    // Si el archivo existe, servirlo
-    if (fs.existsSync(requestedFile) && fs.statSync(requestedFile).isFile()) {
-        res.sendFile(requestedFile);
-    } else {
-        // Si no existe, servir el index principal
-        res.sendFile(path.join(__dirname, '..', 'index.html'));
-    }
+    // Handle routes without .html extension
+    const routeName = page.replace('.html', '');
+    app.get(`/${routeName}`, (req, res) => {
+        res.sendFile(path.join(__dirname, '..', page));
+    });
+});
+
+// Fallback for any other routes - serve main index
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
