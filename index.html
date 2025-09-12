@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/animations.css?v=2024091801">
     <link rel="stylesheet" href="css/firebase-features.css?v=2024091801">
     <link rel="stylesheet" href="css/cookie-banner.css?v=2025091201">
+    <link rel="stylesheet" href="css/app-download-banner.css?v=2025091201">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
@@ -406,6 +407,58 @@
         </div>
     </section>
 
+    <!-- Banner de Descarga de Aplicación -->
+    <section class="app-download-banner">
+        <div class="app-banner-content">
+            <div class="app-banner-text">
+                <h2 class="app-banner-title">Descarga Nuestra Aplicación</h2>
+                <p class="app-banner-subtitle">Lleva toda la emoción de UltraGol en tu móvil. Resultados, estadísticas y transmisiones en vivo.</p>
+                
+                <div class="app-banner-features">
+                    <div class="app-feature">
+                        <i class="fas fa-bolt" style="--delay: 0s;"></i>
+                        <span>Resultados en Tiempo Real</span>
+                    </div>
+                    <div class="app-feature">
+                        <i class="fas fa-users" style="--delay: 0.5s;"></i>
+                        <span>Comunidad Activa</span>
+                    </div>
+                    <div class="app-feature">
+                        <i class="fas fa-mobile-alt" style="--delay: 1s;"></i>
+                        <span>Diseño Optimizado</span>
+                    </div>
+                </div>
+                
+                <div class="app-banner-actions">
+                    <a href="#" class="download-btn" id="downloadAppBtn">
+                        <i class="fas fa-download"></i>
+                        Descargar Gratis
+                    </a>
+                    <a href="#" class="github-link" id="githubLinkBtn">
+                        <i class="fab fa-github"></i>
+                        Ver en GitHub
+                    </a>
+                </div>
+            </div>
+            
+            <div class="app-mockup">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="screen-logo">UltraGol</div>
+                        <div class="screen-tagline">Tu pasión por<br>el fútbol mexicano</div>
+                    </div>
+                </div>
+                
+                <div class="floating-icons">
+                    <div class="floating-icon">⚽</div>
+                    <div class="floating-icon">🏆</div>
+                    <div class="floating-icon">📱</div>
+                    <div class="floating-icon">🎯</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -622,6 +675,32 @@
     
     <!-- Cookie Banner Script -->
     <script src="js/cookie-banner.js?v=2025091201"></script>
+    
+    <!-- App Download Banner Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Manejar click en botón de descarga
+            const downloadBtn = document.getElementById('downloadAppBtn');
+            const githubBtn = document.getElementById('githubLinkBtn');
+            
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Por ahora muestra mensaje, tú puedes cambiar este enlace
+                    alert('🚀 ¡Próximamente disponible!\n\nLa aplicación móvil de UltraGol estará disponible pronto en GitHub.');
+                });
+            }
+            
+            if (githubBtn) {
+                githubBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // Aquí puedes poner tu enlace de GitHub cuando esté listo
+                    alert('📱 Enlace de GitHub\n\nPuedes actualizar este enlace cuando subas la aplicación a GitHub.');
+                    // window.open('https://github.com/tu-usuario/ultragol-app', '_blank');
+                });
+            }
+        });
+    </script>
     
     <!-- Original main.js -->
     <script src="js/main.js?v=2024091801"></script>

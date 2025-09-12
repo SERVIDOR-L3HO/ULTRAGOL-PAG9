@@ -1,0 +1,405 @@
+/* Banner de Descarga de Aplicación UltraGol - Diseño Creativo */
+
+.app-download-banner {
+    position: relative;
+    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 25%, #ff6b35 50%, #e85a2e 75%, #ff6b35 100%);
+    background-size: 400% 400%;
+    animation: gradientShift 8s ease infinite;
+    padding: 30px 20px;
+    margin-top: 50px;
+    overflow: hidden;
+    box-shadow: 0 -10px 30px rgba(255, 107, 53, 0.3);
+    border-top: 4px solid rgba(255, 255, 255, 0.2);
+}
+
+.app-download-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="footballPattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23footballPattern)"/></svg>');
+    opacity: 0.1;
+    animation: patternMove 20s linear infinite;
+}
+
+.app-download-banner::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    animation: shimmer 3s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.app-banner-content {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    z-index: 2;
+}
+
+.app-banner-text {
+    flex: 1;
+    color: white;
+}
+
+.app-banner-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin: 0 0 10px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    animation: titlePulse 2s ease-in-out infinite alternate;
+    position: relative;
+}
+
+.app-banner-title::before {
+    content: "📱";
+    position: absolute;
+    left: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 3rem;
+    animation: phoneFloat 3s ease-in-out infinite;
+}
+
+.app-banner-subtitle {
+    font-size: 1.2rem;
+    margin: 0 0 20px 0;
+    opacity: 0.95;
+    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.app-banner-features {
+    display: flex;
+    gap: 25px;
+    margin: 20px 0;
+}
+
+.app-feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.app-feature i {
+    font-size: 1.2rem;
+    animation: iconBounce 2s ease-in-out infinite;
+    animation-delay: var(--delay);
+}
+
+.app-banner-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.download-btn {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 15px 35px;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.download-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transition: all 0.6s ease;
+    transform: translate(-50%, -50%);
+}
+
+.download-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.download-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+}
+
+.download-btn i {
+    font-size: 1.3rem;
+    animation: downloadPulse 1.5s ease-in-out infinite;
+}
+
+.github-link {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.github-link:hover {
+    color: white;
+    transform: translateY(-2px);
+}
+
+.github-link i {
+    font-size: 1.1rem;
+}
+
+.app-mockup {
+    position: relative;
+    margin-left: 20px;
+}
+
+.phone-mockup {
+    width: 150px;
+    height: 300px;
+    background: linear-gradient(145deg, #2c2c2c, #1a1a1a);
+    border-radius: 25px;
+    padding: 15px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    position: relative;
+    animation: phoneFloat 4s ease-in-out infinite;
+}
+
+.phone-screen {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, #000 0%, #1a1a1a 100%);
+    border-radius: 15px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #333;
+}
+
+.screen-logo {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #ff6b35;
+    text-shadow: 0 0 10px rgba(255, 107, 53, 0.5);
+    margin-bottom: 10px;
+}
+
+.screen-tagline {
+    font-size: 0.7rem;
+    color: #ccc;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.floating-icons {
+    position: absolute;
+    top: 20%;
+    left: -30px;
+    right: -30px;
+    height: 60%;
+    pointer-events: none;
+}
+
+.floating-icon {
+    position: absolute;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.5rem;
+    animation: floatIcon 6s ease-in-out infinite;
+}
+
+.floating-icon:nth-child(1) {
+    top: 10%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.floating-icon:nth-child(2) {
+    top: 30%;
+    right: 15%;
+    animation-delay: 1s;
+}
+
+.floating-icon:nth-child(3) {
+    bottom: 40%;
+    left: 5%;
+    animation-delay: 2s;
+}
+
+.floating-icon:nth-child(4) {
+    bottom: 20%;
+    right: 10%;
+    animation-delay: 3s;
+}
+
+/* Animaciones */
+@keyframes gradientShift {
+    0% { background-position: 0% 50% }
+    50% { background-position: 100% 50% }
+    100% { background-position: 0% 50% }
+}
+
+@keyframes patternMove {
+    0% { transform: translateX(0) translateY(0) }
+    100% { transform: translateX(20px) translateY(20px) }
+}
+
+@keyframes shimmer {
+    0%, 100% { transform: translateX(-100%) translateY(-100%) rotate(45deg) }
+    50% { transform: translateX(100%) translateY(100%) rotate(45deg) }
+}
+
+@keyframes titlePulse {
+    0% { transform: scale(1) }
+    100% { transform: scale(1.02) }
+}
+
+@keyframes phoneFloat {
+    0%, 100% { transform: translateY(0px) rotate(-2deg) }
+    50% { transform: translateY(-10px) rotate(2deg) }
+}
+
+@keyframes downloadPulse {
+    0%, 100% { transform: scale(1) }
+    50% { transform: scale(1.1) }
+}
+
+@keyframes iconBounce {
+    0%, 100% { transform: translateY(0) }
+    50% { transform: translateY(-3px) }
+}
+
+@keyframes floatIcon {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.3;
+    }
+    33% { 
+        transform: translateY(-15px) rotate(120deg);
+        opacity: 0.6;
+    }
+    66% { 
+        transform: translateY(-5px) rotate(240deg);
+        opacity: 0.4;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .app-banner-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 30px;
+    }
+    
+    .app-banner-title {
+        font-size: 2rem;
+    }
+    
+    .app-banner-title::before {
+        position: relative;
+        left: 0;
+        display: block;
+        margin-bottom: 10px;
+    }
+    
+    .app-banner-features {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .phone-mockup {
+        width: 120px;
+        height: 240px;
+    }
+    
+    .floating-icons {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-download-banner {
+        padding: 25px 15px;
+    }
+    
+    .app-banner-title {
+        font-size: 1.6rem;
+        line-height: 1.2;
+    }
+    
+    .app-banner-subtitle {
+        font-size: 1rem;
+    }
+    
+    .app-banner-features {
+        gap: 15px;
+    }
+    
+    .app-feature {
+        font-size: 0.9rem;
+    }
+    
+    .download-btn {
+        padding: 12px 25px;
+        font-size: 1rem;
+    }
+}
+
+/* Efectos adicionales */
+.app-download-banner:hover .floating-icons {
+    animation-play-state: paused;
+}
+
+.download-btn:active {
+    transform: translateY(-1px) scale(0.98);
+}
+
+/* Icono especial para la característica principal */
+.app-feature:first-child .fa-bolt {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.app-feature:nth-child(2) .fa-users {
+    color: #00ff88;
+}
+
+.app-feature:nth-child(3) .fa-mobile-alt {
+    color: #ff69b4;
+}
