@@ -301,15 +301,145 @@
         </div>
     </section>
 
-    <!-- Recent Matches -->
-    <section class="recent-matches">
+    <!-- Mejores Momentos -->
+    <section class="best-moments">
         <div class="container">
-            <h2 class="section-title">Últimos Resultados</h2>
-            <div class="matches-container" id="recentMatches">
-                <!-- Dynamic content loaded via JavaScript -->
+            <h2 class="section-title">
+                <i class="fas fa-star"></i>
+                Mejores Momentos
+            </h2>
+            <p class="section-subtitle">Los momentos más emocionantes de la Liga MX</p>
+            
+            <div class="video-carousel-container">
+                <div class="video-carousel" id="videoCarousel">
+                    <!-- Video Card 1 -->
+                    <div class="video-card active">
+                        <div class="video-wrapper">
+                            <iframe 
+                                src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&modestbranding=1&rel=0" 
+                                title="Gol espectacular - Liga MX" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">Golazo del América vs Chivas</h3>
+                            <p class="video-description">Increíble gol de larga distancia en el Clásico Nacional</p>
+                            <div class="video-meta">
+                                <span class="video-team">Club América</span>
+                                <span class="video-date">Liga MX 2024</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Card 2 -->
+                    <div class="video-card">
+                        <div class="video-wrapper">
+                            <iframe 
+                                src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&modestbranding=1&rel=0" 
+                                title="Jugada destacada - Liga MX" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">Atajada Espectacular</h3>
+                            <p class="video-description">Increíble parada del portero de Pumas</p>
+                            <div class="video-meta">
+                                <span class="video-team">Pumas UNAM</span>
+                                <span class="video-date">Liga MX 2024</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Card 3 -->
+                    <div class="video-card">
+                        <div class="video-wrapper">
+                            <iframe 
+                                src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&modestbranding=1&rel=0" 
+                                title="Gol del Cruz Azul - Liga MX" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">Gol de Último Minuto</h3>
+                            <p class="video-description">Cruz Azul marca en los minutos finales</p>
+                            <div class="video-meta">
+                                <span class="video-team">Cruz Azul</span>
+                                <span class="video-date">Liga MX 2024</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Card 4 -->
+                    <div class="video-card">
+                        <div class="video-wrapper">
+                            <iframe 
+                                src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&modestbranding=1&rel=0" 
+                                title="Tigres vs Monterrey - Liga MX" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">Clásico Regiomontano</h3>
+                            <p class="video-description">Los mejores momentos del derbi de Monterrey</p>
+                            <div class="video-meta">
+                                <span class="video-team">Tigres vs Rayados</span>
+                                <span class="video-date">Liga MX 2024</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Video Card 5 -->
+                    <div class="video-card">
+                        <div class="video-wrapper">
+                            <iframe 
+                                src="https://www.youtube.com/embed/dQw4w9WgXcQ?enablejsapi=1&modestbranding=1&rel=0" 
+                                title="Santos vs Toluca - Liga MX" 
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        <div class="video-info">
+                            <h3 class="video-title">Hat-trick de Santos</h3>
+                            <p class="video-description">Tres goles en una jugada increíble</p>
+                            <div class="video-meta">
+                                <span class="video-team">Santos Laguna</span>
+                                <span class="video-date">Liga MX 2024</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Controls -->
+                <div class="carousel-controls">
+                    <button class="carousel-btn prev-btn" id="prevVideo">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-btn next-btn" id="nextVideo">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Carousel Indicators -->
+                <div class="carousel-indicators">
+                    <button class="indicator active" data-index="0"></button>
+                    <button class="indicator" data-index="1"></button>
+                    <button class="indicator" data-index="2"></button>
+                    <button class="indicator" data-index="3"></button>
+                    <button class="indicator" data-index="4"></button>
+                </div>
             </div>
+
             <div class="section-footer">
-                <a href="fixtures.html" class="btn btn-outline">Ver Todos los Partidos</a>
+                <a href="noticias.html" class="btn btn-outline">Ver Todas las Noticias</a>
             </div>
         </div>
     </section>
