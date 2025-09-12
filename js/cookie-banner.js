@@ -31,14 +31,19 @@ class CookieBanner {
     
     checkExistingConsent() {
         const consent = this.getCookie('cookieConsent');
-        if (consent) {
+        if (consent && consent.trim() !== '') {
             try {
-                this.preferences = JSON.parse(consent);
-                this.applyConsentSettings();
-                return true;
+                const parsed = JSON.parse(consent);
+                // Verificar que es un objeto válido con las propiedades esperadas
+                if (parsed && typeof parsed === 'object' && 'necessary' in parsed) {
+                    this.preferences = parsed;
+                    this.applyConsentSettings();
+                    return true;
+                }
             } catch (e) {
                 console.warn('Error parsing cookie consent:', e);
-                return false;
+                // Limpiar cookie corrupta
+                this.deleteCookie('cookieConsent');
             }
         }
         return false;
@@ -153,7 +158,10 @@ class CookieBanner {
     
     showBannerIfNeeded() {
         if (!this.checkExistingConsent()) {
-            setTimeout(() => this.showBanner(), 1000); // Mostrar después de 1 segundo
+            // Solo mostrar si no existe el banner ya
+            if (!document.getElementById('cookie-banner') || !document.getElementById('cookie-banner').classList.contains('show')) {
+                setTimeout(() => this.showBanner(), 1500); // Mostrar después de 1.5 segundos
+            }
         }
     }
     
@@ -227,20 +235,27 @@ class CookieBanner {
             if (response.ok) {
                 const result = await response.json();
                 this.preferences = result.consent;
+                
+                // Guardar localmente también como respaldo
+                document.cookie = `cookieConsent=${JSON.stringify(result.consent)}; path=/; max-age=31536000; SameSite=Strict`;
+                
                 this.applyConsentSettings();
                 this.hideBanner();
                 this.showConsentStatus('Preferencias de cookies guardadas exitosamente');
                 
-                // Recargar la página para aplicar los cambios de cookies
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
+                // No recargar automáticamente - dejar que el usuario continúe navegando
+                console.log('✅ Consentimiento guardado:', this.preferences);
             } else {
                 throw new Error('Error al guardar preferencias');
             }
         } catch (error) {
             console.error('Error saving consent:', error);
-            this.showConsentStatus('Error al guardar las preferencias', 'error');
+            // Fallback: guardar solo localmente si la API falla
+            document.cookie = `cookieConsent=${JSON.stringify(preferences)}; path=/; max-age=31536000; SameSite=Strict`;
+            this.preferences = preferences;
+            this.applyConsentSettings();
+            this.hideBanner();
+            this.showConsentStatus('Preferencias guardadas localmente');
         }
     }
     
