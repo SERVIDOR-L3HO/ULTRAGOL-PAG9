@@ -18,7 +18,8 @@ app.use(helmet({
                 "'self'",
                 "'unsafe-inline'", // Para Firebase y scripts inline necesarios
                 "https://www.gstatic.com",
-                "https://cdnjs.cloudflare.com"
+                "https://cdnjs.cloudflare.com",
+                "https://apis.google.com"
             ],
             styleSrc: [
                 "'self'",
@@ -36,7 +37,17 @@ app.use(helmet({
                 "'self'",
                 "https://firestore.googleapis.com",
                 "https://identitytoolkit.googleapis.com",
-                "https://firebase.googleapis.com"
+                "https://firebase.googleapis.com",
+                "https://securetoken.googleapis.com",
+                "https://www.googleapis.com",
+                "https://firebasestorage.googleapis.com",
+                "https://firebasestorage.app",
+                "https://accounts.google.com",
+                "https://apis.google.com"
+            ],
+            frameSrc: [
+                "'self'",
+                "https://accounts.google.com"
             ]
         }
     },
@@ -187,6 +198,16 @@ app.get('/api/cookie-consent', (req, res) => {
     }
 });
 
+// Health check endpoint for monitoring
+app.get('/healthz', (req, res) => {
+    res.status(200).json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        service: 'ULTRAGOL Server'
+    });
+});
+
 // Ruta específica para ULTRA - manejo exacto (antes de static middleware)
 app.get('/ULTRA', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -205,14 +226,17 @@ app.use('/ULTRA', express.static(__dirname, {
     }
 }));
 
-// Servir archivos estáticos del proyecto principal
-app.use(express.static('..', {
-    setHeaders: (res, path) => {
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-        res.setHeader('Pragma', 'no-cache');
-        res.setHeader('Expires', '0');
-    }
-}));
+// Servir archivos estáticos del proyecto principal de forma segura
+const allowedDirectories = ['assets', 'css', 'js', 'data'];
+allowedDirectories.forEach(dir => {
+    app.use(`/${dir}`, express.static(path.join(__dirname, '..', dir), {
+        setHeaders: (res, path) => {
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+        }
+    }));
+});
 
 // Sub-rutas de ULTRA - servir SPA para rutas ULTRA
 app.get('/ULTRA/*', (req, res) => {
