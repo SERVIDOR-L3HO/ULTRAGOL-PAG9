@@ -341,45 +341,212 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, #4a7c59 0%, #2d5016 100%);
+    background: linear-gradient(135deg, #2d5016 0%, #4a7c59 50%, #2d5016 100%);
+    background-size: 200% 200%;
+    animation: gradientMove 8s ease infinite;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    padding: 15px;
+    opacity: 0;
+    animation: screenFadeIn 2s ease 1.5s forwards, gradientMove 8s ease 2s infinite;
+    overflow: hidden;
+}
+
+.screen-content::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 30%),
+        radial-gradient(circle at 70% 80%, rgba(255,107,53,0.1) 0%, transparent 40%);
+    animation: ambientMove 12s ease infinite;
+    pointer-events: none;
+}
+
+.screen-content::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(transparent, rgba(0,0,0,0.2));
+    pointer-events: none;
+}
+
+.screen-header {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 15px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    z-index: 2;
+}
+
+.screen-content-main {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: white;
-    padding: 20px;
-    opacity: 0;
-    animation: screenFadeIn 2s ease 1.5s forwards;
+    flex: 1;
+    position: relative;
+    z-index: 2;
 }
 
-.screen-header {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    right: 15px;
+.screen-stats {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin: 10px 0;
+    padding: 8px 0;
+}
+
+.screen-stat {
+    text-align: center;
+    flex: 1;
+}
+
+.screen-stat-number {
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #ff6b35;
+    display: block;
+}
+
+.screen-stat-label {
+    font-size: 0.5rem;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.screen-match-card {
+    background: rgba(0,0,0,0.3);
+    border-radius: 8px;
+    padding: 8px;
+    margin: 5px 0;
+    width: 100%;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,107,53,0.2);
+}
+
+.screen-teams {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.6rem;
+}
+
+.screen-team {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.8);
+    gap: 4px;
+}
+
+.screen-team-logo {
+    width: 16px;
+    height: 16px;
+    background: #ff6b35;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.5rem;
+}
+
+.screen-score {
+    font-weight: 900;
+    color: #ff6b35;
+    font-size: 0.8rem;
 }
 
 .screen-logo {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: 900;
     color: #ff6b35;
     text-shadow: 0 0 15px rgba(255, 107, 53, 0.6);
-    margin-bottom: 8px;
+    margin-bottom: 5px;
     animation: logoGlow 3s ease infinite;
+    position: relative;
+}
+
+.screen-logo::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ff6b35, transparent);
 }
 
 .screen-tagline {
-    font-size: 0.65rem;
-    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.6rem;
+    color: rgba(255, 255, 255, 0.8);
     text-align: center;
-    line-height: 1.3;
-    margin-bottom: 20px;
+    line-height: 1.2;
+    margin-bottom: 15px;
+    font-weight: 300;
 }
+
+.screen-live-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,0,0,0.2);
+    color: #ff4444;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255,68,68,0.3);
+}
+
+.screen-live-dot {
+    width: 4px;
+    height: 4px;
+    background: #ff4444;
+    border-radius: 50%;
+    animation: livePulse 1.5s ease infinite;
+}
+
+.screen-mini-chart {
+    width: 100%;
+    height: 20px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 4px;
+    margin: 5px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.screen-chart-bar {
+    position: absolute;
+    bottom: 0;
+    background: linear-gradient(to top, #ff6b35, #f7931e);
+    border-radius: 2px 2px 0 0;
+    width: 3px;
+    animation: chartGrow 2s ease infinite;
+}
+
+.screen-chart-bar:nth-child(1) { left: 10%; height: 60%; animation-delay: 0s; }
+.screen-chart-bar:nth-child(2) { left: 25%; height: 80%; animation-delay: 0.2s; }
+.screen-chart-bar:nth-child(3) { left: 40%; height: 45%; animation-delay: 0.4s; }
+.screen-chart-bar:nth-child(4) { left: 55%; height: 90%; animation-delay: 0.6s; }
+.screen-chart-bar:nth-child(5) { left: 70%; height: 65%; animation-delay: 0.8s; }
+.screen-chart-bar:nth-child(6) { left: 85%; height: 75%; animation-delay: 1s; }
 
 .screen-buttons {
     display: flex;
@@ -514,6 +681,27 @@
     0% { background-position: 0% 50% }
     50% { background-position: 100% 50% }
     100% { background-position: 0% 50% }
+}
+
+@keyframes gradientMove {
+    0%, 100% { background-position: 0% 0% }
+    50% { background-position: 100% 100% }
+}
+
+@keyframes ambientMove {
+    0%, 100% { transform: translate(0, 0) rotate(0deg) }
+    33% { transform: translate(10px, -10px) rotate(120deg) }
+    66% { transform: translate(-10px, 10px) rotate(240deg) }
+}
+
+@keyframes livePulse {
+    0%, 100% { opacity: 1; transform: scale(1) }
+    50% { opacity: 0.5; transform: scale(1.2) }
+}
+
+@keyframes chartGrow {
+    0%, 100% { transform: scaleY(0.8) }
+    50% { transform: scaleY(1.1) }
 }
 
 @keyframes ambientGlow {
