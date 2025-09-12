@@ -467,27 +467,34 @@ function setupCarousel() {
         // Touch/swipe support for mobile
         let startX = 0;
         let endX = 0;
+        let startY = 0;
+        let endY = 0;
         
         carousel.addEventListener('touchstart', (e) => {
             startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
         });
         
         carousel.addEventListener('touchend', (e) => {
             endX = e.changedTouches[0].clientX;
+            endY = e.changedTouches[0].clientY;
             handleSwipe();
         });
         
         function handleSwipe() {
             const threshold = 50;
-            const diff = startX - endX;
+            const diffX = startX - endX;
+            const diffY = startY - endY;
             
-            if (Math.abs(diff) > threshold) {
-                if (diff > 0) {
+            // Solo tratar como swipe horizontal si el movimiento horizontal es mayor que el vertical
+            if (Math.abs(diffX) > threshold && Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0) {
                     nextSlide();
                 } else {
                     prevSlide();
                 }
             }
+            // Si el movimiento vertical es mayor, no hacer nada (permitir scroll normal)
         }
     }
     
