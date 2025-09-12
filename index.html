@@ -1223,20 +1223,35 @@
 
             async loadVideos() {
                 try {
+                    console.log('📥 Loading Liga MX videos from JSON...');
                     const response = await fetch('data/videos-highlights.json');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
                     const videosData = await response.json();
+                    console.log('✅ JSON loaded successfully with', videosData.length, 'total videos');
+                    
+                    if (!Array.isArray(videosData) || videosData.length === 0) {
+                        throw new Error('Invalid or empty video data array');
+                    }
                     
                     // Use first 5 videos for the carousel
                     this.videos = videosData.slice(0, 5);
                     this.totalCards = this.videos.length;
                     
+                    console.log('🎬 Using first', this.totalCards, 'Liga MX videos for carousel');
+                    console.log('📋 Videos loaded:', this.videos.map(v => v.partido));
+                    
                     this.generateVideoCards();
                     this.generateIndicators();
                     this.init();
                     
-                    console.log('🎬 Video Carousel 3D initialized with', this.totalCards, 'Liga MX videos');
+                    console.log('🎬 Video Carousel 3D initialized with', this.totalCards, 'Liga MX videos from JSON');
                 } catch (error) {
-                    console.error('❌ Error loading video data:', error);
+                    console.error('❌ Error loading Liga MX video data:', error);
+                    console.log('⚠️ Falling back to default videos...');
                     this.loadFallbackVideos();
                 }
             }
@@ -1498,24 +1513,24 @@
         // Initialize video carousel when DOM is ready
         document.addEventListener('DOMContentLoaded', () => {
             window.videoCarousel = new VideoCarousel3D();
-        });
-
-        // Pause auto-play when user hovers over carousel
-        document.addEventListener('DOMContentLoaded', () => {
-            const carouselContainer = document.querySelector('.video-carousel-container');
-            if (carouselContainer) {
-                carouselContainer.addEventListener('mouseenter', () => {
-                    if (window.videoCarousel) {
-                        window.videoCarousel.stopAutoPlay();
-                    }
-                });
-                
-                carouselContainer.addEventListener('mouseleave', () => {
-                    if (window.videoCarousel) {
-                        window.videoCarousel.startAutoPlay();
-                    }
-                });
-            }
+            
+            // Add hover events after carousel is initialized
+            setTimeout(() => {
+                const carouselContainer = document.querySelector('.video-carousel-container');
+                if (carouselContainer && window.videoCarousel) {
+                    carouselContainer.addEventListener('mouseenter', () => {
+                        if (window.videoCarousel && typeof window.videoCarousel.stopAutoPlay === 'function') {
+                            window.videoCarousel.stopAutoPlay();
+                        }
+                    });
+                    
+                    carouselContainer.addEventListener('mouseleave', () => {
+                        if (window.videoCarousel && typeof window.videoCarousel.startAutoPlay === 'function') {
+                            window.videoCarousel.startAutoPlay();
+                        }
+                    });
+                }
+            }, 1000); // Wait for carousel to fully initialize
         });
     </script>
 </body>
