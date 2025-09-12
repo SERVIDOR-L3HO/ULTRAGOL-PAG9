@@ -1128,5 +1128,58 @@
     
     <!-- Original main.js -->
     <script src="js/main.js?v=2024091801"></script>
+    
+    <!-- Mini Banner de Aplicación UltraGol -->
+    <div id="ultraGolMiniAppBanner" class="mini-app-banner">
+        <div class="mini-banner-content">
+            <div class="mini-banner-icon">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="mini-banner-text">
+                <span class="mini-banner-title">ABRIR APLICACION DE ULTRAGOL</span>
+            </div>
+            <button id="closeMiniAppBanner" class="mini-banner-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Mini App Banner functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const miniAppBanner = document.getElementById('ultraGolMiniAppBanner');
+            const closeBannerBtn = document.getElementById('closeMiniAppBanner');
+            
+            // Check if banner was previously closed
+            const bannerClosed = localStorage.getItem('ultraGolMiniAppBannerClosed');
+            if (bannerClosed === 'true') {
+                miniAppBanner.style.display = 'none';
+            } else {
+                // Show banner after 2 seconds
+                setTimeout(() => {
+                    miniAppBanner.classList.add('show');
+                }, 2000);
+            }
+            
+            // Close banner functionality
+            closeBannerBtn.addEventListener('click', function() {
+                miniAppBanner.classList.add('hide');
+                localStorage.setItem('ultraGolMiniAppBannerClosed', 'true');
+                setTimeout(() => {
+                    miniAppBanner.style.display = 'none';
+                }, 300);
+            });
+            
+            // Banner click to open app (you can customize this action)
+            miniAppBanner.addEventListener('click', function(e) {
+                if (e.target === closeBannerBtn || e.target.parentNode === closeBannerBtn) {
+                    return; // Don't trigger if clicking close button
+                }
+                // Here you can add action to open the app
+                // For example: window.open('/ULTRA/index.html', '_blank');
+                window.open('/ULTRA/index.html', '_blank');
+            });
+        });
+    </script>
 </body>
 </html>
