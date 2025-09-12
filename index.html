@@ -1364,48 +1364,79 @@
                 
                 this.isTransitioning = true;
 
-                // Update cards positions
+                // Update cards positions with enhanced 3D effects
                 this.cards.forEach((card, index) => {
                     card.classList.remove('active');
                     
                     const position = (index - this.currentIndex + this.totalCards) % this.totalCards;
                     
+                    // Set CSS custom properties for hover effects
                     switch(position) {
                         case 0: // Active center card
-                            card.style.transform = 'translateX(0) translateZ(0) rotateY(0deg) scale(1)';
-                            card.style.zIndex = '3';
+                            card.style.transform = 'translateX(0) translateZ(50px) rotateY(0deg) scale(1.05)';
+                            card.style.setProperty('--tx', '0');
+                            card.style.setProperty('--tz', '50px');
+                            card.style.setProperty('--ry', '0deg');
+                            card.style.setProperty('--scale', '1.05');
+                            card.style.zIndex = '5';
                             card.style.opacity = '1';
+                            card.style.filter = 'brightness(1.1) saturate(1.2)';
                             card.classList.add('active');
                             break;
                         case 1: // Right card
-                            card.style.transform = 'translateX(450px) translateZ(-200px) rotateY(-45deg) scale(0.8)';
-                            card.style.zIndex = '2';
-                            card.style.opacity = '0.7';
+                            card.style.transform = 'translateX(480px) translateZ(-180px) rotateY(-35deg) scale(0.85)';
+                            card.style.setProperty('--tx', '480px');
+                            card.style.setProperty('--tz', '-180px');
+                            card.style.setProperty('--ry', '-35deg');
+                            card.style.setProperty('--scale', '0.85');
+                            card.style.zIndex = '4';
+                            card.style.opacity = '0.8';
+                            card.style.filter = 'brightness(0.9) saturate(0.9)';
                             break;
                         case this.totalCards - 1: // Left card
-                            card.style.transform = 'translateX(-450px) translateZ(-200px) rotateY(45deg) scale(0.8)';
-                            card.style.zIndex = '2';
-                            card.style.opacity = '0.7';
+                            card.style.transform = 'translateX(-480px) translateZ(-180px) rotateY(35deg) scale(0.85)';
+                            card.style.setProperty('--tx', '-480px');
+                            card.style.setProperty('--tz', '-180px');
+                            card.style.setProperty('--ry', '35deg');
+                            card.style.setProperty('--scale', '0.85');
+                            card.style.zIndex = '4';
+                            card.style.opacity = '0.8';
+                            card.style.filter = 'brightness(0.9) saturate(0.9)';
                             break;
                         case 2: // Far right card
-                            card.style.transform = 'translateX(700px) translateZ(-400px) rotateY(-60deg) scale(0.6)';
-                            card.style.zIndex = '1';
-                            card.style.opacity = '0.4';
+                            card.style.transform = 'translateX(750px) translateZ(-350px) rotateY(-50deg) scale(0.65)';
+                            card.style.setProperty('--tx', '750px');
+                            card.style.setProperty('--tz', '-350px');
+                            card.style.setProperty('--ry', '-50deg');
+                            card.style.setProperty('--scale', '0.65');
+                            card.style.zIndex = '3';
+                            card.style.opacity = '0.5';
+                            card.style.filter = 'brightness(0.7) saturate(0.7)';
                             break;
                         case this.totalCards - 2: // Far left card
-                            card.style.transform = 'translateX(-700px) translateZ(-400px) rotateY(60deg) scale(0.6)';
-                            card.style.zIndex = '1';
-                            card.style.opacity = '0.4';
+                            card.style.transform = 'translateX(-750px) translateZ(-350px) rotateY(50deg) scale(0.65)';
+                            card.style.setProperty('--tx', '-750px');
+                            card.style.setProperty('--tz', '-350px');
+                            card.style.setProperty('--ry', '50deg');
+                            card.style.setProperty('--scale', '0.65');
+                            card.style.zIndex = '3';
+                            card.style.opacity = '0.5';
+                            card.style.filter = 'brightness(0.7) saturate(0.7)';
                             break;
                         default: // Hidden cards
                             card.style.transform = 'translateX(0) translateZ(-600px) rotateY(0deg) scale(0.3)';
-                            card.style.zIndex = '0';
+                            card.style.setProperty('--tx', '0');
+                            card.style.setProperty('--tz', '-600px');
+                            card.style.setProperty('--ry', '0deg');
+                            card.style.setProperty('--scale', '0.3');
+                            card.style.zIndex = '1';
                             card.style.opacity = '0';
+                            card.style.filter = 'brightness(0.5) saturate(0.5)';
                             break;
                     }
                 });
 
-                // Update indicators
+                // Update indicators with smooth animation
                 this.indicators?.forEach((indicator, index) => {
                     indicator.classList.toggle('active', index === this.currentIndex);
                 });
@@ -1413,7 +1444,9 @@
                 // Reset transition flag
                 setTimeout(() => {
                     this.isTransitioning = false;
-                }, 800);
+                }, 1000);
+                
+                console.log('🎬 Carousel updated - Active video:', this.videos[this.currentIndex]?.partido);
             }
 
             nextSlide() {
