@@ -227,7 +227,7 @@ app.use('/ULTRA', express.static(__dirname, {
 }));
 
 // Servir archivos estáticos del proyecto principal de forma segura
-const allowedDirectories = ['assets', 'css', 'js', 'data'];
+const allowedDirectories = ['assets', 'css', 'js', 'data', 'attached_assets'];
 allowedDirectories.forEach(dir => {
     app.use(`/${dir}`, express.static(path.join(__dirname, '..', dir), {
         setHeaders: (res, path) => {
