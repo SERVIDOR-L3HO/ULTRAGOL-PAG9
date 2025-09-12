@@ -420,6 +420,171 @@
     }
 }
 
+/* ====== ANIMACIONES ULTRA CREATIVAS DANZ STYLE ====== */
+
+/* Partículas flotantes de fondo */
+@keyframes particleFloat {
+    0% {
+        transform: translateX(-100px) translateY(0px) rotate(0deg);
+    }
+    33% {
+        transform: translateX(100px) translateY(-30px) rotate(120deg);
+    }
+    66% {
+        transform: translateX(-50px) translateY(-60px) rotate(240deg);
+    }
+    100% {
+        transform: translateX(-100px) translateY(0px) rotate(360deg);
+    }
+}
+
+/* Pulso energético para slides activos */
+@keyframes energyPulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    25% {
+        opacity: 0.9;
+        transform: scale(1.02);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    75% {
+        opacity: 0.8;
+        transform: scale(1.03);
+    }
+}
+
+/* Rotación energética de fondo */
+@keyframes rotateEnergy {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        transform: rotate(180deg) scale(1.1);
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+/* Animación espectacular para títulos */
+@keyframes titleSpectacular {
+    0% {
+        opacity: 0;
+        transform: translateY(50px) scale(0.8) rotateX(45deg);
+        filter: blur(10px) brightness(0.5);
+    }
+    40% {
+        opacity: 0.7;
+        transform: translateY(20px) scale(0.95) rotateX(20deg);
+        filter: blur(3px) brightness(0.8);
+    }
+    70% {
+        opacity: 0.9;
+        transform: translateY(5px) scale(1.02) rotateX(5deg);
+        filter: blur(1px) brightness(1.1);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotateX(0deg);
+        filter: blur(0px) brightness(1);
+    }
+}
+
+/* Brillo dinámico para títulos */
+@keyframes titleGlow {
+    0%, 100% {
+        text-shadow: 0 0 20px rgba(255, 107, 53, 0.5),
+                     0 0 40px rgba(0, 150, 255, 0.3),
+                     0 0 60px rgba(220, 38, 127, 0.2);
+    }
+    50% {
+        text-shadow: 0 0 30px rgba(255, 107, 53, 0.8),
+                     0 0 60px rgba(0, 150, 255, 0.6),
+                     0 0 90px rgba(220, 38, 127, 0.4);
+    }
+}
+
+/* Brillo sutil para subtítulos */
+@keyframes subtitleGlow {
+    0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.9);
+        backdrop-filter: blur(20px);
+        background: rgba(255, 255, 255, 0.02);
+    }
+    60% {
+        opacity: 0.8;
+        transform: translateY(10px) scale(0.98);
+        backdrop-filter: blur(15px);
+        background: rgba(255, 255, 255, 0.04);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.05);
+    }
+}
+
+/* Revelación espectacular del contenido */
+@keyframes slideContentReveal {
+    0% {
+        opacity: 0;
+        transform: translateY(60px) scale(0.9) rotateX(30deg);
+        filter: blur(8px);
+    }
+    30% {
+        opacity: 0.4;
+        transform: translateY(30px) scale(0.95) rotateX(15deg);
+        filter: blur(4px);
+    }
+    70% {
+        opacity: 0.8;
+        transform: translateY(10px) scale(0.99) rotateX(5deg);
+        filter: blur(1px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotateX(0deg);
+        filter: blur(0px);
+    }
+}
+
+/* Indicadores con energía */
+@keyframes indicatorEnergy {
+    0%, 100% {
+        background: linear-gradient(90deg, rgba(255, 107, 53, 0.6), rgba(255, 107, 53, 0.6));
+        box-shadow: 0 0 10px rgba(255, 107, 53, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        background: linear-gradient(90deg, rgba(255, 107, 53, 1), rgba(0, 150, 255, 0.8));
+        box-shadow: 0 0 20px rgba(255, 107, 53, 0.8), 0 0 30px rgba(0, 150, 255, 0.5);
+        transform: scale(1.1);
+    }
+}
+
+/* Hover espectacular para botones */
+@keyframes buttonHover {
+    0% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+    }
+    50% {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 15px 30px rgba(255, 107, 53, 0.5);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+    }
+}
+
 /* Responsive Animation Controls */
 @media (prefers-reduced-motion: reduce) {
     *,
