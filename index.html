@@ -1311,5 +1311,210 @@
             });
         });
     </script>
+
+    <!-- Video Carousel 3D Functionality -->
+    <script>
+        class VideoCarousel3D {
+            constructor() {
+                this.carousel = document.getElementById('videoCarousel');
+                this.cards = document.querySelectorAll('.video-card');
+                this.indicators = document.querySelectorAll('.indicator');
+                this.prevBtn = document.getElementById('prevVideo');
+                this.nextBtn = document.getElementById('nextVideo');
+                this.currentIndex = 0;
+                this.totalCards = this.cards.length;
+                this.isTransitioning = false;
+
+                this.init();
+            }
+
+            init() {
+                if (!this.carousel || !this.cards.length) {
+                    console.log('Video carousel elements not found');
+                    return;
+                }
+
+                // Add event listeners
+                this.prevBtn?.addEventListener('click', () => this.prevSlide());
+                this.nextBtn?.addEventListener('click', () => this.nextSlide());
+
+                // Indicator event listeners
+                this.indicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', () => this.goToSlide(index));
+                });
+
+                // Touch/Swipe support
+                this.addTouchSupport();
+
+                // Keyboard navigation
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') this.prevSlide();
+                    if (e.key === 'ArrowRight') this.nextSlide();
+                });
+
+                // Auto-play (optional)
+                this.startAutoPlay();
+
+                console.log('🎬 Video Carousel 3D initialized with', this.totalCards, 'videos');
+            }
+
+            updateCarousel() {
+                if (this.isTransitioning) return;
+                
+                this.isTransitioning = true;
+
+                // Update cards positions
+                this.cards.forEach((card, index) => {
+                    card.classList.remove('active');
+                    
+                    const position = (index - this.currentIndex + this.totalCards) % this.totalCards;
+                    
+                    switch(position) {
+                        case 0: // Active center card
+                            card.style.transform = 'translateX(0) translateZ(0) rotateY(0deg) scale(1)';
+                            card.style.zIndex = '3';
+                            card.style.opacity = '1';
+                            card.classList.add('active');
+                            break;
+                        case 1: // Right card
+                            card.style.transform = 'translateX(450px) translateZ(-200px) rotateY(-45deg) scale(0.8)';
+                            card.style.zIndex = '2';
+                            card.style.opacity = '0.7';
+                            break;
+                        case this.totalCards - 1: // Left card
+                            card.style.transform = 'translateX(-450px) translateZ(-200px) rotateY(45deg) scale(0.8)';
+                            card.style.zIndex = '2';
+                            card.style.opacity = '0.7';
+                            break;
+                        case 2: // Far right card
+                            card.style.transform = 'translateX(700px) translateZ(-400px) rotateY(-60deg) scale(0.6)';
+                            card.style.zIndex = '1';
+                            card.style.opacity = '0.4';
+                            break;
+                        case this.totalCards - 2: // Far left card
+                            card.style.transform = 'translateX(-700px) translateZ(-400px) rotateY(60deg) scale(0.6)';
+                            card.style.zIndex = '1';
+                            card.style.opacity = '0.4';
+                            break;
+                        default: // Hidden cards
+                            card.style.transform = 'translateX(0) translateZ(-600px) rotateY(0deg) scale(0.3)';
+                            card.style.zIndex = '0';
+                            card.style.opacity = '0';
+                            break;
+                    }
+                });
+
+                // Update indicators
+                this.indicators.forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index === this.currentIndex);
+                });
+
+                // Reset transition flag
+                setTimeout(() => {
+                    this.isTransitioning = false;
+                }, 800);
+            }
+
+            nextSlide() {
+                if (this.isTransitioning) return;
+                this.currentIndex = (this.currentIndex + 1) % this.totalCards;
+                this.updateCarousel();
+                this.resetAutoPlay();
+            }
+
+            prevSlide() {
+                if (this.isTransitioning) return;
+                this.currentIndex = (this.currentIndex - 1 + this.totalCards) % this.totalCards;
+                this.updateCarousel();
+                this.resetAutoPlay();
+            }
+
+            goToSlide(index) {
+                if (this.isTransitioning || index === this.currentIndex) return;
+                this.currentIndex = index;
+                this.updateCarousel();
+                this.resetAutoPlay();
+            }
+
+            addTouchSupport() {
+                let startX = 0;
+                let isDragging = false;
+
+                this.carousel.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    isDragging = true;
+                }, { passive: true });
+
+                this.carousel.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    e.preventDefault();
+                }, { passive: false });
+
+                this.carousel.addEventListener('touchend', (e) => {
+                    if (!isDragging) return;
+                    
+                    const endX = e.changedTouches[0].clientX;
+                    const diffX = startX - endX;
+                    const threshold = 50;
+
+                    if (Math.abs(diffX) > threshold) {
+                        if (diffX > 0) {
+                            this.nextSlide();
+                        } else {
+                            this.prevSlide();
+                        }
+                    }
+
+                    isDragging = false;
+                });
+            }
+
+            startAutoPlay() {
+                this.autoPlayInterval = setInterval(() => {
+                    if (!this.isTransitioning) {
+                        this.nextSlide();
+                    }
+                }, 8000); // Change slide every 8 seconds
+            }
+
+            stopAutoPlay() {
+                if (this.autoPlayInterval) {
+                    clearInterval(this.autoPlayInterval);
+                    this.autoPlayInterval = null;
+                }
+            }
+
+            resetAutoPlay() {
+                this.stopAutoPlay();
+                this.startAutoPlay();
+            }
+        }
+
+        // Initialize video carousel when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait a bit for all elements to be rendered
+            setTimeout(() => {
+                new VideoCarousel3D();
+            }, 500);
+        });
+
+        // Pause auto-play when user hovers over carousel
+        document.addEventListener('DOMContentLoaded', () => {
+            const carouselContainer = document.querySelector('.video-carousel-container');
+            if (carouselContainer) {
+                carouselContainer.addEventListener('mouseenter', () => {
+                    if (window.videoCarousel) {
+                        window.videoCarousel.stopAutoPlay();
+                    }
+                });
+                
+                carouselContainer.addEventListener('mouseleave', () => {
+                    if (window.videoCarousel) {
+                        window.videoCarousel.startAutoPlay();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
