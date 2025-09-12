@@ -110,8 +110,29 @@ app.use((req, res, next) => {
 // API Routes para gestión de cookies
 app.use(express.json());
 
+// Middleware de protección CSRF para endpoints críticos
+const csrfProtection = (req, res, next) => {
+    // Verificar Origin o Referer para endpoints de consentimiento
+    const origin = req.get('Origin') || req.get('Referer');
+    const allowedOrigins = [
+        `http://localhost:${PORT}`,
+        `https://localhost:${PORT}`,
+        req.get('Host') ? `http://${req.get('Host')}` : null,
+        req.get('Host') ? `https://${req.get('Host')}` : null
+    ].filter(Boolean);
+    
+    if (!origin || !allowedOrigins.some(allowed => origin.startsWith(allowed))) {
+        return res.status(403).json({ 
+            success: false, 
+            error: 'Solicitud bloqueada por política de seguridad CSRF' 
+        });
+    }
+    
+    next();
+};
+
 // Endpoint para gestionar consentimiento de cookies
-app.post('/api/cookie-consent', (req, res) => {
+app.post('/api/cookie-consent', csrfProtection, (req, res) => {
     const { necessary = true, analytics = false, marketing = false, preferences = false } = req.body;
     
     const consentData = {
@@ -139,7 +160,7 @@ app.post('/api/cookie-consent', (req, res) => {
 });
 
 // Endpoint para retirar consentimiento
-app.delete('/api/cookie-consent', (req, res) => {
+app.delete('/api/cookie-consent', csrfProtection, (req, res) => {
     res.clearCookie('cookieConsent');
     res.clearCookie('_ga'); // Limpiar Google Analytics si existe
     res.clearCookie('_gid');
