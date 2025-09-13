@@ -21,8 +21,8 @@ class DonationsManager {
             return;
         }
 
-        // Inicializar Stripe (la clave pública se establecerá desde las variables de entorno)
-        const publishableKey = this.getStripePublishableKey();
+        // Inicializar Stripe (la clave pública se obtendrá del servidor)
+        const publishableKey = await this.getStripePublishableKey();
         if (!publishableKey) {
             console.error('Clave pública de Stripe no configurada');
             this.showError('Sistema de pagos no configurado');
@@ -38,10 +38,17 @@ class DonationsManager {
         }
     }
 
-    getStripePublishableKey() {
-        // En un entorno real, esto vendría de variables de entorno
-        // Por ahora, usamos una clave de prueba por defecto
-        return window.STRIPE_PUBLISHABLE_KEY || 'pk_test_51234567890abcdef'; // Esta será reemplazada por la clave real
+    async getStripePublishableKey() {
+        // En desarrollo, obtener la clave desde el servidor
+        try {
+            const response = await fetch('/api/stripe-config');
+            const data = await response.json();
+            return data.publishable_key;
+        } catch (error) {
+            console.error('Error obteniendo clave de Stripe:', error);
+            // Fallback a variable global si está disponible
+            return window.STRIPE_PUBLISHABLE_KEY;
+        }
     }
 
     initializeEventListeners() {
@@ -110,6 +117,11 @@ class DonationsManager {
             
             if (!amount || amount < 10) {
                 this.showError('Por favor ingresa una cantidad mínima de $10 MXN');
+                return;
+            }
+            
+            if (amount > 50000) {
+                this.showError('La cantidad máxima permitida es $50,000 MXN');
                 return;
             }
         } else {
@@ -192,10 +204,9 @@ class DonationsManager {
 
     async createPaymentIntent(amount) {
         try {
-            // En un entorno real, esto sería una llamada a tu servidor
-            // Por ahora, simulamos la respuesta del servidor
+            // Enviar cantidad en pesos MXN al servidor (el servidor la convertirá a centavos)
             const response = await this.callServer('/api/create-payment-intent', {
-                amount: Math.round(amount * 100), // Convertir a centavos
+                amount: amount, // Enviar directamente en pesos MXN
                 currency: 'mxn',
                 metadata: {
                     platform: 'UltraGol',
@@ -211,23 +222,25 @@ class DonationsManager {
     }
 
     async callServer(endpoint, data) {
-        // Simulación de llamada al servidor
-        // En producción, esto sería una llamada real a tu backend
-        console.log('Llamada simulada al servidor:', endpoint, data);
-        
-        // Simulamos una respuesta exitosa
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (Math.random() > 0.1) { // 90% de éxito
-                    resolve({
-                        client_secret: 'pi_simulate_' + Math.random().toString(36).substr(2, 9) + '_secret_simulate',
-                        status: 'success'
-                    });
-                } else {
-                    reject(new Error('Error simulado del servidor'));
-                }
-            }, 1000);
-        });
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error del servidor');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error en llamada al servidor:', error);
+            throw error;
+        }
     }
 
     async handlePaymentSubmit(event) {

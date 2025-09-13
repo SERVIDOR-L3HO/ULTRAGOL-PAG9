@@ -19,7 +19,8 @@ app.use(helmet({
                 "'unsafe-inline'", // Para Firebase y scripts inline necesarios
                 "https://www.gstatic.com",
                 "https://cdnjs.cloudflare.com",
-                "https://apis.google.com"
+                "https://apis.google.com",
+                "https://js.stripe.com"
             ],
             styleSrc: [
                 "'self'",
@@ -43,11 +44,15 @@ app.use(helmet({
                 "https://firebasestorage.googleapis.com",
                 "https://firebasestorage.app",
                 "https://accounts.google.com",
-                "https://apis.google.com"
+                "https://apis.google.com",
+                "https://api.stripe.com",
+                "https://js.stripe.com"
             ],
             frameSrc: [
                 "'self'",
-                "https://accounts.google.com"
+                "https://accounts.google.com",
+                "https://js.stripe.com",
+                "https://hooks.stripe.com"
             ]
         }
     },
@@ -198,6 +203,77 @@ app.get('/api/cookie-consent', (req, res) => {
     }
 });
 
+// Stripe payment endpoints
+app.post('/api/create-payment-intent', csrfProtection, async (req, res) => {
+    try {
+        const { amount, currency = 'mxn', metadata = {} } = req.body;
+        
+        // Validar que amount es un número válido en pesos MXN
+        const amountInPesos = Number(amount);
+        if (!amountInPesos || amountInPesos < 10) { // Mínimo $10 MXN
+            return res.status(400).json({
+                error: 'Cantidad mínima requerida es $10 MXN'
+            });
+        }
+        
+        if (amountInPesos > 50000) { // Máximo $50,000 MXN
+            return res.status(400).json({
+                error: 'Cantidad máxima permitida es $50,000 MXN'
+            });
+        }
+        
+        // Convertir pesos a centavos para Stripe
+        const amountInCentavos = Math.round(amountInPesos * 100);
+        
+        // Verificar que las claves de Stripe estén configuradas
+        if (!process.env.STRIPE_SECRET_KEY) {
+            console.error('STRIPE_SECRET_KEY no está configurada');
+            return res.status(500).json({
+                error: 'Configuración de pagos no disponible'
+            });
+        }
+        
+        // Crear PaymentIntent con Stripe
+        const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amountInCentavos, // amount en centavos
+            currency: currency.toLowerCase(),
+            payment_method_types: ['card'],
+            metadata: {
+                platform: 'UltraGol',
+                type: 'donation',
+                amountInPesos: amountInPesos.toString(),
+                ...metadata
+            }
+        });
+        
+        res.json({
+            client_secret: paymentIntent.client_secret,
+            status: 'success'
+        });
+        
+    } catch (error) {
+        console.error('Error creating PaymentIntent:', error);
+        res.status(500).json({
+            error: 'Error interno del servidor al procesar el pago'
+        });
+    }
+});
+
+// Endpoint para obtener configuración de Stripe (clave pública)
+app.get('/api/stripe-config', (req, res) => {
+    if (!process.env.STRIPE_PUBLISHABLE_KEY) {
+        return res.status(500).json({
+            error: 'Configuración de Stripe no disponible'
+        });
+    }
+    
+    res.json({
+        publishable_key: process.env.STRIPE_PUBLISHABLE_KEY
+    });
+});
+
 // Health check endpoint for monitoring
 app.get('/healthz', (req, res) => {
     res.status(200).json({
@@ -249,7 +325,7 @@ app.get('/', (req, res) => {
 });
 
 // Rutas específicas para páginas HTML del proyecto principal
-const mainPages = ['calendario.html', 'chat-global.html', 'estadisticas.html', 'fotos.html', 'historias.html', 'noticias.html', 'standings.html', 'team-profile.html', 'teams.html'];
+const mainPages = ['calendario.html', 'chat-global.html', 'donaciones.html', 'estadisticas.html', 'fotos.html', 'historias.html', 'noticias.html', 'standings.html', 'team-profile.html', 'teams.html'];
 
 mainPages.forEach(page => {
     app.get(`/${page}`, (req, res) => {
