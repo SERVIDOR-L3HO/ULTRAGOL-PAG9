@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@paypal/paypal-server-sdk": "^1.1.0",
     "stripe": "^18.5.0"
   }
 }

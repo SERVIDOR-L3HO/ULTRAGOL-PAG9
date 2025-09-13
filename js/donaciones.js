@@ -1,54 +1,72 @@
-// UltraGol - Módulo de Donaciones
-// Integración con Stripe para procesamiento de pagos
+// UltraGol - Módulo de Donaciones con PayPal
+// Integración con PayPal para procesamiento de pagos
 
 class DonationsManager {
     constructor() {
-        this.stripe = null;
-        this.elements = null;
-        this.paymentElement = null;
+        this.paypal = null;
         this.currentAmount = 0;
-        this.paymentIntent = null;
+        this.paypalClientId = null;
+        this.environment = 'sandbox';
         
-        this.initializeStripe();
+        this.initializePayPal();
         this.initializeEventListeners();
     }
 
-    async initializeStripe() {
-        // Verificar si Stripe está cargado
-        if (typeof Stripe === 'undefined') {
-            console.error('Stripe.js no está cargado');
-            this.showError('Error: Sistema de pagos no disponible');
-            return;
-        }
-
-        // Inicializar Stripe (la clave pública se obtendrá del servidor)
-        const publishableKey = await this.getStripePublishableKey();
-        if (!publishableKey) {
-            console.error('Clave pública de Stripe no configurada');
-            this.showError('Sistema de pagos no configurado');
-            return;
-        }
-
+    async initializePayPal() {
         try {
-            this.stripe = Stripe(publishableKey);
-            console.log('Stripe inicializado correctamente');
+            // Obtener configuración de PayPal desde el servidor
+            const config = await this.getPayPalConfig();
+            this.paypalClientId = config.client_id;
+            this.environment = config.environment;
+            
+            // Cargar el SDK de PayPal dinámicamente
+            await this.loadPayPalSDK();
+            
+            console.log('PayPal inicializado correctamente');
         } catch (error) {
-            console.error('Error al inicializar Stripe:', error);
+            console.error('Error al inicializar PayPal:', error);
             this.showError('Error al inicializar el sistema de pagos');
         }
     }
 
-    async getStripePublishableKey() {
-        // En desarrollo, obtener la clave desde el servidor
+    async getPayPalConfig() {
         try {
-            const response = await fetch('/api/stripe-config');
-            const data = await response.json();
-            return data.publishable_key;
+            const response = await fetch('/api/paypal/config');
+            if (!response.ok) {
+                throw new Error('Error al obtener configuración de PayPal');
+            }
+            return await response.json();
         } catch (error) {
-            console.error('Error obteniendo clave de Stripe:', error);
-            // Fallback a variable global si está disponible
-            return window.STRIPE_PUBLISHABLE_KEY;
+            console.error('Error obteniendo configuración de PayPal:', error);
+            throw error;
         }
+    }
+
+    async loadPayPalSDK() {
+        return new Promise((resolve, reject) => {
+            // Si PayPal ya está cargado, resolver inmediatamente
+            if (window.paypal) {
+                resolve();
+                return;
+            }
+
+            // Cargar el script de PayPal
+            const script = document.createElement('script');
+            script.src = `https://www.paypal.com/sdk/js?client-id=${this.paypalClientId}&currency=MXN`;
+            script.async = true;
+            
+            script.onload = () => {
+                console.log('PayPal SDK cargado correctamente');
+                resolve();
+            };
+            
+            script.onerror = () => {
+                console.error('Error cargando PayPal SDK');
+                reject(new Error('Error cargando PayPal SDK'));
+            };
+            
+            document.head.appendChild(script);
+        });
     }
 
     initializeEventListeners() {
@@ -81,12 +99,6 @@ class DonationsManager {
                     this.closePaymentModal();
                 }
             });
-        }
-
-        // Form de pago
-        const paymentForm = document.getElementById('payment-form');
-        if (paymentForm) {
-            paymentForm.addEventListener('submit', this.handlePaymentSubmit.bind(this));
         }
     }
 
@@ -144,160 +156,119 @@ class DonationsManager {
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
 
-        // Inicializar Payment Element de Stripe
-        await this.initializePaymentElement(amount);
+        // Inicializar botón de PayPal
+        await this.initializePayPalButton(amount);
     }
 
-    async initializePaymentElement(amount) {
-        if (!this.stripe) {
-            this.showError('Sistema de pagos no disponible');
+    async initializePayPalButton(amount) {
+        if (!window.paypal) {
+            this.showError('PayPal no está disponible');
             return;
         }
 
+        const container = document.getElementById('paypal-button-container');
+        if (!container) {
+            console.error('Contenedor de PayPal no encontrado');
+            return;
+        }
+
+        // Limpiar contenedor anterior
+        container.innerHTML = '';
+
         try {
-            // Crear PaymentIntent en el servidor
-            const clientSecret = await this.createPaymentIntent(amount);
-            
-            if (!clientSecret) {
-                throw new Error('No se pudo crear la intención de pago');
-            }
-
-            // Crear Elements
-            this.elements = this.stripe.elements({
-                clientSecret: clientSecret,
-                appearance: {
-                    theme: 'stripe',
-                    variables: {
-                        colorPrimary: '#ff9933',
-                        colorBackground: '#ffffff',
-                        colorText: '#1a1a1a',
-                        colorDanger: '#dc3545',
-                        fontFamily: 'Roboto, sans-serif',
-                        spacingUnit: '4px',
-                        borderRadius: '8px',
-                    }
+            // Renderizar botón de PayPal
+            window.paypal.Buttons({
+                createOrder: (data, actions) => {
+                    return this.createPayPalOrder(amount);
+                },
+                onApprove: (data, actions) => {
+                    return this.onPayPalApprove(data, actions);
+                },
+                onCancel: (data) => {
+                    this.onPayPalCancel(data);
+                },
+                onError: (err) => {
+                    this.onPayPalError(err);
+                },
+                style: {
+                    layout: 'vertical',
+                    color: 'gold',
+                    shape: 'rect',
+                    label: 'paypal',
+                    height: 50
                 }
-            });
-
-            // Crear Payment Element
-            this.paymentElement = this.elements.create('payment', {
-                layout: 'tabs'
-            });
-
-            // Montar el elemento
-            this.paymentElement.mount('#payment-element');
-
-            // Manejar errores en tiempo real
-            this.paymentElement.on('change', (event) => {
-                if (event.error) {
-                    this.showError(event.error.message);
-                } else {
-                    this.clearErrors();
-                }
-            });
+            }).render('#paypal-button-container');
 
         } catch (error) {
-            console.error('Error al inicializar Payment Element:', error);
-            this.showError('Error al cargar el formulario de pago');
+            console.error('Error inicializando botón de PayPal:', error);
+            this.showError('Error al cargar el botón de pago');
         }
     }
 
-    async createPaymentIntent(amount) {
+    async createPayPalOrder(amount) {
         try {
-            // Enviar cantidad en pesos MXN al servidor (el servidor la convertirá a centavos)
-            const response = await this.callServer('/api/create-payment-intent', {
-                amount: amount, // Enviar directamente en pesos MXN
-                currency: 'mxn',
-                metadata: {
-                    platform: 'UltraGol',
-                    type: 'donation'
-                }
-            });
-
-            return response.client_secret;
-        } catch (error) {
-            console.error('Error al crear PaymentIntent:', error);
-            throw error;
-        }
-    }
-
-    async callServer(endpoint, data) {
-        try {
-            const response = await fetch(endpoint, {
+            const response = await fetch('/api/paypal/order', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify({
+                    intent: 'CAPTURE',
+                    amount: amount.toString(),
+                    currency: 'MXN'
+                })
             });
-            
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Error del servidor');
             }
-            
-            return await response.json();
+
+            const orderData = await response.json();
+            return orderData.id;
+
         } catch (error) {
-            console.error('Error en llamada al servidor:', error);
+            console.error('Error creando orden de PayPal:', error);
+            this.showError('Error al crear la orden de pago');
             throw error;
         }
     }
 
-    async handlePaymentSubmit(event) {
-        event.preventDefault();
-
-        if (!this.stripe || !this.elements) {
-            this.showError('Sistema de pagos no disponible');
-            return;
-        }
-
-        const submitButton = document.getElementById('submit-payment');
-        const buttonText = submitButton.querySelector('span');
-        const buttonLoading = submitButton.querySelector('.btn-loading');
-
-        // Deshabilitar botón y mostrar loading
-        submitButton.disabled = true;
-        buttonText.style.display = 'none';
-        buttonLoading.style.display = 'block';
-
+    async onPayPalApprove(data, actions) {
         try {
-            // Confirmar pago
-            const { error, paymentIntent } = await this.stripe.confirmPayment({
-                elements: this.elements,
-                confirmParams: {
-                    return_url: window.location.origin + '/donaciones.html?success=true',
-                    receipt_email: this.getUserEmail(), // Si el usuario está logueado
-                },
-                redirect: 'if_required'
+            const response = await fetch(`/api/paypal/order/${data.orderID}/capture`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
             });
 
-            if (error) {
-                this.showError(error.message);
-            } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-                this.handlePaymentSuccess(paymentIntent);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error del servidor');
             }
 
+            const orderData = await response.json();
+            this.handlePaymentSuccess(orderData);
+
         } catch (error) {
-            console.error('Error al procesar pago:', error);
-            this.showError('Error al procesar el pago. Por favor intenta de nuevo.');
-        } finally {
-            // Rehabilitar botón
-            submitButton.disabled = false;
-            buttonText.style.display = 'block';
-            buttonLoading.style.display = 'none';
+            console.error('Error capturando orden de PayPal:', error);
+            this.showError('Error al procesar el pago');
         }
     }
 
-    getUserEmail() {
-        // Si está integrado con Firebase Auth, obtener email del usuario
-        if (window.firebase && window.firebase.auth && window.firebase.auth().currentUser) {
-            return window.firebase.auth().currentUser.email;
-        }
-        return null;
+    onPayPalCancel(data) {
+        console.log('Pago cancelado por el usuario:', data);
+        this.showInfo('Pago cancelado por el usuario');
     }
 
-    handlePaymentSuccess(paymentIntent) {
-        console.log('Pago exitoso:', paymentIntent);
+    onPayPalError(err) {
+        console.error('Error en PayPal:', err);
+        this.showError('Error en el proceso de pago de PayPal');
+    }
+
+    handlePaymentSuccess(orderData) {
+        console.log('Pago exitoso:', orderData);
         
         // Cerrar modal
         this.closePaymentModal();
@@ -306,10 +277,10 @@ class DonationsManager {
         this.showSuccessMessage();
 
         // Registrar donación si el usuario está logueado
-        this.recordDonation(paymentIntent);
+        this.recordDonation(orderData);
 
         // Enviar eventos de analytics si están configurados
-        this.trackDonation(paymentIntent.amount / 100);
+        this.trackDonation(this.currentAmount);
     }
 
     showSuccessMessage() {
@@ -323,7 +294,7 @@ class DonationsManager {
                 </div>
                 <h2>¡Gracias por tu donación!</h2>
                 <p>Tu apoyo es invaluable para seguir mejorando UltraGol.</p>
-                <p>Recibirás un recibo por email en unos minutos.</p>
+                <p>PayPal te enviará un recibo por email.</p>
                 <button onclick="this.parentElement.parentElement.remove()" class="success-btn">
                     <i class="fas fa-check"></i> Continuar
                 </button>
@@ -365,7 +336,7 @@ class DonationsManager {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ff9933, #e67e22);
+            background: linear-gradient(135deg, #0070ba, #003087);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -378,7 +349,7 @@ class DonationsManager {
         // Estilo para el botón
         const successBtn = successOverlay.querySelector('.success-btn');
         successBtn.style.cssText = `
-            background: linear-gradient(135deg, #ff9933, #e67e22);
+            background: linear-gradient(135deg, #0070ba, #003087);
             color: white;
             border: none;
             padding: 1rem 2rem;
@@ -397,7 +368,7 @@ class DonationsManager {
         }, 10000);
     }
 
-    async recordDonation(paymentIntent) {
+    async recordDonation(orderData) {
         // Si Firebase está disponible y el usuario está logueado
         if (window.firebase && window.firebase.firestore && window.firebase.auth().currentUser) {
             try {
@@ -407,12 +378,13 @@ class DonationsManager {
                 await db.collection('donations').add({
                     userId: user.uid,
                     userEmail: user.email,
-                    amount: paymentIntent.amount / 100,
+                    amount: this.currentAmount,
                     currency: 'MXN',
-                    paymentIntentId: paymentIntent.id,
-                    status: paymentIntent.status,
+                    paypalOrderId: orderData.id,
+                    status: orderData.status,
                     timestamp: window.firebase.firestore.Timestamp.now(),
-                    platform: 'UltraGol'
+                    platform: 'UltraGol',
+                    paymentMethod: 'PayPal'
                 });
 
                 console.log('Donación registrada en Firebase');
@@ -453,13 +425,10 @@ class DonationsManager {
         modal.style.display = 'none';
         document.body.style.overflow = 'auto';
 
-        // Limpiar Payment Element
-        if (this.paymentElement) {
-            this.paymentElement.unmount();
-            this.paymentElement = null;
-        }
-        if (this.elements) {
-            this.elements = null;
+        // Limpiar contenedor de PayPal
+        const container = document.getElementById('paypal-button-container');
+        if (container) {
+            container.innerHTML = '';
         }
 
         this.clearErrors();
@@ -505,6 +474,43 @@ class DonationsManager {
         }, 5000);
     }
 
+    showInfo(message) {
+        // Crear elemento de información
+        const infoElement = document.createElement('div');
+        infoElement.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #17a2b8;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            z-index: 10002;
+            max-width: 300px;
+            box-shadow: 0 5px 15px rgba(23, 162, 184, 0.3);
+        `;
+        
+        infoElement.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-info-circle"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.parentElement.remove()" 
+                        style="background: none; border: none; color: white; margin-left: auto; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(infoElement);
+
+        // Auto-remove después de 3 segundos
+        setTimeout(() => {
+            if (infoElement.parentNode) {
+                infoElement.remove();
+            }
+        }, 3000);
+    }
+
     clearErrors() {
         const errorElement = document.getElementById('donation-error');
         if (errorElement) {
@@ -533,7 +539,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hacer disponible globalmente para debugging
     window.donationsManager = donationsManager;
 });
-
-// Configuración de variables de entorno (debe ser establecido desde el servidor)
-// En producción, estas variables vendrían del servidor o de variables de entorno
-window.STRIPE_PUBLISHABLE_KEY = 'pk_test_stripe_key_here'; // Esta será reemplazada por la clave real

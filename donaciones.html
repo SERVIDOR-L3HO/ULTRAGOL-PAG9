@@ -20,8 +20,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
-    <!-- Stripe.js -->
-    <script src="https://js.stripe.com/v3/"></script>
+    <!-- PayPal SDK will be loaded dynamically -->
 </head>
 <body>
     <!-- Header Navigation -->
@@ -293,21 +292,10 @@
                     </div>
                 </div>
                 
-                <!-- Formulario de Stripe -->
-                <form id="payment-form">
-                    <div id="payment-element">
-                        <!-- Stripe Elements will create form elements here -->
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" id="submit-payment" class="payment-submit-btn">
-                            <i class="fas fa-heart"></i>
-                            <span>Completar Donación</span>
-                            <div class="btn-loading" style="display: none;">
-                                <i class="fas fa-spinner fa-spin"></i>
-                            </div>
-                        </button>
-                    </div>
-                </form>
+                <!-- Botón de PayPal -->
+                <div id="paypal-button-container">
+                    <!-- PayPal button will be rendered here -->
+                </div>
                 
                 <div class="payment-security">
                     <div class="security-badges">
@@ -316,8 +304,8 @@
                             <span>Pago 100% Seguro</span>
                         </div>
                         <div class="security-badge">
-                            <i class="fab fa-cc-stripe"></i>
-                            <span>Procesado por Stripe</span>
+                            <i class="fab fa-paypal"></i>
+                            <span>Procesado por PayPal</span>
                         </div>
                     </div>
                 </div>

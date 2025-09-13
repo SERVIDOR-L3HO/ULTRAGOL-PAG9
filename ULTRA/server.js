@@ -20,7 +20,8 @@ app.use(helmet({
                 "https://www.gstatic.com",
                 "https://cdnjs.cloudflare.com",
                 "https://apis.google.com",
-                "https://js.stripe.com"
+                "https://www.paypal.com",
+                "https://www.sandbox.paypal.com"
             ],
             styleSrc: [
                 "'self'",
@@ -33,7 +34,7 @@ app.use(helmet({
                 "https://fonts.gstatic.com",
                 "https://cdnjs.cloudflare.com"
             ],
-            imgSrc: ["'self'", "data:", "https:"],
+            imgSrc: ["'self'", "data:", "https:", "https://www.paypalobjects.com"],
             connectSrc: [
                 "'self'",
                 "https://firestore.googleapis.com",
@@ -45,14 +46,16 @@ app.use(helmet({
                 "https://firebasestorage.app",
                 "https://accounts.google.com",
                 "https://apis.google.com",
-                "https://api.stripe.com",
-                "https://js.stripe.com"
+                "https://www.paypal.com",
+                "https://www.sandbox.paypal.com",
+                "https://api.paypal.com",
+                "https://api.sandbox.paypal.com"
             ],
             frameSrc: [
                 "'self'",
                 "https://accounts.google.com",
-                "https://js.stripe.com",
-                "https://hooks.stripe.com"
+                "https://www.paypal.com",
+                "https://www.sandbox.paypal.com"
             ]
         }
     },
@@ -203,74 +206,46 @@ app.get('/api/cookie-consent', (req, res) => {
     }
 });
 
-// Stripe payment endpoints
-app.post('/api/create-payment-intent', csrfProtection, async (req, res) => {
-    try {
-        const { amount, currency = 'mxn', metadata = {} } = req.body;
-        
-        // Validar que amount es un número válido en pesos MXN
-        const amountInPesos = Number(amount);
-        if (!amountInPesos || amountInPesos < 10) { // Mínimo $10 MXN
-            return res.status(400).json({
-                error: 'Cantidad mínima requerida es $10 MXN'
-            });
-        }
-        
-        if (amountInPesos > 50000) { // Máximo $50,000 MXN
-            return res.status(400).json({
-                error: 'Cantidad máxima permitida es $50,000 MXN'
-            });
-        }
-        
-        // Convertir pesos a centavos para Stripe
-        const amountInCentavos = Math.round(amountInPesos * 100);
-        
-        // Verificar que las claves de Stripe estén configuradas
-        if (!process.env.STRIPE_SECRET_KEY) {
-            console.error('STRIPE_SECRET_KEY no está configurada');
-            return res.status(500).json({
-                error: 'Configuración de pagos no disponible'
-            });
-        }
-        
-        // Crear PaymentIntent con Stripe
-        const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-        
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: amountInCentavos, // amount en centavos
-            currency: currency.toLowerCase(),
-            payment_method_types: ['card'],
-            metadata: {
-                platform: 'UltraGol',
-                type: 'donation',
-                amountInPesos: amountInPesos.toString(),
-                ...metadata
-            }
-        });
-        
-        res.json({
-            client_secret: paymentIntent.client_secret,
-            status: 'success'
-        });
-        
-    } catch (error) {
-        console.error('Error creating PaymentIntent:', error);
-        res.status(500).json({
-            error: 'Error interno del servidor al procesar el pago'
-        });
-    }
+// PayPal endpoints from integration
+const { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } = require('../server/paypal');
+
+app.get('/api/paypal/setup', async (req, res) => {
+    await loadPaypalDefault(req, res);
 });
 
-// Endpoint para obtener configuración de Stripe (clave pública)
-app.get('/api/stripe-config', (req, res) => {
-    if (!process.env.STRIPE_PUBLISHABLE_KEY) {
+app.get('/api/paypal/config', (req, res) => {
+    if (!process.env.PAYPAL_CLIENT_ID) {
         return res.status(500).json({
-            error: 'Configuración de Stripe no disponible'
+            error: 'Configuración de PayPal no disponible'
         });
     }
     
     res.json({
-        publishable_key: process.env.STRIPE_PUBLISHABLE_KEY
+        client_id: process.env.PAYPAL_CLIENT_ID,
+        environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'
+    });
+});
+
+app.post('/api/paypal/order', csrfProtection, async (req, res) => {
+    // Request body should contain: { intent, amount, currency }
+    await createPaypalOrder(req, res);
+});
+
+app.post('/api/paypal/order/:orderID/capture', csrfProtection, async (req, res) => {
+    await capturePaypalOrder(req, res);
+});
+
+// Endpoint para obtener configuración de PayPal (client ID)
+app.get('/api/paypal/config', (req, res) => {
+    if (!process.env.PAYPAL_CLIENT_ID) {
+        return res.status(500).json({
+            error: 'Configuración de PayPal no disponible'
+        });
+    }
+    
+    res.json({
+        client_id: process.env.PAYPAL_CLIENT_ID,
+        environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'
     });
 });
 
