@@ -206,8 +206,29 @@ app.get('/api/cookie-consent', (req, res) => {
     }
 });
 
-// PayPal endpoints from integration
-const { createPaypalOrder, capturePaypalOrder, loadPaypalDefault } = require('../server/paypal');
+// PayPal endpoints from integration (conditional loading for development)
+let createPaypalOrder, capturePaypalOrder, loadPaypalDefault;
+
+try {
+    if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {
+        const paypalModule = require('../server/paypal');
+        createPaypalOrder = paypalModule.createPaypalOrder;
+        capturePaypalOrder = paypalModule.capturePaypalOrder;
+        loadPaypalDefault = paypalModule.loadPaypalDefault;
+        console.log('✅ PayPal integration loaded successfully');
+    } else {
+        console.log('⚠️  PayPal credentials not found - PayPal features will be disabled');
+        // Create mock functions that return appropriate errors
+        createPaypalOrder = (req, res) => res.status(503).json({ error: 'PayPal no configurado en desarrollo' });
+        capturePaypalOrder = (req, res) => res.status(503).json({ error: 'PayPal no configurado en desarrollo' });
+        loadPaypalDefault = (req, res) => res.status(503).json({ error: 'PayPal no configurado en desarrollo' });
+    }
+} catch (error) {
+    console.log('⚠️  PayPal integration error - PayPal features will be disabled:', error.message);
+    createPaypalOrder = (req, res) => res.status(503).json({ error: 'PayPal no configurado en desarrollo' });
+    capturePaypalOrder = (req, res) => res.status(503).json({ error: 'PayPal no configurado en desarrollo' });
+    loadPaypalDefault = (req, res) => res.status(503).json({ error: 'PayPal no configurado en desarrollo' });
+}
 
 app.get('/api/paypal/setup', async (req, res) => {
     await loadPaypalDefault(req, res);
