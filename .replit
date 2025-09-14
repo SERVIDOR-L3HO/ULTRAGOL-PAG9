@@ -83,5 +83,5 @@ localPort = 46505
 externalPort = 5000
 
 [deployment]
-deploymentTarget = "vm"
-run = ["bash", "-c", "cd ULTRA && npm start"]
+deploymentTarget = "autoscale"
+run = ["node", "ULTRA/server.js"]

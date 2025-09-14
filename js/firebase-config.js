@@ -6,9 +6,10 @@ const firebaseConfig = {
     apiKey: "AIzaSyAneyRjnZzvhIFLzykATmW4ShN3IVuf5E0",
     authDomain: "ligamx-daf3d.firebaseapp.com",
     projectId: "ligamx-daf3d",
-    storageBucket: "ligamx-daf3d.firebasestorage.app",
-    messagingSenderId: "G-LKVTFN2463",
-    appId: "1:437421248316:web:38e9f436a57389d2c49839"
+    storageBucket: "ligamx-daf3d.appspot.com",
+    messagingSenderId: "437421248316",
+    appId: "1:437421248316:web:38e9f436a57389d2c49839",
+    measurementId: "G-LKVTFN2463"
 };
 
 // Check if Firebase is loaded and initialize

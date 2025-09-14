@@ -55,7 +55,8 @@ app.use(helmet({
                 "'self'",
                 "https://accounts.google.com",
                 "https://www.paypal.com",
-                "https://www.sandbox.paypal.com"
+                "https://www.sandbox.paypal.com",
+                "https://www.youtube.com"
             ]
         }
     },
@@ -256,19 +257,6 @@ app.post('/api/paypal/order/:orderID/capture', csrfProtection, async (req, res) 
     await capturePaypalOrder(req, res);
 });
 
-// Endpoint para obtener configuración de PayPal (client ID)
-app.get('/api/paypal/config', (req, res) => {
-    if (!process.env.PAYPAL_CLIENT_ID) {
-        return res.status(500).json({
-            error: 'Configuración de PayPal no disponible'
-        });
-    }
-    
-    res.json({
-        client_id: process.env.PAYPAL_CLIENT_ID,
-        environment: process.env.NODE_ENV === 'production' ? 'production' : 'sandbox'
-    });
-});
 
 // Health check endpoint for monitoring
 app.get('/healthz', (req, res) => {
