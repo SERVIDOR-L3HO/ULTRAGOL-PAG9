@@ -117,28 +117,6 @@
                     </div>
                 </div>
                 
-                <!-- Slide 3: Estadísticas Pro -->
-                <div class="carousel-slide slide-3">
-                    <div class="modern-overlay"></div>
-                    <div class="slide-info">
-                        <div class="slide-info-title">Analytics</div>
-                        <div class="slide-info-desc">Datos en tiempo real</div>
-                    </div>
-                    <div class="slide-content">
-                        <h1 class="hero-title">Estadísticas Pro</h1>
-                        <p class="hero-subtitle">Análisis avanzado con inteligencia artificial y métricas profesionales</p>
-                        <div class="hero-buttons">
-                            <a href="estadisticas.html" class="hero-btn hero-btn-primary">
-                                <i class="fas fa-chart-line"></i>
-                                Ver Análisis
-                            </a>
-                            <a href="standings.html" class="hero-btn hero-btn-secondary">
-                                <i class="fas fa-table"></i>
-                                Clasificación
-                            </a>
-                        </div>
-                    </div>
-                </div>
                 
                 <!-- Slide 4: Premium Experience -->
                 <div class="carousel-slide slide-4">
@@ -193,7 +171,6 @@
                 <span class="indicator" data-slide="1"></span>
                 <span class="indicator" data-slide="2"></span>
                 <span class="indicator" data-slide="3"></span>
-                <span class="indicator" data-slide="4"></span>
             </div>
         </div>
     </section>
@@ -306,74 +283,7 @@
         </div>
     </section>
 
-    <!-- Mejores Momentos -->
-    <section class="best-moments">
-        <div class="container">
-            <h2 class="section-title">
-                <i class="fas fa-star"></i>
-                Mejores Momentos
-            </h2>
-            <p class="section-subtitle">Los momentos más emocionantes de la Liga MX</p>
-            
-            <div class="video-carousel-container">
-                <div class="video-carousel" id="videoCarousel">
-                    <!-- Videos will be loaded dynamically from JSON -->
-                </div>
 
-                <!-- Navigation Controls -->
-                <div class="carousel-controls">
-                    <button class="carousel-btn prev-btn" id="prevVideo">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="carousel-btn next-btn" id="nextVideo">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-
-                <!-- Carousel Indicators -->
-                <div class="carousel-indicators" id="carouselIndicators">
-                    <!-- Indicators will be generated dynamically -->
-                </div>
-            </div>
-
-            <div class="section-footer">
-                <a href="noticias.html" class="btn btn-outline">Ver Todas las Noticias</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Advanced Search & Comparison -->
-    <section class="search-comparison">
-        <div class="container">
-            <h2 class="section-title">Búsqueda Avanzada & Comparación</h2>
-            <div class="search-tools">
-                <div class="search-bar">
-                    <input type="text" id="globalSearch" placeholder="Buscar equipos, jugadores, partidos..." class="search-input">
-                    <button class="search-btn"><i class="fas fa-search"></i></button>
-                </div>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" data-filter="all" data-value="all">Todos</button>
-                    <button class="filter-btn" data-filter="region" data-value="norte">Norte</button>
-                    <button class="filter-btn" data-filter="region" data-value="centro">Centro</button>
-                    <button class="filter-btn" data-filter="region" data-value="sur">Sur</button>
-                </div>
-            </div>
-            <div class="comparison-tools">
-                <h3>Comparador de Equipos</h3>
-                <div class="team-selectors">
-                    <select id="team1Select" class="team-select">
-                        <option value="">Seleccionar Equipo 1</option>
-                    </select>
-                    <div class="vs-indicator">VS</div>
-                    <select id="team2Select" class="team-select">
-                        <option value="">Seleccionar Equipo 2</option>
-                    </select>
-                    <button id="compareBtn" class="btn btn-primary">Comparar</button>
-                </div>
-                <div id="comparisonResults" class="comparison-results"></div>
-            </div>
-        </div>
-    </section>
 
     <!-- Analytics Dashboard -->
     <section class="analytics-dashboard">
