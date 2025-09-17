@@ -126,8 +126,11 @@ function renderTeamsGrid() {
                  data-region="${team.region}"
                  style="--team-primary: ${team.colors.primary}; --team-secondary: ${team.colors.secondary}; animation-delay: ${index * 0.1}s">
                 <div class="team-logo-container">
-                    <div class="team-logo" style="background: ${team.colors.primary}; color: ${team.colors.secondary}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem;">
-                        ${team.shortName || team.name.substring(0, 3).toUpperCase()}
+                    <div class="team-logo">
+                        <img src="${team.logo}" alt="${team.name} logo" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="logo-fallback" style="display: none; background: ${team.colors.primary}; color: ${team.colors.secondary}; width: 100%; height: 100%; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; border-radius: 50%;">
+                            ${team.shortName || team.name.substring(0, 3).toUpperCase()}
+                        </div>
                     </div>
                 </div>
                 <h3 class="team-card-name">${team.name}</h3>

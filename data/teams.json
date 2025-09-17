@@ -21,7 +21,8 @@
     "topScorer": "Henry Martín",
     "topScorerGoals": 12,
     "firstTitle": 1966,
-    "description": "El club más exitoso de México, conocido por su pasión y tradición en el fútbol mexicano. Las Águilas han conquistado más títulos que cualquier otro equipo en la historia de la Liga MX."
+    "description": "El club más exitoso de México, conocido por su pasión y tradición en el fútbol mexicano. Las Águilas han conquistado más títulos que cualquier otro equipo en la historia de la Liga MX.",
+    "logo": "assets/logos/america.png"
   },
   {
     "id": "chivas",
@@ -45,7 +46,8 @@
     "topScorer": "Roberto Alvarado",
     "topScorerGoals": 8,
     "firstTitle": 1957,
-    "description": "El Rebaño Sagrado, único equipo que mantiene la tradición de jugar solo con mexicanos. Un símbolo del orgullo nacional en el fútbol."
+    "description": "El Rebaño Sagrado, único equipo que mantiene la tradición de jugar solo con mexicanos. Un símbolo del orgullo nacional en el fútbol.",
+    "logo": "assets/logos/chivas.png"
   },
   {
     "id": "cruz-azul",
@@ -69,7 +71,8 @@
     "topScorer": "Uriel Antuna",
     "topScorerGoals": 7,
     "firstTitle": 1969,
-    "description": "La Máquina Cementera, conocida por su juego vistoso y por romper la maldición de las finales perdidas en 2021."
+    "description": "La Máquina Cementera, conocida por su juego vistoso y por romper la maldición de las finales perdidas en 2021.",
+    "logo": "assets/logos/cruz-azul.png"
   },
   {
     "id": "pumas",
@@ -93,7 +96,8 @@
     "topScorer": "Dani Alves",
     "topScorerGoals": 6,
     "firstTitle": 1977,
-    "description": "Los Universitarios, representantes del fútbol estudiantil mexicano con una rica tradición de formar grandes jugadores mexicanos."
+    "description": "Los Universitarios, representantes del fútbol estudiantil mexicano con una rica tradición de formar grandes jugadores mexicanos.",
+    "logo": "assets/logos/pumas.png"
   },
   {
     "id": "tigres",
@@ -117,7 +121,8 @@
     "topScorer": "André-Pierre Gignac",
     "topScorerGoals": 10,
     "firstTitle": 1978,
-    "description": "Los Felinos del norte, conocidos por su garra y por ser uno de los equipos más exitosos de la era moderna del fútbol mexicano."
+    "description": "Los Felinos del norte, conocidos por su garra y por ser uno de los equipos más exitosos de la era moderna del fútbol mexicano.",
+    "logo": "assets/logos/tigres.png"
   },
   {
     "id": "monterrey",
@@ -141,7 +146,8 @@
     "topScorer": "Rogelio Funes Mori",
     "topScorerGoals": 9,
     "firstTitle": 1986,
-    "description": "Los Rayados de Monterrey, el orgullo regiomontano con una de las aficiones más leales y uno de los estadios más modernos de América."
+    "description": "Los Rayados de Monterrey, el orgullo regiomontano con una de las aficiones más leales y uno de los estadios más modernos de América.",
+    "logo": "assets/logos/monterrey.png"
   },
   {
     "id": "santos",
@@ -165,7 +171,8 @@
     "topScorer": "Harold Preciado",
     "topScorerGoals": 8,
     "firstTitle": 1996,
-    "description": "Los Guerreros de La Laguna, reconocidos por su excelente trabajo en fuerzas básicas y por formar grandes talentos del fútbol mexicano."
+    "description": "Los Guerreros de La Laguna, reconocidos por su excelente trabajo en fuerzas básicas y por formar grandes talentos del fútbol mexicano.",
+    "logo": "assets/logos/santos.png"
   },
   {
     "id": "toluca",
@@ -189,7 +196,8 @@
     "topScorer": "Alexis Canelo",
     "topScorerGoals": 7,
     "firstTitle": 1967,
-    "description": "Los Diablos Rojos del Toluca, uno de los equipos más tradicionales y exitosos del fútbol mexicano con una rica historia centenaria."
+    "description": "Los Diablos Rojos del Toluca, uno de los equipos más tradicionales y exitosos del fútbol mexicano con una rica historia centenaria.",
+    "logo": "assets/logos/toluca.png"
   },
   {
     "id": "atlas",
@@ -213,7 +221,8 @@
     "topScorer": "Julio Furch",
     "topScorerGoals": 6,
     "firstTitle": 2021,
-    "description": "Los Zorros del Atlas, el equipo que rompió la maldición más larga del fútbol mexicano al conquistar su primer título después de 70 años."
+    "description": "Los Zorros del Atlas, el equipo que rompió la maldición más larga del fútbol mexicano al conquistar su primer título después de 70 años.",
+    "logo": "assets/logos/atlas.png"
   },
   {
     "id": "pachuca",
@@ -237,7 +246,8 @@
     "topScorer": "Nicolás Ibáñez",
     "topScorerGoals": 5,
     "firstTitle": 1999,
-    "description": "Los Tuzos de Pachuca, pioneros en la modernización del fútbol mexicano y especialistas en torneos internacionales."
+    "description": "Los Tuzos de Pachuca, pioneros en la modernización del fútbol mexicano y especialistas en torneos internacionales.",
+    "logo": "assets/logos/pachuca.png"
   },
   {
     "id": "leon",
@@ -261,7 +271,8 @@
     "topScorer": "Ángel Mena",
     "topScorerGoals": 6,
     "firstTitle": 1948,
-    "description": "La Fiera Esmeralda, el equipo del Bajío mexicano conocido por su juego aguerrido y su afición incondicional."
+    "description": "La Fiera Esmeralda, el equipo del Bajío mexicano conocido por su juego aguerrido y su afición incondicional.",
+    "logo": "assets/logos/leon.png"
   },
   {
     "id": "necaxa",
@@ -285,7 +296,8 @@
     "topScorer": "Rodrigo Aguirre",
     "topScorerGoals": 5,
     "firstTitle": 1995,
-    "description": "Los Rayos de Necaxa, equipo histórico del fútbol mexicano que resurgió con fuerza en los años 90."
+    "description": "Los Rayos de Necaxa, equipo histórico del fútbol mexicano que resurgió con fuerza en los años 90.",
+    "logo": "assets/logos/necaxa.png"
   },
   {
     "id": "tijuana",
@@ -309,7 +321,8 @@
     "topScorer": "Lucas Rodríguez",
     "topScorerGoals": 4,
     "firstTitle": 2012,
-    "description": "Los Xolos de Tijuana, el equipo más joven de la Liga MX que rápidamente se consolidó como una fuerza competitiva."
+    "description": "Los Xolos de Tijuana, el equipo más joven de la Liga MX que rápidamente se consolidó como una fuerza competitiva.",
+    "logo": "assets/logos/tijuana.png"
   },
   {
     "id": "puebla",
@@ -333,7 +346,8 @@
     "topScorer": "Santiago Ormeño",
     "topScorerGoals": 4,
     "firstTitle": 1983,
-    "description": "La Franja del Puebla, equipo tradicional del fútbol mexicano con una afición muy leal en el estado de Puebla."
+    "description": "La Franja del Puebla, equipo tradicional del fútbol mexicano con una afición muy leal en el estado de Puebla.",
+    "logo": "assets/logos/puebla.png"
   },
   {
     "id": "queretaro",
@@ -357,7 +371,8 @@
     "topScorer": "Pablo Barrera",
     "topScorerGoals": 3,
     "firstTitle": 2012,
-    "description": "Los Gallos Blancos de Querétaro, equipo que ha luchado por establecerse entre los grandes del fútbol mexicano."
+    "description": "Los Gallos Blancos de Querétaro, equipo que ha luchado por establecerse entre los grandes del fútbol mexicano.",
+    "logo": "assets/logos/queretaro.png"
   },
   {
     "id": "mazatlan",
@@ -381,7 +396,8 @@
     "topScorer": "Gustavo del Prete",
     "topScorerGoals": 3,
     "firstTitle": null,
-    "description": "Los Cañoneros del puerto, el equipo más nuevo de la Liga MX buscando establecer su identidad en el máximo circuito."
+    "description": "Los Cañoneros del puerto, el equipo más nuevo de la Liga MX buscando establecer su identidad en el máximo circuito.",
+    "logo": "assets/logos/mazatlan.png"
   },
   {
     "id": "fc-juarez",
@@ -405,7 +421,8 @@
     "topScorer": "Darío Lezcano",
     "topScorerGoals": 3,
     "firstTitle": null,
-    "description": "Los Bravos de Juárez, representantes del fútbol fronterizo que buscan consolidarse en la primera división mexicana."
+    "description": "Los Bravos de Juárez, representantes del fútbol fronterizo que buscan consolidarse en la primera división mexicana.",
+    "logo": "assets/logos/fc-juarez.png"
   },
   {
     "id": "atletico-san-luis",
@@ -429,6 +446,7 @@
     "topScorer": "Germán Berterame",
     "topScorerGoals": 2,
     "firstTitle": null,
-    "description": "Los Rojiblancos potosinos, equipo que regresó a primera división con el objetivo de establecerse entre los mejores."
+    "description": "Los Rojiblancos potosinos, equipo que regresó a primera división con el objetivo de establecerse entre los mejores.",
+    "logo": "assets/logos/atletico-san-luis.png"
   }
 ]
