@@ -228,8 +228,11 @@ function openTeamModal(teamId) {
     if (!modal || !confirmContent) return;
 
     confirmContent.innerHTML = `
-        <div class="confirm-team-logo" style="background: ${team.colors.primary}; color: ${team.colors.secondary}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 2rem;">
-            ${team.shortName || team.name.substring(0, 3).toUpperCase()}
+        <div class="confirm-team-logo">
+            <img src="${team.logo}" alt="${team.name} logo" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="logo-fallback" style="display: none; background: ${team.colors.primary}; color: ${team.colors.secondary}; width: 100%; height: 100%; align-items: center; justify-content: center; font-weight: bold; font-size: 2rem; border-radius: 50%;">
+                ${team.shortName || team.name.substring(0, 3).toUpperCase()}
+            </div>
         </div>
         <h3 class="confirm-team-name" style="color: ${team.colors.primary}">${team.name}</h3>
         <p class="confirm-team-description">
@@ -289,8 +292,11 @@ function showSelectedTeam() {
     const teamStats = getTeamStats(team);
 
     selectedTeamCard.innerHTML = `
-        <div class="selected-team-logo" style="background: ${team.colors.primary}; color: ${team.colors.secondary}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 2.5rem;">
-            ${team.shortName || team.name.substring(0, 3).toUpperCase()}
+        <div class="selected-team-logo">
+            <img src="${team.logo}" alt="${team.name} logo" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="logo-fallback" style="display: none; background: ${team.colors.primary}; color: ${team.colors.secondary}; width: 100%; height: 100%; align-items: center; justify-content: center; font-weight: bold; font-size: 2.5rem; border-radius: 50%;">
+                ${team.shortName || team.name.substring(0, 3).toUpperCase()}
+            </div>
         </div>
         <h2 class="selected-team-name">${team.name}</h2>
         <p class="selected-team-motto">"${team.nickname}"</p>
