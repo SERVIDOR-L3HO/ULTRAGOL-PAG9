@@ -15,14 +15,43 @@
       "primary": "#ffed00",
       "secondary": "#002856"
     },
-    "titles": 13,
+    "titles": 16,
     "cups": 6,
     "international": 7,
     "topScorer": "Henry Martín",
     "topScorerGoals": 12,
     "firstTitle": 1966,
-    "description": "El club más exitoso de México, conocido por su pasión y tradición en el fútbol mexicano. Las Águilas han conquistado más títulos que cualquier otro equipo en la historia de la Liga MX.",
-    "logo": "assets/logos/america.png"
+    "lastTitle": 2024,
+    "description": "El club más exitoso de México y actual tricampeón de Liga MX (2023-2024). Las Águilas son el equipo más grande de México, con 16 títulos de liga y una afición masiva en todo el país.",
+    "logo": "assets/logos/america.png",
+    "classicRivals": ["Guadalajara", "Cruz Azul", "Pumas UNAM"],
+    "historicPlayers": ["Cuauhtémoc Blanco", "Carlos Hermosillo", "Luis Roberto Alves 'Zague'", "Pavel Pardo", "Salvador Cabañas"],
+    "famousCoaches": ["Miguel Herrera", "Fernando Ortiz", "Antonio Mohamed", "Sergio Bueno"],
+    "stadiumDetails": {
+      "address": "Calzada de Tlalpan 3465, Santa Úrsula Coapa",
+      "altitude": 2240,
+      "surface": "Césped natural",
+      "nickname": "El Coloso de Santa Úrsula"
+    },
+    "achievements": {
+      "ligaMX": 16,
+      "copaMX": 6,
+      "champions": 7,
+      "concachampions": 7,
+      "interamericana": 2,
+      "campeondecampeones": 8
+    },
+    "records": [
+      "Único tricampeón en torneos cortos",
+      "Equipo más popular de México",
+      "Más títulos en la historia de Liga MX",
+      "Más participaciones en finales"
+    ],
+    "foundation": {
+      "founders": "Estudiantes mexicanos y refugiados españoles",
+      "originalName": "Club de Fútbol América",
+      "firstStadium": "Campo de los Deportes"
+    }
   },
   {
     "id": "chivas",
@@ -46,8 +75,38 @@
     "topScorer": "Roberto Alvarado",
     "topScorerGoals": 8,
     "firstTitle": 1957,
-    "description": "El Rebaño Sagrado, único equipo que mantiene la tradición de jugar solo con mexicanos. Un símbolo del orgullo nacional en el fútbol.",
-    "logo": "assets/logos/chivas.png"
+    "lastTitle": 2017,
+    "description": "El Rebaño Sagrado, único equipo que mantiene la tradición de jugar solo con mexicanos. Símbolo del orgullo nacional y segundo equipo más exitoso de México.",
+    "logo": "assets/logos/chivas.png",
+    "classicRivals": ["Club América", "Atlas FC"],
+    "historicPlayers": ["Salvador Reyes", "Javier Hernández Chicharito", "Omar Bravo", "Ramón Ramírez", "Carlos Vela"],
+    "famousCoaches": ["Matías Almeyda", "José Saturnino Cardozo", "Fernando Gago"],
+    "stadiumDetails": {
+      "address": "Periférico Sur Manuel Gómez Morín 1500, Zapopan",
+      "altitude": 1566,
+      "surface": "Césped natural",
+      "nickname": "La Casa del Fútbol Mexicano",
+      "previousStadium": "Estadio Jalisco"
+    },
+    "achievements": {
+      "ligaMX": 12,
+      "copaMX": 4,
+      "champions": 4,
+      "concachampions": 2,
+      "interamericana": 1,
+      "campeondecampeones": 7
+    },
+    "records": [
+      "Único equipo 100% mexicano en Liga MX",
+      "Segundo equipo más popular de México",
+      "Más de 100 años de historia",
+      "Cuna de grandes jugadores mexicanos"
+    ],
+    "foundation": {
+      "founders": "Edgar Everaert y estudiantes belgas",
+      "originalName": "Club Deportivo Guadalajara",
+      "philosophy": "Solo mexicanos"
+    }
   },
   {
     "id": "cruz-azul",
@@ -71,8 +130,38 @@
     "topScorer": "Uriel Antuna",
     "topScorerGoals": 7,
     "firstTitle": 1969,
-    "description": "La Máquina Cementera, conocida por su juego vistoso y por romper la maldición de las finales perdidas en 2021.",
-    "logo": "assets/logos/cruz-azul.png"
+    "lastTitle": 2021,
+    "description": "La Máquina Cementera, que rompió 23 años de sequía al conquistar el título en 2021. Famosa por su juego vistoso y por ser uno de los equipos más queridos de México.",
+    "logo": "assets/logos/cruz-azul.png",
+    "classicRivals": ["Club América", "Pumas UNAM"],
+    "historicPlayers": ["Carlos Hermosillo", "Óscar Pérez", "Jesús Corona", "Jonathan Rodríguez", "José de Jesús Corona"],
+    "famousCoaches": ["Juan Reynoso", "Pedro Caixinha", "Ignacio Ambriz"],
+    "stadiumDetails": {
+      "address": "Calzada de Tlalpan 3465, Santa Úrsula Coapa",
+      "altitude": 2240,
+      "surface": "Césped natural",
+      "nickname": "El Coloso de Santa Úrsula",
+      "shared": "Comparte con Club América"
+    },
+    "achievements": {
+      "ligaMX": 9,
+      "copaMX": 5,
+      "champions": 6,
+      "concachampions": 6,
+      "interamericana": 1,
+      "campeondecampeones": 4
+    },
+    "records": [
+      "Rompió sequía de 23 años en 2021",
+      "Máquina de los 70s (época dorada)",
+      "Una de las aficiones más leales",
+      "Especialista en CONCACAF"
+    ],
+    "foundation": {
+      "founders": "Cooperativa Cruz Azul",
+      "originalName": "Club de Fútbol Cruz Azul",
+      "connection": "Empresa cementera"
+    }
   },
   {
     "id": "pumas",
@@ -96,8 +185,38 @@
     "topScorer": "Dani Alves",
     "topScorerGoals": 6,
     "firstTitle": 1977,
-    "description": "Los Universitarios, representantes del fútbol estudiantil mexicano con una rica tradición de formar grandes jugadores mexicanos.",
-    "logo": "assets/logos/pumas.png"
+    "lastTitle": 2011,
+    "description": "Los Universitarios, representantes del fútbol estudiantil mexicano. Famosos por su cantera y por formar grandes jugadores que triunfan en Europa.",
+    "logo": "assets/logos/pumas.png",
+    "classicRivals": ["Club América", "Cruz Azul"],
+    "historicPlayers": ["Hugo Sánchez", "Luis García", "Claudio López", "Jorge Campos", "Juan Carlos Cacho"],
+    "famousCoaches": ["José Luis Trejo", "Guillermo Vázquez", "Rafael Puente"],
+    "stadiumDetails": {
+      "address": "Av. de los Insurgentes Sur s/n, Ciudad Universitaria",
+      "altitude": 2240,
+      "surface": "Césped natural",
+      "nickname": "El Olímpico",
+      "olympics": "Sede de JJ.OO. México 1968"
+    },
+    "achievements": {
+      "ligaMX": 7,
+      "copaMX": 3,
+      "champions": 3,
+      "concachampions": 2,
+      "interamericana": 1,
+      "campeondecampeones": 1
+    },
+    "records": [
+      "Mejor cantera de México",
+      "Estadio sede de los JJ.OO. 1968",
+      "Cuna de Hugo Sánchez",
+      "Equipo universitario más exitoso"
+    ],
+    "foundation": {
+      "founders": "Universidad Nacional Autónoma de México",
+      "originalName": "Club Universidad Nacional",
+      "connection": "Equipo universitario"
+    }
   },
   {
     "id": "tigres",
@@ -121,8 +240,37 @@
     "topScorer": "André-Pierre Gignac",
     "topScorerGoals": 10,
     "firstTitle": 1978,
-    "description": "Los Felinos del norte, conocidos por su garra y por ser uno de los equipos más exitosos de la era moderna del fútbol mexicano.",
-    "logo": "assets/logos/tigres.png"
+    "lastTitle": 2019,
+    "description": "Los Felinos de la UANL, equipo más exitoso de la era moderna junto con América. Famosos por tener jugadores estelares y una afición apasionada llamada 'La Libres y Lokos'.",
+    "logo": "assets/logos/tigres.png",
+    "classicRivals": ["CF Monterrey"],
+    "historicPlayers": ["André-Pierre Gignac", "Rafael Sobis", "Damián Álvarez", "Lucas Zelarayán", "Eduardo Vargas"],
+    "famousCoaches": ["Ricardo Ferretti", "Miguel Herrera", "Robert Siboldi"],
+    "stadiumDetails": {
+      "address": "Av. Universidad s/n, San Nicolás",
+      "altitude": 538,
+      "surface": "Césped natural",
+      "nickname": "El Volcán"
+    },
+    "achievements": {
+      "ligaMX": 8,
+      "copaMX": 3,
+      "champions": 1,
+      "concachampions": 3,
+      "clubworldcup": "Subcampeón 2020",
+      "campeondecampeones": 2
+    },
+    "records": [
+      "Subcampeón Mundial de Clubes 2020",
+      "Equipo de la década 2010-2020",
+      "Gignac: máximo goleador extranjero",
+      "Afición más apasionada del norte"
+    ],
+    "foundation": {
+      "founders": "Universidad Autónoma de Nuevo León",
+      "originalName": "Club de Fútbol Tigres",
+      "connection": "Equipo universitario"
+    }
   },
   {
     "id": "monterrey",
@@ -146,8 +294,38 @@
     "topScorer": "Rogelio Funes Mori",
     "topScorerGoals": 9,
     "firstTitle": 1986,
-    "description": "Los Rayados de Monterrey, el orgullo regiomontano con una de las aficiones más leales y uno de los estadios más modernos de América.",
-    "logo": "assets/logos/monterrey.png"
+    "lastTitle": 2019,
+    "description": "Los Rayados de Monterrey, orgullo regiomontano con una de las aficiones más leales de México y el estadio más moderno del país.",
+    "logo": "assets/logos/monterrey.png",
+    "classicRivals": ["Tigres UANL"],
+    "historicPlayers": ["Humberto Suazo", "José María Basanta", "Nery Castillo", "Rogelio Funes Mori", "Jesús Arellano"],
+    "famousCoaches": ["Víctor Manuel Vucetich", "Antonio Mohamed", "Javier Aguirre"],
+    "stadiumDetails": {
+      "address": "Av. Pablo Livas 2011, Guadalupe",
+      "altitude": 538,
+      "surface": "Césped natural",
+      "nickname": "El Gigante de Acero",
+      "features": "Estadio más moderno de México"
+    },
+    "achievements": {
+      "ligaMX": 5,
+      "copaMX": 3,
+      "champions": 5,
+      "concachampions": 4,
+      "clubworldcup": "3er lugar 2019",
+      "campeondecampeones": 1
+    },
+    "records": [
+      "Especialista en CONCACAF Champions",
+      "Estadio más moderno de México",
+      "Afición más leal del norte",
+      "3er lugar Mundial de Clubes 2019"
+    ],
+    "foundation": {
+      "founders": "Empresarios regiomontanos",
+      "originalName": "Club de Fútbol Monterrey",
+      "significance": "Orgullo de Nuevo León"
+    }
   },
   {
     "id": "santos",
@@ -171,8 +349,37 @@
     "topScorer": "Harold Preciado",
     "topScorerGoals": 8,
     "firstTitle": 1996,
-    "description": "Los Guerreros de La Laguna, reconocidos por su excelente trabajo en fuerzas básicas y por formar grandes talentos del fútbol mexicano.",
-    "logo": "assets/logos/santos.png"
+    "lastTitle": 2018,
+    "description": "Los Guerreros de La Laguna, famosos por tener la mejor cantera de México y por formar grandes talentos que triunfan en Europa como Carlos Vela, Javier Hernández y Hirving Lozano.",
+    "logo": "assets/logos/santos.png",
+    "classicRivals": ["Club América", "Tigres UANL"],
+    "historicPlayers": ["Carlos Vela", "Javier Hernández", "Hirving Lozano", "Oribe Peralta", "Rodrigo Ruiz"],
+    "famousCoaches": ["José Manuel de la Torre", "Pedro Caixinha", "Guillermo Almada"],
+    "stadiumDetails": {
+      "address": "Blvd. Revolución 4355, Torreón",
+      "altitude": 1120,
+      "surface": "Césped natural",
+      "nickname": "Territorio Santos Modelo"
+    },
+    "achievements": {
+      "ligaMX": 6,
+      "copaMX": 1,
+      "champions": 2,
+      "concachampions": 2,
+      "interamericana": 0,
+      "campeondecampeones": 1
+    },
+    "records": [
+      "Mejor cantera de México actualmente",
+      "Exportó más jugadores a Europa",
+      "Bicampeón 2008-2012",
+      "Equipo más exitoso de La Laguna"
+    ],
+    "foundation": {
+      "founders": "Empresarios laguneros",
+      "originalName": "Club Santos Laguna",
+      "inspiration": "Santos FC de Brasil"
+    }
   },
   {
     "id": "toluca",
@@ -190,14 +397,44 @@
       "primary": "#cc0000",
       "secondary": "#ffffff"
     },
-    "titles": 10,
+    "titles": 11,
     "cups": 2,
     "international": 2,
     "topScorer": "Alexis Canelo",
     "topScorerGoals": 7,
     "firstTitle": 1967,
-    "description": "Los Diablos Rojos del Toluca, uno de los equipos más tradicionales y exitosos del fútbol mexicano con una rica historia centenaria.",
-    "logo": "assets/logos/toluca.png"
+    "lastTitle": 2010,
+    "description": "Los Diablos Rojos del Toluca, tercer equipo más exitoso de México con 11 títulos. Famoso por su gran época dorada en los 2000s bajo la dirección de José Manuel de la Torre.",
+    "logo": "assets/logos/toluca.png",
+    "classicRivals": ["Club América", "Cruz Azul", "Pumas UNAM"],
+    "historicPlayers": ["José Saturnino Cardozo", "Vicente Sánchez", "Paulo Da Silva", "Carlos Hermosillo", "Sinha"],
+    "famousCoaches": ["José Manuel de la Torre", "Ricardo La Volpe", "Ignacio Ambriz"],
+    "stadiumDetails": {
+      "address": "Av. José López Portillo, Toluca",
+      "altitude": 2667,
+      "surface": "Césped natural",
+      "nickname": "La Bombonera",
+      "namedAfter": "Nemesio Díez (fundador del club)"
+    },
+    "achievements": {
+      "ligaMX": 11,
+      "copaMX": 2,
+      "champions": 2,
+      "concachampions": 1,
+      "interamericana": 2,
+      "campeondecampeones": 3
+    },
+    "records": [
+      "Tetracampeón (1998-2002)",
+      "Equipo de la década 2000-2010",
+      "Más de 100 años de historia",
+      "Estadio con mayor altitud de Liga MX"
+    ],
+    "foundation": {
+      "founders": "Román de Goyzueta y españoles residentes",
+      "originalName": "Club Deportivo Toluca",
+      "goldenEra": "1998-2010"
+    }
   },
   {
     "id": "atlas",
@@ -215,14 +452,44 @@
       "primary": "#000000",
       "secondary": "#e30613"
     },
-    "titles": 1,
+    "titles": 2,
     "cups": 0,
     "international": 0,
     "topScorer": "Julio Furch",
     "topScorerGoals": 6,
-    "firstTitle": 2021,
-    "description": "Los Zorros del Atlas, el equipo que rompió la maldición más larga del fútbol mexicano al conquistar su primer título después de 70 años.",
-    "logo": "assets/logos/atlas.png"
+    "firstTitle": 1951,
+    "lastTitle": 2022,
+    "description": "Los Zorros del Atlas, bicampeón reciente que rompió 70 años de sequía al conquistar los títulos Apertura 2021 y Clausura 2022. Una de las aficiones más leales de México.",
+    "logo": "assets/logos/atlas.png",
+    "classicRivals": ["CD Guadalajara"],
+    "historicPlayers": ["Rafael Márquez", "Julio Furch", "Luciano Acosta", "Jesús Angulo", "Ánderson Santamaría"],
+    "famousCoaches": ["Diego Cocca", "José Guadalupe Cruz", "Tomás Boy"],
+    "stadiumDetails": {
+      "address": "Av. Federalismo Norte 943, Guadalajara",
+      "altitude": 1566,
+      "surface": "Césped natural",
+      "nickname": "El Jalisco",
+      "worldcup": "Sede Mundial 1970 y 1986"
+    },
+    "achievements": {
+      "ligaMX": 2,
+      "copaMX": 0,
+      "champions": 0,
+      "concachampions": 0,
+      "interamericana": 0,
+      "campeondecampeones": 0
+    },
+    "records": [
+      "Rompió sequía de 70 años",
+      "Bicampeón 2021-2022",
+      "Una de las aficiones más leales",
+      "Más de 100 años de historia"
+    ],
+    "foundation": {
+      "founders": "Estudiantes tapatíos",
+      "originalName": "Club de Fútbol Atlas",
+      "significance": "Segundo equipo de Guadalajara"
+    }
   },
   {
     "id": "pachuca",
@@ -240,14 +507,43 @@
       "primary": "#003d82",
       "secondary": "#ffffff"
     },
-    "titles": 6,
+    "titles": 7,
     "cups": 5,
     "international": 5,
     "topScorer": "Nicolás Ibáñez",
     "topScorerGoals": 5,
     "firstTitle": 1999,
-    "description": "Los Tuzos de Pachuca, pioneros en la modernización del fútbol mexicano y especialistas en torneos internacionales.",
-    "logo": "assets/logos/pachuca.png"
+    "lastTitle": 2022,
+    "description": "Los Tuzos de Pachuca, club más antiguo de México (1901) y especialistas en torneos internacionales. Pioneros en la modernización del fútbol mexicano.",
+    "logo": "assets/logos/pachuca.png",
+    "classicRivals": ["Club América", "Cruz Azul"],
+    "historicPlayers": ["Miguel Calero", "Christian Giménez", "Hirving Lozano", "Erick Gutiérrez", "Éver Banega"],
+    "famousCoaches": ["Javier Aguirre", "Diego Alonso", "Paulo Pezzolano"],
+    "stadiumDetails": {
+      "address": "Blvd. Felipe Ángeles, Pachuca",
+      "altitude": 2426,
+      "surface": "Césped natural",
+      "nickname": "El Huracán"
+    },
+    "achievements": {
+      "ligaMX": 7,
+      "copaMX": 5,
+      "champions": 5,
+      "concachampions": 5,
+      "sudamericana": 1,
+      "campeondecampeones": 2
+    },
+    "records": [
+      "Club más antiguo de México",
+      "Único mexicano campeón de Copa Sudamericana",
+      "Especialistas en torneos internacionales",
+      "Cuna de talentos para Europa"
+    ],
+    "foundation": {
+      "founders": "Mineros ingleses de Real del Monte",
+      "originalName": "Pachuca Athletic Club",
+      "significance": "Primer club de fútbol en México"
+    }
   },
   {
     "id": "leon",
@@ -271,8 +567,37 @@
     "topScorer": "Ángel Mena",
     "topScorerGoals": 6,
     "firstTitle": 1948,
-    "description": "La Fiera Esmeralda, el equipo del Bajío mexicano conocido por su juego aguerrido y su afición incondicional.",
-    "logo": "assets/logos/leon.png"
+    "lastTitle": 2014,
+    "description": "La Fiera Esmeralda, bicampeón reciente (2013-2014) y uno de los equipos más queridos del Bajío mexicano. Conocido por su afición fiel y juego aguerrido.",
+    "logo": "assets/logos/leon.png",
+    "classicRivals": ["Club América", "Pumas UNAM"],
+    "historicPlayers": ["Carlos Miloc", "Ángel Reyna", "Luis Montes", "Mauro Boselli", "Elías Hernández"],
+    "famousCoaches": ["Gustavo Matosas", "Ignacio Ambriz", "Ariel Holan"],
+    "stadiumDetails": {
+      "address": "Blvd. Campestre 1499, León",
+      "altitude": 1815,
+      "surface": "Césped natural",
+      "nickname": "El Nou Camp"
+    },
+    "achievements": {
+      "ligaMX": 8,
+      "copaMX": 2,
+      "champions": 1,
+      "concachampions": 0,
+      "interamericana": 1,
+      "campeondecampeones": 2
+    },
+    "records": [
+      "Bicampeón consecutivo 2013-2014",
+      "Una de las mejores aficiones de México",
+      "Más de 75 años de historia",
+      "Equipo emblemático del Bajío"
+    ],
+    "foundation": {
+      "founders": "Empresarios leoneses",
+      "originalName": "Club de Fútbol León",
+      "significance": "Orgullo guanajuatense"
+    }
   },
   {
     "id": "necaxa",
@@ -296,8 +621,37 @@
     "topScorer": "Rodrigo Aguirre",
     "topScorerGoals": 5,
     "firstTitle": 1995,
-    "description": "Los Rayos de Necaxa, equipo histórico del fútbol mexicano que resurgió con fuerza en los años 90.",
-    "logo": "assets/logos/necaxa.png"
+    "lastTitle": 1998,
+    "description": "Los Rayos de Necaxa, equipo histórico que vivió su época dorada en los 90s. Famoso por su identidad de barrio y por ser el primer campeón del fútbol profesional mexicano.",
+    "logo": "assets/logos/necaxa.png",
+    "classicRivals": ["Club América", "Cruz Azul"],
+    "historicPlayers": ["Alex Aguinaga", "José Luis López", "Claudio López", "Antonio de Nigris", "José Ponce"],
+    "famousCoaches": ["Manuel Lapuente", "Enrique Meza", "Jaime Lozano"],
+    "stadiumDetails": {
+      "address": "Av. Siglo XXI 2131, Aguascalientes",
+      "altitude": 1888,
+      "surface": "Césped natural",
+      "nickname": "Victoria"
+    },
+    "achievements": {
+      "ligaMX": 3,
+      "copaMX": 1,
+      "champions": 1,
+      "concachampions": 1,
+      "interamericana": 1,
+      "campeondecampeones": 1
+    },
+    "records": [
+      "Primer campeón del fútbol profesional (1933)",
+      "Época dorada años 90",
+      "Equipo más querido de Aguascalientes",
+      "Más de 90 años de historia"
+    ],
+    "foundation": {
+      "founders": "Trabajadores de la Compañía de Luz y Fuerza",
+      "originalName": "Necaxa Club",
+      "significance": "Equipo de barrio histórico"
+    }
   },
   {
     "id": "tijuana",
@@ -321,8 +675,37 @@
     "topScorer": "Lucas Rodríguez",
     "topScorerGoals": 4,
     "firstTitle": 2012,
-    "description": "Los Xolos de Tijuana, el equipo más joven de la Liga MX que rápidamente se consolidó como una fuerza competitiva.",
-    "logo": "assets/logos/tijuana.png"
+    "lastTitle": 2012,
+    "description": "Los Xolos de Tijuana, el proyecto más exitoso de la frontera norte. En solo 5 años pasaron de Segunda División a campeones de Liga MX, estableciendo un récord único en el fútbol mexicano.",
+    "logo": "assets/logos/tijuana.png",
+    "classicRivals": ["Club América", "Atlas FC"],
+    "historicPlayers": ["Dayro Moreno", "Fidel Martínez", "Paul Arriola", "Rubio Rubin", "Lucas Rodríguez"],
+    "famousCoaches": ["Antonio Mohamed", "Miguel Herrera", "Sebastián Méndez"],
+    "stadiumDetails": {
+      "address": "Blvd. Agua Caliente 12027, Tijuana",
+      "altitude": 120,
+      "surface": "Césped natural",
+      "nickname": "El Caliente"
+    },
+    "achievements": {
+      "ligaMX": 1,
+      "copaMX": 1,
+      "champions": 0,
+      "concachampions": 0,
+      "ascensoMX": 1,
+      "campeondecampeones": 0
+    },
+    "records": [
+      "Ascenso más rápido en la historia",
+      "Campeón en su 5ta temporada",
+      "Primer equipo fronterizo campeón",
+      "Proyecto más exitoso de expansión"
+    ],
+    "foundation": {
+      "founders": "Jorge Hank Rhon",
+      "originalName": "Club Tijuana Xoloitzcuintles de Caliente",
+      "significance": "Orgullo de la frontera"
+    }
   },
   {
     "id": "puebla",
@@ -346,8 +729,38 @@
     "topScorer": "Santiago Ormeño",
     "topScorerGoals": 4,
     "firstTitle": 1983,
-    "description": "La Franja del Puebla, equipo tradicional del fútbol mexicano con una afición muy leal en el estado de Puebla.",
-    "logo": "assets/logos/puebla.png"
+    "lastTitle": 1990,
+    "description": "La Franja poblana, equipo tradicional con una rica historia y una de las aficiones más fieles de México. Famoso por su estadio histórico y por ser semillero de grandes jugadores.",
+    "logo": "assets/logos/puebla.png",
+    "classicRivals": ["Club América", "Cruz Azul"],
+    "historicPlayers": ["Enrique Borja", "Carlos Poblete", "Salvador Cabañas", "Christian Benítez", "Omar Fernández"],
+    "famousCoaches": ["José Antonio Roca", "Enrique Meza", "Nicolás Larcamón"],
+    "stadiumDetails": {
+      "address": "Calzada Ignacio Zaragoza 666, Puebla",
+      "altitude": 2175,
+      "surface": "Césped natural",
+      "nickname": "El Cuauhtémoc",
+      "worldcup": "Sede Mundial 1970 y 1986"
+    },
+    "achievements": {
+      "ligaMX": 2,
+      "copaMX": 1,
+      "champions": 0,
+      "concachampions": 0,
+      "interamericana": 0,
+      "campeondecampeones": 0
+    },
+    "records": [
+      "Estadio sede de 2 Mundiales",
+      "Una de las aficiones más leales",
+      "Más de 75 años de historia",
+      "Cuna de grandes delanteros"
+    ],
+    "foundation": {
+      "founders": "Inmigrantes españoles y poblanos",
+      "originalName": "Club de Fútbol Puebla",
+      "significance": "Orgullo poblano"
+    }
   },
   {
     "id": "queretaro",
@@ -371,8 +784,38 @@
     "topScorer": "Pablo Barrera",
     "topScorerGoals": 3,
     "firstTitle": 2012,
-    "description": "Los Gallos Blancos de Querétaro, equipo que ha luchado por establecerse entre los grandes del fútbol mexicano.",
-    "logo": "assets/logos/queretaro.png"
+    "lastTitle": 2012,
+    "description": "Los Gallos Blancos de Querétaro, equipo con más de 70 años de historia que logró su primer título de Liga MX en 2012. Conocido por su afición leal y su estadio histórico.",
+    "logo": "assets/logos/queretaro.png",
+    "classicRivals": ["Club América", "Pumas UNAM"],
+    "historicPlayers": ["Ronaldinho", "Pablo Barrera", "Yerson Candelo", "William da Silva", "Daniel Villalva"],
+    "famousCoaches": ["Víctor Manuel Vucetich", "Ignacio Ambriz", "Hernán Cristóbal"],
+    "stadiumDetails": {
+      "address": "Av. de las Ciencias s/n, Santiago de Querétaro",
+      "altitude": 1820,
+      "surface": "Césped natural",
+      "nickname": "La Corregidora",
+      "namedAfter": "Josefa Ortiz de Domínguez"
+    },
+    "achievements": {
+      "ligaMX": 1,
+      "copaMX": 0,
+      "champions": 0,
+      "concachampions": 0,
+      "interamericana": 0,
+      "campeondecampeones": 0
+    },
+    "records": [
+      "Tuvo a Ronaldinho en sus filas",
+      "Campeón sorpresa en 2012",
+      "Más de 70 años de historia",
+      "Equipo tradicional del Bajío"
+    ],
+    "foundation": {
+      "founders": "Empresarios queretanos",
+      "originalName": "Club de Fútbol Querétaro",
+      "significance": "Orgullo queretano"
+    }
   },
   {
     "id": "mazatlan",
@@ -396,8 +839,38 @@
     "topScorer": "Gustavo del Prete",
     "topScorerGoals": 3,
     "firstTitle": null,
-    "description": "Los Cañoneros del puerto, el equipo más nuevo de la Liga MX buscando establecer su identidad en el máximo circuito.",
-    "logo": "assets/logos/mazatlan.png"
+    "lastTitle": null,
+    "description": "Los Cañoneros del Pacífico, el proyecto más nuevo de Liga MX que representa el regreso del fútbol profesional a Sinaloa después de muchos años. Fundado como reubicación de Monarcas Morelia.",
+    "logo": "assets/logos/mazatlan.png",
+    "classicRivals": [],
+    "historicPlayers": ["Gustavo del Prete", "José Maduenya", "Giovanni Augusto", "Eduardo Torres", "Facundo Almada"],
+    "famousCoaches": ["Tomás Boy", "Gabriel Caballero", "Víctor Manuel Vucetich"],
+    "stadiumDetails": {
+      "address": "Av. Sabálo Ceárritos s/n, Mazatlán",
+      "altitude": 10,
+      "surface": "Césped natural",
+      "nickname": "El Encanto",
+      "features": "Estadio costero con vista al mar"
+    },
+    "achievements": {
+      "ligaMX": 0,
+      "copaMX": 0,
+      "champions": 0,
+      "concachampions": 0,
+      "interamericana": 0,
+      "liguilladeascenso": "Clasificados desde su primera temporada"
+    },
+    "records": [
+      "Equipo más nuevo de Liga MX",
+      "Primer equipo sinaloense en primera división en décadas",
+      "Proyecto de reubicación exitoso",
+      "Estadio costero único en Liga MX"
+    ],
+    "foundation": {
+      "founders": "Grupo Salinas (reubicación de Monarcas)",
+      "originalName": "FC Mazatlán",
+      "significance": "Regreso del fútbol profesional a Sinaloa"
+    }
   },
   {
     "id": "fc-juarez",
@@ -421,8 +894,38 @@
     "topScorer": "Darío Lezcano",
     "topScorerGoals": 3,
     "firstTitle": null,
-    "description": "Los Bravos de Juárez, representantes del fútbol fronterizo que buscan consolidarse en la primera división mexicana.",
-    "logo": "assets/logos/fc-juarez.png"
+    "lastTitle": null,
+    "description": "Los Bravos de la frontera, que representan el orgullo juarense y buscan consolidarse como fuerza competitiva en Liga MX. Fundado como resultado de la reubicación de Indios de Ciudad Juárez.",
+    "logo": "assets/logos/fc-juarez.png",
+    "classicRivals": [],
+    "historicPlayers": ["Darío Lezcano", "Flavio Santos", "Mauro Fernández", "Jefferson Intriago", "Anderson Leite"],
+    "famousCoaches": ["Gabriel Caballero", "Luis Fernández", "Mauricio Barbieri"],
+    "stadiumDetails": {
+      "address": "Av. Manuel J. Clouthier, Ciudad Juárez",
+      "altitude": 1137,
+      "surface": "Césped natural",
+      "nickname": "El Olímpico",
+      "namedAfter": "Benito Juárez (prócer mexicano)"
+    },
+    "achievements": {
+      "ligaMX": 0,
+      "copaMX": 0,
+      "champions": 0,
+      "concachampions": 0,
+      "ascensoMX": "Promovido en 2019",
+      "liguilladeascenso": "Varios playoffs"
+    },
+    "records": [
+      "Equipo fronterizo más reciente",
+      "Regreso del fútbol profesional a Juárez",
+      "Luchando por consolidarse en Liga MX",
+      "Orgullo de la frontera norte"
+    ],
+    "foundation": {
+      "founders": "Empresarios juarenses",
+      "originalName": "FC Juárez",
+      "significance": "Representante del fútbol fronterizo"
+    }
   },
   {
     "id": "atletico-san-luis",
@@ -446,7 +949,37 @@
     "topScorer": "Germán Berterame",
     "topScorerGoals": 2,
     "firstTitle": null,
-    "description": "Los Rojiblancos potosinos, equipo que regresó a primera división con el objetivo de establecerse entre los mejores.",
-    "logo": "assets/logos/atletico-san-luis.png"
+    "lastTitle": null,
+    "description": "Los Rojiblancos potosinos, que regresan el fútbol profesional a San Luis Potosí después de varios años. Buscan establecerse como equipo competitivo y representar con orgullo al estado potosino.",
+    "logo": "assets/logos/atletico-san-luis.png",
+    "classicRivals": [],
+    "historicPlayers": ["Germán Berterame", "Nicolás Ibáñez", "Mateo Klimowicz", "Abel Hernández", "Juan Manuel Sanabria"],
+    "famousCoaches": ["Guillermo Vasconcelos", "Leonel Rocco", "Domènec Torrent"],
+    "stadiumDetails": {
+      "address": "Av. Karakorum 2849, San Luis Potosí",
+      "altitude": 1877,
+      "surface": "Césped natural",
+      "nickname": "Alfonso Lastras Ramsínrez",
+      "namedAfter": "Alfonso Lastras Ramsínrez (empresario potosino)"
+    },
+    "achievements": {
+      "ligaMX": 0,
+      "copaMX": 0,
+      "champions": 0,
+      "concachampions": 0,
+      "ascensoMX": "Promovido en 2019",
+      "liguilladeascenso": "Campeón Ascenso MX"
+    },
+    "records": [
+      "Regreso del fútbol profesional a San Luis Potosí",
+      "Ascenso rápido desde su fundación",
+      "Proyecto de crecimiento constante",
+      "Orgullo potosino"
+    ],
+    "foundation": {
+      "founders": "Empresarios potosinos",
+      "originalName": "Atlético San Luis",
+      "significance": "Regreso del fútbol profesional al estado"
+    }
   }
 ]
