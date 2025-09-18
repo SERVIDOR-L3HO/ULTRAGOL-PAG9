@@ -137,13 +137,22 @@ function renderTeamHeader() {
 
     if (teamName) teamName.textContent = currentTeam.name;
     if (teamNickname) teamNickname.textContent = `"${currentTeam.nickname}"`;
-    if (teamFounded) teamFounded.textContent = `Fundado: ${currentTeam.founded}`;
-    if (teamCity) teamCity.textContent = `Ciudad: ${currentTeam.city}, ${currentTeam.state}`;
-    if (teamStadium) teamStadium.textContent = `Estadio: ${currentTeam.stadium}`;
+    if (teamFounded) teamFounded.innerHTML = `<i class="fas fa-calendar"></i> Fundado: ${currentTeam.founded}`;
+    if (teamCity) teamCity.innerHTML = `<i class="fas fa-map-marker-alt"></i> Ciudad: ${currentTeam.city}, ${currentTeam.state}`;
+    if (teamStadium) teamStadium.innerHTML = `<i class="fas fa-building"></i> Estadio: ${currentTeam.stadium}`;
+    
+    // Add capacity info
+    const teamCapacity = document.getElementById('teamCapacity');
+    if (teamCapacity) teamCapacity.innerHTML = `<i class="fas fa-users"></i> Capacidad: ${currentTeam.capacity?.toLocaleString() || 'N/A'} espectadores`;
+    
+    // Fill additional team information
+    fillTeamDetails();
     
     if (teamLogoLarge) {
         teamLogoLarge.innerHTML = `
-            <div style="width: 100%; height: 100%; background: ${currentTeam.colors.primary}; color: ${currentTeam.colors.secondary}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 3rem; border-radius: 50%;">
+            <img src="${currentTeam.logo}" alt="${currentTeam.name} logo" loading="lazy" 
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="logo-fallback" style="display: none; width: 100%; height: 100%; background: ${currentTeam.colors.primary}; color: ${currentTeam.colors.secondary}; align-items: center; justify-content: center; font-weight: bold; font-size: 3rem; border-radius: 50%;">
                 ${currentTeam.shortName || currentTeam.name.substring(0, 3).toUpperCase()}
             </div>
         `;
@@ -227,7 +236,7 @@ function renderOverviewSection() {
         stadiumInfo.innerHTML = `
             <div class="stadium-details">
                 <h4>${currentTeam.stadium}</h4>
-                <p><i class="fas fa-users"></i> Capacidad: ${currentTeam.capacity} espectadores</p>
+                <p><i class="fas fa-users"></i> Capacidad: ${currentTeam.capacity?.toLocaleString() || 'N/A'} espectadores</p>
                 <p><i class="fas fa-map-marker-alt"></i> ${currentTeam.city}, ${currentTeam.state}</p>
                 <p><i class="fas fa-calendar"></i> Inaugurado: ${currentTeam.stadiumYear || 'N/A'}</p>
             </div>
@@ -508,6 +517,72 @@ function showErrorMessage(message) {
         window.ligaMXApp.showErrorMessage(message);
     } else {
         alert(message);
+    }
+}
+
+// Fill additional team details
+function fillTeamDetails() {
+    if (!currentTeam) return;
+
+    // Fill team description
+    const teamDescription = document.getElementById('teamDescription');
+    if (teamDescription && currentTeam.description) {
+        teamDescription.textContent = currentTeam.description;
+    }
+
+    // Fill team trophies summary
+    const teamTrophies = document.getElementById('teamTrophies');
+    if (teamTrophies) {
+        const totalTrophies = (currentTeam.titles || 0) + (currentTeam.cups || 0) + (currentTeam.international || 0);
+        teamTrophies.innerHTML = `
+            <div class="trophy-summary">
+                <div class="trophy-item">
+                    <i class="fas fa-trophy" style="color: gold;"></i>
+                    <span>${currentTeam.titles || 0} Títulos de Liga</span>
+                </div>
+                <div class="trophy-item">
+                    <i class="fas fa-medal" style="color: silver;"></i>
+                    <span>${currentTeam.cups || 0} Copas Nacionales</span>
+                </div>
+                <div class="trophy-item">
+                    <i class="fas fa-globe-americas" style="color: #1e88e5;"></i>
+                    <span>${currentTeam.international || 0} Títulos Internacionales</span>
+                </div>
+                <div class="trophy-total">
+                    <strong>Total: ${totalTrophies} Trofeos</strong>
+                </div>
+            </div>
+        `;
+    }
+
+    // Fill detailed stadium info
+    const stadiumDetails = document.getElementById('stadiumDetails');
+    if (stadiumDetails) {
+        stadiumDetails.innerHTML = `
+            <div class="stadium-detail-info">
+                <p><strong>Nombre:</strong> ${currentTeam.stadium}</p>
+                <p><strong>Capacidad:</strong> ${currentTeam.capacity?.toLocaleString() || 'N/A'} espectadores</p>
+                <p><strong>Ubicación:</strong> ${currentTeam.city}, ${currentTeam.state}</p>
+                <p><strong>Inauguración:</strong> ${currentTeam.stadiumYear || 'N/A'}</p>
+                <p><strong>Equipo Local:</strong> ${currentTeam.name}</p>
+                ${currentTeam.stadiumYear ? `<p><strong>Antigüedad:</strong> ${new Date().getFullYear() - currentTeam.stadiumYear} años</p>` : ''}
+            </div>
+        `;
+    }
+
+    // Update top scorer with avatar
+    const topScorer = document.getElementById('topScorer');
+    if (topScorer && currentTeam.topScorer) {
+        const initials = currentTeam.topScorer.split(' ').map(name => name[0]).join('').substring(0, 2);
+        topScorer.innerHTML = `
+            <div class="player-info">
+                <div class="player-avatar">${initials}</div>
+                <div class="player-details">
+                    <div class="player-name">${currentTeam.topScorer}</div>
+                    <div class="player-goals">${currentTeam.topScorerGoals || 0} goles esta temporada</div>
+                </div>
+            </div>
+        `;
     }
 }
 

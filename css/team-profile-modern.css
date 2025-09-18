@@ -834,6 +834,17 @@
         flex-direction: column;
         gap: 0.5rem;
     }
+    
+    .trophy-summary {
+        gap: 0.6rem;
+    }
+    
+    .trophy-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -897,4 +908,159 @@
     font-size: 4rem;
     margin-bottom: 1rem;
     color: #ddd;
+}
+
+/* Additional Styles for New Elements */
+.trophy-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.trophy-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.trophy-item:hover {
+    background: rgba(var(--team-primary), 0.1);
+    transform: translateX(5px);
+}
+
+.trophy-item i {
+    font-size: 1.2rem;
+    width: 20px;
+}
+
+.trophy-total {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: 15px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.stadium-detail-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.stadium-detail-info p {
+    margin: 0;
+    padding: 0.6rem 1rem;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 10px;
+    border-left: 4px solid var(--team-primary);
+}
+
+.stadium-detail-info strong {
+    color: var(--team-primary);
+    font-weight: 700;
+}
+
+/* Enhanced Logo Display */
+.team-logo-large img {
+    width: 85%;
+    height: 85%;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+    border-radius: 50%;
+}
+
+/* Card Title Icons */
+.card-title i {
+    margin-right: 0.5rem;
+    color: var(--team-primary);
+    font-size: 1.1rem;
+}
+
+/* Enhanced Player Avatar */
+.player-avatar {
+    background: var(--gradient-primary) !important;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Detail Card Improvements */
+.detail-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+}
+
+.detail-icon {
+    background: var(--gradient-primary) !important;
+}
+
+.detail-title {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.detail-text {
+    line-height: 1.7;
+    font-size: 0.95rem;
+}
+
+/* Team Theme Colors Integration */
+.team-themed .team-logo-large {
+    border-color: var(--team-primary);
+}
+
+.team-themed .achievement-icon {
+    background: var(--gradient-primary);
+}
+
+.team-themed .detail-icon {
+    background: var(--gradient-primary);
+}
+
+.team-themed .trophy-total {
+    background: var(--gradient-primary);
+}
+
+.team-themed .stadium-detail-info p {
+    border-left-color: var(--team-primary);
+}
+
+.team-themed .card-title i {
+    color: var(--team-primary);
+}
+
+/* Animation Improvements */
+.trophy-item,
+.stadium-detail-info p {
+    animation: slideInLeft 0.6s ease forwards;
+    opacity: 0;
+    transform: translateX(-20px);
+}
+
+.trophy-item:nth-child(1) { animation-delay: 0.1s; }
+.trophy-item:nth-child(2) { animation-delay: 0.2s; }
+.trophy-item:nth-child(3) { animation-delay: 0.3s; }
+.trophy-total { animation-delay: 0.4s; }
+
+.stadium-detail-info p:nth-child(1) { animation-delay: 0.1s; }
+.stadium-detail-info p:nth-child(2) { animation-delay: 0.2s; }
+.stadium-detail-info p:nth-child(3) { animation-delay: 0.3s; }
+.stadium-detail-info p:nth-child(4) { animation-delay: 0.4s; }
+.stadium-detail-info p:nth-child(5) { animation-delay: 0.5s; }
+.stadium-detail-info p:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes slideInLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }

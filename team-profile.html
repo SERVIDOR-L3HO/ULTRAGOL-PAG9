@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/teams.css">
+    <link rel="stylesheet" href="css/team-profile-modern.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
@@ -55,9 +56,10 @@
                     <h1 class="team-name fade-in" id="teamName">Cargando...</h1>
                     <p class="team-nickname slide-up" id="teamNickname">...</p>
                     <div class="team-meta">
-                        <span class="team-founded" id="teamFounded">Fundado: ...</span>
-                        <span class="team-city" id="teamCity">Ciudad: ...</span>
-                        <span class="team-stadium" id="teamStadium">Estadio: ...</span>
+                        <span id="teamFounded"><i class="fas fa-calendar"></i> Fundado: ...</span>
+                        <span id="teamCity"><i class="fas fa-map-marker-alt"></i> Ciudad: ...</span>
+                        <span id="teamStadium"><i class="fas fa-building"></i> Estadio: ...</span>
+                        <span id="teamCapacity"><i class="fas fa-users"></i> Capacidad: ...</span>
                     </div>
                 </div>
             </div>
@@ -92,7 +94,7 @@
                 <div class="section-grid">
                     <!-- Current Position -->
                     <div class="info-card">
-                        <h3 class="card-title">Posición Actual</h3>
+                        <h3 class="card-title"><i class="fas fa-trophy"></i> Posición Actual</h3>
                         <div class="position-display" id="currentPosition">
                             <span class="position-number">-</span>
                             <span class="position-suffix">°</span>
@@ -104,7 +106,7 @@
 
                     <!-- Recent Form -->
                     <div class="info-card">
-                        <h3 class="card-title">Últimos 5 Partidos</h3>
+                        <h3 class="card-title"><i class="fas fa-chart-line"></i> Últimos 5 Partidos</h3>
                         <div class="form-display" id="recentForm">
                             <!-- Dynamic form indicators -->
                         </div>
@@ -112,7 +114,7 @@
 
                     <!-- Top Scorer -->
                     <div class="info-card">
-                        <h3 class="card-title">Máximo Goleador</h3>
+                        <h3 class="card-title"><i class="fas fa-futbol"></i> Máximo Goleador</h3>
                         <div class="top-scorer" id="topScorer">
                             <!-- Dynamic top scorer info -->
                         </div>
@@ -120,9 +122,45 @@
 
                     <!-- Stadium Info -->
                     <div class="info-card">
-                        <h3 class="card-title">Estadio</h3>
+                        <h3 class="card-title"><i class="fas fa-building"></i> Estadio</h3>
                         <div class="stadium-info" id="stadiumInfo">
                             <!-- Dynamic stadium info -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Details Grid -->
+                <div class="team-details-grid">
+                    <!-- Club Description -->
+                    <div class="detail-card">
+                        <div class="detail-icon">
+                            <i class="fas fa-info-circle"></i>
+                        </div>
+                        <h4 class="detail-title">Acerca del Club</h4>
+                        <p class="detail-text" id="teamDescription">
+                            <!-- Dynamic description -->
+                        </p>
+                    </div>
+
+                    <!-- Titles and Achievements -->
+                    <div class="detail-card">
+                        <div class="detail-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h4 class="detail-title">Palmarés</h4>
+                        <div id="teamTrophies">
+                            <!-- Dynamic trophies -->
+                        </div>
+                    </div>
+
+                    <!-- Stadium Details -->
+                    <div class="detail-card">
+                        <div class="detail-icon">
+                            <i class="fas fa-map"></i>
+                        </div>
+                        <h4 class="detail-title">Estadio Detallado</h4>
+                        <div id="stadiumDetails">
+                            <!-- Dynamic stadium details -->
                         </div>
                     </div>
                 </div>
