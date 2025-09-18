@@ -298,9 +298,12 @@ allowedDirectories.forEach(dir => {
     }));
 });
 
-// Sub-rutas de ULTRA - servir SPA para rutas ULTRA
-app.get('/ULTRA/*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+// Sub-rutas de ULTRA - servir SPA para rutas ULTRA usando regex
+app.get(/^\/ULTRA\/.*/, (req, res) => {
+    // Only serve index.html if it's not already handled by static files
+    if (!req.url.includes('.')) {
+        res.sendFile(path.join(__dirname, 'index.html'));
+    }
 });
 
 // Ruta principal - servir el index.html del proyecto principal
@@ -324,7 +327,7 @@ mainPages.forEach(page => {
 });
 
 // Fallback for any other routes - serve main index
-app.get('*', (req, res) => {
+app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 
