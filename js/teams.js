@@ -153,15 +153,25 @@ function renderTeamsGrid() {
                         <div class="stat-label">Títulos</div>
                     </div>
                 </div>
-                <button class="team-select-btn" onclick="openTeamModal('${team.id}')">
+                <button class="team-select-btn" data-team-id="${team.id}">
                     <i class="fas fa-heart"></i> Seleccionar Equipo
                 </button>
             </div>
         `;
     }).join('');
 
-    // Trigger stagger animation
+    // Add event listeners to team select buttons
     setTimeout(() => {
+        document.querySelectorAll('.team-select-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const teamId = btn.getAttribute('data-team-id');
+                openTeamModal(teamId);
+            });
+        });
+        
+        // Trigger stagger animation
         document.querySelectorAll('.team-card').forEach(card => {
             card.classList.add('revealed');
         });
