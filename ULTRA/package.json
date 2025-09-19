@@ -8,12 +8,8 @@
     "dev": "node server.js"
   },
   "dependencies": {
-    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "csurf": "^1.11.0",
-    "express": "^4.21.2",
-    "express-session": "^1.18.2",
-    "helmet": "^8.1.0"
+    "express": "^4.21.2"
   },
   "author": "L3HO",
   "license": "MIT"
