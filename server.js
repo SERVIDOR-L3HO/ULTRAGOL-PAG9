@@ -40,15 +40,29 @@ app.use((req, res, next) => {
     next();
 });
 
-const { 
-    createPaypalOrder, 
-    capturePaypalOrder, 
-    loadPaypalDefault 
-} = require('./server/paypal');
+if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {
+    const { 
+        createPaypalOrder, 
+        capturePaypalOrder, 
+        loadPaypalDefault 
+    } = require('./server/paypal');
 
-app.post('/api/paypal/orders', createPaypalOrder);
-app.post('/api/paypal/orders/:orderID/capture', capturePaypalOrder);
-app.get('/api/paypal', loadPaypalDefault);
+    app.post('/api/paypal/orders', createPaypalOrder);
+    app.post('/api/paypal/orders/:orderID/capture', capturePaypalOrder);
+    app.get('/api/paypal', loadPaypalDefault);
+    console.log('✅ PayPal integration enabled');
+} else {
+    console.log('⚠️  PayPal integration disabled (missing credentials)');
+    app.post('/api/paypal/orders', (req, res) => {
+        res.status(503).json({ error: 'PayPal service not configured' });
+    });
+    app.post('/api/paypal/orders/:orderID/capture', (req, res) => {
+        res.status(503).json({ error: 'PayPal service not configured' });
+    });
+    app.get('/api/paypal', (req, res) => {
+        res.status(503).json({ error: 'PayPal service not configured' });
+    });
+}
 
 app.use(express.static(path.join(__dirname), {
     setHeaders: (res, filepath) => {
@@ -59,17 +73,6 @@ app.use(express.static(path.join(__dirname), {
 }));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.get('*', (req, res) => {
-    const requestedFile = path.join(__dirname, req.path);
-    const ext = path.extname(requestedFile);
-    
-    if (ext && ext !== '.html') {
-        return res.status(404).send('Not Found');
-    }
-    
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
