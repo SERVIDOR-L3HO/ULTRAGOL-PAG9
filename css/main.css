@@ -851,8 +851,8 @@ body {
 }
 
 .logo {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
 }
 
 .logo-text {
@@ -863,10 +863,10 @@ body {
 }
 
 .company-tag {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: #fff;
     margin-left: 0.5rem;
-    padding: 0.2rem 0.5rem;
+    padding: 0.3rem 0.6rem;
     background: linear-gradient(45deg, #ff9933, #ffaa44);
     border-radius: 10px;
     font-weight: 500;
