@@ -2522,8 +2522,590 @@ if (typeof window.showToast === 'undefined') {
     };
 }
 
+// ======================== PICTURE-IN-PICTURE FUNCTIONALITY ========================
+
+// Variable global para rastrear la ventana popup
+let pipPopupWindow = null;
+
+// Detectar si es dispositivo móvil
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           (window.innerWidth <= 768 && 'ontouchstart' in window);
+}
+
+// Función para activar/desactivar modo Picture-in-Picture
+async function togglePIP() {
+    const iframe = document.getElementById('live-stream-iframe');
+    const pipBtn = document.querySelector('.pip-btn');
+    
+    if (!iframe) {
+        showToast('No se encontró el reproductor de video', 'error');
+        return;
+    }
+    
+    // Verificar si es móvil o desktop
+    if (isMobileDevice()) {
+        // Para móviles: usar ventana flotante CSS dentro de la página
+        toggleMobilePIP(iframe);
+    } else {
+        // Para desktop: usar ventana popup separada
+        // Si ya hay una ventana popup abierta, cerrarla
+        if (pipPopupWindow && !pipPopupWindow.closed) {
+            pipPopupWindow.close();
+            pipPopupWindow = null;
+            updatePIPButton(pipBtn, false);
+            showToast('Ventana flotante cerrada', 'info');
+            return;
+        }
+        
+        // Abrir ventana popup separada del navegador
+        openPIPPopupWindow(iframe);
+    }
+}
+
+// Función para activar PIP en móviles (ventana flotante CSS)
+function toggleMobilePIP(iframe) {
+    const existingMobilePip = document.getElementById('mobile-pip-window');
+    const pipBtn = document.querySelector('.pip-btn');
+    
+    // Si ya existe, cerrarla
+    if (existingMobilePip) {
+        existingMobilePip.classList.add('pip-closing');
+        setTimeout(() => {
+            existingMobilePip.remove();
+            updatePIPButton(pipBtn, false);
+        }, 300);
+        showToast('Ventana flotante cerrada', 'info');
+        return;
+    }
+    
+    // Crear ventana flotante móvil
+    const mobilePip = document.createElement('div');
+    mobilePip.id = 'mobile-pip-window';
+    mobilePip.className = 'mobile-pip-window';
+    mobilePip.innerHTML = `
+        <div class="mobile-pip-header">
+            <div class="mobile-pip-drag-handle">
+                <i class="fas fa-grip-lines"></i>
+            </div>
+            <div class="mobile-pip-title">
+                <i class="fas fa-broadcast-tower"></i>
+                <span>ULTRAGOL</span>
+                <span class="mobile-live-badge">
+                    <i class="fas fa-circle"></i>
+                    EN VIVO
+                </span>
+            </div>
+            <button class="mobile-pip-close" onclick="closeMobilePIP()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-pip-body">
+            <iframe 
+                src="${iframe.src}" 
+                frameborder="0" 
+                allowfullscreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                title="ULTRAGOL Stream - Flotante">
+            </iframe>
+        </div>
+    `;
+    
+    document.body.appendChild(mobilePip);
+    
+    // Hacer arrastrable con touch
+    makeMobilePIPDraggable(mobilePip);
+    
+    // Actualizar botón
+    updatePIPButton(pipBtn, true);
+    
+    showToast('¡Ventana flotante activada! Arrastra con el dedo para moverla', 'success');
+}
+
+// Función para cerrar PIP móvil
+function closeMobilePIP() {
+    const mobilePip = document.getElementById('mobile-pip-window');
+    const pipBtn = document.querySelector('.pip-btn');
+    
+    if (mobilePip) {
+        mobilePip.classList.add('pip-closing');
+        setTimeout(() => {
+            mobilePip.remove();
+            updatePIPButton(pipBtn, false);
+        }, 300);
+        showToast('Ventana flotante cerrada', 'info');
+    }
+}
+
+// Hacer ventana móvil PIP arrastrable con touch
+function makeMobilePIPDraggable(element) {
+    const header = element.querySelector('.mobile-pip-header');
+    let isDragging = false;
+    let currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+    
+    // Touch events
+    header.addEventListener('touchstart', dragStart, { passive: false });
+    document.addEventListener('touchmove', drag, { passive: false });
+    document.addEventListener('touchend', dragEnd);
+    
+    // Mouse events para testing en desktop
+    header.addEventListener('mousedown', dragStart);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
+    
+    function dragStart(e) {
+        if (e.type === 'touchstart') {
+            initialX = e.touches[0].clientX - xOffset;
+            initialY = e.touches[0].clientY - yOffset;
+        } else {
+            initialX = e.clientX - xOffset;
+            initialY = e.clientY - yOffset;
+        }
+        
+        if (e.target === header || e.target.closest('.mobile-pip-drag-handle')) {
+            isDragging = true;
+            element.classList.add('dragging');
+        }
+    }
+    
+    function drag(e) {
+        if (!isDragging) return;
+        
+        e.preventDefault();
+        
+        if (e.type === 'touchmove') {
+            currentX = e.touches[0].clientX - initialX;
+            currentY = e.touches[0].clientY - initialY;
+        } else {
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+        }
+        
+        xOffset = currentX;
+        yOffset = currentY;
+        
+        // Limitar a los bordes de la pantalla
+        const maxX = window.innerWidth - element.offsetWidth;
+        const maxY = window.innerHeight - element.offsetHeight;
+        
+        xOffset = Math.max(0, Math.min(xOffset, maxX));
+        yOffset = Math.max(0, Math.min(yOffset, maxY));
+        
+        setTranslate(xOffset, yOffset, element);
+    }
+    
+    function dragEnd() {
+        isDragging = false;
+        element.classList.remove('dragging');
+    }
+    
+    function setTranslate(xPos, yPos, el) {
+        el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+    }
+}
+
+// Función para abrir ventana popup separada del navegador
+function openPIPPopupWindow(iframe) {
+    const pipBtn = document.querySelector('.pip-btn');
+    
+    // Dimensiones de la ventana popup
+    const width = 800;
+    const height = 500;
+    
+    // Centrar la ventana en la pantalla
+    const left = (screen.width - width) / 2;
+    const top = (screen.height - height) / 2;
+    
+    // Características de la ventana popup
+    const features = `
+        width=${width},
+        height=${height},
+        left=${left},
+        top=${top},
+        resizable=yes,
+        scrollbars=no,
+        toolbar=no,
+        menubar=no,
+        location=no,
+        status=no,
+        directories=no
+    `.replace(/\s/g, '');
+    
+    try {
+        // Abrir ventana popup
+        pipPopupWindow = window.open('', 'ULTRAGOL_PIP', features);
+        
+        if (!pipPopupWindow || pipPopupWindow.closed) {
+            showToast('Por favor, permite las ventanas emergentes para usar esta función', 'error');
+            return;
+        }
+        
+        // Escribir contenido HTML en la ventana popup
+        pipPopupWindow.document.write(`
+            <!DOCTYPE html>
+            <html lang="es">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>ULTRAGOL - Stream Flotante</title>
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+                <style>
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+                    
+                    body {
+                        font-family: 'Inter', system-ui, sans-serif;
+                        background: linear-gradient(135deg, #000000 0%, #0d1117 100%);
+                        color: white;
+                        display: flex;
+                        flex-direction: column;
+                        height: 100vh;
+                        overflow: hidden;
+                    }
+                    
+                    .pip-header {
+                        background: linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, rgba(255, 107, 0, 0.1) 100%);
+                        padding: 12px 16px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        border-bottom: 2px solid rgba(0, 255, 65, 0.3);
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+                    }
+                    
+                    .pip-title {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        font-weight: 700;
+                        font-size: 16px;
+                    }
+                    
+                    .pip-title i {
+                        color: #00ff41;
+                        animation: rotate 3s linear infinite;
+                    }
+                    
+                    @keyframes rotate {
+                        from { transform: rotate(0deg); }
+                        to { transform: rotate(360deg); }
+                    }
+                    
+                    .live-badge {
+                        background: linear-gradient(135deg, #00ff41 0%, #00cc34 100%);
+                        color: #000;
+                        padding: 4px 12px;
+                        border-radius: 20px;
+                        font-size: 12px;
+                        font-weight: 700;
+                        letter-spacing: 1px;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+                    }
+                    
+                    .live-badge i {
+                        animation: pulse 1.5s infinite;
+                    }
+                    
+                    @keyframes pulse {
+                        0%, 100% { opacity: 1; transform: scale(1); }
+                        50% { opacity: 0.6; transform: scale(1.2); }
+                    }
+                    
+                    .pip-body {
+                        flex: 1;
+                        position: relative;
+                        background: #000;
+                        overflow: hidden;
+                    }
+                    
+                    .pip-body iframe {
+                        width: 100%;
+                        height: 100%;
+                        border: none;
+                    }
+                    
+                    .loading {
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        text-align: center;
+                    }
+                    
+                    .loading i {
+                        font-size: 48px;
+                        color: #00ff41;
+                        animation: spin 1s linear infinite;
+                    }
+                    
+                    @keyframes spin {
+                        from { transform: rotate(0deg); }
+                        to { transform: rotate(360deg); }
+                    }
+                    
+                    .loading p {
+                        margin-top: 16px;
+                        color: #999;
+                        font-size: 14px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="pip-header">
+                    <div class="pip-title">
+                        <i class="fas fa-broadcast-tower"></i>
+                        <span>ULTRAGOL Stream</span>
+                    </div>
+                    <div class="live-badge">
+                        <i class="fas fa-circle"></i>
+                        <span>EN VIVO</span>
+                    </div>
+                </div>
+                <div class="pip-body">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>Cargando transmisión...</p>
+                    </div>
+                    <iframe 
+                        src="${iframe.src}" 
+                        frameborder="0" 
+                        allowfullscreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        title="ULTRAGOL Stream Premium - Ventana Flotante"
+                        onload="document.querySelector('.loading').style.display='none';">
+                    </iframe>
+                </div>
+            </body>
+            </html>
+        `);
+        
+        pipPopupWindow.document.close();
+        
+        // Actualizar botón
+        updatePIPButton(pipBtn, true);
+        
+        // Detectar cuando se cierra la ventana popup
+        const checkWindowClosed = setInterval(() => {
+            if (pipPopupWindow.closed) {
+                clearInterval(checkWindowClosed);
+                pipPopupWindow = null;
+                updatePIPButton(pipBtn, false);
+                showToast('Ventana flotante cerrada', 'info');
+            }
+        }, 500);
+        
+        showToast('¡Ventana flotante abierta! Puedes moverla libremente y minimizar el navegador', 'success');
+        
+    } catch (error) {
+        console.error('Error al abrir ventana popup:', error);
+        showToast('Error al abrir la ventana flotante. Verifica los permisos de ventanas emergentes', 'error');
+    }
+}
+
+// Función para crear una ventana flotante personalizada (fallback - no se usa pero se mantiene)
+function createFloatingWindow(iframe) {
+    const existingFloat = document.getElementById('custom-pip-window');
+    
+    // Si ya existe, cerrarla
+    if (existingFloat) {
+        closeFloatingWindow();
+        return;
+    }
+    
+    // Crear contenedor flotante
+    const floatingWindow = document.createElement('div');
+    floatingWindow.id = 'custom-pip-window';
+    floatingWindow.className = 'custom-pip-window';
+    floatingWindow.innerHTML = `
+        <div class="pip-header">
+            <div class="pip-title">
+                <i class="fas fa-broadcast-tower"></i>
+                <span>ULTRAGOL - Stream En Vivo</span>
+            </div>
+            <div class="pip-controls">
+                <button class="pip-minimize" onclick="minimizePIPWindow()" title="Minimizar">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="pip-close" onclick="closeFloatingWindow()" title="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="pip-body">
+            <iframe 
+                src="${iframe.src}" 
+                frameborder="0" 
+                allowfullscreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                title="ULTRAGOL Stream Premium - Flotante">
+            </iframe>
+        </div>
+        <div class="pip-resize-handle"></div>
+    `;
+    
+    document.body.appendChild(floatingWindow);
+    
+    // Hacer la ventana arrastrable
+    makeDraggable(floatingWindow);
+    makeResizable(floatingWindow);
+    
+    // Actualizar botón
+    const pipBtn = document.querySelector('.pip-btn');
+    updatePIPButton(pipBtn, true);
+    
+    showToast('¡Ventana flotante creada! Puedes arrastrarla y redimensionarla', 'success');
+}
+
+// Función para cerrar la ventana flotante
+function closeFloatingWindow() {
+    const floatingWindow = document.getElementById('custom-pip-window');
+    if (floatingWindow) {
+        floatingWindow.classList.add('pip-closing');
+        setTimeout(() => {
+            floatingWindow.remove();
+            const pipBtn = document.querySelector('.pip-btn');
+            updatePIPButton(pipBtn, false);
+            showToast('Ventana flotante cerrada', 'info');
+        }, 300);
+    }
+}
+
+// Función para minimizar/restaurar la ventana PIP
+function minimizePIPWindow() {
+    const floatingWindow = document.getElementById('custom-pip-window');
+    if (floatingWindow) {
+        floatingWindow.classList.toggle('pip-minimized');
+    }
+}
+
+// Hacer la ventana arrastrable
+function makeDraggable(element) {
+    const header = element.querySelector('.pip-header');
+    let isDragging = false;
+    let currentX, currentY, initialX, initialY;
+    
+    header.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.pip-controls')) return;
+        isDragging = true;
+        initialX = e.clientX - element.offsetLeft;
+        initialY = e.clientY - element.offsetTop;
+        element.classList.add('pip-dragging');
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault();
+        currentX = e.clientX - initialX;
+        currentY = e.clientY - initialY;
+        
+        // Limitar a los bordes de la pantalla
+        const maxX = window.innerWidth - element.offsetWidth;
+        const maxY = window.innerHeight - element.offsetHeight;
+        currentX = Math.max(0, Math.min(currentX, maxX));
+        currentY = Math.max(0, Math.min(currentY, maxY));
+        
+        element.style.left = currentX + 'px';
+        element.style.top = currentY + 'px';
+    });
+    
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        element.classList.remove('pip-dragging');
+    });
+}
+
+// Hacer la ventana redimensionable
+function makeResizable(element) {
+    const resizeHandle = element.querySelector('.pip-resize-handle');
+    let isResizing = false;
+    let startX, startY, startWidth, startHeight;
+    
+    resizeHandle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = element.offsetWidth;
+        startHeight = element.offsetHeight;
+        element.classList.add('pip-resizing');
+        e.preventDefault();
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        const width = startWidth + (e.clientX - startX);
+        const height = startHeight + (e.clientY - startY);
+        
+        // Tamaños mínimos y máximos
+        const minWidth = 400;
+        const minHeight = 250;
+        const maxWidth = window.innerWidth * 0.9;
+        const maxHeight = window.innerHeight * 0.9;
+        
+        if (width >= minWidth && width <= maxWidth) {
+            element.style.width = width + 'px';
+        }
+        if (height >= minHeight && height <= maxHeight) {
+            element.style.height = height + 'px';
+        }
+    });
+    
+    document.addEventListener('mouseup', () => {
+        isResizing = false;
+        element.classList.remove('pip-resizing');
+    });
+}
+
+// Actualizar apariencia del botón PIP
+function updatePIPButton(button, isActive) {
+    if (!button) return;
+    
+    const icon = button.querySelector('i');
+    const text = button.querySelector('span');
+    
+    if (isActive) {
+        icon.className = 'fas fa-compress-arrows-alt';
+        text.textContent = 'Desactivar Flotante';
+        button.classList.add('pip-active');
+    } else {
+        icon.className = 'fas fa-external-link-square-alt';
+        text.textContent = 'Video Flotante';
+        button.classList.remove('pip-active');
+    }
+}
+
+// Escuchar eventos de PIP nativo
+document.addEventListener('enterpictureinpicture', () => {
+    const pipBtn = document.querySelector('.pip-btn');
+    updatePIPButton(pipBtn, true);
+});
+
+document.addEventListener('leavepictureinpicture', () => {
+    const pipBtn = document.querySelector('.pip-btn');
+    updatePIPButton(pipBtn, false);
+});
+
 // Hacer las funciones globales para que funcionen con onclick
 window.toggleFullscreen = toggleFullscreen;
 window.refreshStream = refreshStream;
 window.shareLiveStream = shareLiveStream;
+window.togglePIP = togglePIP;
+window.closeFloatingWindow = closeFloatingWindow;
+window.closeMobilePIP = closeMobilePIP;
+window.minimizePIPWindow = minimizePIPWindow;
 window.showToast = window.showToast; // Ensure showToast is also globally available
+// Función para mostrar directamente la sección live-stream al cargar
+document.addEventListener('DOMContentLoaded', function() {
+    // Si la URL contiene live-stream, mostrar esa sección
+    if (window.location.href.includes('live-stream')) {
+        setTimeout(() => {
+            showSection('live-stream');
+        }, 500);
+    }
+});
+

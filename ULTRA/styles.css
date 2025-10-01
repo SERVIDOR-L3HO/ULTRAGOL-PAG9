@@ -157,16 +157,36 @@ body {
     gap: var(--space-lg);
 }
 
-.logo h1 {
-    font-family: var(--font-display);
-    font-size: var(--text-2xl);
-    font-weight: 800;
-    background: var(--gradient-hero);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    letter-spacing: -0.02em;
+.logo-image {
+    height: 50px;
+    width: auto;
     margin-bottom: var(--space-xs);
+    animation: logoFloat 3s ease-in-out infinite, logoGlow 2s ease-in-out infinite alternate;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 0 10px rgba(255, 138, 0, 0.5));
+}
+
+.logo-image:hover {
+    transform: scale(1.1) rotate(2deg);
+    filter: drop-shadow(0 0 20px rgba(255, 138, 0, 0.8)) brightness(1.1);
+}
+
+@keyframes logoFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes logoGlow {
+    0% {
+        filter: drop-shadow(0 0 10px rgba(255, 138, 0, 0.5));
+    }
+    100% {
+        filter: drop-shadow(0 0 20px rgba(255, 138, 0, 0.8)) drop-shadow(0 0 30px rgba(255, 138, 0, 0.4));
+    }
 }
 
 .logo .company {
@@ -2002,6 +2022,259 @@ textarea:focus-visible {
     color: var(--accent-green);
 }
 
+/* ======================== CREATIVE PIP BUTTON STYLES ======================== */
+
+.control-btn.pip-btn {
+    background: var(--gradient-hero);
+    color: white;
+    border-color: var(--accent-green);
+    font-weight: 600;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+    position: relative;
+}
+
+.control-btn.pip-btn::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: var(--gradient-border);
+    border-radius: var(--radius-md);
+    z-index: -1;
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.control-btn.pip-btn:hover::before {
+    opacity: 1;
+    animation: borderRotate 3s linear infinite;
+}
+
+.control-btn.pip-btn:hover {
+    background: var(--gradient-orange);
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 107, 0, 0.5);
+}
+
+.control-btn.pip-btn i {
+    color: white;
+    animation: pipPulse 2s ease-in-out infinite;
+}
+
+@keyframes pipPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+@keyframes borderRotate {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+}
+
+/* ======================== CREATIVE IFRAME GLOW EFFECTS ======================== */
+
+.iframe-container {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    min-height: 400px;
+    background: var(--bg-primary);
+    overflow: hidden;
+}
+
+.iframe-glow-effect {
+    position: absolute;
+    inset: -50px;
+    background: radial-gradient(circle at 50% 50%, rgba(0, 255, 65, 0.15) 0%, transparent 60%);
+    filter: blur(40px);
+    animation: glowPulse 4s ease-in-out infinite alternate;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes glowPulse {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+.iframe-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-live);
+    animation: progressBar 3s ease-in-out infinite;
+    z-index: 1;
+}
+
+@keyframes progressBar {
+    0%, 100% {
+        transform: scaleX(0);
+        transform-origin: left;
+    }
+    50% {
+        transform: scaleX(1);
+        transform-origin: left;
+    }
+    51% {
+        transform: scaleX(1);
+        transform-origin: right;
+    }
+    100% {
+        transform: scaleX(0);
+        transform-origin: right;
+    }
+}
+
+.iframe-container iframe {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: var(--bg-primary);
+    z-index: 2;
+}
+
+/* ======================== ENHANCED STREAM INFO BAR ======================== */
+
+.stream-info-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md) var(--space-lg);
+    background: linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, rgba(255, 107, 0, 0.1) 100%);
+    border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.stream-info-bar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+    animation: shimmerBar 3s infinite;
+}
+
+@keyframes shimmerBar {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.live-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--accent-green);
+    font-weight: 700;
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    position: relative;
+}
+
+.live-indicator::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    background: radial-gradient(circle, rgba(0, 255, 65, 0.2) 0%, transparent 70%);
+    filter: blur(8px);
+    animation: liveGlow 2s ease-in-out infinite;
+}
+
+@keyframes liveGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.live-indicator i {
+    color: var(--accent-green);
+    animation: livePulse 1.5s infinite;
+    font-size: var(--text-xs);
+    filter: drop-shadow(0 0 8px var(--accent-green));
+}
+
+@keyframes livePulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.3);
+    }
+}
+
+/* ======================== ENHANCED IFRAME WRAPPER ======================== */
+
+.iframe-wrapper {
+    background: var(--bg-card);
+    border: 2px solid transparent;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    position: relative;
+    transition: all var(--duration-normal) var(--ease-out);
+}
+
+.iframe-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-xl);
+    padding: 2px;
+    background: var(--gradient-border);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.5;
+    animation: borderGlow 4s linear infinite;
+}
+
+@keyframes borderGlow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+}
+
+.iframe-wrapper:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 48px rgba(0, 255, 65, 0.3);
+}
+
+/* ======================== ENHANCED STREAM CONTROLS ======================== */
+
+.stream-controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-card) 100%);
+    border-top: 1px solid rgba(0, 255, 65, 0.2);
+    position: relative;
+}
+
+.stream-controls::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--gradient-border);
+    opacity: 0.6;
+}
+
 /* Stream Sidebar */
 .stream-sidebar {
     display: flex;
@@ -2216,6 +2489,367 @@ textarea:focus-visible {
     }
 }
 
+/* ======================== CUSTOM PIP FLOATING WINDOW STYLES ======================== */
+
+.custom-pip-window {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 600px;
+    height: 400px;
+    background: var(--bg-card);
+    border: 2px solid var(--accent-green);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 255, 65, 0.3);
+    z-index: 10000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: pipFadeIn 0.3s var(--ease-out);
+    backdrop-filter: blur(20px);
+}
+
+@keyframes pipFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.custom-pip-window.pip-closing {
+    animation: pipFadeOut 0.3s var(--ease-in) forwards;
+}
+
+@keyframes pipFadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+}
+
+.custom-pip-window.pip-dragging {
+    cursor: move;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 0 2px var(--accent-green);
+}
+
+.custom-pip-window.pip-resizing {
+    cursor: nwse-resize;
+}
+
+.custom-pip-window.pip-minimized {
+    height: 50px !important;
+}
+
+.custom-pip-window.pip-minimized .pip-body {
+    display: none;
+}
+
+.pip-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--gradient-card);
+    border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+    cursor: move;
+    user-select: none;
+}
+
+.pip-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: var(--text-sm);
+}
+
+.pip-title i {
+    color: var(--accent-green);
+    animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.pip-controls {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.pip-controls button {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.pip-controls button:hover {
+    background: var(--gradient-card);
+    color: var(--accent-green);
+    border-color: var(--accent-green);
+    transform: scale(1.1);
+}
+
+.pip-close:hover {
+    background: var(--error) !important;
+    color: white !important;
+    border-color: var(--error) !important;
+}
+
+.pip-body {
+    flex: 1;
+    position: relative;
+    background: var(--bg-primary);
+    overflow: hidden;
+}
+
+.pip-body iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.pip-resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    background: var(--gradient-hero);
+    cursor: nwse-resize;
+    border-top-left-radius: var(--radius-sm);
+    transition: all var(--duration-fast) var(--ease-out);
+}
+
+.pip-resize-handle:hover {
+    background: var(--gradient-orange);
+    width: 24px;
+    height: 24px;
+}
+
+.pip-resize-handle::before {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    border-right: 2px solid white;
+    border-bottom: 2px solid white;
+    opacity: 0.7;
+}
+
+/* Active state for PIP button */
+.control-btn.pip-active {
+    background: var(--gradient-orange);
+    color: white;
+    border-color: var(--accent-orange);
+    box-shadow: 0 0 20px rgba(255, 107, 0, 0.5);
+}
+
+.control-btn.pip-active i {
+    color: white;
+}
+
+/* ======================== MOBILE PIP FLOATING WINDOW STYLES ======================== */
+
+.mobile-pip-window {
+    position: fixed;
+    bottom: 80px;
+    right: 16px;
+    width: 90%;
+    max-width: 380px;
+    height: auto;
+    background: var(--bg-card);
+    border: 2px solid var(--accent-green);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(0, 255, 65, 0.4);
+    z-index: 10000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: mobilePipFadeIn 0.3s var(--ease-out);
+    touch-action: none;
+    will-change: transform;
+}
+
+@keyframes mobilePipFadeIn {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 30px, 0) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+.mobile-pip-window.pip-closing {
+    animation: mobilePipFadeOut 0.3s var(--ease-in) forwards;
+}
+
+@keyframes mobilePipFadeOut {
+    from {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translate3d(0, 30px, 0) scale(0.95);
+    }
+}
+
+.mobile-pip-window.dragging {
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.95), 0 0 0 3px var(--accent-green);
+    cursor: grabbing;
+}
+
+.mobile-pip-header {
+    background: linear-gradient(135deg, rgba(0, 255, 65, 0.15) 0%, rgba(255, 107, 0, 0.1) 100%);
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid rgba(0, 255, 65, 0.3);
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.mobile-pip-header:active {
+    cursor: grabbing;
+}
+
+.mobile-pip-drag-handle {
+    display: flex;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: var(--text-lg);
+    padding: 4px;
+}
+
+.mobile-pip-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: var(--text-sm);
+    flex: 1;
+    margin: 0 8px;
+}
+
+.mobile-pip-title i:first-child {
+    color: var(--accent-green);
+    font-size: var(--text-base);
+}
+
+.mobile-live-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--gradient-hero);
+    color: #000;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+}
+
+.mobile-live-badge i {
+    animation: livePulse 1.5s infinite;
+    font-size: 6px;
+}
+
+.mobile-pip-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-out);
+    font-size: var(--text-base);
+}
+
+.mobile-pip-close:active {
+    background: var(--error);
+    color: white;
+    border-color: var(--error);
+    transform: scale(0.95);
+}
+
+.mobile-pip-body {
+    position: relative;
+    background: var(--bg-primary);
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+}
+
+.mobile-pip-body iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Responsive adjustments for very small screens */
+@media (max-width: 480px) {
+    .mobile-pip-window {
+        width: 95%;
+        max-width: none;
+        bottom: 70px;
+        right: 2.5%;
+    }
+    
+    .mobile-pip-header {
+        padding: 6px 8px;
+    }
+    
+    .mobile-pip-title {
+        font-size: 12px;
+        gap: 4px;
+    }
+    
+    .mobile-live-badge {
+        padding: 2px 6px;
+        font-size: 9px;
+    }
+    
+    .mobile-pip-close {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+/* Ensure mobile PIP stays on top of everything */
+.mobile-pip-window {
+    z-index: 9999 !important;
+}
+
 /* ======================== PRINT STYLES ======================== */
 
 @media print {
@@ -2237,3 +2871,533 @@ textarea:focus-visible {
         margin-bottom: 1rem;
     }
 }
+
+/* ================ BANNER COLABORACIÓN GOLAZOZ ================ */
+.collaboration-banner {
+    margin: 2rem 0;
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    box-shadow: 0 20px 40px rgba(0, 255, 136, 0.1), 
+                0 0 30px rgba(255, 159, 64, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    animation: bannerGlow 6s ease-in-out infinite alternate;
+}
+
+@keyframes bannerGlow {
+    0% { box-shadow: 0 20px 40px rgba(0, 255, 136, 0.05), 0 0 20px rgba(255, 159, 64, 0.05); }
+    100% { box-shadow: 0 22px 45px rgba(0, 255, 136, 0.08), 0 0 25px rgba(255, 159, 64, 0.08); }
+}
+
+.banner-container {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    min-height: 200px;
+}
+
+.banner-image {
+    width: 100%;
+    height: auto;
+    max-height: 350px;
+    object-fit: contain;
+    filter: brightness(1) contrast(1.05);
+    transition: all 0.3s ease;
+}
+
+.banner-container:hover .banner-image {
+    filter: brightness(1.1) contrast(1.1);
+    transform: scale(1.02);
+}
+
+/* Texto de Colaboración */
+.collaboration-description {
+    padding: 2rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+}
+
+.collab-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.collab-title i {
+    color: #ff9f40;
+    animation: handshake 5s ease-in-out infinite;
+}
+
+@keyframes handshake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.collab-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 1.5rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.golazoz-btn {
+    background: linear-gradient(135deg, #ff9f40 0%, #ff6b35 100%);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 50px;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(255, 159, 64, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.golazoz-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 35px rgba(255, 159, 64, 0.4);
+    background: linear-gradient(135deg, #ff6b35 0%, #ff9f40 100%);
+}
+
+.golazoz-btn:active {
+    transform: translateY(-1px) scale(1.02);
+}
+
+.btn-sparkle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+.banner-effects {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.floating-ball {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: float 4s ease-in-out infinite;
+    opacity: 0.7;
+}
+
+.ball-1 {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.ball-2 {
+    top: 30%;
+    right: 15%;
+    animation-delay: 1s;
+}
+
+.ball-3 {
+    bottom: 25%;
+    left: 20%;
+    animation-delay: 2s;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(90deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+    75% { transform: translateY(-10px) rotate(270deg); }
+}
+
+/* Responsivo para el banner */
+@media (max-width: 768px) {
+    .collaboration-banner {
+        margin: 1rem 0;
+        border-radius: 15px;
+    }
+    
+    .banner-container {
+        min-height: 150px;
+    }
+    
+    .banner-image {
+        max-height: 250px;
+    }
+    
+    .collaboration-description {
+        padding: 1.5rem 1rem;
+    }
+    
+    .collab-title {
+        font-size: 1.4rem;
+    }
+    
+    .collab-text {
+        font-size: 1rem;
+        line-height: 1.6;
+    }
+    
+    .golazoz-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+/* ================ MEJORAS CREATIVAS GENERALES ================ */
+
+/* Efectos de partículas en el fondo */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(255, 159, 64, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 60% 40%, rgba(0, 255, 136, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+    animation: particleMove 20s ease-in-out infinite;
+}
+
+@keyframes particleMove {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    25% { transform: translateX(-20px) translateY(-10px); }
+    50% { transform: translateX(20px) translateY(10px); }
+    75% { transform: translateX(-10px) translateY(20px); }
+}
+
+/* Mejoras en los botones de navegación */
+.nav-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, #00ff88, #ff9f40);
+    transition: left 0.3s ease;
+}
+
+.nav-btn:hover::after,
+.nav-btn.active::after {
+    left: 0;
+}
+
+/* Efectos de hover mejorados en las cards */
+.stream-card {
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stream-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+    transition: left 0.5s ease;
+}
+
+.stream-card:hover::before {
+    left: 100%;
+}
+
+.stream-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 255, 136, 0.2);
+}
+
+
+
+/* ================ EFECTOS CREATIVOS ADICIONALES ================ */
+
+/* Animación de entrada para las secciones */
+.section {
+    opacity: 0;
+    animation: sectionFadeIn 0.8s ease-out forwards;
+}
+
+.section.active {
+    opacity: 1;
+}
+
+@keyframes sectionFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efecto de brillo en el header */
+.navbar {
+    position: relative;
+    overflow: hidden;
+}
+
+.navbar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+    animation: navbarSweep 8s ease-in-out infinite;
+}
+
+@keyframes navbarSweep {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: -100%; }
+}
+
+/* Efectos de neon en el logo */
+.logo h1 {
+    position: relative;
+    text-shadow: 
+        0 0 5px #00ff88,
+        0 0 10px #00ff88,
+        0 0 20px #00ff88,
+        0 0 40px #00ff88;
+    animation: neonPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes neonPulse {
+    0% {
+        text-shadow: 
+            0 0 5px #00ff88,
+            0 0 10px #00ff88,
+            0 0 20px #00ff88,
+            0 0 40px #00ff88;
+    }
+    100% {
+        text-shadow: 
+            0 0 10px #00ff88,
+            0 0 20px #00ff88,
+            0 0 30px #00ff88,
+            0 0 60px #00ff88;
+    }
+}
+
+/* Efectos de brillo en botones principales */
+.login-btn, .action-btn.primary {
+    position: relative;
+    overflow: hidden;
+}
+
+.login-btn::before, .action-btn.primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.login-btn:hover::before, .action-btn.primary:hover::before {
+    left: 100%;
+}
+
+/* Animaciones para íconos */
+.warning-notice i {
+    animation: warningBlink 2s ease-in-out infinite;
+}
+
+@keyframes warningBlink {
+    0%, 100% { color: #ff9f40; }
+    50% { color: #ff6b35; }
+}
+
+/* Efecto de typing en subtítulos */
+.search-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus {
+    border-color: #00ff88;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Efectos de carga mejorados */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 255, 136, 0.3);
+    border-radius: 50%;
+    border-top-color: #00ff88;
+    animation: spinGlow 1s ease-in-out infinite;
+}
+
+@keyframes spinGlow {
+    0% {
+        transform: rotate(0deg);
+        box-shadow: 0 0 5px #00ff88;
+    }
+    100% {
+        transform: rotate(360deg);
+        box-shadow: 0 0 15px #00ff88;
+    }
+}
+
+/* Efectos de glassmorphism mejorados */
+.stream-info-bar {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Animaciones de hover para filtros */
+.filter-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.filter-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #00ff88, #ff9f40);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.filter-btn:hover::before {
+    opacity: 0.1;
+}
+
+.filter-btn.active::before {
+    opacity: 0.2;
+}
+
+/* Efectos de scroll suaves */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Efectos de entrada para cards */
+.stream-card {
+    opacity: 0;
+    animation: cardSlideIn 0.6s ease-out forwards;
+}
+
+@keyframes cardSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Efecto de resplandor en elementos activos */
+.live-indicator {
+    position: relative;
+}
+
+.live-indicator::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0, 255, 136, 0.4) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    animation: liveGlow 2s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes liveGlow {
+    0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* Efectos de transición mejorados */
+* {
+    transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+
+/* Estilos para mensajes de información vacía */
+.no-match-message, .no-matches-message {
+    text-align: center;
+    padding: 1rem;
+    color: #999;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+}
+
+.no-match-message i, .no-matches-message i {
+    margin-right: 0.5rem;
+    opacity: 0.7;
+}
+

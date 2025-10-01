@@ -11,15 +11,14 @@
     
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../css/cookie-banner.css?v=2025091201">
 </head>
 <body>
     <header>
         <nav class="navbar">
             <div class="nav-container">
                 <div class="logo">
-                    <h1>ULTRAGOL</h1>
-                    <span class="company">L3HO</span>
+                    <img src="attached_assets/1001721720-removebg-preview_1759196407381.png" alt="ULTRAGOL" class="logo-image">
+                    <span class="company"></span>
                 </div>
                 <div class="nav-menu">
                     <button class="nav-btn active" data-section="transmisiones">
@@ -127,6 +126,29 @@
                     <p>Disfruta de transmisiones de fútbol en alta calidad con múltiples opciones</p>
                 </div>
 
+                <!-- Banner de Colaboración GOLAZOZ -->
+                <div class="collaboration-banner">
+                    <div class="banner-container">
+                        <img src="golazoz-banner.jpg" alt="ULTRAGOL x GOLAZOZ" class="banner-image">
+                    </div>
+                    
+                    <!-- Texto de Colaboración -->
+                    <div class="collaboration-description">
+                        <h3 class="collab-title">
+                            <i class="fas fa-handshake"></i> Colaboración Oficial
+                        </h3>
+                        <p class="collab-text">
+                            ULTRAGOL y GOLAZOZ se unen para ofrecerte la mejor experiencia de transmisiones de fútbol en vivo. 
+                            Dos plataformas trabajando juntas por la pasión del fútbol, brindándote múltiples opciones para que 
+                            nunca te pierdas un partido importante.
+                        </p>
+                        <a href="https://golazoz.com/" target="_blank" rel="noopener noreferrer" class="golazoz-btn">
+                            <i class="fas fa-external-link-alt"></i>
+                            <span>Visitar GOLAZOZ.com</span>
+                        </a>
+                    </div>
+                </div>
+
                 <div class="live-stream-container">
                     <div class="iframe-wrapper">
                         <div class="stream-info-bar">
@@ -138,14 +160,12 @@
                                 <i class="fas fa-hd-video"></i>
                                 <span>FULL HD</span>
                             </div>
-                            <div class="stream-viewers">
-                                <i class="fas fa-users"></i>
-                                <span id="viewer-count">2,847 espectadores</span>
-                            </div>
                         </div>
                         
-                        <div class="iframe-container">
+                        <div class="iframe-container" id="stream-iframe-container">
+                            <div class="iframe-glow-effect"></div>
                             <iframe 
+                                id="live-stream-iframe"
                                 src="https://pxnel.donromans.com/" 
                                 frameborder="0" 
                                 allowfullscreen
@@ -155,6 +175,10 @@
                         </div>
                         
                         <div class="stream-controls">
+                            <button class="control-btn pip-btn" onclick="togglePIP()" title="Video Flotante (PIP)">
+                                <i class="fas fa-external-link-square-alt"></i>
+                                <span>Video Flotante</span>
+                            </button>
                             <button class="control-btn fullscreen-btn" onclick="toggleFullscreen()">
                                 <i class="fas fa-expand"></i>
                                 <span>Pantalla Completa</span>
@@ -170,68 +194,6 @@
                         </div>
                     </div>
 
-                    <!-- Panel lateral con información adicional -->
-                    <div class="stream-sidebar">
-                        <div class="current-match">
-                            <h3><i class="fas fa-futbol"></i> Partido Actual</h3>
-                            <div class="match-info">
-                                <div class="teams">
-                                    <span class="team">Real Madrid</span>
-                                    <span class="vs">VS</span>
-                                    <span class="team">Barcelona</span>
-                                </div>
-                                <div class="match-time">
-                                    <i class="fas fa-clock"></i>
-                                    <span>2° Tiempo - 67'</span>
-                                </div>
-                                <div class="score">
-                                    <span class="score-home">2</span>
-                                    <span class="score-separator">-</span>
-                                    <span class="score-away">1</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="upcoming-matches">
-                            <h3><i class="fas fa-calendar"></i> Próximos Partidos</h3>
-                            <div class="match-list">
-                                <div class="match-item">
-                                    <div class="match-teams">Liverpool vs Man City</div>
-                                    <div class="match-time">19:00</div>
-                                </div>
-                                <div class="match-item">
-                                    <div class="match-teams">PSG vs Bayern</div>
-                                    <div class="match-time">21:45</div>
-                                </div>
-                                <div class="match-item">
-                                    <div class="match-teams">Juventus vs Milan</div>
-                                    <div class="match-time">22:00</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="stream-stats">
-                            <h3><i class="fas fa-chart-line"></i> Estadísticas</h3>
-                            <div class="stats-grid">
-                                <div class="stat-item">
-                                    <span class="stat-value">98%</span>
-                                    <span class="stat-label">Calidad</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-value">0ms</span>
-                                    <span class="stat-label">Latencia</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-value">1080p</span>
-                                    <span class="stat-label">Resolución</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-value">60fps</span>
-                                    <span class="stat-label">FPS</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -504,9 +466,6 @@
             <p class="footer-note">Las transmisiones se eliminan automáticamente después de 1 hora.</p>
         </div>
     </footer>
-    
-    <!-- Cookie Banner Script -->
-    <script src="../js/cookie-banner.js?v=2025091201"></script>
 
     <!-- Scripts de Firebase -->
     <script type="module" src="firebase-config.js"></script>
