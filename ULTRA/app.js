@@ -340,8 +340,8 @@ function initializeApp() {
     // Configurar modales de perfil
     setupProfileModals();
     
-    // Inicializar búsqueda
-    setupSearch();
+    // Inicializar búsqueda (comentado - ya existe en HTML)
+    // setupSearch();
     
     // Inicializar favoritos
     initializeFavorites();
