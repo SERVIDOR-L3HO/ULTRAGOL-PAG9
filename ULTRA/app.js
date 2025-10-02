@@ -313,6 +313,7 @@ class UltraSearchEngine {
 
 // Initialize search engine
 const ultraSearch = new UltraSearchEngine();
+window.ultraSearch = ultraSearch;
 
 // Variables globales
 let currentFilter = 'all';
@@ -603,6 +604,11 @@ async function loadStreams() {
                 data.id = doc.id;
                 streamsData.push(data);
             });
+            
+            // Actualizar array de búsqueda
+            if (window.ultraSearch) {
+                window.ultraSearch.allStreams = streamsData;
+            }
             
             displayStreams(streamsData);
         }, (error) => {
