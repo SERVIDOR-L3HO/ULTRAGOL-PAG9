@@ -149,6 +149,30 @@
                     </div>
                 </div>
 
+                <!-- Botones de Selección de Canal -->
+                <div class="channel-selector">
+                    <button class="channel-btn active" onclick="changeChannel('https://pxnel.donromans.com/', this)" data-channel="1">
+                        <div class="channel-icon">
+                            <i class="fas fa-satellite-dish"></i>
+                        </div>
+                        <div class="channel-info">
+                            <span class="channel-label">OPCIÓN 1</span>
+                            <span class="channel-name">Panel Premium</span>
+                        </div>
+                        <div class="channel-indicator"></div>
+                    </button>
+                    <button class="channel-btn" onclick="changeChannel('https://panel.donromans.com/', this)" data-channel="2">
+                        <div class="channel-icon">
+                            <i class="fas fa-tv"></i>
+                        </div>
+                        <div class="channel-info">
+                            <span class="channel-label">OPCIÓN 2</span>
+                            <span class="channel-name">Panel Alterno</span>
+                        </div>
+                        <div class="channel-indicator"></div>
+                    </button>
+                </div>
+
                 <div class="live-stream-container">
                     <div class="iframe-wrapper">
                         <div class="stream-info-bar">
@@ -470,5 +494,23 @@
     <!-- Scripts de Firebase -->
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="app.js"></script>
+    
+    <!-- Script para cambio de canales -->
+    <script>
+        function changeChannel(url, button) {
+            const iframe = document.getElementById('live-stream-iframe');
+            const allButtons = document.querySelectorAll('.channel-btn');
+            
+            allButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            iframe.style.opacity = '0';
+            
+            setTimeout(() => {
+                iframe.src = url;
+                iframe.style.opacity = '1';
+            }, 300);
+        }
+    </script>
 </body>
 </html>
