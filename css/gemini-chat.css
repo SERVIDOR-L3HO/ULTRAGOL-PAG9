@@ -1,4 +1,13 @@
-/* Gemini AI Chat Flotante - Liga MX */
+/* Gemini AI Chat Flotante - Liga MX - Enhanced Edition */
+
+:root {
+    --chat-primary: #ff9933;
+    --chat-secondary: #ff6600;
+    --chat-dark: #1a1a1a;
+    --chat-darker: #0d0d0d;
+    --chat-border: #ff9933;
+    --chat-glow: rgba(255, 153, 51, 0.4);
+}
 
 .gemini-chat-button {
     position: fixed;
@@ -50,33 +59,66 @@
     50% { opacity: 0.7; }
 }
 
+/* Contenedor flotante mejorado - Más grande y glassmorphism */
 .gemini-chat-container {
     position: fixed;
     bottom: 120px;
     right: 30px;
-    width: 400px;
-    max-width: calc(100vw - 60px);
-    height: 600px;
-    max-height: calc(100vh - 200px);
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    width: 520px;
+    height: 720px;
+    background: rgba(26, 26, 26, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6),
+                0 0 1px 1px rgba(255, 153, 51, 0.3),
+                inset 0 0 80px rgba(255, 153, 51, 0.05);
     display: none;
     flex-direction: column;
     overflow: hidden;
     z-index: 9998;
-    border: 2px solid #ff9933;
-    animation: slideUp 0.3s ease;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    animation: slideUpScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.3s ease;
 }
 
-@keyframes slideUp {
-    from {
+/* Animación de entrada más dinámica */
+@keyframes slideUpScale {
+    0% {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(30px) scale(0.9);
     }
-    to {
+    100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Borde animado con gradiente */
+.gemini-chat-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 2px;
+    background: linear-gradient(135deg, #ff9933, #ff6600, #ff9933);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRotate 3s linear infinite;
+}
+
+@keyframes borderRotate {
+    0% {
+        background: linear-gradient(135deg, #ff9933, #ff6600, #ff9933);
+    }
+    50% {
+        background: linear-gradient(135deg, #ff6600, #ff9933, #ff6600);
+    }
+    100% {
+        background: linear-gradient(135deg, #ff9933, #ff6600, #ff9933);
     }
 }
 
@@ -84,100 +126,208 @@
     display: flex;
 }
 
+/* Header con gradiente vibrante y cursor de arrastre */
 .gemini-chat-header {
-    background: linear-gradient(135deg, #ff9933 0%, #ff6600 100%);
-    padding: 20px;
+    background: linear-gradient(135deg, #ff9933 0%, #ff6600 50%, #ff9933 100%);
+    background-size: 200% 100%;
+    padding: 24px;
     color: white;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 2px solid #ff6600;
+    border-bottom: 2px solid rgba(255, 153, 51, 0.3);
+    cursor: move;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+    animation: gradientSlide 3s ease infinite;
+}
+
+@keyframes gradientSlide {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Efecto de brillo en hover del header */
+.gemini-chat-header::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 70%
+    );
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+    }
+    100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+    }
 }
 
 .gemini-chat-header-content {
     display: flex;
     align-items: center;
     gap: 12px;
+    z-index: 1;
 }
 
 .gemini-chat-header-content i {
-    font-size: 24px;
-    animation: rotate 3s linear infinite;
+    font-size: 28px;
+    animation: rotateGlow 4s linear infinite;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
 }
 
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+@keyframes rotateGlow {
+    0%, 100% {
+        transform: rotate(0deg);
+        filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.5));
+    }
+    50% {
+        transform: rotate(180deg);
+        filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.8));
+    }
 }
 
 .gemini-chat-header h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .gemini-chat-header p {
     margin: 5px 0 0 0;
-    font-size: 12px;
-    opacity: 0.9;
+    font-size: 13px;
+    opacity: 0.95;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .gemini-chat-close {
     background: rgba(255, 255, 255, 0.2);
     border: none;
     color: white;
-    width: 35px;
-    height: 35px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    z-index: 1;
+    backdrop-filter: blur(5px);
 }
 
 .gemini-chat-close:hover {
     background: rgba(255, 255, 255, 0.3);
-    transform: rotate(90deg);
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
 
+/* Sugerencias mejoradas */
+.gemini-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px 20px;
+    background: rgba(26, 26, 26, 0.5);
+    border-bottom: 1px solid rgba(255, 153, 51, 0.2);
+}
+
+.gemini-suggestion {
+    padding: 10px 18px;
+    background: rgba(255, 153, 51, 0.12);
+    border: 1.5px solid rgba(255, 153, 51, 0.4);
+    border-radius: 22px;
+    color: #ff9933;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.gemini-suggestion::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 153, 51, 0.3), rgba(255, 102, 0, 0.3));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.gemini-suggestion:hover {
+    background: linear-gradient(135deg, #ff9933, #ff6600);
+    color: white;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 153, 51, 0.4);
+}
+
+.gemini-suggestion:hover::before {
+    opacity: 1;
+}
+
+/* Mensajes con efectos mejorados */
 .gemini-chat-messages {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    background: #1a1a1a;
+    gap: 16px;
+    background: linear-gradient(180deg, rgba(13, 13, 13, 0.8) 0%, rgba(26, 26, 26, 0.6) 100%);
 }
 
 .gemini-chat-messages::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
 }
 
 .gemini-chat-messages::-webkit-scrollbar-track {
-    background: #2d2d2d;
+    background: rgba(45, 45, 45, 0.3);
+    border-radius: 4px;
 }
 
 .gemini-chat-messages::-webkit-scrollbar-thumb {
-    background: #ff9933;
-    border-radius: 3px;
+    background: linear-gradient(180deg, #ff9933, #ff6600);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.gemini-chat-messages::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #ff6600, #ff9933);
+    box-shadow: 0 0 10px rgba(255, 153, 51, 0.5);
 }
 
 .gemini-message {
     display: flex;
-    gap: 10px;
-    animation: fadeIn 0.3s ease;
+    gap: 12px;
+    animation: messageSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes fadeIn {
-    from {
+@keyframes messageSlideIn {
+    0% {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(15px) scale(0.95);
     }
-    to {
+    100% {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
@@ -186,18 +336,20 @@
 }
 
 .gemini-message-avatar {
-    width: 35px;
-    height: 35px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .gemini-message.bot .gemini-message-avatar {
     background: linear-gradient(135deg, #ff9933 0%, #ff6600 100%);
     color: white;
+    animation: avatarPulse 2s ease-in-out infinite;
 }
 
 .gemini-message.user .gemini-message-avatar {
@@ -205,27 +357,40 @@
     color: white;
 }
 
+@keyframes avatarPulse {
+    0%, 100% {
+        box-shadow: 0 4px 12px rgba(255, 153, 51, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 20px rgba(255, 153, 51, 0.6);
+    }
+}
+
 .gemini-message-content {
-    max-width: 70%;
-    padding: 12px 16px;
-    border-radius: 15px;
+    max-width: 75%;
+    padding: 14px 18px;
+    border-radius: 18px;
     word-wrap: break-word;
+    position: relative;
+    backdrop-filter: blur(10px);
 }
 
 .gemini-message.bot .gemini-message-content {
-    background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+    background: linear-gradient(135deg, rgba(45, 45, 45, 0.9) 0%, rgba(58, 58, 58, 0.8) 100%);
     color: white;
-    border: 1px solid #ff9933;
+    border: 1.5px solid rgba(255, 153, 51, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .gemini-message.user .gemini-message-content {
     background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
     color: white;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
 }
 
 .gemini-message-content p {
     margin: 0 0 10px 0;
-    line-height: 1.5;
+    line-height: 1.6;
 }
 
 .gemini-message-content p:last-child {
@@ -234,24 +399,27 @@
 
 .gemini-message-content strong {
     color: #ff9933;
+    font-weight: 600;
 }
 
 .gemini-message.user .gemini-message-content strong {
     color: white;
 }
 
+/* Indicador de escritura mejorado */
 .gemini-typing {
     display: flex;
-    gap: 5px;
-    padding: 10px;
+    gap: 6px;
+    padding: 12px;
 }
 
 .gemini-typing span {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     background: #ff9933;
-    animation: typing 1.4s infinite;
+    animation: typingBounce 1.4s infinite;
+    box-shadow: 0 0 10px rgba(255, 153, 51, 0.5);
 }
 
 .gemini-typing span:nth-child(2) {
@@ -262,49 +430,55 @@
     animation-delay: 0.4s;
 }
 
-@keyframes typing {
+@keyframes typingBounce {
     0%, 60%, 100% {
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
         opacity: 0.5;
+        box-shadow: 0 0 5px rgba(255, 153, 51, 0.3);
     }
     30% {
-        transform: translateY(-10px);
+        transform: translateY(-15px) scale(1.2);
         opacity: 1;
+        box-shadow: 0 0 15px rgba(255, 153, 51, 0.8);
     }
 }
 
+/* Input mejorado */
 .gemini-chat-input-container {
-    padding: 15px;
-    background: #2d2d2d;
-    border-top: 2px solid #ff9933;
+    padding: 18px;
+    background: rgba(45, 45, 45, 0.8);
+    backdrop-filter: blur(10px);
+    border-top: 2px solid rgba(255, 153, 51, 0.3);
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
 .gemini-chat-input {
     flex: 1;
-    padding: 12px 16px;
-    border: 2px solid #3a3a3a;
-    border-radius: 25px;
-    background: #1a1a1a;
+    padding: 14px 20px;
+    border: 2px solid rgba(58, 58, 58, 0.6);
+    border-radius: 28px;
+    background: rgba(26, 26, 26, 0.8);
     color: white;
-    font-size: 14px;
+    font-size: 15px;
     outline: none;
     transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
 }
 
 .gemini-chat-input:focus {
     border-color: #ff9933;
-    box-shadow: 0 0 15px rgba(255, 153, 51, 0.3);
+    box-shadow: 0 0 20px rgba(255, 153, 51, 0.4);
+    background: rgba(26, 26, 26, 0.95);
 }
 
 .gemini-chat-input::placeholder {
-    color: #888;
+    color: #999;
 }
 
 .gemini-chat-send {
-    width: 45px;
-    height: 45px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: linear-gradient(135deg, #ff9933 0%, #ff6600 100%);
     border: none;
@@ -314,11 +488,26 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.gemini-chat-send::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
 }
 
 .gemini-chat-send:hover:not(:disabled) {
-    transform: scale(1.1);
-    box-shadow: 0 5px 15px rgba(255, 153, 51, 0.5);
+    transform: scale(1.15) rotate(15deg);
+    box-shadow: 0 6px 20px rgba(255, 153, 51, 0.6);
+}
+
+.gemini-chat-send:hover:not(:disabled)::before {
+    opacity: 1;
 }
 
 .gemini-chat-send:disabled {
@@ -327,42 +516,57 @@
 }
 
 .gemini-chat-send i {
-    font-size: 18px;
+    font-size: 20px;
+    z-index: 1;
 }
 
-.gemini-suggestions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 0 20px 10px;
-    background: #1a1a1a;
+/* Resize handle - esquina inferior derecha */
+.gemini-resize-handle {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    cursor: nwse-resize;
+    z-index: 10;
 }
 
-.gemini-suggestion {
-    padding: 8px 16px;
-    background: rgba(255, 153, 51, 0.1);
-    border: 1px solid #ff9933;
-    border-radius: 20px;
-    color: #ff9933;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.gemini-resize-handle::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 12px;
+    height: 12px;
+    border-right: 3px solid rgba(255, 153, 51, 0.6);
+    border-bottom: 3px solid rgba(255, 153, 51, 0.6);
+    border-radius: 0 0 4px 0;
 }
 
-.gemini-suggestion:hover {
-    background: #ff9933;
-    color: white;
-    transform: translateY(-2px);
+.gemini-resize-handle:hover::after {
+    border-color: #ff9933;
 }
 
+/* Estado de arrastre */
+.gemini-chat-container.dragging {
+    opacity: 0.9;
+    cursor: move;
+}
+
+/* Estado de redimensionamiento */
+.gemini-chat-container.resizing {
+    opacity: 0.95;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
     .gemini-chat-container {
         bottom: 110px;
         right: 15px;
         left: 15px;
-        width: auto;
+        width: auto !important;
         max-width: none;
-        height: 500px;
+        height: 550px !important;
     }
     
     .gemini-chat-button {
@@ -375,4 +579,16 @@
     .gemini-chat-button i {
         font-size: 28px;
     }
+
+    .gemini-resize-handle {
+        display: none;
+    }
+}
+
+/* Límites de tamaño */
+.gemini-chat-container {
+    min-width: 380px;
+    min-height: 450px;
+    max-width: 90vw;
+    max-height: 90vh;
 }
