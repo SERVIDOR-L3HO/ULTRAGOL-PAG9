@@ -47,7 +47,7 @@ class GeminiLigaMXChat {
             </div>
             
             <div class="gemini-chat-container" id="gemini-chat-container">
-                <div class="gemini-chat-header">
+                <div class="gemini-chat-header" id="gemini-chat-header">
                     <div class="gemini-chat-header-content">
                         <i class="fas fa-robot"></i>
                         <div>
@@ -89,10 +89,14 @@ class GeminiLigaMXChat {
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
+                
+                <div class="gemini-resize-handle" id="gemini-resize-handle"></div>
             </div>
         `;
 
         document.body.insertAdjacentHTML('beforeend', chatHTML);
+        this.initDragAndResize();
+        this.restorePosition();
     }
 
     attachEventListeners() {
@@ -343,6 +347,150 @@ tabla de posiciones, próximos partidos y resultados recientes. Estos datos son 
         const typingIndicator = document.querySelector('.typing-indicator');
         if (typingIndicator) {
             typingIndicator.remove();
+        }
+    }
+
+    initDragAndResize() {
+        const container = document.getElementById('gemini-chat-container');
+        const header = document.getElementById('gemini-chat-header');
+        const resizeHandle = document.getElementById('gemini-resize-handle');
+        
+        let isDragging = false;
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight, startLeft, startTop;
+
+        header.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.gemini-chat-close') || window.innerWidth <= 768) return;
+            
+            isDragging = true;
+            container.classList.add('dragging');
+            
+            const rect = container.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            
+            e.preventDefault();
+        });
+
+        resizeHandle.addEventListener('mousedown', (e) => {
+            if (window.innerWidth <= 768) return;
+            
+            isResizing = true;
+            container.classList.add('resizing');
+            
+            const rect = container.getBoundingClientRect();
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = rect.width;
+            startHeight = rect.height;
+            
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const newLeft = e.clientX - startX;
+                const newTop = e.clientY - startY;
+                
+                const maxX = window.innerWidth - container.offsetWidth;
+                const maxY = window.innerHeight - container.offsetHeight;
+                
+                const clampedLeft = Math.max(10, Math.min(newLeft, maxX - 10));
+                const clampedTop = Math.max(10, Math.min(newTop, maxY - 10));
+                
+                container.style.left = clampedLeft + 'px';
+                container.style.top = clampedTop + 'px';
+                container.style.right = 'auto';
+                container.style.bottom = 'auto';
+            }
+            
+            if (isResizing) {
+                const deltaX = e.clientX - startX;
+                const deltaY = e.clientY - startY;
+                
+                let newWidth = startWidth + deltaX;
+                let newHeight = startHeight + deltaY;
+                
+                newWidth = Math.max(380, Math.min(newWidth, window.innerWidth * 0.9));
+                newHeight = Math.max(450, Math.min(newHeight, window.innerHeight * 0.9));
+                
+                container.style.width = newWidth + 'px';
+                container.style.height = newHeight + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging || isResizing) {
+                this.savePosition();
+            }
+            
+            isDragging = false;
+            isResizing = false;
+            container.classList.remove('dragging', 'resizing');
+        });
+
+        window.addEventListener('resize', () => {
+            const rect = container.getBoundingClientRect();
+            const maxX = window.innerWidth - rect.width;
+            const maxY = window.innerHeight - rect.height;
+            
+            if (rect.left > maxX) {
+                container.style.left = Math.max(10, maxX - 10) + 'px';
+            }
+            if (rect.top > maxY) {
+                container.style.top = Math.max(10, maxY - 10) + 'px';
+            }
+        });
+    }
+
+    savePosition() {
+        const container = document.getElementById('gemini-chat-container');
+        const rect = container.getBoundingClientRect();
+        
+        const position = {
+            left: container.style.left || null,
+            top: container.style.top || null,
+            width: container.style.width || null,
+            height: container.style.height || null
+        };
+        
+        localStorage.setItem('geminiChatPosition', JSON.stringify(position));
+    }
+
+    restorePosition() {
+        const saved = localStorage.getItem('geminiChatPosition');
+        if (!saved) return;
+        
+        try {
+            const position = JSON.parse(saved);
+            const container = document.getElementById('gemini-chat-container');
+            
+            if (window.innerWidth > 768) {
+                if (position.left) container.style.left = position.left;
+                if (position.top) container.style.top = position.top;
+                if (position.width) container.style.width = position.width;
+                if (position.height) container.style.height = position.height;
+                
+                if (position.left || position.top) {
+                    container.style.right = 'auto';
+                    container.style.bottom = 'auto';
+                }
+                
+                const rect = container.getBoundingClientRect();
+                const maxX = window.innerWidth - rect.width;
+                const maxY = window.innerHeight - rect.height;
+                
+                if (rect.left > maxX || rect.left < 0) {
+                    container.style.left = '';
+                    container.style.right = '30px';
+                }
+                if (rect.top > maxY || rect.top < 0) {
+                    container.style.top = '';
+                    container.style.bottom = '120px';
+                }
+            }
+        } catch (error) {
+            console.error('Error restoring chat position:', error);
         }
     }
 }
