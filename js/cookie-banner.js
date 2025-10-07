@@ -120,9 +120,9 @@ class CookieBanner {
                     </div>
                     
                     <div class="cookie-links">
-                        <a href="/privacy-policy" target="_blank">Política de Privacidad</a>
+                        <a href="privacy-policy.html" target="_blank">Política de Privacidad</a>
                         <span>|</span>
-                        <a href="/cookie-policy" target="_blank">Política de Cookies</a>
+                        <a href="cookie-policy.html" target="_blank">Política de Cookies</a>
                         <span>|</span>
                         <a href="#" id="manage-cookies">Gestionar Cookies</a>
                     </div>
