@@ -67,6 +67,22 @@
                 </li>
             </ul>
             
+            <!-- Auth Section (igual que ULTRA) -->
+            <div class="auth-section">
+                <div id="user-info" class="user-info" style="display: none;">
+                    <img id="user-avatar" class="user-avatar" src="" alt="Avatar">
+                    <div class="user-details">
+                        <span id="user-name" class="user-name"></span>
+                        <button id="logout-btn" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Salir
+                        </button>
+                    </div>
+                </div>
+                <button id="login-btn" class="login-btn">
+                    <i class="fab fa-google"></i> Iniciar Sesión
+                </button>
+            </div>
+            
             <div class="hamburger">
                 <span class="bar"></span>
                 <span class="bar"></span>
@@ -1454,5 +1470,6 @@
     </script>
     
     <script src="js/gemini-chat.js"></script>
+    <script src="js/simple-auth.js"></script>
 </body>
 </html>

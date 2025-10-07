@@ -3014,3 +3014,89 @@ body {
         font-size: 11px;
     }
 }
+
+/* ======================== AUTHENTICATION STYLES (como ULTRA) ======================== */
+.auth-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-left: auto;
+}
+
+.login-btn {
+    background: linear-gradient(135deg, #00ff41 0%, #39ff69 100%);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 255, 65, 0.3);
+}
+
+.login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 32px rgba(0, 255, 65, 0.4);
+    background: linear-gradient(135deg, #ff6b00 0%, #ff8533 100%);
+}
+
+.login-btn i {
+    margin-right: 0.5rem;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #00ff41;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #fff;
+}
+
+.logout-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #999;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.logout-btn:hover {
+    color: #ff4757;
+    border-color: #ff4757;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .auth-section {
+        margin-left: 0;
+        margin-top: 1rem;
+    }
+    
+    .user-details {
+        display: none;
+    }
+}
