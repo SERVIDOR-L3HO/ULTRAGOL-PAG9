@@ -159,9 +159,55 @@ async function loadInitialData() {
         if (document.getElementById('recentMatches')) {
             loadRecentMatches();
         }
+        if (document.getElementById('topScorersHome')) {
+            loadHomeScorers();
+        }
     } catch (error) {
         console.error('Error loading initial data:', error);
         showErrorMessage('Error al cargar los datos. Por favor, recarga la página.');
+    }
+}
+
+// Cargar goleadores en página principal
+async function loadHomeScorers() {
+    const container = document.getElementById('topScorersHome');
+    if (!container) return;
+
+    try {
+        const goleadores = await ultraGolAPI.getGoleadores();
+        
+        if (!goleadores || goleadores.length === 0) {
+            container.innerHTML = `
+                <div class="scorer-item">
+                    <span class="name" style="text-align: center; width: 100%; color: #999;">
+                        No hay datos disponibles
+                    </span>
+                </div>
+            `;
+            return;
+        }
+
+        // Mostrar top 5 goleadores
+        const topScorers = goleadores.slice(0, 5);
+        
+        container.innerHTML = topScorers.map((scorer, index) => `
+            <div class="scorer-item" style="animation: fadeInUp ${index * 0.1}s ease-out;">
+                <span class="position">${index + 1}</span>
+                <span class="name">${scorer.jugador}</span>
+                <span class="goals">${scorer.goles}</span>
+            </div>
+        `).join('');
+
+        console.log('✅ Top goleadores cargados en home:', topScorers.length);
+    } catch (error) {
+        console.error('❌ Error cargando goleadores en home:', error);
+        container.innerHTML = `
+            <div class="scorer-item">
+                <span class="name" style="text-align: center; width: 100%; color: #dc3545;">
+                    Error al cargar goleadores
+                </span>
+            </div>
+        `;
     }
 }
 
