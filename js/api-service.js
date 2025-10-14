@@ -3,8 +3,14 @@
  * Centraliza todas las llamadas a la API de UltraGol
  */
 
-// Usar proxy local en lugar de la API directa (evita problemas de CORS)
-const API_BASE_URL = '/api/ultragol';
+// Detectar si estamos en GitHub Pages o en Replit
+const isGitHubPages = window.location.hostname.includes('github.io') || 
+                      window.location.hostname.includes('ultragol-l3ho.com.mx');
+
+// Usar API directa en GitHub Pages, proxy local en Replit
+const API_BASE_URL = isGitHubPages 
+    ? 'https://ultragol-api3.onrender.com' 
+    : '/api/ultragol';
 
 class UltraGolAPI {
     constructor() {
