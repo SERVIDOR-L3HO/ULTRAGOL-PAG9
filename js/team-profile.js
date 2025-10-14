@@ -60,10 +60,23 @@ async function loadTeamProfile() {
         }
 
         // Load additional data
-        const [standings, fixtures] = await Promise.all([
+        const [standings, fixtures, goleadores] = await Promise.all([
             loadStandingsData(),
-            loadFixturesData()
+            loadFixturesData(),
+            loadGoleadoresData()
         ]);
+
+        // Find team's top scorer from API
+        const teamScorer = goleadores.find(g => 
+            g.equipo && currentTeam.name && 
+            (g.equipo.toLowerCase().includes(currentTeam.name.toLowerCase()) ||
+             currentTeam.name.toLowerCase().includes(g.equipo.toLowerCase()))
+        );
+
+        if (teamScorer) {
+            currentTeam.topScorer = teamScorer.jugador;
+            currentTeam.topScorerGoals = teamScorer.goles;
+        }
 
         // Filter matches for this team
         teamMatches = fixtures.filter(match => 
@@ -75,7 +88,7 @@ async function loadTeamProfile() {
 
         // Render team profile
         renderTeamHeader();
-        renderOverviewSection();
+        renderOverviewSection(standings);
         renderStatisticsSection();
         renderMatchesSection();
         renderHistorySection();
@@ -87,19 +100,33 @@ async function loadTeamProfile() {
 }
 
 async function loadTeamsData() {
-    if (window.ligaMXApp && window.ligaMXApp.teamsData().length > 0) {
-        return window.ligaMXApp.teamsData();
+    try {
+        // Intentar cargar desde la API primero
+        return await ultraGolAPI.getEquipos();
+    } catch (error) {
+        console.error('Error loading teams from API:', error);
+        // Fallback a datos locales
+        if (window.ligaMXApp && window.ligaMXApp.teamsData().length > 0) {
+            return window.ligaMXApp.teamsData();
+        }
+        const response = await fetch('data/teams.json');
+        return await response.json();
     }
-    const response = await fetch('data/teams.json');
-    return await response.json();
 }
 
 async function loadStandingsData() {
-    if (window.ligaMXApp && window.ligaMXApp.standingsData().length > 0) {
-        return window.ligaMXApp.standingsData();
+    try {
+        // Intentar cargar desde la API primero
+        return await ultraGolAPI.getTabla();
+    } catch (error) {
+        console.error('Error loading standings from API:', error);
+        // Fallback a datos locales
+        if (window.ligaMXApp && window.ligaMXApp.standingsData().length > 0) {
+            return window.ligaMXApp.standingsData();
+        }
+        const response = await fetch('data/standings.json');
+        return await response.json();
     }
-    const response = await fetch('data/standings.json');
-    return await response.json();
 }
 
 async function loadFixturesData() {
@@ -108,6 +135,16 @@ async function loadFixturesData() {
     }
     const response = await fetch('data/fixtures.json');
     return await response.json();
+}
+
+async function loadGoleadoresData() {
+    try {
+        // Cargar goleadores desde la API
+        return await ultraGolAPI.getGoleadores();
+    } catch (error) {
+        console.error('Error loading goleadores from API:', error);
+        return [];
+    }
 }
 
 function applyTeamTheme() {
@@ -159,11 +196,14 @@ function renderTeamHeader() {
     }
 }
 
-function renderOverviewSection() {
+function renderOverviewSection(standings = []) {
     if (!currentTeam) return;
 
-    const standings = window.ligaMXApp ? window.ligaMXApp.standingsData() : [];
-    const teamStats = standings.find(t => t.id === currentTeam.id);
+    const teamStats = standings.find(t => 
+        t.id === currentTeam.id || 
+        t.name === currentTeam.name ||
+        (t.name && currentTeam.name && t.name.toLowerCase().includes(currentTeam.name.toLowerCase()))
+    );
 
     // Current position
     const currentPosition = document.getElementById('currentPosition');
@@ -171,7 +211,12 @@ function renderOverviewSection() {
     
     if (currentPosition && teamStats) {
         currentPosition.innerHTML = `
-            <span class="position-number">${teamStats.position}</span>
+            <span class="position-number">${teamStats.position || '-'}</span>
+            <span class="position-suffix">°</span>
+        `;
+    } else if (currentPosition) {
+        currentPosition.innerHTML = `
+            <span class="position-number">-</span>
             <span class="position-suffix">°</span>
         `;
     }
@@ -179,15 +224,15 @@ function renderOverviewSection() {
     if (positionStats && teamStats) {
         positionStats.innerHTML = `
             <div class="position-stat">
-                <div class="position-stat-value">${teamStats.points}</div>
+                <div class="position-stat-value">${teamStats.points || 0}</div>
                 <div class="position-stat-label">PTS</div>
             </div>
             <div class="position-stat">
-                <div class="position-stat-value">${teamStats.played}</div>
+                <div class="position-stat-value">${teamStats.played || 0}</div>
                 <div class="position-stat-label">PJ</div>
             </div>
             <div class="position-stat">
-                <div class="position-stat-value">${teamStats.wins}</div>
+                <div class="position-stat-value">${teamStats.wins || 0}</div>
                 <div class="position-stat-label">G</div>
             </div>
         `;
