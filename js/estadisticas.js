@@ -101,16 +101,9 @@ function loadTabContent(tabId) {
 }
 
 // Actualizar estadísticas generales
-function updateGeneralStats() {
-    const data = statsData.general;
-    
-    // Actualizar gráficos y métricas
-    updateStatValue('avg-goals', data.avgGoals || '2.8');
-    updateStatValue('high-scoring', data.highScoring || '68%');
-    updateStatValue('avg-cards', data.avgCards || '4.2');
-    
-    // Animar contadores
-    animateCounters('.stat-value');
+async function updateGeneralStats() {
+    // Cargar y mostrar goleadores
+    await loadTopScorers();
 }
 
 // Actualizar estadísticas de equipos
@@ -650,6 +643,68 @@ function calculatePlayerStats(standings, teams, goleadores = []) {
         topAssists: [],
         bestGoalkeepers: []
     };
+}
+
+// Cargar y mostrar goleadores desde API
+async function loadTopScorers() {
+    const container = document.getElementById('topScorers');
+    if (!container) return;
+
+    try {
+        // Mostrar loading
+        container.innerHTML = `
+            <div class="leader-item">
+                <div class="leader-info" style="justify-content: center; width: 100%;">
+                    <div class="leader-name" style="text-align: center;">
+                        <i class="fas fa-spinner fa-spin"></i> Cargando goleadores...
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Obtener goleadores de la API
+        const goleadores = await ultraGolAPI.getGoleadores();
+        
+        if (!goleadores || goleadores.length === 0) {
+            container.innerHTML = `
+                <div class="leader-item">
+                    <div class="leader-info" style="justify-content: center; width: 100%;">
+                        <div class="leader-name" style="text-align: center; color: #999;">
+                            <i class="fas fa-info-circle"></i> No hay datos de goleadores disponibles
+                        </div>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // Mostrar top 10 goleadores
+        const topScorers = goleadores.slice(0, 10);
+        
+        container.innerHTML = topScorers.map((scorer, index) => `
+            <div class="leader-item" style="animation: fadeInUp ${index * 0.1}s ease-out;">
+                <div class="leader-rank">${index + 1}</div>
+                <div class="leader-info">
+                    <div class="leader-name">${scorer.jugador}</div>
+                    <div class="leader-team">${scorer.equipo}</div>
+                </div>
+                <div class="leader-stat">${scorer.goles}</div>
+            </div>
+        `).join('');
+
+        console.log('✅ Top goleadores mostrados:', topScorers.length);
+    } catch (error) {
+        console.error('❌ Error cargando goleadores:', error);
+        container.innerHTML = `
+            <div class="leader-item">
+                <div class="leader-info" style="justify-content: center; width: 100%;">
+                    <div class="leader-name" style="text-align: center; color: #dc3545;">
+                        <i class="fas fa-exclamation-triangle"></i> Error al cargar goleadores
+                    </div>
+                </div>
+            </div>
+        `;
+    }
 }
 
 function calculateAdvancedStats(standings, fixtures) {

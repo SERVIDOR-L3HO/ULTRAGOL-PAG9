@@ -283,6 +283,17 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @media (max-width: 768px) {
             .stats-hero h1 {
                 font-size: 2.5rem;
@@ -376,95 +387,19 @@
 
             <!-- General Stats Tab -->
             <div class="tab-content active" id="general">
-                <div class="stats-grid">
-                    <div class="stat-widget">
-                        <div class="widget-header">
-                            <h3 class="widget-title">Rendimiento de Liga</h3>
-                            <div class="widget-icon">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-                        </div>
-                        <div class="stat-chart">
-                            <div class="chart-placeholder">
-                                <i class="fas fa-chart-area" style="font-size: 3rem; color: #ff9933; margin-bottom: 10px;"></i>
-                                <p>Gráfico de rendimiento general</p>
-                            </div>
-                        </div>
-                        <ul class="stat-list">
-                            <li>
-                                <span class="stat-label">Promedio de goles por partido</span>
-                                <span class="stat-value">2.8</span>
-                            </li>
-                            <li>
-                                <span class="stat-label">Partidos con más de 2.5 goles</span>
-                                <span class="stat-value">68%</span>
-                            </li>
-                            <li>
-                                <span class="stat-label">Promedio de tarjetas por partido</span>
-                                <span class="stat-value">4.2</span>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div class="stat-widget">
-                        <div class="widget-header">
-                            <h3 class="widget-title">Tendencias</h3>
-                            <div class="widget-icon">
-                                <i class="fas fa-trending-up"></i>
-                            </div>
-                        </div>
-                        <div class="stat-chart">
-                            <div class="chart-placeholder">
-                                <i class="fas fa-chart-pie" style="font-size: 3rem; color: #ff9933; margin-bottom: 10px;"></i>
-                                <p>Análisis de tendencias</p>
-                            </div>
-                        </div>
-                        <ul class="stat-list">
-                            <li>
-                                <span class="stat-label">Partidos emocionantes</span>
-                                <span class="stat-value">+15%</span>
-                            </li>
-                            <li>
-                                <span class="stat-label">Goles en tiempo añadido</span>
-                                <span class="stat-value">+8%</span>
-                            </li>
-                            <li>
-                                <span class="stat-label">Espectadores promedio</span>
-                                <span class="stat-value">35,420</span>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-
                 <div class="leaderboard">
                     <div class="leaderboard-header">
                         <h3 class="leaderboard-title">Top Goleadores</h3>
                         <p>Los artilleros más letales de la temporada</p>
                     </div>
                     <div class="leaders-list" id="topScorers">
+                        <!-- Cargando goleadores desde API... -->
                         <div class="leader-item">
-                            <div class="leader-rank">1</div>
-                            <div class="leader-info">
-                                <div class="leader-name">Henry Martín</div>
-                                <div class="leader-team">Club América</div>
+                            <div class="leader-info" style="justify-content: center; width: 100%;">
+                                <div class="leader-name" style="text-align: center;">
+                                    <i class="fas fa-spinner fa-spin"></i> Cargando goleadores...
+                                </div>
                             </div>
-                            <div class="leader-stat">15</div>
-                        </div>
-                        <div class="leader-item">
-                            <div class="leader-rank">2</div>
-                            <div class="leader-info">
-                                <div class="leader-name">André-Pierre Gignac</div>
-                                <div class="leader-team">Tigres UANL</div>
-                            </div>
-                            <div class="leader-stat">13</div>
-                        </div>
-                        <div class="leader-item">
-                            <div class="leader-rank">3</div>
-                            <div class="leader-info">
-                                <div class="leader-name">Rogelio Funes Mori</div>
-                                <div class="leader-team">CF Monterrey</div>
-                            </div>
-                            <div class="leader-stat">12</div>
                         </div>
                     </div>
                 </div>
