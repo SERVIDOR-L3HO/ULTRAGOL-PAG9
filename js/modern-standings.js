@@ -66,16 +66,23 @@ function switchView(view) {
 
 async function loadStandingsData() {
     try {
-        const response = await fetch('data/standings.json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        modernStandingsData = await response.json();
-        console.log('✅ Standings data loaded:', modernStandingsData.length, 'teams');
+        // Usar API de UltraGol
+        modernStandingsData = await ultraGolAPI.getTabla();
+        console.log('✅ Standings data loaded from API:', modernStandingsData.length, 'teams');
         renderStandings();
     } catch (error) {
-        console.error('Error loading standings:', error);
-        showErrorState();
+        console.error('Error loading standings from API:', error);
+        // Fallback a JSON local si la API falla
+        try {
+            const response = await fetch('data/standings.json');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            modernStandingsData = await response.json();
+            console.log('⚠️ Standings data loaded from local JSON fallback');
+            renderStandings();
+        } catch (fallbackError) {
+            console.error('Error in fallback:', fallbackError);
+            showErrorState();
+        }
     }
 }
 

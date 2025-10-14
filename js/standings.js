@@ -57,13 +57,20 @@ async function getStandingsData() {
         return filterStandingsByType(window.ligaMXApp.standingsData());
     }
 
-    // Otherwise, load from JSON
+    // Otherwise, load from API
     try {
-        const response = await fetch('data/standings.json');
-        const data = await response.json();
+        const data = await ultraGolAPI.getTabla();
         return filterStandingsByType(data);
     } catch (error) {
-        throw new Error('Failed to load standings data');
+        console.error('Error loading from API:', error);
+        // Fallback a JSON local
+        try {
+            const response = await fetch('data/standings.json');
+            const data = await response.json();
+            return filterStandingsByType(data);
+        } catch (fallbackError) {
+            throw new Error('Failed to load standings data');
+        }
     }
 }
 

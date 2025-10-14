@@ -30,17 +30,18 @@ async function initializeStats() {
 // Cargar datos de estadísticas
 async function loadStatsData() {
     try {
-        // Simular carga de datos desde las fuentes existentes
-        const [standings, teams, fixtures] = await Promise.all([
-            fetch('data/standings.json').then(r => r.json()),
-            fetch('data/teams.json').then(r => r.json()),
-            fetch('data/fixtures.json').then(r => r.json())
+        // Cargar datos desde la API de UltraGol
+        const [standings, teams, fixtures, goleadores] = await Promise.all([
+            ultraGolAPI.getTabla().catch(() => fetch('data/standings.json').then(r => r.json())),
+            ultraGolAPI.getEquipos().catch(() => fetch('data/teams.json').then(r => r.json())),
+            fetch('data/fixtures.json').then(r => r.json()),
+            ultraGolAPI.getGoleadores().catch(() => [])
         ]);
 
         // Procesar datos para estadísticas
         statsData.general = calculateGeneralStats(standings, fixtures);
         statsData.teams = calculateTeamStats(standings, teams);
-        statsData.players = calculatePlayerStats(standings, teams);
+        statsData.players = calculatePlayerStats(standings, teams, goleadores);
         statsData.advanced = calculateAdvancedStats(standings, fixtures);
 
     } catch (error) {
@@ -643,8 +644,9 @@ function calculateTeamStats(standings, teams) {
     };
 }
 
-function calculatePlayerStats(standings, teams) {
+function calculatePlayerStats(standings, teams, goleadores = []) {
     return {
+        topScorers: goleadores,
         topAssists: [],
         bestGoalkeepers: []
     };

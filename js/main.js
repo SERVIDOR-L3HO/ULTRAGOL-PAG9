@@ -167,31 +167,45 @@ async function loadInitialData() {
 
 async function loadTeamsData() {
     try {
-        const response = await fetch('data/teams.json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        teamsData = await response.json();
-        console.log('✅ Teams data loaded:', teamsData.length, 'teams');
+        // Usar API de UltraGol
+        teamsData = await ultraGolAPI.getEquipos();
+        console.log('✅ Teams data loaded from API:', teamsData.length, 'teams');
         return teamsData;
     } catch (error) {
-        console.error('Error loading teams data:', error);
-        return [];
+        console.error('Error loading teams data from API:', error);
+        // Fallback a JSON local si la API falla
+        try {
+            const response = await fetch('data/teams.json');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            teamsData = await response.json();
+            console.log('⚠️ Teams data loaded from local JSON fallback');
+            return teamsData;
+        } catch (fallbackError) {
+            console.error('Error in fallback:', fallbackError);
+            return [];
+        }
     }
 }
 
 async function loadStandingsData() {
     try {
-        const response = await fetch('data/standings.json');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        standingsData = await response.json();
-        console.log('✅ Standings data loaded:', standingsData.length, 'teams');
+        // Usar API de UltraGol
+        standingsData = await ultraGolAPI.getTabla();
+        console.log('✅ Standings data loaded from API:', standingsData.length, 'teams');
         return standingsData;
     } catch (error) {
-        console.error('Error loading standings data:', error);
-        return [];
+        console.error('Error loading standings data from API:', error);
+        // Fallback a JSON local si la API falla
+        try {
+            const response = await fetch('data/standings.json');
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            standingsData = await response.json();
+            console.log('⚠️ Standings data loaded from local JSON fallback');
+            return standingsData;
+        } catch (fallbackError) {
+            console.error('Error in fallback:', fallbackError);
+            return [];
+        }
     }
 }
 

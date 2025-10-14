@@ -17,9 +17,38 @@ function initializeNews() {
 }
 
 // Cargar datos de noticias
-function loadNewsData() {
-    // Noticias de ejemplo con datos realistas
-    newsData = [
+async function loadNewsData() {
+    try {
+        // Cargar noticias desde la API
+        const apiNews = await ultraGolAPI.getNoticias();
+        
+        // Mapear noticias de API al formato esperado
+        newsData = apiNews.map((noticia, index) => ({
+            id: `news-api-${index}`,
+            title: noticia.titulo,
+            excerpt: noticia.descripcion,
+            category: 'general',
+            author: 'UltraGol',
+            date: noticia.fecha,
+            image: noticia.imagen,
+            url: noticia.url,
+            featured: index === 0
+        }));
+        
+        console.log('✅ Noticias cargadas desde API:', newsData.length, 'artículos');
+        filteredNews = [...newsData];
+        displayNews();
+    } catch (error) {
+        console.error('Error cargando noticias desde API:', error);
+        // Fallback a noticias de ejemplo
+        newsData = getFallbackNews();
+        filteredNews = [...newsData];
+        displayNews();
+    }
+}
+
+function getFallbackNews() {
+    return [
         {
             id: 'news-1',
             title: 'América refuerza su plantilla con nuevo delantero internacional',
@@ -39,70 +68,8 @@ function loadNewsData() {
             date: '2025-09-02T12:15:00Z',
             image: 'tigres-comeback.jpg',
             featured: false
-        },
-        {
-            id: 'news-3',
-            title: 'Clásico Nacional: Todo listo para el América vs Chivas',
-            excerpt: 'El partido más esperado del fútbol mexicano se acerca. Ambos equipos llegan en gran forma y prometen un espectáculo inolvidable para los aficionados.',
-            category: 'matches',
-            author: 'Roberto Martínez',
-            date: '2025-09-02T10:45:00Z',
-            image: 'clasico-nacional.jpg',
-            featured: true
-        },
-        {
-            id: 'news-4',
-            title: 'Gignac alcanza marca histórica en Liga MX',
-            excerpt: 'El delantero francés del Tigres UANL continúa escribiendo su nombre en la historia de la Liga MX con una nueva marca personal y del club.',
-            category: 'players',
-            author: 'Ana Ruiz',
-            date: '2025-09-02T08:30:00Z',
-            image: 'gignac-record.jpg',
-            featured: false
-        },
-        {
-            id: 'news-5',
-            title: 'Monterrey domina las estadísticas defensivas',
-            excerpt: 'La Pandilla de Monterrey se consolida como el equipo más sólido defensivamente de la Liga MX, siendo clave en su buen momento actual.',
-            category: 'teams',
-            author: 'Carlos López',
-            date: '2025-09-01T16:20:00Z',
-            image: 'monterrey-defense.jpg',
-            featured: false
-        },
-        {
-            id: 'news-6',
-            title: 'Liga MX evalúa cambios en el formato de competencia',
-            excerpt: 'La dirigencia de la Liga MX estudia posibles modificaciones al formato actual para hacer más atractivo el torneo y beneficiar a todos los equipos.',
-            category: 'league',
-            author: 'Fernando Sánchez',
-            date: '2025-09-01T14:10:00Z',
-            image: 'league-format.jpg',
-            featured: false
-        },
-        {
-            id: 'news-7',
-            title: 'Cruz Azul busca recuperar su mejor versión',
-            excerpt: 'La Máquina Celeste trabaja intensamente para volver a ser el equipo competitivo que sus aficionados merecen, con nuevas estrategias y refuerzos.',
-            category: 'teams',
-            author: 'Patricia Morales',
-            date: '2025-09-01T11:45:00Z',
-            image: 'cruz-azul-recovery.jpg',
-            featured: false
-        },
-        {
-            id: 'news-8',
-            title: 'Nuevo talento mexicano destaca en las fuerzas básicas',
-            excerpt: 'Un joven prometedor de las categorías menores llama la atención de varios equipos de Liga MX por su extraordinario talento y potencial.',
-            category: 'players',
-            author: 'Miguel Ángel Torres',
-            date: '2025-09-01T09:30:00Z',
-            image: 'young-talent.jpg',
-            featured: false
         }
     ];
-
-    filteredNews = [...newsData];
 }
 
 // Configurar controles de noticias

@@ -40,6 +40,55 @@ app.use((req, res, next) => {
     next();
 });
 
+// UltraGol API Proxy (para evitar problemas de CORS)
+const API_BASE_URL = 'https://ultragol-api3.onrender.com';
+
+app.get('/api/ultragol/tabla', async (req, res) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/tabla`);
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error proxying tabla:', error);
+        res.status(500).json({ error: 'Error al obtener la tabla' });
+    }
+});
+
+app.get('/api/ultragol/goleadores', async (req, res) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/goleadores`);
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error proxying goleadores:', error);
+        res.status(500).json({ error: 'Error al obtener goleadores' });
+    }
+});
+
+app.get('/api/ultragol/noticias', async (req, res) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/Noticias`);
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error proxying noticias:', error);
+        res.status(500).json({ error: 'Error al obtener noticias' });
+    }
+});
+
+app.get('/api/ultragol/equipos', async (req, res) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/Equipos`);
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error proxying equipos:', error);
+        res.status(500).json({ error: 'Error al obtener equipos' });
+    }
+});
+
+console.log('✅ UltraGol API proxy enabled');
+
 if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {
     const { 
         createPaypalOrder, 
