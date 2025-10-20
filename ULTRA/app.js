@@ -19,34 +19,91 @@ function switchTab(tab, element) {
     }
 }
 
-function watchMatch(matchId) {
+function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     const modal = document.getElementById('playerModal');
-    const iframe = document.getElementById('modalIframe');
+    const modalBody = modal.querySelector('.modal-body');
     const modalTitle = document.getElementById('modalTitle');
     const loader = document.getElementById('modalLoader');
     
-    currentStreamUrl = 'https://servidor-l3ho.github.io/ULTRACANALES.2/index.html';
-    
-    modalTitle.textContent = 'Transmisión en Vivo - ' + matchId.toUpperCase();
-    modal.classList.add('active');
-    loader.style.display = 'flex';
-    
-    iframe.src = currentStreamUrl;
-    
-    iframe.onload = () => {
-        setTimeout(() => {
-            loader.style.display = 'none';
-        }, 500);
-    };
+    // Si se proporciona una URL de video, usar un reproductor de video
+    if (videoUrl) {
+        modalTitle.textContent = videoTitle || 'Video';
+        modal.classList.add('active');
+        loader.style.display = 'flex';
+        
+        // Crear un reproductor de video en lugar de iframe
+        modalBody.innerHTML = `
+            <div class="loading-spinner" id="modalLoader" style="display: flex;">
+                <div class="spinner"></div>
+            </div>
+            <video id="modalVideo" controls autoplay style="width: 100%; height: 100%; background: #000;">
+                <source src="${videoUrl}" type="video/mp4">
+                Tu navegador no soporta el elemento de video.
+            </video>
+        `;
+        
+        const video = document.getElementById('modalVideo');
+        video.onloadeddata = () => {
+            setTimeout(() => {
+                const loaderEl = document.getElementById('modalLoader');
+                if (loaderEl) loaderEl.style.display = 'none';
+            }, 500);
+        };
+    } else {
+        // Modo de transmisión en vivo (iframe)
+        currentStreamUrl = 'https://servidor-l3ho.github.io/ULTRACANALES.2/index.html';
+        
+        modalTitle.textContent = 'Transmisión en Vivo - ' + matchId.toUpperCase();
+        modal.classList.add('active');
+        loader.style.display = 'flex';
+        
+        modalBody.innerHTML = `
+            <div class="loading-spinner" id="modalLoader" style="display: flex;">
+                <div class="spinner"></div>
+            </div>
+            <iframe id="modalIframe" src="${currentStreamUrl}" frameborder="0" allowfullscreen style="width: 100%; height: 100%;"></iframe>
+        `;
+        
+        const iframe = document.getElementById('modalIframe');
+        iframe.onload = () => {
+            setTimeout(() => {
+                const loaderEl = document.getElementById('modalLoader');
+                if (loaderEl) loaderEl.style.display = 'none';
+            }, 500);
+        };
+    }
 }
 
 function closeModal() {
     const modal = document.getElementById('playerModal');
-    const iframe = document.getElementById('modalIframe');
+    const modalBody = modal.querySelector('.modal-body');
     
     modal.classList.remove('active');
-    iframe.src = '';
+    
+    // Detener video si existe
+    const video = document.getElementById('modalVideo');
+    if (video) {
+        video.pause();
+        video.src = '';
+    }
+    
+    // Limpiar iframe si existe
+    const iframe = document.getElementById('modalIframe');
+    if (iframe) {
+        iframe.src = '';
+    }
+    
     currentStreamUrl = '';
+    
+    // Restaurar estructura original del modal
+    setTimeout(() => {
+        modalBody.innerHTML = `
+            <div class="loading-spinner" id="modalLoader">
+                <div class="spinner"></div>
+            </div>
+            <iframe id="modalIframe" frameborder="0" allowfullscreen></iframe>
+        `;
+    }, 300);
 }
 
 function refreshStream() {
@@ -221,24 +278,31 @@ async function loadReplays() {
         
         // Si hay videos de la API, usarlos
         if (videosArray && videosArray.length > 0) {
-            container.innerHTML = videosArray.slice(0, 4).map((video, index) => `
+            container.innerHTML = videosArray.slice(0, 4).map((video, index) => {
+                const videoUrl = video.url || video.videoUrl || video.link || '';
+                const videoTitle = video.titulo || video.title || 'Video sin título';
+                const videoTitleEscaped = videoTitle.replace(/'/g, "\\'");
+                const videoUrlEscaped = videoUrl.replace(/'/g, "\\'");
+                
+                return `
                 <div class="match-card">
                     <div class="match-card-bg">
-                        <img src="${video.imagen || video.thumbnail || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'}" alt="${video.titulo || video.title || 'Video'}">
+                        <img src="${video.imagen || video.thumbnail || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'}" alt="${videoTitle}">
                     </div>
                     <div class="match-card-content">
                         <div class="teams">
-                            <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--text);">${video.titulo || video.title || 'Video sin título'}</h4>
+                            <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--text);">${videoTitle}</h4>
                         </div>
                         <div class="match-score-mini">
                             <span class="match-time">Liga MX</span>
                         </div>
-                        <button class="watch-btn" onclick="watchMatch('${video.id || 'video-' + index}')">
+                        <button class="watch-btn" onclick="watchMatch('${video.id || 'video-' + index}', '${videoUrlEscaped}', '${videoTitleEscaped}')">
                             <span>VER VIDEO</span>
                         </button>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         } else {
             // Usar videos de muestra si no hay datos de la API
             const videos = [
@@ -567,17 +631,37 @@ function selectLeague(leagueName, element) {
 function openNewsModal(noticia) {
     const modal = document.getElementById('newsModal');
     const modalTitle = document.getElementById('newsModalTitle');
-    const modalImage = document.getElementById('newsModalImage');
-    const modalText = document.getElementById('newsModalText');
+    const modalBody = modal.querySelector('.news-modal-body');
     
     modalTitle.textContent = noticia.titulo || noticia.headline || 'Noticia';
-    modalImage.src = noticia.imagen || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600';
-    modalText.innerHTML = `
-        <p><strong>${noticia.titulo || noticia.headline || ''}</strong></p>
-        ${noticia.descripcion ? `<p>${noticia.descripcion}</p>` : ''}
-        ${noticia.contenido ? `<p>${noticia.contenido}</p>` : ''}
-        ${noticia.fecha ? `<p style="color: #999; font-size: 12px; margin-top: 15px;"><i class="fas fa-calendar"></i> ${noticia.fecha}</p>` : ''}
-    `;
+    
+    // Si la noticia tiene un link externo, mostrarlo en un iframe
+    if (noticia.link || noticia.url || noticia.enlace) {
+        const newsUrl = noticia.link || noticia.url || noticia.enlace;
+        modalBody.innerHTML = `
+            <div style="position: relative; width: 100%; height: 70vh;">
+                <div class="loading-spinner" style="display: flex; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10;">
+                    <div class="spinner"></div>
+                </div>
+                <iframe src="${newsUrl}" frameborder="0" style="width: 100%; height: 100%; border: none;" onload="this.previousElementSibling.style.display='none'"></iframe>
+            </div>
+            ${noticia.fecha ? `<p style="color: #999; font-size: 12px; margin-top: 15px; padding: 10px;"><i class="fas fa-calendar"></i> ${noticia.fecha}</p>` : ''}
+        `;
+    } else {
+        // Si no hay link, mostrar la información completa de la noticia
+        modalBody.innerHTML = `
+            <img id="newsModalImage" src="${noticia.imagen || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600'}" alt="Noticia" style="width: 100%; border-radius: 8px; margin-bottom: 15px;">
+            <div id="newsModalText" class="news-modal-text">
+                <h3 style="margin-bottom: 15px;">${noticia.titulo || noticia.headline || ''}</h3>
+                ${noticia.descripcion ? `<p style="margin-bottom: 10px;">${noticia.descripcion}</p>` : ''}
+                ${noticia.contenido ? `<p style="margin-bottom: 10px;">${noticia.contenido}</p>` : ''}
+                ${noticia.texto ? `<p style="margin-bottom: 10px;">${noticia.texto}</p>` : ''}
+                ${noticia.cuerpo ? `<div style="margin-bottom: 10px;">${noticia.cuerpo}</div>` : ''}
+                ${noticia.autor ? `<p style="color: #999; font-size: 12px; margin-top: 15px;"><i class="fas fa-user"></i> ${noticia.autor}</p>` : ''}
+                ${noticia.fecha ? `<p style="color: #999; font-size: 12px; margin-top: 15px;"><i class="fas fa-calendar"></i> ${noticia.fecha}</p>` : ''}
+            </div>
+        `;
+    }
     
     modal.classList.add('active');
 }
