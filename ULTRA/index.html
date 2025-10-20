@@ -17,11 +17,11 @@
                 </button>
                 <div class="score-badge">9:4</div>
             </div>
-            
+
             <div class="header-center">
                 <h1 class="app-title">ULTRAGOL</h1>
             </div>
-            
+
             <div class="header-right">
                 <button class="icon-btn share-btn" onclick="shareApp()">
                     <i class="fas fa-share-alt"></i>
@@ -35,7 +35,7 @@
         <div class="featured-match">
             <div class="match-overlay"></div>
             <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800" alt="Stadium" class="match-bg">
-            
+
             <div class="match-score">
                 <div class="team-logo">
                     <img src="https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" alt="Team 1">
@@ -47,7 +47,7 @@
                     <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" alt="Team 2">
                 </div>
             </div>
-            
+
             <div class="match-info">
                 <h2 class="match-title">MAN. UNITED vs. LIVERPOOL</h2>
                 <div class="match-badges">
@@ -56,7 +56,7 @@
                     <span class="badge-icon"><i class="fas fa-wifi"></i></span>
                 </div>
             </div>
-            
+
             <div class="live-badge">
                 <span class="live-dot"></span>
                 <span>LIVE</span>
@@ -67,7 +67,7 @@
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('live', this)">EN VIVO</button>
                 <button class="tab" onclick="switchTab('upcoming', this)">UPCOMING</button>
-                <button class="tab" onclick="switchTab('replays', this)">REPETICIONES</button>
+                <button class="tab" onclick="switchTab('replays', this)">LOS MEJORES MOMENTOS</button>
             </div>
         </div>
 
@@ -143,39 +143,39 @@
                 </button>
             </div>
             <div class="leagues-container">
-                <button class="league-btn active">
+                <button class="league-btn active" onclick="selectLeague('Liga MX', this)">
                     <div class="league-icon liga-mx">
                         <i class="fas fa-futbol"></i>
                     </div>
                     <span>Liga MX</span>
                 </button>
-                <button class="league-btn">
+                <button class="league-btn" onclick="showLockedLeagueMessage('Premier League')">
                     <div class="league-icon premier">
-                        <i class="fas fa-trophy"></i>
+                        <i class="fas fa-lock"></i>
                     </div>
                     <span>Premier League</span>
                 </button>
-                <button class="league-btn">
+                <button class="league-btn" onclick="showLockedLeagueMessage('La Liga')">
                     <div class="league-icon laliga">
-                        <i class="fas fa-shield-alt"></i>
+                        <i class="fas fa-lock"></i>
                     </div>
                     <span>La Liga</span>
                 </button>
-                <button class="league-btn">
+                <button class="league-btn" onclick="showLockedLeagueMessage('Serie A')">
                     <div class="league-icon serie-a">
-                        <i class="fas fa-star"></i>
+                        <i class="fas fa-lock"></i>
                     </div>
                     <span>Serie A</span>
                 </button>
-                <button class="league-btn">
+                <button class="league-btn" onclick="showLockedLeagueMessage('Bundesliga')">
                     <div class="league-icon bundesliga">
-                        <i class="fas fa-award"></i>
+                        <i class="fas fa-lock"></i>
                     </div>
                     <span>Bundesliga</span>
                 </button>
-                <button class="league-btn">
+                <button class="league-btn" onclick="showLockedLeagueMessage('Ligue 1')">
                     <div class="league-icon ligue1">
-                        <i class="fas fa-medal"></i>
+                        <i class="fas fa-lock"></i>
                     </div>
                     <span>Ligue 1</span>
                 </button>
@@ -185,6 +185,10 @@
         <section class="standings-section">
             <div class="section-header">
                 <h3 id="standingsLeagueName">TABLA DE POSICIONES</h3>
+            </div>
+            <div class="standings-info-message">
+                <i class="fas fa-info-circle"></i>
+                Esta página fue diseñada especialmente para la Liga MX. Puedes encontrar más información de Liga MX en las páginas anteriores.
             </div>
             <div class="standings-table" id="standingsTable">
                 <div class="standings-loading">Cargando tabla...</div>
@@ -198,31 +202,8 @@
                     <i class="fas fa-crown"></i>
                 </button>
             </div>
-            <div class="news-grid">
-                <div class="news-card">
-                    <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600" alt="News">
-                    <div class="news-content">
-                        <h4>Haaland's hat-trick: City dominates!</h4>
-                    </div>
-                </div>
-                <div class="news-card">
-                    <img src="https://images.unsplash.com/photo-1614632537239-fa46907f6e44?w=600" alt="News">
-                    <div class="news-content">
-                        <h4>Rumores de rumores? Transfer saga Mbappé continúa</h4>
-                    </div>
-                </div>
-                <div class="news-card">
-                    <img src="https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=600" alt="News">
-                    <div class="news-content">
-                        <h4>Champions League: Las mejores jugadas de la semana</h4>
-                    </div>
-                </div>
-                <div class="news-card">
-                    <img src="https://images.unsplash.com/photo-1551958219-acbc608c6377?w=600" alt="News">
-                    <div class="news-content">
-                        <h4>Liga MX: Análisis de la jornada</h4>
-                    </div>
-                </div>
+            <div class="news-grid" id="newsGrid">
+                <div class="news-loading">Cargando noticias de Liga MX...</div>
             </div>
         </section>
 
@@ -329,500 +310,22 @@
         </div>
     </div>
 
-    <script src="ultragol-api.js"></script>
-    <script src="app.js"></script>
-</body>
-</html>                        <i class="fas fa-tv"></i> Transmisiones
-                    </button>
-                    <button class="nav-btn" data-section="live-stream">
-                        <i class="fas fa-satellite-dish"></i> Stream En Vivo
-                    </button>
-                    <button class="nav-btn" data-section="subir">
-                        <i class="fas fa-upload"></i> Subir Transmisión
-                    </button>
-                    <button class="nav-btn" data-section="mis-streams" style="display: none;">
-                        <i class="fas fa-user-circle"></i> Mis Streams
-                    </button>
-                    <button class="nav-btn" data-section="perfil" style="display: none;">
-                        <i class="fas fa-user-edit"></i> Mi Perfil
-                    </button>
-                </div>
-                <div class="auth-section">
-                    <div id="user-info" class="user-info" style="display: none;">
-                        <img id="user-avatar" class="user-avatar" src="" alt="Avatar">
-                        <div class="user-details">
-                            <span id="user-name" class="user-name"></span>
-                            <button id="logout-btn" class="logout-btn">
-                                <i class="fas fa-sign-out-alt"></i> Salir
-                            </button>
-                        </div>
-                    </div>
-                    <button id="login-btn" class="login-btn">
-                        <i class="fab fa-google"></i> Iniciar Sesión
-                    </button>
-                </div>
+    <div id="newsModal" class="news-modal">
+        <div class="news-modal-content">
+            <div class="news-modal-header">
+                <h3 id="newsModalTitle">Noticia</h3>
+                <button class="close-news-modal" onclick="closeNewsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-        </nav>
-    </header>
-
-    <!-- Nota de Aviso -->
-    <div class="warning-notice">
-        <div class="container">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p><strong>AVISO IMPORTANTE:</strong> En caso de que la aplicación principal de transmisiones ULTRAGOL falle, utiliza esta sección para subir y ver transmisiones de respaldo.</p>
+            <div class="news-modal-body">
+                <img id="newsModalImage" src="" alt="Noticia">
+                <div id="newsModalText" class="news-modal-text"></div>
+            </div>
         </div>
     </div>
 
-    <main>
-        <!-- Sección de Transmisiones -->
-        <section id="transmisiones" class="section active">
-            <div class="container">
-                <div class="section-header">
-                    <h2><i class="fas fa-broadcast-tower"></i> Transmisiones en Vivo</h2>
-                    <p>Encuentra las mejores transmisiones de fútbol aquí</p>
-                </div>
-                
-                <!-- Buscador Creativo -->
-                <div class="search-container">
-                    <div class="search-wrapper">
-                        <div class="search-icon">
-                            <i class="fas fa-search"></i>
-                        </div>
-                        <input type="text" id="stream-search" class="search-input" placeholder="Buscar equipos, ligas o transmisiones...">
-                        <div class="search-suggestions" id="search-suggestions">
-                            <div class="suggestion-category">
-                                <h4><i class="fas fa-users"></i> Equipos Populares</h4>
-                                <div class="suggestion-item" data-search="Real Madrid">Real Madrid</div>
-                                <div class="suggestion-item" data-search="Barcelona">Barcelona</div>
-                                <div class="suggestion-item" data-search="Manchester United">Manchester United</div>
-                            </div>
-                            <div class="suggestion-category">
-                                <h4><i class="fas fa-trophy"></i> Ligas</h4>
-                                <div class="suggestion-item" data-search="Liga MX">Liga MX</div>
-                                <div class="suggestion-item" data-search="Champions League">Champions League</div>
-                                <div class="suggestion-item" data-search="Premier League">Premier League</div>
-                            </div>
-                        </div>
-                        <button class="search-clear" id="search-clear">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="filters">
-                    <button class="filter-btn active" data-platform="all">Todos</button>
-                    <button class="filter-btn" data-platform="youtube">YouTube</button>
-                    <button class="filter-btn" data-platform="instagram">Instagram</button>
-                    <button class="filter-btn" data-platform="tiktok">TikTok</button>
-                    <button class="filter-btn" data-platform="facebook">Facebook</button>
-                    <button class="filter-btn" data-platform="twitch">Twitch</button>
-                </div>
-
-                <div id="streams-container" class="streams-grid">
-                    <div class="no-streams">
-                        <i class="fas fa-futbol"></i>
-                        <p>No hay transmisiones disponibles en este momento</p>
-                        <p class="sub-text">¡Sé el primero en compartir una transmisión!</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección de Stream En Vivo con iframe -->
-        <section id="live-stream" class="section">
-            <div class="container">
-                <div class="section-header">
-                    <h2><i class="fas fa-satellite-dish"></i> Transmisión En Vivo Premium</h2>
-                    <p>Disfruta de transmisiones de fútbol en alta calidad con múltiples opciones</p>
-                </div>
-
-                <!-- Banner de Colaboración GOLAZOZ -->
-                <div class="collaboration-banner">
-                    <div class="banner-container">
-                        <img src="golazoz-banner.jpg" alt="ULTRAGOL x GOLAZOZ" class="banner-image">
-                    </div>
-                    
-                    <!-- Texto de Colaboración -->
-                    <div class="collaboration-description">
-                        <h3 class="collab-title">
-                            <i class="fas fa-handshake"></i> Colaboración Oficial
-                        </h3>
-                        <p class="collab-text">
-                            ULTRAGOL y GOLAZOZ se unen para ofrecerte la mejor experiencia de transmisiones de fútbol en vivo. 
-                            Dos plataformas trabajando juntas por la pasión del fútbol, brindándote múltiples opciones para que 
-                            nunca te pierdas un partido importante.
-                        </p>
-                        <a href="https://golazoz.com/" target="_blank" rel="noopener noreferrer" class="golazoz-btn">
-                            <i class="fas fa-external-link-alt"></i>
-                            <span>Visitar GOLAZOZ.com</span>
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Botones de Selección de Canal -->
-                <div class="channel-selector">
-                    <button class="channel-btn active" onclick="changeChannel('https://servidor-l3ho.github.io/ULTRACANALES.2/', this)" data-channel="1">
-                        <div class="channel-icon">
-                            <i class="fas fa-satellite-dish"></i>
-                        </div>
-                        <div class="channel-info">
-                            <span class="channel-label">OPCIÓN 1</span>
-                            <span class="channel-name">ULTRACANALES</span>
-                        </div>
-                        <div class="channel-indicator"></div>
-                    </button>
-                    <button class="channel-btn" onclick="changeChannel('https://panel.donromans.com/', this)" data-channel="2">
-                        <div class="channel-icon">
-                            <i class="fas fa-tv"></i>
-                        </div>
-                        <div class="channel-info">
-                            <span class="channel-label">OPCIÓN 2</span>
-                            <span class="channel-name">PANEL PREMIUM</span>
-                        </div>
-                        <div class="channel-indicator"></div>
-                    </button>
-                </div>
-
-                <div class="live-stream-container">
-                    <div class="iframe-wrapper">
-                        <div class="stream-info-bar">
-                            <div class="live-indicator">
-                                <i class="fas fa-circle"></i>
-                                <span>EN VIVO</span>
-                            </div>
-                            <div class="stream-quality">
-                                <i class="fas fa-hd-video"></i>
-                                <span>FULL HD</span>
-                            </div>
-                        </div>
-                        
-                        <div class="iframe-container" id="stream-iframe-container">
-                            <div class="iframe-glow-effect"></div>
-                            <iframe 
-                                id="live-stream-iframe"
-                                src="https://servidor-l3ho.github.io/ULTRACANALES.2/" 
-                                frameborder="0" 
-                                allowfullscreen
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                title="ULTRAGOL Stream Premium">
-                            </iframe>
-                        </div>
-                        
-                        <div class="stream-controls">
-                            <button class="control-btn pip-btn" onclick="togglePIP()" title="Video Flotante (PIP)">
-                                <i class="fas fa-external-link-square-alt"></i>
-                                <span>Video Flotante</span>
-                            </button>
-                            <button class="control-btn fullscreen-btn" onclick="toggleFullscreen()">
-                                <i class="fas fa-expand"></i>
-                                <span>Pantalla Completa</span>
-                            </button>
-                            <button class="control-btn refresh-btn" onclick="refreshStream()">
-                                <i class="fas fa-sync-alt"></i>
-                                <span>Actualizar</span>
-                            </button>
-                            <button class="control-btn share-btn" onclick="shareLiveStream()">
-                                <i class="fas fa-share"></i>
-                                <span>Compartir</span>
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección de Mis Streams -->
-        <section id="mis-streams" class="section">
-            <div class="container">
-                <div class="section-header">
-                    <h2><i class="fas fa-user-circle"></i> Mis Transmisiones</h2>
-                    <p>Gestiona las transmisiones que has subido</p>
-                </div>
-                
-                <div id="my-streams-container" class="streams-grid">
-                    <div class="no-streams">
-                        <i class="fas fa-broadcast-tower"></i>
-                        <p>No has subido ninguna transmisión aún</p>
-                        <p class="sub-text">¡Comparte tu primera transmisión!</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sección de Perfil de Usuario -->
-        <section id="perfil" class="section">
-            <div class="container">
-                <div class="section-header">
-                    <h2><i class="fas fa-user-edit"></i> Mi Perfil</h2>
-                    <p>Gestiona tu información personal y estadísticas</p>
-                </div>
-
-                <div class="profile-container">
-                    <div class="profile-card">
-                        <div class="profile-header">
-                            <div class="profile-avatar-section">
-                                <img id="profile-avatar-display" class="profile-avatar-large" src="" alt="Avatar">
-                                <button id="edit-avatar-btn" class="edit-avatar-btn">
-                                    <i class="fas fa-camera"></i>
-                                </button>
-                            </div>
-                            <div class="profile-info">
-                                <h3 id="profile-username-display">Usuario</h3>
-                                <p id="profile-email-display">email@ejemplo.com</p>
-                                <button id="edit-username-btn" class="edit-username-btn">
-                                    <i class="fas fa-edit"></i> Editar Nombre
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="profile-stats">
-                            <div class="stat-card">
-                                <div class="stat-number" id="total-streams">0</div>
-                                <div class="stat-label">Transmisiones</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number" id="average-rating">0.0</div>
-                                <div class="stat-label">Calificación Promedio</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number" id="total-comments">0</div>
-                                <div class="stat-label">Comentarios Recibidos</div>
-                            </div>
-                        </div>
-
-                        <div class="profile-recent">
-                            <h4><i class="fas fa-history"></i> Transmisiones Recientes</h4>
-                            <div id="recent-streams-list" class="recent-streams">
-                                <!-- Las transmisiones recientes se cargarán aquí -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Modal para editar avatar -->
-        <div id="avatar-modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3><i class="fas fa-camera"></i> Cambiar Foto de Perfil</h3>
-                    <button class="modal-close" id="close-avatar-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form id="avatar-form">
-                        <div class="form-group">
-                            <label for="avatar-url">
-                                <i class="fas fa-link"></i> URL de la Imagen
-                            </label>
-                            <input type="url" id="avatar-url" name="avatar-url" placeholder="https://..." required>
-                            <small class="form-help">Ingresa la URL de tu nueva foto de perfil</small>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="submit-btn">
-                                <i class="fas fa-save"></i> Guardar Foto
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Modal para editar nombre de usuario -->
-        <div id="username-modal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3><i class="fas fa-edit"></i> Cambiar Nombre de Usuario</h3>
-                    <button class="modal-close" id="close-username-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form id="username-form">
-                        <div class="form-group">
-                            <label for="new-username">
-                                <i class="fas fa-user"></i> Nuevo Nombre de Usuario
-                            </label>
-                            <input type="text" id="new-username" name="new-username" placeholder="Mi nuevo nombre" required>
-                            <small class="form-help">Este nombre aparecerá en tus transmisiones</small>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="submit-btn">
-                                <i class="fas fa-save"></i> Guardar Nombre
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sección de Subir Transmisión -->
-        <section id="subir" class="section">
-            <div class="container">
-                <div class="section-header">
-                    <h2><i class="fas fa-plus-circle"></i> Compartir Tu Transmisión</h2>
-                    <p>Comparte tu transmisión de fútbol con la comunidad</p>
-                </div>
-
-                <form id="stream-form" class="stream-form">
-                    <div class="form-group">
-                        <label for="equipos">
-                            <i class="fas fa-users"></i> Equipos que Juegan
-                        </label>
-                        <input type="text" id="equipos" name="equipos" placeholder="Ej: Real Madrid vs Barcelona" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="plataforma">
-                            <i class="fas fa-desktop"></i> Plataforma de Transmisión
-                        </label>
-                        <select id="plataforma" name="plataforma" required>
-                            <option value="">Selecciona una plataforma</option>
-                            <option value="youtube">YouTube</option>
-                            <option value="instagram">Instagram Live</option>
-                            <option value="tiktok">TikTok Live</option>
-                            <option value="facebook">Facebook Live</option>
-                            <option value="twitch">Twitch</option>
-                            <option value="kick">Kick</option>
-                            <option value="otra">Otra plataforma</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="otra-plataforma-group" style="display: none;">
-                        <label for="otra-plataforma">
-                            <i class="fas fa-globe"></i> Especifica la Plataforma
-                        </label>
-                        <input type="text" id="otra-plataforma" name="otra-plataforma" placeholder="Nombre de la plataforma">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="link">
-                            <i class="fas fa-link"></i> Link de la Transmisión
-                        </label>
-                        <input type="url" id="link" name="link" placeholder="https://..." required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="tiempo-partido">
-                            <i class="fas fa-clock"></i> Tiempo del Partido
-                        </label>
-                        <select id="tiempo-partido" name="tiempo-partido" required>
-                            <option value="">Selecciona el tiempo</option>
-                            <option value="primer-tiempo">Primer Tiempo</option>
-                            <option value="descanso">Descanso</option>
-                            <option value="segundo-tiempo">Segundo Tiempo</option>
-                            <option value="tiempo-extra">Tiempo Extra</option>
-                            <option value="penales">Penales</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="liga">
-                            <i class="fas fa-trophy"></i> Liga/Competición
-                        </label>
-                        <select id="liga" name="liga" required>
-                            <option value="">Selecciona una liga</option>
-                            <option value="liga-mx">Liga MX</option>
-                            <option value="champions">Champions League</option>
-                            <option value="europa">Europa League</option>
-                            <option value="laliga">La Liga</option>
-                            <option value="premier">Premier League</option>
-                            <option value="serie-a">Serie A</option>
-                            <option value="bundesliga">Bundesliga</option>
-                            <option value="copa-mx">Copa MX</option>
-                            <option value="seleccion">Selección Nacional</option>
-                            <option value="otra-liga">Otra Liga</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="otra-liga-group" style="display: none;">
-                        <label for="otra-liga">
-                            <i class="fas fa-futbol"></i> Especifica la Liga
-                        </label>
-                        <input type="text" id="otra-liga" name="otra-liga" placeholder="Nombre de la liga">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="calidad">
-                            <i class="fas fa-hd-video"></i> Calidad del Stream
-                        </label>
-                        <select id="calidad" name="calidad" required>
-                            <option value="">Selecciona la calidad</option>
-                            <option value="4k">4K Ultra HD</option>
-                            <option value="1080p">1080p Full HD</option>
-                            <option value="720p">720p HD</option>
-                            <option value="480p">480p SD</option>
-                            <option value="360p">360p</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="idioma">
-                            <i class="fas fa-language"></i> Idioma de la Transmisión
-                        </label>
-                        <select id="idioma" name="idioma" required>
-                            <option value="">Selecciona el idioma</option>
-                            <option value="español">Español</option>
-                            <option value="inglés">Inglés</option>
-                            <option value="portugués">Portugués</option>
-                            <option value="francés">Francés</option>
-                            <option value="italiano">Italiano</option>
-                            <option value="alemán">Alemán</option>
-                            <option value="otro">Otro idioma</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="portada">
-                            <i class="fas fa-image"></i> Imagen de Portada (Opcional)
-                        </label>
-                        <input type="url" id="portada" name="portada-url" placeholder="https://... (URL de la imagen de portada/miniatura)">
-                        <small class="form-help">Agrega la URL de una imagen que represente tu transmisión</small>
-                    </div>
-
-                    <div class="form-group checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="comentarios" name="comentarios">
-                            <span class="checkmark"></span>
-                            <i class="fas fa-microphone"></i> Transmisión con comentarios
-                        </label>
-                    </div>
-
-                    <button type="submit" class="submit-btn">
-                        <i class="fas fa-share"></i> Compartir Transmisión
-                    </button>
-                </form>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 ULTRAGOL - L3HO. Todos los derechos reservados.</p>
-            <p class="footer-note">Las transmisiones se eliminan automáticamente después de 1 hora.</p>
-        </div>
-    </footer>
-
-    <!-- Scripts de Firebase -->
-    <script type="module" src="firebase-config.js"></script>
-    <script type="module" src="app.js"></script>
-    
-    <!-- Script para cambio de canales -->
-    <script>
-        function changeChannel(url, button) {
-            const iframe = document.getElementById('live-stream-iframe');
-            const allButtons = document.querySelectorAll('.channel-btn');
-            
-            allButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            
-            iframe.style.opacity = '0';
-            
-            setTimeout(() => {
-                iframe.src = url;
-                iframe.style.opacity = '1';
-            }, 300);
-        }
-    </script>
-    
-    <script src="../js/gemini-chat.js"></script>
+    <script src="ultragol-api.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
