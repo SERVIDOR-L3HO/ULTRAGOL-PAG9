@@ -87,6 +87,17 @@ app.get('/api/ultragol/equipos', async (req, res) => {
     }
 });
 
+app.get('/api/ultragol/videos', async (req, res) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/videos`);
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error proxying videos:', error);
+        res.status(500).json({ error: 'Error al obtener videos' });
+    }
+});
+
 console.log('✅ UltraGol API proxy enabled');
 
 if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {

@@ -212,52 +212,77 @@ async function loadReplays() {
     container.innerHTML = '<div class="loading-spinner">Cargando mejores momentos de Liga MX...</div>';
     
     try {
-        // Intentar cargar videos desde la API
-        const response = await fetch('/api/ultragol/noticias');
+        // Cargar videos desde la API
+        const response = await fetch('/api/ultragol/videos');
         const data = await response.json();
         
-        // Usar videos de muestra si no hay datos de la API
-        const videos = [
-            {
-                titulo: 'Resumen Jornada 7 - Liga MX',
-                equipos: 'AMÉRICA vs CRUZ AZUL',
-                imagen: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'
-            },
-            {
-                titulo: 'Mejores Goles Jornada 7',
-                equipos: 'TIGRES vs MONTERREY',
-                imagen: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=600'
-            },
-            {
-                titulo: 'Highlights Liga MX',
-                equipos: 'CHIVAS vs PUMAS',
-                imagen: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=600'
-            },
-            {
-                titulo: 'Resumen de la Semana',
-                equipos: 'SANTOS vs ATLAS',
-                imagen: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600'
-            }
-        ];
+        // La API puede devolver un array directamente o un objeto con un array dentro
+        let videosArray = Array.isArray(data) ? data : (data.videos || data.data || []);
         
-        container.innerHTML = videos.map((video, index) => `
-            <div class="match-card">
-                <div class="match-card-bg">
-                    <img src="${video.imagen}" alt="${video.titulo}">
-                </div>
-                <div class="match-card-content">
-                    <div class="teams">
-                        <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--text);">${video.titulo}</h4>
+        // Si hay videos de la API, usarlos
+        if (videosArray && videosArray.length > 0) {
+            container.innerHTML = videosArray.slice(0, 4).map((video, index) => `
+                <div class="match-card">
+                    <div class="match-card-bg">
+                        <img src="${video.imagen || video.thumbnail || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'}" alt="${video.titulo || video.title || 'Video'}">
                     </div>
-                    <div class="match-score-mini">
-                        <span class="match-time">Liga MX</span>
+                    <div class="match-card-content">
+                        <div class="teams">
+                            <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--text);">${video.titulo || video.title || 'Video sin título'}</h4>
+                        </div>
+                        <div class="match-score-mini">
+                            <span class="match-time">Liga MX</span>
+                        </div>
+                        <button class="watch-btn" onclick="watchMatch('${video.id || 'video-' + index}')">
+                            <span>VER VIDEO</span>
+                        </button>
                     </div>
-                    <button class="watch-btn" onclick="watchMatch('ligamx-video-${index}')">
-                        <span>VER VIDEO</span>
-                    </button>
                 </div>
-            </div>
-        `).join('');
+            `).join('');
+        } else {
+            // Usar videos de muestra si no hay datos de la API
+            const videos = [
+                {
+                    titulo: 'Resumen Jornada 7 - Liga MX',
+                    equipos: 'AMÉRICA vs CRUZ AZUL',
+                    imagen: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'
+                },
+                {
+                    titulo: 'Mejores Goles Jornada 7',
+                    equipos: 'TIGRES vs MONTERREY',
+                    imagen: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=600'
+                },
+                {
+                    titulo: 'Highlights Liga MX',
+                    equipos: 'CHIVAS vs PUMAS',
+                    imagen: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=600'
+                },
+                {
+                    titulo: 'Resumen de la Semana',
+                    equipos: 'SANTOS vs ATLAS',
+                    imagen: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600'
+                }
+            ];
+            
+            container.innerHTML = videos.map((video, index) => `
+                <div class="match-card">
+                    <div class="match-card-bg">
+                        <img src="${video.imagen}" alt="${video.titulo}">
+                    </div>
+                    <div class="match-card-content">
+                        <div class="teams">
+                            <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--text);">${video.titulo}</h4>
+                        </div>
+                        <div class="match-score-mini">
+                            <span class="match-time">Liga MX</span>
+                        </div>
+                        <button class="watch-btn" onclick="watchMatch('ligamx-video-${index}')">
+                            <span>VER VIDEO</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
     } catch (error) {
         console.error('Error loading replays:', error);
         container.innerHTML = '<div class="error-message">Error al cargar los mejores momentos</div>';
