@@ -25,25 +25,31 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     const modalTitle = document.getElementById('modalTitle');
     const loader = document.getElementById('modalLoader');
     
-    // Si se proporciona una URL de video, usar un reproductor de video
+    // Si se proporciona una URL de video
     if (videoUrl) {
         modalTitle.textContent = videoTitle || 'Video';
         modal.classList.add('active');
         loader.style.display = 'flex';
         
-        // Crear un reproductor de video en lugar de iframe
+        // Para videos de YouTube/externos, usar iframe
+        // Convertir URLs de YouTube normales a embed si es necesario
+        let embedUrl = videoUrl;
+        if (videoUrl.includes('youtube.com/watch')) {
+            const videoId = videoUrl.split('v=')[1]?.split('&')[0];
+            if (videoId) {
+                embedUrl = `https://www.youtube.com/embed/${videoId}`;
+            }
+        }
+        
         modalBody.innerHTML = `
             <div class="loading-spinner" id="modalLoader" style="display: flex;">
                 <div class="spinner"></div>
             </div>
-            <video id="modalVideo" controls autoplay style="width: 100%; height: 100%; background: #000;">
-                <source src="${videoUrl}" type="video/mp4">
-                Tu navegador no soporta el elemento de video.
-            </video>
+            <iframe id="modalIframe" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%;"></iframe>
         `;
         
-        const video = document.getElementById('modalVideo');
-        video.onloadeddata = () => {
+        const iframe = document.getElementById('modalIframe');
+        iframe.onload = () => {
             setTimeout(() => {
                 const loaderEl = document.getElementById('modalLoader');
                 if (loaderEl) loaderEl.style.display = 'none';
@@ -79,13 +85,6 @@ function closeModal() {
     const modalBody = modal.querySelector('.modal-body');
     
     modal.classList.remove('active');
-    
-    // Detener video si existe
-    const video = document.getElementById('modalVideo');
-    if (video) {
-        video.pause();
-        video.src = '';
-    }
     
     // Limpiar iframe si existe
     const iframe = document.getElementById('modalIframe');
@@ -278,8 +277,24 @@ async function loadReplays() {
         
         // Si hay videos de la API, usarlos
         if (videosArray && videosArray.length > 0) {
-            container.innerHTML = videosArray.slice(0, 4).map((video, index) => {
-                const videoUrl = video.url || video.videoUrl || video.link || '';
+            // Aplanar las categorías si existen
+            let allVideos = [];
+            if (videosArray.mejoresMomentos) {
+                allVideos = allVideos.concat(videosArray.mejoresMomentos || []);
+            }
+            if (videosArray.resumenes) {
+                allVideos = allVideos.concat(videosArray.resumenes || []);
+            }
+            if (videosArray.goles) {
+                allVideos = allVideos.concat(videosArray.goles || []);
+            }
+            // Si no hay categorías, usar el array directamente
+            if (allVideos.length === 0 && Array.isArray(videosArray)) {
+                allVideos = videosArray;
+            }
+            
+            container.innerHTML = allVideos.slice(0, 4).map((video, index) => {
+                const videoUrl = video.urlEmbed || video.url || video.videoUrl || video.link || '';
                 const videoTitle = video.titulo || video.title || 'Video sin título';
                 const videoTitleEscaped = videoTitle.replace(/'/g, "\\'");
                 const videoUrlEscaped = videoUrl.replace(/'/g, "\\'");
@@ -287,7 +302,7 @@ async function loadReplays() {
                 return `
                 <div class="match-card">
                     <div class="match-card-bg">
-                        <img src="${video.imagen || video.thumbnail || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'}" alt="${videoTitle}">
+                        <img src="${video.thumbnail || video.imagen || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'}" alt="${videoTitle}">
                     </div>
                     <div class="match-card-content">
                         <div class="teams">
