@@ -1,0 +1,302 @@
+{
+  "categories": [
+    {
+      "id": "tyc-sports",
+      "name": "TyC Sports",
+      "icon": "⚽",
+      "channels": [
+        {
+          "id": "tyc-1",
+          "name": "TyC Sports HD",
+          "sources": [
+            "https://la14hd.com/vivo/canales.php?stream=tycsports",
+            "https://streamtp11.com/global1.php?stream=tycsports"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "tnt-sports",
+      "name": "TNT Sports",
+      "icon": "🏆",
+      "channels": [
+        {
+          "id": "tnt-1",
+          "name": "TNT Sports HD",
+          "sources": [
+            "https://la14hd.com/vivo/canal.php?stream=tntsports",
+            "https://streamtpglobal.com/global1.php?stream=tntsports"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "espn",
+      "name": "ESPN Premium",
+      "icon": "🎯",
+      "channels": [
+        {
+          "id": "espn-1",
+          "name": "ESPN Premium HD",
+          "sources": [
+            "https://streamtp11.com/global1.php?stream=espnpremium",
+            "https://la14hd.com/vivo/canal.php?stream=espnpremium"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "dsports",
+      "name": "DSports",
+      "icon": "⚡",
+      "channels": [
+        {
+          "id": "dsports-1",
+          "name": "DSports HD",
+          "sources": [
+            "https://streamtp11.com/global1.php?stream=dsports",
+            "https://la14hd.com/vivo/canal.php?stream=dsports"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "capoplay",
+      "name": "Capo Play",
+      "icon": "📺",
+      "channels": [
+        {
+          "id": "capo-1",
+          "name": "Canal 1",
+          "sources": ["https://www.capoplay.net/canal1.php"],
+          "live": true
+        },
+        {
+          "id": "capo-2",
+          "name": "Canal 2",
+          "sources": ["https://www.capoplay.net/canal2.php"],
+          "live": true
+        },
+        {
+          "id": "capo-15",
+          "name": "Canal 15",
+          "sources": ["https://www.capoplay.net/canal15.php"],
+          "live": true
+        },
+        {
+          "id": "capo-18",
+          "name": "Canal 18",
+          "sources": ["https://www.capoplay.net/canal18.php"],
+          "live": true
+        },
+        {
+          "id": "capo-21",
+          "name": "Canal 21",
+          "sources": ["https://www.capoplay.net/canal21.php"],
+          "live": true
+        },
+        {
+          "id": "capo-26",
+          "name": "Canal 26",
+          "sources": ["https://www.capoplay.net/canal26.php"],
+          "live": true
+        },
+        {
+          "id": "capo-29",
+          "name": "Canal 29",
+          "sources": ["https://www.capoplay.net/canal29.php"],
+          "live": true
+        },
+        {
+          "id": "capo-35",
+          "name": "Canal 35",
+          "sources": ["https://www.capoplay.net/canal35.php"],
+          "live": true
+        },
+        {
+          "id": "capo-38",
+          "name": "Canal 38",
+          "sources": ["https://www.capoplay.net/canal38.php"],
+          "live": true
+        },
+        {
+          "id": "capo-41",
+          "name": "Canal 41",
+          "sources": ["https://www.capoplay.net/canal41.php"],
+          "live": true
+        },
+        {
+          "id": "capo-47",
+          "name": "Canal 47",
+          "sources": ["https://www.capoplay.net/canal47.php"],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "pelota-libre",
+      "name": "Pelota Libre",
+      "icon": "⚽",
+      "channels": [
+        {
+          "id": "pl-11",
+          "name": "Canal 11",
+          "sources": ["https://www.pelotalibrevivo.net/canal-11.php"],
+          "live": true
+        },
+        {
+          "id": "pl-13",
+          "name": "Canal 13",
+          "sources": ["https://www.pelotalibrevivo.net/canal-13.php"],
+          "live": true
+        },
+        {
+          "id": "pl-24",
+          "name": "Canal 24",
+          "sources": ["https://www.pelotalibrevivo.net/canal-24.php"],
+          "live": true
+        },
+        {
+          "id": "pl-32",
+          "name": "Canal 32",
+          "sources": ["https://www.pelotalibrevivo.net/canal-32.php"],
+          "live": true
+        },
+        {
+          "id": "pl-44",
+          "name": "Canal 44",
+          "sources": ["https://www.pelotalibrevivo.net/canal-44.php"],
+          "live": true
+        },
+        {
+          "id": "pl-capo",
+          "name": "Capo Deportes",
+          "sources": ["https://www.pelotalibrevivo.net/en-vivo/capo-deportes.php"],
+          "live": true
+        },
+        {
+          "id": "pl-gol",
+          "name": "Gol TV",
+          "sources": ["https://www.pelotalibrevivo.net/en-vivo/gol-tv.php"],
+          "live": true
+        },
+        {
+          "id": "pl-ucl",
+          "name": "Liga de Campeones",
+          "sources": ["https://www.pelotalibrevivo.net/en-vivo/liga-de-campeones.php"],
+          "live": true
+        },
+        {
+          "id": "pl-win",
+          "name": "Win Sports Plus",
+          "sources": ["https://www.pelotalibrevivo.net/en-vivo/win-sports-plus.php"],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "pirlo-tv",
+      "name": "Pirlo TV",
+      "icon": "🔴",
+      "channels": [
+        {
+          "id": "pirlo-1",
+          "name": "Canal 1",
+          "sources": ["https://www.pirlotv.pl/canal-1.php"],
+          "live": true
+        },
+        {
+          "id": "pirlo-2",
+          "name": "Canal 2",
+          "sources": ["https://www.pirlotv.pl/canal-2.php"],
+          "live": true
+        },
+        {
+          "id": "pirlo-15",
+          "name": "Canal 15",
+          "sources": ["https://www.pirlotv.pl/canal-15.php"],
+          "live": true
+        },
+        {
+          "id": "pirlo-18",
+          "name": "Canal 18",
+          "sources": ["https://www.pirlotv.pl/canal-18.php"],
+          "live": true
+        },
+        {
+          "id": "pirlo-21",
+          "name": "Canal 21",
+          "sources": ["https://www.pirlotv.pl/canal-21.php"],
+          "live": true
+        },
+        {
+          "id": "pirlo-26",
+          "name": "Canal 26",
+          "sources": ["https://www.pirlotv.pl/canal-26.php"],
+          "live": true
+        },
+        {
+          "id": "pirlo-29",
+          "name": "Canal 29",
+          "sources": ["https://www.pirlotv.pl/canal-29.php"],
+          "live": true
+        },
+        {
+          "id": "pirlo-35",
+          "name": "Canal 35",
+          "sources": ["https://www.pirlotv.pl/canal-35.php"],
+          "live": true
+        },
+        {
+          "id": "pirlo-38",
+          "name": "Canal 38",
+          "sources": ["https://www.pirlotv.pl/canal-38.php"],
+          "live": true
+        },
+        {
+          "id": "pirlo-41",
+          "name": "Canal 41",
+          "sources": ["https://www.pirlotv.pl/canal-41.php"],
+          "live": true
+        },
+        {
+          "id": "pirlo-47",
+          "name": "Canal 47",
+          "sources": ["https://www.pirlotv.pl/canal-47.php"],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "eventos",
+      "name": "Eventos Especiales",
+      "icon": "🏅",
+      "channels": [
+        {
+          "id": "arg-nig",
+          "name": "Argentina vs Nigeria",
+          "sources": [
+            "https://www.pirlotv.pl/2025/argentina-vs-nigeria-8vos-final-en-vivo.php",
+            "https://www.rojadirectaenvivo.pl/2025/argentina-vs-nigeria-8vos-final-en-vivo.php",
+            "https://www.tarjetarojaenvivo.club/2025/argentina-vs-nigeria-8vos-final-en-vivo.php"
+          ],
+          "live": true
+        },
+        {
+          "id": "col-rsa",
+          "name": "Colombia vs Sudáfrica",
+          "sources": [
+            "https://www.pirlotv.pl/2025/colombia-vs-sudafrica-8vos-final-en-vivo.php",
+            "https://www.rojadirectaenvivo.pl/2025/colombia-vs-sudafrica-8vos-final-en-vivo.php",
+            "https://www.tarjetarojaenvivo.club/2025/colombia-vs-sudafrica-8vos-final-en-vivo.php"
+          ],
+          "live": true
+        }
+      ]
+    }
+  ]
+}

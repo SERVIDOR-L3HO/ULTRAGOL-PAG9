@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todos los Canales - ULTRACANALES</title>
+    
+    <meta property="og:title" content="ULTRACANALES - Transmisiones Deportivas en Vivo">
+    <meta property="og:description" content="Mira los mejores canales deportivos en vivo: ESPN, Fox Sports, DAZN y más 🔥">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://ultracanales.com/attached_assets/297938-removebg-preview_1760222866015.png">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <link href="canales-style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <a href="index.html" class="back-btn">← Inicio</a>
+                <div class="logo">
+                    <img src="attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="logo-image">
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="login-btn" id="loginBtn">
+                    <span class="login-icon">G</span>
+                    <span class="login-text">Iniciar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="search-bar-section">
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar canales, equipos o ligas...">
+            <button class="search-icon-btn">🔍</button>
+        </div>
+    </div>
+
+    <div id="hero-banner" class="hero-banner">
+        <img src="attached_assets/1760230812607~2_1760232142546.jpg" alt="El Fútbol Respira Aquí" class="hero-banner-image">
+    </div>
+
+    <div id="player-section" class="player-section hidden">
+        <div class="player-container">
+            <button class="close-player" onclick="closePlayer()">✕</button>
+            <div class="player-wrapper">
+                <iframe id="player" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+            </div>
+            <div class="player-info">
+                <h2 id="current-channel-name">Canal</h2>
+                <div class="player-actions">
+                    <button class="action-btn" data-action="share">📤 Compartir</button>
+                    <button class="action-btn">❤️ <span id="likes">7.2K</span></button>
+                </div>
+            </div>
+            <div class="source-selector">
+                <div id="source-buttons" class="source-buttons"></div>
+            </div>
+        </div>
+    </div>
+
+    <main class="canales-main">
+        <div class="hero-section">
+            <h1 class="hero-title">🌎 Explora Todos los Canales</h1>
+            <p class="hero-subtitle">Transmisiones deportivas de todo el mundo</p>
+        </div>
+
+        <div class="filter-section">
+            <button class="category-filter active" data-category="all">Todos</button>
+            <button class="category-filter" data-category="mexico">🇲🇽 México</button>
+            <button class="category-filter" data-category="fox">🦊 Fox Sports</button>
+            <button class="category-filter" data-category="espn">🎯 ESPN</button>
+            <button class="category-filter" data-category="dazn">🏁 DAZN</button>
+            <button class="category-filter" data-category="sudamerica">🌎 Sudamérica</button>
+            <button class="category-filter" data-category="entretenimiento">🎬 Entretenimiento</button>
+            <button class="category-filter" data-category="infantil">👶 Infantiles</button>
+            <button class="category-filter" data-category="cultura">📚 Cultura</button>
+            <button class="category-filter" data-category="noticias">📰 Noticias</button>
+            <button class="category-filter" data-category="otros">📺 Otros</button>
+        </div>
+
+        <div id="all-channels-grid" class="channels-grid"></div>
+    </main>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="canales-script.js"></script>
+</body>
+</html>

@@ -1,0 +1,2795 @@
+{
+  "categories": [
+    {
+      "id": "canales-mexicanos",
+      "name": "Canales Mexicanos",
+      "icon": "🇲🇽",
+      "channels": [
+        {
+          "id": "azteca-7",
+          "name": "Azteca 7",
+          "sources": [
+            "https://rereyano.ru/player/3/108",
+            "https://live.saohgdasregions.fun/stream2.php?canal=azteca7&target=3",
+            "https://live.saohgdasregions.fun/stream.php?canal=azteca7&target=1",
+            "https://live.saohgdasregions.fun/stream.php?canal=azteca7&target=2",
+            "https://live.saohgdasregions.fun/stream.php?canal=azteca7&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=azteca7&target=1",
+            "https://live.saohgdasregions.fun/stream2.php?canal=azteca7&target=2"
+          ],
+          "live": true
+        },
+        {
+          "id": "canal-5",
+          "name": "Canal 5",
+          "sources": [
+            "https://rereyano.ru/player/3/107",
+            "https://live.saohgdasregions.fun/stream2.php?canal=canal5&target=3",
+            "https://live.saohgdasregions.fun/stream.php?canal=canal5&target=1",
+            "https://live.saohgdasregions.fun/stream.php?canal=canal5&target=2",
+            "https://live.saohgdasregions.fun/stream.php?canal=canal5&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=canal5&target=1",
+            "https://live.saohgdasregions.fun/stream2.php?canal=canal5&target=2"
+          ],
+          "live": true
+        },
+        {
+          "id": "las-estrellas",
+          "name": "Las Estrellas",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream2.php?canal=lasestrellas&target=3",
+            "https://live.saohgdasregions.fun/stream.php?canal=lasestrellas&target=1",
+            "https://live.saohgdasregions.fun/stream.php?canal=lasestrellas&target=2",
+            "https://live.saohgdasregions.fun/stream.php?canal=lasestrellas&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=lasestrellas&target=1",
+            "https://live.saohgdasregions.fun/stream2.php?canal=lasestrellas&target=2"
+          ],
+          "live": true
+        },
+        {
+          "id": "tudn",
+          "name": "TUDN",
+          "sources": [
+            "https://rereyano.ru/player/3/106",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=tudn&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=tudn&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=tudn&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=tudn&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=tudn&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=tudn&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "tudn-vix-plus",
+          "name": "TUDN Vix Plus",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=vixtudn&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=vixtudn&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=vixtudn&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=vixtudn&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=vixtudn&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=vixtudn&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "tvc-deportes",
+          "name": "TVC Deportes",
+          "sources": [
+            "https://rereyano.ru/player/3/105"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "fox-sports",
+      "name": "Fox Sports",
+      "icon": "🦊",
+      "channels": [
+        {
+          "id": "fox-sports",
+          "name": "Fox Sports",
+          "sources": [
+            "https://rereyano.ru/player/3/104",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "fox-sports-mexico",
+          "name": "Fox Sports México",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsportsmexico&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsportsmexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsportsmexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsportsmexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsportsmexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsportsmexico&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "fox-sports-2",
+          "name": "Fox Sports 2",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports2&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports2&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports2&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports2&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports2&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports2&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "fox-sports-2-mexico",
+          "name": "Fox Sports 2 México",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports2mexico&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports2mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports2mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports2mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports2mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports2mexico&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "fox-sports-3",
+          "name": "Fox Sports 3",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports3&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports3&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports3&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports3&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports3&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports3&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "fox-sports-3-mexico",
+          "name": "Fox Sports 3 México",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports3mexico&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports3mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsports3mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports3mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports3mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsports3mexico&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "fox-sports-premium",
+          "name": "Fox Sports Premium",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsportspremium&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsportspremium&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=foxsportspremium&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsportspremium&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsportspremium&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=foxsportspremium&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "dazn",
+      "name": "DAZN",
+      "icon": "🏁",
+      "channels": [
+        {
+          "id": "dazn-f1",
+          "name": "DAZN F1",
+          "sources": [
+            "https://rereyano.ru/player/3/60",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=daznf1&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=daznf1&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=daznf1&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=daznf1&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=daznf1&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=daznf1&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "dazn-la-liga",
+          "name": "DAZN La Liga",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=daznlaliga&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=daznlaliga&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=daznlaliga&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=daznlaliga&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=daznlaliga&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=daznlaliga&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "la-liga",
+      "name": "La Liga",
+      "icon": "⚽",
+      "channels": [
+        {
+          "id": "movistar-la-liga",
+          "name": "Movistar La Liga",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=movistarlaliga&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=movistarlaliga&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=movistarlaliga&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=movistarlaliga&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=movistarlaliga&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=movistarlaliga&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "sky-sports-la-liga",
+          "name": "Sky Sports La Liga",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=skysportslaliga&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=skysportslaliga&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=skysportslaliga&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=skysportslaliga&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=skysportslaliga&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=skysportslaliga&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "directv-sports",
+      "name": "DirectTV Sports",
+      "icon": "📡",
+      "channels": [
+        {
+          "id": "directv-sports",
+          "name": "DirectTV Sports",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=directvsports&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=directvsports&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=directvsports&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=directvsports&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=directvsports&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=directvsports&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "directv-sports-2",
+          "name": "DirectTV Sports 2",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=directvsports2&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=directvsports2&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=directvsports2&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=directvsports2&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=directvsports2&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=directvsports2&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "directv-sports-plus",
+          "name": "DirectTV Sports Plus",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=directvsportsplus&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=directvsportsplus&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=directvsportsplus&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=directvsportsplus&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=directvsportsplus&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=directvsportsplus&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "espn-mexico",
+      "name": "ESPN México",
+      "icon": "🎯",
+      "channels": [
+        {
+          "id": "espn-mexico",
+          "name": "ESPN México",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espnmexico&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espnmexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espnmexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espnmexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espnmexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espnmexico&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "espn-2-mexico",
+          "name": "ESPN 2 México",
+          "sources": [
+            "https://rereyano.ru/player/3/98",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn2mexico&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn2mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn2mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn2mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn2mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn2mexico&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "espn-3-mexico",
+          "name": "ESPN 3 México",
+          "sources": [
+            "https://rereyano.ru/player/3/99",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn3mexico&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn3mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn3mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn3mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn3mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn3mexico&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "espn-4-mexico",
+          "name": "ESPN 4 México",
+          "sources": [
+            "https://rereyano.ru/player/3/100",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn4mexico&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn4mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn4mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn4mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn4mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn4mexico&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "espn-5-mexico",
+          "name": "ESPN 5 México",
+          "sources": [
+            "https://rereyano.ru/player/3/91",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn5mexico&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn5mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn5mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn5mexico&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn5mexico&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn5mexico&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "espn-internacional",
+      "name": "ESPN Internacional",
+      "icon": "🌎",
+      "channels": [
+        {
+          "id": "espn",
+          "name": "ESPN",
+          "sources": [
+            "https://rereyano.ru/player/3/143",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "espn-2",
+          "name": "ESPN 2",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn2&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn2&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn2&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn2&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn2&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn2&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "espn-3",
+          "name": "ESPN 3",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn3&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn3&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn3&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn3&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn3&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn3&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "espn-4",
+          "name": "ESPN 4",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn4&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn4&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn4&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn4&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn4&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn4&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "espn-5",
+          "name": "ESPN 5",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn5&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn5&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn5&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn5&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn5&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn5&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "espn-6",
+          "name": "ESPN 6",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn6&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn6&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn6&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn6&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn6&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn6&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "espn-7",
+          "name": "ESPN 7",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn7&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn7&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espn7&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn7&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn7&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espn7&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "espn-premium",
+      "name": "ESPN Premium",
+      "icon": "⭐",
+      "channels": [
+        {
+          "id": "espn-premium",
+          "name": "ESPN Premium",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espnpremiumlat&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espnpremiumlat&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=espnpremiumlat&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espnpremiumlat&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espnpremiumlat&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=espnpremiumlat&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "sudamerica",
+      "name": "Sudamérica",
+      "icon": "🌎",
+      "channels": [
+        {
+          "id": "tyc-sports",
+          "name": "TyC Sports",
+          "sources": [
+            "https://rereyano.ru/player/3/77",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=tycsports&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=tycsports&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=tycsports&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=tycsports&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=tycsports&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=tycsports&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "tv-publica",
+          "name": "TV Pública",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream2.php?canal=tvpublica&target=3",
+            "https://live.saohgdasregions.fun/stream.php?canal=tvpublica&target=1",
+            "https://live.saohgdasregions.fun/stream.php?canal=tvpublica&target=2",
+            "https://live.saohgdasregions.fun/stream.php?canal=tvpublica&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=tvpublica&target=1",
+            "https://live.saohgdasregions.fun/stream2.php?canal=tvpublica&target=2"
+          ],
+          "live": true
+        },
+        {
+          "id": "tnt-sports-chile",
+          "name": "TNT Sports Chile",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=tntsportschile&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=tntsportschile&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=tntsportschile&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=tntsportschile&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=tntsportschile&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=tntsportschile&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "win-sports-plus",
+          "name": "Win Sports Plus",
+          "sources": [
+            "https://rereyano.ru/player/3/82",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=winsportsplus&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=winsportsplus&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=winsportsplus&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=winsportsplus&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=winsportsplus&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=winsportsplus&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "gol-peru",
+          "name": "Gol Perú",
+          "sources": [
+            "https://rereyano.ru/player/3/85",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=golperu&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=golperu&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=golperu&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=golperu&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=golperu&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=golperu&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "liga-1",
+          "name": "Liga 1",
+          "sources": [
+            "https://rereyano.ru/player/3/111",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=liga1&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=liga1&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=liga1&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=liga1&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=liga1&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=liga1&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "liga-1-max",
+          "name": "Liga 1 Max",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=liga1max&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=liga1max&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=liga1max&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=liga1max&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=liga1max&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=liga1max&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "vtv-plus",
+          "name": "VTV plus",
+          "sources": [
+            "https://rereyano.ru/player/3/109"
+          ],
+          "live": true
+        },
+        {
+          "id": "zapping-sports",
+          "name": "Zapping sports",
+          "sources": [
+            "https://rereyano.ru/player/3/86"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "otros-deportes",
+      "name": "Otros Deportes",
+      "icon": "🏀",
+      "channels": [
+        {
+          "id": "nba",
+          "name": "NBA",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=nba&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=nba&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=nba&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=nba&target=1",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=nba&target=2",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=nba&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "entretenimiento",
+      "name": "Entretenimiento",
+      "icon": "🎬",
+      "channels": [
+        {
+          "id": "amc",
+          "name": "Amc",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=amc&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=amc&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "axn",
+          "name": "Axn",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=axn&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=axn&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "canalsony",
+          "name": "Canal Sony",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=canalsony&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=canalsony&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "cinecanal",
+          "name": "Cinecanal",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=cinecanal&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=cinecanal&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "cinemax",
+          "name": "Cinemax",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=cinemax&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=cinemax&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "comedycentral",
+          "name": "Comedy Central",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=comedycentral&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=comedycentral&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "distritocomedia",
+          "name": "Distrito Comedia",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=distritocomedia&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=distritocomedia&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "fx",
+          "name": "Fx",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=fx&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=fx&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "golden",
+          "name": "Golden",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=golden&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=golden&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "goldenedge",
+          "name": "Golden Edge",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=goldenedge&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=goldenedge&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "goldenplus",
+          "name": "Golden Plus",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=goldenplus&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=goldenplus&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "goldenpremier",
+          "name": "Golden Premier",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=goldenpremier&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=goldenpremier&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "goldenpremier2",
+          "name": "Golden Premier 2",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=goldenpremier2&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=goldenpremier2&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "movistarligadecampeones",
+          "name": "Movistar Liga De Campeones",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=movistarligadecampeones&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=movistarligadecampeones&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "paramountchannel",
+          "name": "Paramount Channel",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=paramountchannel&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=paramountchannel&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "space",
+          "name": "Space",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=space&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=space&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "starchannel",
+          "name": "Star Channel",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=starchannel&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=starchannel&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "studiouniversal",
+          "name": "Studio Universal",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=studiouniversal&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=studiouniversal&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "tnt",
+          "name": "Tnt",
+          "sources": [
+            "https://rereyano.ru/player/3/126",
+            "https://live.saohgdasregions.fun/stream.php?canal=tnt&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=tnt&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "tntnovelas",
+          "name": "Tnt Novelas",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=tntnovelas&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=tntnovelas&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "tntseries",
+          "name": "Tnt Series",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=tntseries&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=tntseries&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "tntsports",
+          "name": "Tnt Sports",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=tntsportsar&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=tntsportsar&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "universalchannel",
+          "name": "Universal Channel",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=universaltv&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=universaltv&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "universalcinema",
+          "name": "Universal Cinema",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=universalcinema&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=universalcinema&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "universalpremiere",
+          "name": "Universal Premiere",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=universalpremiere&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=universalpremiere&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "warnerchannel",
+          "name": "Warner Channel",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=warnerchannel&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=warnerchannel&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "infantil",
+      "name": "Canales Infantiles",
+      "icon": "👶",
+      "channels": [
+        {
+          "id": "cartoonito",
+          "name": "Cartoonito",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=cartoonito&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=cartoonito&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "cartoonnetwork",
+          "name": "Cartoon Network",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=cartoonnetwork&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=cartoonnetwork&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "disneychannel",
+          "name": "Disney Channel",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=disneychannel&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=disneychannel&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "disneyjunior",
+          "name": "Disney Junior",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=disneyjunior&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=disneyjunior&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "nick",
+          "name": "Nick",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=nick&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=nick&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "nickjunior",
+          "name": "Nick Junior",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=nickjr&target=3",
+            "https://live.saohgdasregions.fun/tvporinternet3.php?stream=112_#"
+          ],
+          "live": true
+        },
+        {
+          "id": "tooncast",
+          "name": "Tooncast",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=tooncast&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=tooncast&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "cultura",
+      "name": "Cultura y Documentales",
+      "icon": "📚",
+      "channels": [
+        {
+          "id": "animalplanet",
+          "name": "Animal Planet",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=animalplanet&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=animalplanet&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "discoveryaye",
+          "name": "Discovery Aye",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=discoveryaye&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=discoveryaye&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "discoverychannel",
+          "name": "Discovery Channel",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=discoverychannel&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=discoverychannel&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "discoveryhyh",
+          "name": "Discovery Hyh",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=discoveryhyh&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=discoveryhyh&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "discoverykids",
+          "name": "Discovery Kids",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=discoverykids&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=discoverykids&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "discoverytheater",
+          "name": "Discovery Theater",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=discoverytheater&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=discoverytheater&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "discoverytlc",
+          "name": "Discovery Tlc",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=discoverytlc&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=discoverytlc&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "discoveryworld",
+          "name": "Discovery World",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=discoveryworld&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=discoveryworld&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "dwespanol",
+          "name": "Dw Espanol",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=dwespanol&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=dwespanol&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "elgourmet",
+          "name": "El Gourmet",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=elgourmet&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=elgourmet&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "history",
+          "name": "History",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=history&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=history&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "history2",
+          "name": "History 2",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=history2&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=history2&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "natgeo",
+          "name": "Nat Geo",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=natgeo&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=natgeo&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "noticias",
+      "name": "Noticias",
+      "icon": "📰",
+      "channels": [
+        {
+          "id": "americatv",
+          "name": "America Tv",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=americatv&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=americatv&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "antena3",
+          "name": "Antena 3",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=antena3&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=antena3&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "atv",
+          "name": "Atv",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=atv&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=atv&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "caracol",
+          "name": "Caracol",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=caracol&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=caracol&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "chilevision",
+          "name": "Chilevision",
+          "sources": [
+            "https://live.saohgdasregions.fun/tvporinternet3.php?stream=623_#",
+            "https://live.saohgdasregions.fun/tvporinternet3.php?stream=623_#"
+          ],
+          "live": true
+        },
+        {
+          "id": "ecuavisa",
+          "name": "Ecuavisa",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=ecuavisa&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=ecuavisa&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "eltrece",
+          "name": "El Trece",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=eltrece&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=eltrece&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "extrematv",
+          "name": "Extrema Tv",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=extrematv&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=extrematv&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "galavision",
+          "name": "Galavision",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=galavision&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=galavision&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "globaltv",
+          "name": "Global Tv",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=globaltv&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=globaltv&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "imagentv",
+          "name": "Imagen Tv",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=imagentv&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=imagentv&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "latina",
+          "name": "Latina",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=latina&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=latina&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "rcn",
+          "name": "Rcn",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=rcn&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=rcn&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "telefe",
+          "name": "Telefe",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=telefe&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=telefe&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "telemundo51",
+          "name": "Telemundo 51",
+          "sources": [
+            "https://rereyano.ru/player/3/73",
+            "https://live.saohgdasregions.fun/stream.php?canal=telemundo51&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=telemundo51&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "telemundointernacional",
+          "name": "Telemundo Internacional",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=telemundointernacional&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=telemundointernacional&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "telemundopuertorico",
+          "name": "Telemundo Puerto Rico",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=telemundopuertorico&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=telemundopuertorico&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "univision",
+          "name": "Univision",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=univision&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=univision&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "willaxtv",
+          "name": "Willax Tv",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=willaxtv&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=willaxtv&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "otros",
+      "name": "Otros Canales",
+      "icon": "📺",
+      "channels": [
+        {
+          "id": "aztecadeportes",
+          "name": "Azteca Deportes",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=aztecadeportes&target=3",
+            "https://deportes.ksdjugfsddeports.com/mihdtv.php?stream=75_#"
+          ],
+          "live": true
+        },
+        {
+          "id": "aztecauno",
+          "name": "Azteca Uno",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=aztecauno&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=aztecauno&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "beinsportsxtra",
+          "name": "Bein Sports Xtra",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=beinsportsxtra&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=beinsportsxtra&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "dpeliculaplus",
+          "name": "Dpelicula Plus",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=dpeliculaplus&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=dpeliculaplus&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "everything",
+          "name": "Everything",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=everything&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=everything&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "fmhotkids",
+          "name": "Fm Hot Kids",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=fmhotkids&target=3",
+            "https://live.saohgdasregions.fun/stream.php?canal=fmhotkids&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "fmhotmovies",
+          "name": "Fm Hot Movies",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=fmhotmovies&target=3",
+            "https://live.saohgdasregions.fun/stream.php?canal=fmhotmovies&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "idinvestigation",
+          "name": "Id Investigation",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=idinvestigation&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=idinvestigation&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "mlbnetwork",
+          "name": "Mlb Network",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=mlb&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=mlb&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "mtv",
+          "name": "Mtv",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=mtv&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=mtv&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "multipremier",
+          "name": "Multipremier",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=multipremier&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=multipremier&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "panico",
+          "name": "Panico Hd",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=panico&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=panico&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "pasiones",
+          "name": "Pasiones",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=pasiones&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=pasiones&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "tlnovelas",
+          "name": "Tlnovelas",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=tlnovelas&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=tlnovelas&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "unicable",
+          "name": "Unicable",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=unicable&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=unicable&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "usa",
+          "name": "Usa",
+          "sources": [
+            "https://live.saohgdasregions.fun/stream.php?canal=usa&target=3",
+            "https://live.saohgdasregions.fun/stream2.php?canal=usa&target=3"
+          ],
+          "live": true
+        },
+        {
+          "id": "winsports",
+          "name": "Win Sports",
+          "sources": [
+            "https://deportes.ksdjugfsddeports.com/stream.php?canal=winsports&target=3",
+            "https://deportes.ksdjugfsddeports.com/stream2.php?canal=winsports&target=3"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "canales-francia",
+      "name": "Canales Francia",
+      "icon": "🇫🇷",
+      "channels": [
+        {
+          "id": "bein-1",
+          "name": "beIN 1",
+          "sources": [
+            "https://rereyano.ru/player/3/1"
+          ],
+          "live": true
+        },
+        {
+          "id": "bein-2",
+          "name": "beIN 2",
+          "sources": [
+            "https://rereyano.ru/player/3/2"
+          ],
+          "live": true
+        },
+        {
+          "id": "bein-3",
+          "name": "beIN 3",
+          "sources": [
+            "https://rereyano.ru/player/3/3"
+          ],
+          "live": true
+        },
+        {
+          "id": "bein-max-4",
+          "name": "beIN max 4",
+          "sources": [
+            "https://rereyano.ru/player/3/4"
+          ],
+          "live": true
+        },
+        {
+          "id": "bein-max-5",
+          "name": "beIN max 5",
+          "sources": [
+            "https://rereyano.ru/player/3/5"
+          ],
+          "live": true
+        },
+        {
+          "id": "bein-max-6",
+          "name": "beIN max 6",
+          "sources": [
+            "https://rereyano.ru/player/3/6"
+          ],
+          "live": true
+        },
+        {
+          "id": "bein-max-7",
+          "name": "beIN max 7",
+          "sources": [
+            "https://rereyano.ru/player/3/7"
+          ],
+          "live": true
+        },
+        {
+          "id": "bein-max-8",
+          "name": "beIN max 8",
+          "sources": [
+            "https://rereyano.ru/player/3/8"
+          ],
+          "live": true
+        },
+        {
+          "id": "bein-max-9",
+          "name": "beIN max 9",
+          "sources": [
+            "https://rereyano.ru/player/3/9"
+          ],
+          "live": true
+        },
+        {
+          "id": "bein-max-10",
+          "name": "beIN max 10",
+          "sources": [
+            "https://rereyano.ru/player/3/10"
+          ],
+          "live": true
+        },
+        {
+          "id": "canal-foot",
+          "name": "canal+ foot",
+          "sources": [
+            "https://rereyano.ru/player/3/12"
+          ],
+          "live": true
+        },
+        {
+          "id": "canal-sport",
+          "name": "canal+ sport",
+          "sources": [
+            "https://rereyano.ru/player/3/13"
+          ],
+          "live": true
+        },
+        {
+          "id": "canal-sport360",
+          "name": "canal+ sport360",
+          "sources": [
+            "https://rereyano.ru/player/3/14"
+          ],
+          "live": true
+        },
+        {
+          "id": "eurosport1",
+          "name": "eurosport1",
+          "sources": [
+            "https://rereyano.ru/player/3/15"
+          ],
+          "live": true
+        },
+        {
+          "id": "eurosport2",
+          "name": "eurosport2",
+          "sources": [
+            "https://rereyano.ru/player/3/16"
+          ],
+          "live": true
+        },
+        {
+          "id": "rmc-sport1",
+          "name": "rmc sport1",
+          "sources": [
+            "https://rereyano.ru/player/3/17"
+          ],
+          "live": true
+        },
+        {
+          "id": "rmc-sport2",
+          "name": "rmc sport2",
+          "sources": [
+            "https://rereyano.ru/player/3/18"
+          ],
+          "live": true
+        },
+        {
+          "id": "equipe",
+          "name": "equipe",
+          "sources": [
+            "https://rereyano.ru/player/3/19"
+          ],
+          "live": true
+        },
+        {
+          "id": "ligue-1-fr",
+          "name": "LIGUE 1 FR",
+          "sources": [
+            "https://rereyano.ru/player/3/20"
+          ],
+          "live": true
+        },
+        {
+          "id": "ligue-1-fr",
+          "name": "LIGUE 1 FR",
+          "sources": [
+            "https://rereyano.ru/player/3/21"
+          ],
+          "live": true
+        },
+        {
+          "id": "ligue-1-fr",
+          "name": "LIGUE 1 FR",
+          "sources": [
+            "https://rereyano.ru/player/3/22"
+          ],
+          "live": true
+        },
+        {
+          "id": "automoto",
+          "name": "automoto",
+          "sources": [
+            "https://rereyano.ru/player/3/23"
+          ],
+          "live": true
+        },
+        {
+          "id": "tf1",
+          "name": "tf1",
+          "sources": [
+            "https://rereyano.ru/player/3/24"
+          ],
+          "live": true
+        },
+        {
+          "id": "tmc",
+          "name": "tmc",
+          "sources": [
+            "https://rereyano.ru/player/3/25"
+          ],
+          "live": true
+        },
+        {
+          "id": "m6",
+          "name": "m6",
+          "sources": [
+            "https://rereyano.ru/player/3/26"
+          ],
+          "live": true
+        },
+        {
+          "id": "w9",
+          "name": "w9",
+          "sources": [
+            "https://rereyano.ru/player/3/27"
+          ],
+          "live": true
+        },
+        {
+          "id": "france2",
+          "name": "france2",
+          "sources": [
+            "https://rereyano.ru/player/3/28"
+          ],
+          "live": true
+        },
+        {
+          "id": "france3",
+          "name": "france3",
+          "sources": [
+            "https://rereyano.ru/player/3/29"
+          ],
+          "live": true
+        },
+        {
+          "id": "france4",
+          "name": "france4",
+          "sources": [
+            "https://rereyano.ru/player/3/30"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-1",
+          "name": "C+Live 1",
+          "sources": [
+            "https://rereyano.ru/player/3/31"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-2",
+          "name": "C+Live 2",
+          "sources": [
+            "https://rereyano.ru/player/3/32"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-3",
+          "name": "C+Live 3",
+          "sources": [
+            "https://rereyano.ru/player/3/33"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-4",
+          "name": "C+Live 4",
+          "sources": [
+            "https://rereyano.ru/player/3/34"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-5",
+          "name": "C+Live 5",
+          "sources": [
+            "https://rereyano.ru/player/3/35"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-6",
+          "name": "C+Live 6",
+          "sources": [
+            "https://rereyano.ru/player/3/36"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-7",
+          "name": "C+Live 7",
+          "sources": [
+            "https://rereyano.ru/player/3/37"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-8",
+          "name": "C+Live 8",
+          "sources": [
+            "https://rereyano.ru/player/3/38"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-9",
+          "name": "C+Live 9",
+          "sources": [
+            "https://rereyano.ru/player/3/39"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-10",
+          "name": "C+Live 10",
+          "sources": [
+            "https://rereyano.ru/player/3/40"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-11",
+          "name": "C+Live 11",
+          "sources": [
+            "https://rereyano.ru/player/3/41"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-12",
+          "name": "C+Live 12",
+          "sources": [
+            "https://rereyano.ru/player/3/42"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-13",
+          "name": "C+Live 13",
+          "sources": [
+            "https://rereyano.ru/player/3/43"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-14",
+          "name": "C+Live 14",
+          "sources": [
+            "https://rereyano.ru/player/3/44"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-15",
+          "name": "C+Live 15",
+          "sources": [
+            "https://rereyano.ru/player/3/45"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-16",
+          "name": "C+Live 16",
+          "sources": [
+            "https://rereyano.ru/player/3/46"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-17",
+          "name": "C+Live 17",
+          "sources": [
+            "https://rereyano.ru/player/3/47"
+          ],
+          "live": true
+        },
+        {
+          "id": "clive-18",
+          "name": "C+Live 18",
+          "sources": [
+            "https://rereyano.ru/player/3/48"
+          ],
+          "live": true
+        },
+        {
+          "id": "bein-en-espaol",
+          "name": "beIN En español",
+          "sources": [
+            "https://rereyano.ru/player/3/69"
+          ],
+          "live": true
+        },
+        {
+          "id": "tr-bein-sport-1",
+          "name": "TR BeIN sport 1",
+          "sources": [
+            "https://rereyano.ru/player/3/151"
+          ],
+          "live": true
+        },
+        {
+          "id": "tr-bein-sport-2",
+          "name": "TR BeIN sport 2",
+          "sources": [
+            "https://rereyano.ru/player/3/152"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "canales-espana",
+      "name": "Canales España",
+      "icon": "🇪🇸",
+      "channels": [
+        {
+          "id": "es-mlaliga",
+          "name": "ES m.laliga",
+          "sources": [
+            "https://rereyano.ru/player/3/49"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-mlaliga2",
+          "name": "ES m.laliga2",
+          "sources": [
+            "https://rereyano.ru/player/3/50"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-dazn-liga",
+          "name": "ES DAZN liga",
+          "sources": [
+            "https://rereyano.ru/player/3/51"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-dazn-liga2",
+          "name": "ES DAZN liga2",
+          "sources": [
+            "https://rereyano.ru/player/3/52"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-laliga-hypermotion",
+          "name": "ES LALIGA HYPERMOTION",
+          "sources": [
+            "https://rereyano.ru/player/3/53"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-laliga-hypermotion2",
+          "name": "ES LALIGA HYPERMOTION2",
+          "sources": [
+            "https://rereyano.ru/player/3/54"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-vamos",
+          "name": "ES Vamos",
+          "sources": [
+            "https://rereyano.ru/player/3/55"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-dazn-1",
+          "name": "ES DAZN 1",
+          "sources": [
+            "https://rereyano.ru/player/3/56"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-dazn-2",
+          "name": "ES DAZN 2",
+          "sources": [
+            "https://rereyano.ru/player/3/57"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-dazn-3",
+          "name": "ES DAZN 3",
+          "sources": [
+            "https://rereyano.ru/player/3/58"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-dazn-4",
+          "name": "ES DAZN 4",
+          "sources": [
+            "https://rereyano.ru/player/3/59"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-m-liga-de-campeones",
+          "name": "ES M+ Liga de Campeones",
+          "sources": [
+            "https://rereyano.ru/player/3/61"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-m-deportes",
+          "name": "ES M+ Deportes",
+          "sources": [
+            "https://rereyano.ru/player/3/62"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-m-deportes2",
+          "name": "ES M+ Deportes2",
+          "sources": [
+            "https://rereyano.ru/player/3/63"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-m-deportes3",
+          "name": "ES M+ Deportes3",
+          "sources": [
+            "https://rereyano.ru/player/3/64"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-m-deportes4",
+          "name": "ES M+ Deportes4",
+          "sources": [
+            "https://rereyano.ru/player/3/65"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-m-deportes5",
+          "name": "ES M+ Deportes5",
+          "sources": [
+            "https://rereyano.ru/player/3/66"
+          ],
+          "live": true
+        },
+        {
+          "id": "es-m-deportes6",
+          "name": "ES M+ Deportes6",
+          "sources": [
+            "https://rereyano.ru/player/3/67"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "canales-usa",
+      "name": "Canales USA",
+      "icon": "🇺🇸",
+      "channels": [
+        {
+          "id": "fox-deportes",
+          "name": "FOX Deportes",
+          "sources": [
+            "https://rereyano.ru/player/3/70"
+          ],
+          "live": true
+        },
+        {
+          "id": "nbc-universo",
+          "name": "NBC UNIVERSO",
+          "sources": [
+            "https://rereyano.ru/player/3/72"
+          ],
+          "live": true
+        },
+        {
+          "id": "gol-espaol",
+          "name": "GOL español",
+          "sources": [
+            "https://rereyano.ru/player/3/74"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "canales-argentina",
+      "name": "Canales Argentina",
+      "icon": "🇦🇷",
+      "channels": [
+        {
+          "id": "foxsport1-arg",
+          "name": "FOXsport1 arg",
+          "sources": [
+            "https://rereyano.ru/player/3/78"
+          ],
+          "live": true
+        },
+        {
+          "id": "foxsport2-arg",
+          "name": "FOXsport2 arg",
+          "sources": [
+            "https://rereyano.ru/player/3/79"
+          ],
+          "live": true
+        },
+        {
+          "id": "foxsport3-arg",
+          "name": "FOXsport3 arg",
+          "sources": [
+            "https://rereyano.ru/player/3/80"
+          ],
+          "live": true
+        },
+        {
+          "id": "foxsport1mx",
+          "name": "FOXsport1MX",
+          "sources": [
+            "https://rereyano.ru/player/3/101"
+          ],
+          "live": true
+        },
+        {
+          "id": "foxsport2mx",
+          "name": "FOXsport2MX",
+          "sources": [
+            "https://rereyano.ru/player/3/102"
+          ],
+          "live": true
+        },
+        {
+          "id": "foxsport3mx",
+          "name": "FOXsport3MX",
+          "sources": [
+            "https://rereyano.ru/player/3/103"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "espn-directv-latam",
+      "name": "ESPN & DirectTV LATAM",
+      "icon": "📺",
+      "channels": [
+        {
+          "id": "directv",
+          "name": "directv",
+          "sources": [
+            "https://rereyano.ru/player/3/94"
+          ],
+          "live": true
+        },
+        {
+          "id": "directv2",
+          "name": "directv2",
+          "sources": [
+            "https://rereyano.ru/player/3/95"
+          ],
+          "live": true
+        },
+        {
+          "id": "directv",
+          "name": "directv+",
+          "sources": [
+            "https://rereyano.ru/player/3/96"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "canales-alemania",
+      "name": "Canales Alemania",
+      "icon": "🇩🇪",
+      "channels": [
+        {
+          "id": "de-bundliga2",
+          "name": "DE bundliga2",
+          "sources": [
+            "https://rereyano.ru/player/3/112"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-bundliga3",
+          "name": "DE bundliga3",
+          "sources": [
+            "https://rereyano.ru/player/3/113"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-bundliga4",
+          "name": "DE bundliga4",
+          "sources": [
+            "https://rereyano.ru/player/3/114"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-bundliga5",
+          "name": "DE bundliga5",
+          "sources": [
+            "https://rereyano.ru/player/3/115"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-bundliga6",
+          "name": "DE bundliga6",
+          "sources": [
+            "https://rereyano.ru/player/3/116"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-bundliga7",
+          "name": "DE bundliga7",
+          "sources": [
+            "https://rereyano.ru/player/3/117"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-bundliga8",
+          "name": "DE bundliga8",
+          "sources": [
+            "https://rereyano.ru/player/3/118"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-bundliga9-mix",
+          "name": "DE bundliga9 (mix)",
+          "sources": [
+            "https://rereyano.ru/player/3/119"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-skyde-pl",
+          "name": "DE skyde PL",
+          "sources": [
+            "https://rereyano.ru/player/3/120"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-skyde-f1",
+          "name": "DE skyde f1",
+          "sources": [
+            "https://rereyano.ru/player/3/121"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-skyde-tennis",
+          "name": "DE skyde tennis",
+          "sources": [
+            "https://rereyano.ru/player/3/122"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-dazn-1",
+          "name": "DE dazn 1",
+          "sources": [
+            "https://rereyano.ru/player/3/123"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-dazn-2",
+          "name": "DE dazn 2",
+          "sources": [
+            "https://rereyano.ru/player/3/124"
+          ],
+          "live": true
+        },
+        {
+          "id": "de-sportdigital-fussball",
+          "name": "DE Sportdigital Fussball",
+          "sources": [
+            "https://rereyano.ru/player/3/125"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "canales-uk",
+      "name": "Canales UK",
+      "icon": "🇬🇧",
+      "channels": [
+        {
+          "id": "uk-sky-main",
+          "name": "UK SKY MAIN",
+          "sources": [
+            "https://rereyano.ru/player/3/127"
+          ],
+          "live": true
+        },
+        {
+          "id": "uk-sky-foot",
+          "name": "UK SKY FOOT",
+          "sources": [
+            "https://rereyano.ru/player/3/128"
+          ],
+          "live": true
+        },
+        {
+          "id": "uk-epl-3pm",
+          "name": "UK EPL 3PM",
+          "sources": [
+            "https://rereyano.ru/player/3/129"
+          ],
+          "live": true
+        },
+        {
+          "id": "uk-epl-3pm",
+          "name": "UK EPL 3PM",
+          "sources": [
+            "https://rereyano.ru/player/3/130"
+          ],
+          "live": true
+        },
+        {
+          "id": "uk-epl-3pm",
+          "name": "UK EPL 3PM",
+          "sources": [
+            "https://rereyano.ru/player/3/131"
+          ],
+          "live": true
+        },
+        {
+          "id": "uk-epl-3pm",
+          "name": "UK EPL 3PM",
+          "sources": [
+            "https://rereyano.ru/player/3/132"
+          ],
+          "live": true
+        },
+        {
+          "id": "uk-epl-3pm",
+          "name": "UK EPL 3PM",
+          "sources": [
+            "https://rereyano.ru/player/3/133"
+          ],
+          "live": true
+        },
+        {
+          "id": "uk-f1",
+          "name": "UK F1",
+          "sources": [
+            "https://rereyano.ru/player/3/134"
+          ],
+          "live": true
+        },
+        {
+          "id": "uk-spfl",
+          "name": "UK SPFL",
+          "sources": [
+            "https://rereyano.ru/player/3/135"
+          ],
+          "live": true
+        },
+        {
+          "id": "uk-spfl",
+          "name": "UK SPFL",
+          "sources": [
+            "https://rereyano.ru/player/3/136"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "canales-italia",
+      "name": "Canales Italia",
+      "icon": "🇮🇹",
+      "channels": [
+        {
+          "id": "it-dazn",
+          "name": "IT DAZN",
+          "sources": [
+            "https://rereyano.ru/player/3/137"
+          ],
+          "live": true
+        },
+        {
+          "id": "it-skycalcio",
+          "name": "IT SKYCALCIO",
+          "sources": [
+            "https://rereyano.ru/player/3/138"
+          ],
+          "live": true
+        },
+        {
+          "id": "it-feed",
+          "name": "IT FEED",
+          "sources": [
+            "https://rereyano.ru/player/3/139"
+          ],
+          "live": true
+        },
+        {
+          "id": "it-feed",
+          "name": "IT FEED",
+          "sources": [
+            "https://rereyano.ru/player/3/140"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "canales-portugal",
+      "name": "Canales Portugal",
+      "icon": "🇵🇹",
+      "channels": [
+        {
+          "id": "pt-sport-1",
+          "name": "PT SPORT 1",
+          "sources": [
+            "https://rereyano.ru/player/3/144"
+          ],
+          "live": true
+        },
+        {
+          "id": "pt-sport-2",
+          "name": "PT SPORT 2",
+          "sources": [
+            "https://rereyano.ru/player/3/145"
+          ],
+          "live": true
+        },
+        {
+          "id": "pt-sport-3",
+          "name": "PT SPORT 3",
+          "sources": [
+            "https://rereyano.ru/player/3/146"
+          ],
+          "live": true
+        },
+        {
+          "id": "pt-btv",
+          "name": "PT BTV",
+          "sources": [
+            "https://rereyano.ru/player/3/147"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "canales-grecia",
+      "name": "Canales Grecia",
+      "icon": "🇬🇷",
+      "channels": [
+        {
+          "id": "gr-sport-1",
+          "name": "GR SPORT 1",
+          "sources": [
+            "https://rereyano.ru/player/3/148"
+          ],
+          "live": true
+        },
+        {
+          "id": "gr-sport-2",
+          "name": "GR SPORT 2",
+          "sources": [
+            "https://rereyano.ru/player/3/149"
+          ],
+          "live": true
+        },
+        {
+          "id": "gr-sport-3",
+          "name": "GR SPORT 3",
+          "sources": [
+            "https://rereyano.ru/player/3/150"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "canales-belgica",
+      "name": "Canales Bélgica",
+      "icon": "🇧🇪",
+      "channels": [
+        {
+          "id": "be-channel1",
+          "name": "BE channel1",
+          "sources": [
+            "https://rereyano.ru/player/3/153"
+          ],
+          "live": true
+        },
+        {
+          "id": "be-channel2",
+          "name": "BE channel2",
+          "sources": [
+            "https://rereyano.ru/player/3/154"
+          ],
+          "live": true
+        }
+      ]
+    },
+    {
+      "id": "canales-extra",
+      "name": "Canales Extra",
+      "icon": "⚡",
+      "channels": [
+        {
+          "id": "extra-sport1",
+          "name": "EXTRA SPORT1",
+          "sources": [
+            "https://rereyano.ru/player/3/155"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport2",
+          "name": "EXTRA SPORT2",
+          "sources": [
+            "https://rereyano.ru/player/3/156"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport3",
+          "name": "EXTRA SPORT3",
+          "sources": [
+            "https://rereyano.ru/player/3/157"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport4",
+          "name": "EXTRA SPORT4",
+          "sources": [
+            "https://rereyano.ru/player/3/158"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport5",
+          "name": "EXTRA SPORT5",
+          "sources": [
+            "https://rereyano.ru/player/3/159"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport6",
+          "name": "EXTRA SPORT6",
+          "sources": [
+            "https://rereyano.ru/player/3/160"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport7",
+          "name": "EXTRA SPORT7",
+          "sources": [
+            "https://rereyano.ru/player/3/161"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport8",
+          "name": "EXTRA SPORT8",
+          "sources": [
+            "https://rereyano.ru/player/3/162"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport9",
+          "name": "EXTRA SPORT9",
+          "sources": [
+            "https://rereyano.ru/player/3/163"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport10",
+          "name": "EXTRA SPORT10",
+          "sources": [
+            "https://rereyano.ru/player/3/164"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport11",
+          "name": "EXTRA SPORT11",
+          "sources": [
+            "https://rereyano.ru/player/3/165"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport12",
+          "name": "EXTRA SPORT12",
+          "sources": [
+            "https://rereyano.ru/player/3/166"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport13",
+          "name": "EXTRA SPORT13",
+          "sources": [
+            "https://rereyano.ru/player/3/167"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport14",
+          "name": "EXTRA SPORT14",
+          "sources": [
+            "https://rereyano.ru/player/3/168"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport15",
+          "name": "EXTRA SPORT15",
+          "sources": [
+            "https://rereyano.ru/player/3/169"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport16",
+          "name": "EXTRA SPORT16",
+          "sources": [
+            "https://rereyano.ru/player/3/170"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport17",
+          "name": "EXTRA SPORT17",
+          "sources": [
+            "https://rereyano.ru/player/3/171"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport18",
+          "name": "EXTRA SPORT18",
+          "sources": [
+            "https://rereyano.ru/player/3/172"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport19",
+          "name": "EXTRA SPORT19",
+          "sources": [
+            "https://rereyano.ru/player/3/173"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport20",
+          "name": "EXTRA SPORT20",
+          "sources": [
+            "https://rereyano.ru/player/3/174"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport21",
+          "name": "EXTRA SPORT21",
+          "sources": [
+            "https://rereyano.ru/player/3/175"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport22",
+          "name": "EXTRA SPORT22",
+          "sources": [
+            "https://rereyano.ru/player/3/176"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport23",
+          "name": "EXTRA SPORT23",
+          "sources": [
+            "https://rereyano.ru/player/3/177"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport24",
+          "name": "EXTRA SPORT24",
+          "sources": [
+            "https://rereyano.ru/player/3/178"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport25",
+          "name": "EXTRA SPORT25",
+          "sources": [
+            "https://rereyano.ru/player/3/179"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport26",
+          "name": "EXTRA SPORT26",
+          "sources": [
+            "https://rereyano.ru/player/3/180"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport27",
+          "name": "EXTRA SPORT27",
+          "sources": [
+            "https://rereyano.ru/player/3/181"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport28",
+          "name": "EXTRA SPORT28",
+          "sources": [
+            "https://rereyano.ru/player/3/182"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport30",
+          "name": "EXTRA SPORT30",
+          "sources": [
+            "https://rereyano.ru/player/3/183"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport31",
+          "name": "EXTRA SPORT31",
+          "sources": [
+            "https://rereyano.ru/player/3/184"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport32",
+          "name": "EXTRA SPORT32",
+          "sources": [
+            "https://rereyano.ru/player/3/185"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport33",
+          "name": "EXTRA SPORT33",
+          "sources": [
+            "https://rereyano.ru/player/3/186"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport34",
+          "name": "EXTRA SPORT34",
+          "sources": [
+            "https://rereyano.ru/player/3/187"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport35",
+          "name": "EXTRA SPORT35",
+          "sources": [
+            "https://rereyano.ru/player/3/188"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport36",
+          "name": "EXTRA SPORT36",
+          "sources": [
+            "https://rereyano.ru/player/3/189"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport37",
+          "name": "EXTRA SPORT37",
+          "sources": [
+            "https://rereyano.ru/player/3/190"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport38",
+          "name": "EXTRA SPORT38",
+          "sources": [
+            "https://rereyano.ru/player/3/191"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport39",
+          "name": "EXTRA SPORT39",
+          "sources": [
+            "https://rereyano.ru/player/3/192"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport40",
+          "name": "EXTRA SPORT40",
+          "sources": [
+            "https://rereyano.ru/player/3/193"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport41",
+          "name": "EXTRA SPORT41",
+          "sources": [
+            "https://rereyano.ru/player/3/194"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport42",
+          "name": "EXTRA SPORT42",
+          "sources": [
+            "https://rereyano.ru/player/3/195"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport43",
+          "name": "EXTRA SPORT43",
+          "sources": [
+            "https://rereyano.ru/player/3/196"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport44",
+          "name": "EXTRA SPORT44",
+          "sources": [
+            "https://rereyano.ru/player/3/197"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport45",
+          "name": "EXTRA SPORT45",
+          "sources": [
+            "https://rereyano.ru/player/3/198"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport46",
+          "name": "EXTRA SPORT46",
+          "sources": [
+            "https://rereyano.ru/player/3/199"
+          ],
+          "live": true
+        },
+        {
+          "id": "extra-sport47",
+          "name": "EXTRA SPORT47",
+          "sources": [
+            "https://rereyano.ru/player/3/200"
+          ],
+          "live": true
+        }
+      ]
+    }
+  ]
+}
