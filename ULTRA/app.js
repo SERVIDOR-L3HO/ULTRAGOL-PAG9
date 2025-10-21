@@ -225,7 +225,10 @@ async function loadUpcomingMatches() {
     container.innerHTML = '<div class="loading-spinner">Cargando partidos...</div>';
     
     try {
-        const partidos = await ULTRAGOL_API.getPartidosProximos(currentLeague);
+        // Llamar directamente a la API para obtener partidos
+        const response = await fetch('https://ultragol-api3.onrender.com/ultragol/partidos');
+        const data = await response.json();
+        const partidos = data.partidos || [];
         
         if (partidos.length === 0) {
             container.innerHTML = '<div class="no-matches">No hay partidos próximos disponibles</div>';
@@ -240,11 +243,11 @@ async function loadUpcomingMatches() {
                 <div class="match-card-content">
                     <div class="teams">
                         <div class="team">
-                            <img src="${ULTRAGOL_API.getTeamLogo(partido.equipoLocal, currentLeague)}" alt="${partido.equipoLocal}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
+                            <img src="${partido.equipoLocalEscudo || 'https://via.placeholder.com/50'}" alt="${partido.equipoLocal}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
                             <span>${partido.equipoLocal || 'TBD'}</span>
                         </div>
                         <div class="team">
-                            <img src="${ULTRAGOL_API.getTeamLogo(partido.equipoVisitante, currentLeague)}" alt="${partido.equipoVisitante}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
+                            <img src="${partido.equipoVisitanteEscudo || 'https://via.placeholder.com/50'}" alt="${partido.equipoVisitante}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
                             <span>${partido.equipoVisitante || 'TBD'}</span>
                         </div>
                     </div>
@@ -259,7 +262,7 @@ async function loadUpcomingMatches() {
         `).join('');
     } catch (error) {
         console.error('Error loading upcoming matches:', error);
-        container.innerHTML = '<div class="error-message">Error al cargar partidos próximos</div>';
+        container.innerHTML = '<div class="no-matches">No hay partidos próximos en este momento</div>';
     }
 }
 
@@ -268,30 +271,26 @@ async function loadReplays() {
     container.innerHTML = '<div class="loading-spinner">Cargando mejores momentos de Liga MX...</div>';
     
     try {
-        // Cargar videos desde la API
-        const response = await fetch('/api/ultragol/videos');
+        // Llamar directamente a la API externa (funciona en sitios publicados)
+        const response = await fetch('https://ultragol-api3.onrender.com/videos');
         const data = await response.json();
         
-        // La API puede devolver un array directamente o un objeto con un array dentro
-        let videosArray = Array.isArray(data) ? data : (data.videos || data.data || []);
+        // Aplanar las categorías de videos
+        let allVideos = [];
+        if (data.categorias) {
+            if (data.categorias.mejoresMomentos) {
+                allVideos = allVideos.concat(data.categorias.mejoresMomentos);
+            }
+            if (data.categorias.resumenes) {
+                allVideos = allVideos.concat(data.categorias.resumenes);
+            }
+            if (data.categorias.goles) {
+                allVideos = allVideos.concat(data.categorias.goles);
+            }
+        }
         
         // Si hay videos de la API, usarlos
-        if (videosArray && videosArray.length > 0) {
-            // Aplanar las categorías si existen
-            let allVideos = [];
-            if (videosArray.mejoresMomentos) {
-                allVideos = allVideos.concat(videosArray.mejoresMomentos || []);
-            }
-            if (videosArray.resumenes) {
-                allVideos = allVideos.concat(videosArray.resumenes || []);
-            }
-            if (videosArray.goles) {
-                allVideos = allVideos.concat(videosArray.goles || []);
-            }
-            // Si no hay categorías, usar el array directamente
-            if (allVideos.length === 0 && Array.isArray(videosArray)) {
-                allVideos = videosArray;
-            }
+        if (allVideos && allVideos.length > 0) {
             
             container.innerHTML = allVideos.slice(0, 4).map((video, index) => {
                 const videoUrl = video.urlEmbed || video.url || video.videoUrl || video.link || '';
@@ -373,14 +372,17 @@ async function loadLiveMatches() {
     if (!container) return;
     
     try {
-        const partidos = await ULTRAGOL_API.getPartidosEnVivo(currentLeague);
+        // Llamar directamente a la API para obtener partidos en vivo
+        const response = await fetch('https://ultragol-api3.onrender.com/ultragol/partidos');
+        const data = await response.json();
+        const partidosEnVivo = (data.partidos || []).filter(p => p.estado === 'En vivo');
         
-        if (partidos.length === 0) {
+        if (partidosEnVivo.length === 0) {
             container.innerHTML = '<div class="no-matches">No hay partidos en vivo en este momento</div>';
             return;
         }
         
-        container.innerHTML = partidos.map(partido => `
+        container.innerHTML = partidosEnVivo.map(partido => `
             <div class="match-card">
                 <div class="match-card-bg">
                     <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600" alt="Match">
@@ -388,11 +390,11 @@ async function loadLiveMatches() {
                 <div class="match-card-content">
                     <div class="teams">
                         <div class="team">
-                            <img src="${ULTRAGOL_API.getTeamLogo(partido.equipoLocal, currentLeague)}" alt="${partido.equipoLocal}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
+                            <img src="${partido.equipoLocalEscudo || 'https://via.placeholder.com/50'}" alt="${partido.equipoLocal}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
                             <span>${partido.equipoLocal || 'TBD'}</span>
                         </div>
                         <div class="team">
-                            <img src="${ULTRAGOL_API.getTeamLogo(partido.equipoVisitante, currentLeague)}" alt="${partido.equipoVisitante}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
+                            <img src="${partido.equipoVisitanteEscudo || 'https://via.placeholder.com/50'}" alt="${partido.equipoVisitante}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
                             <span>${partido.equipoVisitante || 'TBD'}</span>
                         </div>
                     </div>
@@ -408,14 +410,13 @@ async function loadLiveMatches() {
         `).join('');
     } catch (error) {
         console.error('Error loading live matches:', error);
+        container.innerHTML = '<div class="no-matches">No hay partidos en vivo en este momento</div>';
     }
 }
 
 async function loadLeagues() {
     try {
-        const ligas = await ULTRAGOL_API.getLigas();
-        console.log('Ligas disponibles:', ligas);
-        
+        // Configurar botones de liga con eventos
         const leagueBtns = document.querySelectorAll('.league-btn');
         leagueBtns.forEach(btn => {
             btn.addEventListener('click', async function() {
@@ -450,13 +451,16 @@ async function loadMatchesByLeague(leagueName) {
     }
     
     try {
-        const [tabla, goleadores, noticias] = await Promise.all([
-            ULTRAGOL_API.getTablaPorLiga(leagueName),
-            ULTRAGOL_API.getGoleadoresPorLiga(leagueName),
-            ULTRAGOL_API.getNoticiasPorLiga(leagueName)
-        ]);
+        // Llamar directamente a las APIs
+        const tablasResponse = await fetch('https://ultragol-api3.onrender.com/ultragol/posiciones');
+        const tablasData = await tablasResponse.json();
+        const tabla = tablasData.tabla || [];
         
-        console.log(`Datos de ${leagueName}:`, { tabla, goleadores, noticias });
+        const noticiasResponse = await fetch('https://ultragol-api3.onrender.com/Noticias');
+        const noticiasData = await noticiasResponse.json();
+        const noticias = noticiasData.noticias || [];
+        
+        console.log(`Datos de ${leagueName}:`, { tabla, noticias });
         
         // Actualizar tabla de posiciones
         if (tabla && tabla.length > 0) {
@@ -468,7 +472,7 @@ async function loadMatchesByLeague(leagueName) {
             }
         }
         
-        // Actualizar noticias
+        // Actualizar noticias (LIBRE - SIN RESTRICCIONES)
         if (noticias.length > 0) {
             const newsGrid = document.querySelector('.news-grid');
             if (newsGrid) {
@@ -504,7 +508,7 @@ function displayStandings(tabla, leagueName) {
             <div class="standings-row">
                 <div class="standings-pos">${team.posicion || index + 1}</div>
                 <div class="standings-team">
-                    <img src="${ULTRAGOL_API.getTeamLogo(team.equipo, leagueName)}" alt="${team.equipo}" class="standings-team-logo" onerror="this.style.display='none'">
+                    <img src="${team.escudo || 'https://via.placeholder.com/50'}" alt="${team.equipo}" class="standings-team-logo" onerror="this.style.display='none'">
                     <span class="standings-team-name">${team.equipo}</span>
                 </div>
                 <div class="standings-stat">${team.estadisticas?.pj || team.pj || 0}</div>
@@ -523,7 +527,10 @@ async function loadNews() {
     if (!newsGrid) return;
     
     try {
-        const noticias = await ULTRAGOL_API.getAllNoticias();
+        // Llamar directamente a la API de noticias (SIN RESTRICCIONES - LIBRE PARA TODOS)
+        const response = await fetch('https://ultragol-api3.onrender.com/Noticias');
+        const data = await response.json();
+        const noticias = data.noticias || [];
         
         if (noticias.length === 0) {
             console.log('No hay noticias disponibles');
@@ -687,7 +694,7 @@ function closeNewsModal() {
     modal.classList.remove('active');
 }
 
-// Cargar noticias de Liga MX desde la API
+// Cargar noticias de Liga MX desde la API (SIN RESTRICCIONES - LIBRE PARA TODOS)
 async function loadLigaMXNews() {
     const newsGrid = document.getElementById('newsGrid');
     if (!newsGrid) return;
@@ -695,7 +702,8 @@ async function loadLigaMXNews() {
     try {
         newsGrid.innerHTML = '<div class="news-loading">Cargando noticias de Liga MX...</div>';
         
-        const response = await fetch('/api/ultragol/noticias');
+        // Llamar directamente a la API externa (funciona en sitios publicados)
+        const response = await fetch('https://ultragol-api3.onrender.com/Noticias');
         const data = await response.json();
         
         // La API puede devolver un array directamente o un objeto con un array dentro
