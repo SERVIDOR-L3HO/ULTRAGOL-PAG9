@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="css/app-download-banner.css?v=2025091201">
     <link rel="stylesheet" href="css/professional-hero.css?v=2025091401">
     <link rel="stylesheet" href="css/gemini-chat.css">
+    <link rel="stylesheet" href="css/live-scoreboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
@@ -158,6 +159,45 @@
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <span>Explorar</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Scoreboard Section -->
+    <section class="live-scoreboard-section">
+        <div class="scoreboard-container">
+            <div class="scoreboard-header">
+                <h2 class="scoreboard-title">
+                    <i class="fas fa-broadcast-tower"></i>
+                    Marcadores en Vivo
+                </h2>
+                <p class="scoreboard-subtitle">Sigue todos los partidos de la Liga MX en tiempo real</p>
+            </div>
+
+            <div class="scoreboard-tabs">
+                <button class="scoreboard-tab active" data-filter="live">
+                    <i class="fas fa-circle"></i> EN VIVO
+                </button>
+                <button class="scoreboard-tab" data-filter="upcoming">
+                    <i class="far fa-clock"></i> PRÓXIMOS
+                </button>
+                <button class="scoreboard-tab" data-filter="all">
+                    <i class="fas fa-list"></i> TODOS
+                </button>
+            </div>
+
+            <div class="scoreboard-grid" id="scoreboard-grid">
+                <!-- Los partidos se cargarán aquí dinámicamente -->
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h3>Cargando partidos...</h3>
+                    <p>Por favor espera un momento</p>
+                </div>
+            </div>
+
+            <div class="last-updated">
+                <i class="fas fa-sync-alt"></i>
+                Última actualización: <span id="last-updated-time">--</span>
             </div>
         </div>
     </section>
@@ -1036,6 +1076,9 @@
     
     <!-- Original main.js -->
     <script src="js/main.js?v=2024091801"></script>
+    
+    <!-- Live Scoreboard -->
+    <script src="js/live-scoreboard.js"></script>
     
     <!-- Mini Banner de Aplicación UltraGol -->
     <div id="ultraGolMiniAppBanner" class="mini-app-banner">
