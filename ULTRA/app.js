@@ -241,7 +241,7 @@ async function loadUpcomingMatches() {
             return `
             <div class="match-card">
                 <div class="match-card-bg">
-                    <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600" alt="Match">
+                    <img src="ultragol-vs-stadium.jpg" alt="Match">
                 </div>
                 <div class="match-card-content">
                     <div class="teams">
@@ -388,7 +388,7 @@ async function loadLiveMatches() {
         container.innerHTML = partidosEnVivo.map(partido => `
             <div class="match-card">
                 <div class="match-card-bg">
-                    <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600" alt="Match">
+                    <img src="ultragol-vs-stadium.jpg" alt="Match">
                 </div>
                 <div class="match-card-content">
                     <div class="teams">
