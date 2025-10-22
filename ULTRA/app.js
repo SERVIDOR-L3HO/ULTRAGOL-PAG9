@@ -1,7 +1,280 @@
 let currentStreamUrl = '';
 let activeTab = 'live';
 let currentLeague = 'Liga MX';
+let marcadoresData = null;
+let updateInterval = null;
 
+// Inicializar cuando se carga la página
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadMarcadores();
+    startAutoUpdate();
+    await loadStandings();
+    await loadNews();
+});
+
+// Función principal para cargar marcadores desde la API
+async function loadMarcadores() {
+    try {
+        const response = await fetch('https://ultragol-api3.onrender.com/marcadores');
+        const data = await response.json();
+        marcadoresData = data;
+        
+        console.log('✅ Marcadores cargados:', data);
+        
+        // Actualizar featured match
+        updateFeaturedMatch(data);
+        
+        // Actualizar partidos según la pestaña activa
+        if (activeTab === 'live') {
+            updateLiveMatches(data);
+        } else if (activeTab === 'upcoming') {
+            updateUpcomingMatches(data);
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('❌ Error cargando marcadores:', error);
+        return null;
+    }
+}
+
+// Actualizar el partido destacado
+function updateFeaturedMatch(data) {
+    if (!data || !data.partidos || data.partidos.length === 0) return;
+    
+    // Buscar un partido en vivo, si no hay, tomar el primero
+    let featuredMatch = data.partidos.find(p => p.estado?.enVivo) || data.partidos[0];
+    
+    const matchBg = document.querySelector('.match-bg');
+    const matchScore = document.querySelector('.match-score');
+    const matchInfo = document.querySelector('.match-info');
+    const liveBadge = document.querySelector('.live-badge');
+    
+    if (!matchScore || !matchInfo) return;
+    
+    // Actualizar logos y marcador
+    matchScore.innerHTML = `
+        <div class="team-logo">
+            <img src="${featuredMatch.local.logo}" alt="${featuredMatch.local.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
+        </div>
+        <div class="score-display">
+            <span class="score">${featuredMatch.local.marcador} - ${featuredMatch.visitante.marcador}</span>
+        </div>
+        <div class="team-logo">
+            <img src="${featuredMatch.visitante.logo}" alt="${featuredMatch.visitante.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
+        </div>
+    `;
+    
+    // Formatear la hora del partido
+    const hora = formatearHora(featuredMatch.fecha);
+    
+    // Actualizar información del partido
+    matchInfo.innerHTML = `
+        <div class="match-time-display">
+            <i class="far fa-clock"></i> ${hora}
+        </div>
+        <h2 class="match-title">${featuredMatch.local.nombreCorto} vs. ${featuredMatch.visitante.nombreCorto}</h2>
+        <div class="match-badges">
+            <span class="badge-icon" title="Marcador"><i class="fas fa-circle"></i></span>
+            <span class="badge-icon" title="Estadio"><i class="fas fa-users"></i></span>
+            <span class="badge-icon" title="Transmisión"><i class="fas fa-wifi"></i></span>
+        </div>
+    `;
+    
+    // Mostrar/ocultar badge de EN VIVO
+    if (liveBadge) {
+        if (featuredMatch.estado?.enVivo) {
+            liveBadge.style.display = 'flex';
+            liveBadge.innerHTML = `
+                <span class="live-dot"></span>
+                <span>EN VIVO - ${featuredMatch.reloj}</span>
+            `;
+        } else if (featuredMatch.estado?.programado) {
+            liveBadge.style.display = 'flex';
+            liveBadge.innerHTML = `
+                <span class="live-dot" style="background: #ffa500;"></span>
+                <span>${hora}</span>
+            `;
+        } else {
+            liveBadge.style.display = 'none';
+        }
+    }
+}
+
+// Actualizar partidos en vivo
+function updateLiveMatches(data) {
+    const container = document.getElementById('liveMatches');
+    if (!container) return;
+    
+    const partidosEnVivo = data.partidos.filter(p => p.estado?.enVivo);
+    
+    if (partidosEnVivo.length === 0) {
+        container.innerHTML = `
+            <div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">⚽</div>
+                <div style="color: rgba(255,255,255,0.8); font-size: 18px; margin-bottom: 8px;">No hay partidos de Liga MX en vivo</div>
+                <div style="color: rgba(255,255,255,0.5); font-size: 14px;">Revisa la sección UPCOMING para próximos partidos</div>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = partidosEnVivo.map(partido => renderLiveMatchCard(partido)).join('');
+}
+
+// Renderizar tarjeta de partido en vivo
+function renderLiveMatchCard(partido) {
+    const golesInfo = renderGolesInfo(partido);
+    
+    return `
+        <div class="match-card live-match-card">
+            <div class="live-badge-corner">
+                <span class="live-dot"></span>
+                EN VIVO
+            </div>
+            <div class="match-card-bg">
+                <img src="ultragol-vs-stadium.jpg" alt="Match">
+            </div>
+            <div class="match-card-content">
+                <div class="match-clock">${partido.reloj}</div>
+                <div class="teams">
+                    <div class="team">
+                        <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
+                        <span>${partido.local.nombreCorto}</span>
+                    </div>
+                    <div class="team">
+                        <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
+                        <span>${partido.visitante.nombreCorto}</span>
+                    </div>
+                </div>
+                <div class="match-score-mini">
+                    ${partido.local.marcador} - ${partido.visitante.marcador}
+                    <span class="match-time">${partido.reloj}</span>
+                </div>
+                ${golesInfo}
+                <button class="watch-btn" onclick="watchMatch('${partido.id}')">
+                    <span>VER AHORA</span>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Renderizar información de goles
+function renderGolesInfo(partido) {
+    if (!partido.goles || partido.goles.length === 0) {
+        return '';
+    }
+    
+    // Agrupar goles por equipo
+    const golesLocal = partido.goles.filter(g => g.equipoId === partido.local.id);
+    const golesVisitante = partido.goles.filter(g => g.equipoId === partido.visitante.id);
+    
+    let html = '<div class="goles-info">';
+    
+    // Goles del local
+    if (golesLocal.length > 0) {
+        html += '<div class="goles-equipo">';
+        html += `<div class="goles-equipo-nombre">${partido.local.nombreCorto}</div>`;
+        golesLocal.forEach(gol => {
+            html += `
+                <div class="gol-item">
+                    <i class="fas fa-futbol"></i>
+                    <span class="gol-jugador">${gol.jugador || 'Jugador'}</span>
+                    <span class="gol-minuto">${gol.minuto}'</span>
+                </div>
+            `;
+        });
+        html += '</div>';
+    }
+    
+    // Goles del visitante
+    if (golesVisitante.length > 0) {
+        html += '<div class="goles-equipo">';
+        html += `<div class="goles-equipo-nombre">${partido.visitante.nombreCorto}</div>`;
+        golesVisitante.forEach(gol => {
+            html += `
+                <div class="gol-item">
+                    <i class="fas fa-futbol"></i>
+                    <span class="gol-jugador">${gol.jugador || 'Jugador'}</span>
+                    <span class="gol-minuto">${gol.minuto}'</span>
+                </div>
+            `;
+        });
+        html += '</div>';
+    }
+    
+    html += '</div>';
+    return html;
+}
+
+// Actualizar partidos próximos
+function updateUpcomingMatches(data) {
+    const container = document.getElementById('upcomingMatches');
+    if (!container) return;
+    
+    const partidosProgramados = data.partidos.filter(p => p.estado?.programado && !p.estado?.enVivo);
+    
+    if (partidosProgramados.length === 0) {
+        container.innerHTML = '<div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">No hay partidos próximos disponibles</div>';
+        return;
+    }
+    
+    container.innerHTML = partidosProgramados.map(partido => {
+        const hora = formatearHora(partido.fecha);
+        
+        return `
+        <div class="match-card">
+            <div class="match-card-bg">
+                <img src="ultragol-vs-stadium.jpg" alt="Match">
+            </div>
+            <div class="match-card-content">
+                <div class="match-time-badge">
+                    <i class="far fa-clock"></i> ${hora}
+                </div>
+                <div class="teams">
+                    <div class="team">
+                        <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
+                        <span>${partido.local.nombreCorto}</span>
+                    </div>
+                    <div class="team">
+                        <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
+                        <span>${partido.visitante.nombreCorto}</span>
+                    </div>
+                </div>
+                <div class="match-score-mini">
+                    <span class="vs-text">VS</span>
+                </div>
+                ${partido.detalles?.estadio ? `
+                    <div class="match-venue">
+                        <i class="fas fa-map-marker-alt"></i>
+                        ${partido.detalles.estadio}
+                    </div>
+                ` : ''}
+                <button class="watch-btn secondary" onclick="showToast('Este partido aún no ha comenzado')">
+                    <span>PRÓXIMAMENTE</span>
+                </button>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+// Formatear hora del partido
+function formatearHora(fechaStr) {
+    try {
+        // La fecha viene en formato "22/10/25, 7:00 p.m."
+        const match = fechaStr.match(/(\d{1,2}:\d{2}\s*[ap]\.?\s*m\.?)/i);
+        if (match) {
+            return match[1];
+        }
+        return fechaStr;
+    } catch (e) {
+        return fechaStr;
+    }
+}
+
+// Cambiar de pestaña
 function switchTab(tab, element) {
     activeTab = tab;
     
@@ -13,10 +286,34 @@ function switchTab(tab, element) {
     document.getElementById(tab + 'Content').classList.add('active');
     
     if (tab === 'upcoming') {
-        loadUpcomingMatches();
+        if (marcadoresData) {
+            updateUpcomingMatches(marcadoresData);
+        } else {
+            loadMarcadores();
+        }
     } else if (tab === 'replays') {
         loadReplays();
+    } else if (tab === 'live') {
+        if (marcadoresData) {
+            updateLiveMatches(marcadoresData);
+        } else {
+            loadMarcadores();
+        }
     }
+}
+
+// Iniciar actualización automática cada 30 segundos
+function startAutoUpdate() {
+    // Limpiar intervalo anterior si existe
+    if (updateInterval) {
+        clearInterval(updateInterval);
+    }
+    
+    // Actualizar cada 30 segundos
+    updateInterval = setInterval(async () => {
+        console.log('🔄 Actualizando marcadores...');
+        await loadMarcadores();
+    }, 30000);
 }
 
 function watchMatch(matchId, videoUrl = null, videoTitle = null) {
@@ -25,14 +322,11 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     const modalTitle = document.getElementById('modalTitle');
     const loader = document.getElementById('modalLoader');
     
-    // Si se proporciona una URL de video
     if (videoUrl) {
         modalTitle.textContent = videoTitle || 'Video';
         modal.classList.add('active');
         loader.style.display = 'flex';
         
-        // Para videos de YouTube/externos, usar iframe
-        // Convertir URLs de YouTube normales a embed si es necesario
         let embedUrl = videoUrl;
         if (videoUrl.includes('youtube.com/watch')) {
             const videoId = videoUrl.split('v=')[1]?.split('&')[0];
@@ -56,7 +350,6 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
             }, 500);
         };
     } else {
-        // Modo de transmisión en vivo (iframe)
         currentStreamUrl = '../ULTRACANALES/index.html';
         
         modalTitle.textContent = 'Transmisión en Vivo - ' + matchId.toUpperCase();
@@ -86,7 +379,6 @@ function closeModal() {
     
     modal.classList.remove('active');
     
-    // Limpiar iframe si existe
     const iframe = document.getElementById('modalIframe');
     if (iframe) {
         iframe.src = '';
@@ -94,7 +386,6 @@ function closeModal() {
     
     currentStreamUrl = '';
     
-    // Restaurar estructura original del modal
     setTimeout(() => {
         modalBody.innerHTML = `
             <div class="loading-spinner" id="modalLoader">
@@ -220,66 +511,14 @@ function showToast(message) {
     }, 2000);
 }
 
-async function loadUpcomingMatches() {
-    const container = document.getElementById('upcomingMatches');
-    container.innerHTML = '<div class="loading-spinner" style="grid-column: 1/-1; text-align: center; padding: 40px;">Cargando partidos...</div>';
-    
-    try {
-        const response = await fetch('https://ultragol-api3.onrender.com/marcadores');
-        const data = await response.json();
-        const partidosProgramados = (data.partidos || []).filter(p => p.estado?.programado === true);
-        
-        if (partidosProgramados.length === 0) {
-            container.innerHTML = '<div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">No hay partidos próximos disponibles</div>';
-            return;
-        }
-        
-        container.innerHTML = partidosProgramados.slice(0, 6).map(partido => {
-            const fecha = new Date(partido.fechaISO);
-            const hora = fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-            
-            return `
-            <div class="match-card">
-                <div class="match-card-bg">
-                    <img src="ultragol-vs-stadium.jpg" alt="Match">
-                </div>
-                <div class="match-card-content">
-                    <div class="teams">
-                        <div class="team">
-                            <img src="${partido.local?.logo || 'https://via.placeholder.com/50'}" alt="${partido.local?.nombreCorto}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
-                            <span>${partido.local?.nombreCorto || 'TBD'}</span>
-                        </div>
-                        <div class="team">
-                            <img src="${partido.visitante?.logo || 'https://via.placeholder.com/50'}" alt="${partido.visitante?.nombreCorto}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
-                            <span>${partido.visitante?.nombreCorto || 'TBD'}</span>
-                        </div>
-                    </div>
-                    <div class="match-score-mini">
-                        <span class="match-time">${hora}</span>
-                    </div>
-                    <button class="watch-btn" onclick="showToast('Este partido aún no ha comenzado')">
-                        <span>PRÓXIMAMENTE</span>
-                    </button>
-                </div>
-            </div>
-            `;
-        }).join('');
-    } catch (error) {
-        console.error('Error loading upcoming matches:', error);
-        container.innerHTML = '<div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">Error al cargar partidos próximos</div>';
-    }
-}
-
 async function loadReplays() {
     const container = document.getElementById('replayMatches');
     container.innerHTML = '<div class="loading-spinner">Cargando mejores momentos de Liga MX...</div>';
     
     try {
-        // Llamar directamente a la API externa (funciona en sitios publicados)
         const response = await fetch('https://ultragol-api3.onrender.com/videos');
         const data = await response.json();
         
-        // Aplanar las categorías de videos
         let allVideos = [];
         if (data.categorias) {
             if (data.categorias.mejoresMomentos) {
@@ -293,10 +532,8 @@ async function loadReplays() {
             }
         }
         
-        // Si hay videos de la API, usarlos
         if (allVideos && allVideos.length > 0) {
-            
-            container.innerHTML = allVideos.slice(0, 4).map((video, index) => {
+            container.innerHTML = allVideos.slice(0, 6).map((video, index) => {
                 const videoUrl = video.urlEmbed || video.url || video.videoUrl || video.link || '';
                 const videoTitle = video.titulo || video.title || 'Video sin título';
                 const videoTitleEscaped = videoTitle.replace(/'/g, "\\'");
@@ -322,48 +559,7 @@ async function loadReplays() {
                 `;
             }).join('');
         } else {
-            // Usar videos de muestra si no hay datos de la API
-            const videos = [
-                {
-                    titulo: 'Resumen Jornada 7 - Liga MX',
-                    equipos: 'AMÉRICA vs CRUZ AZUL',
-                    imagen: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'
-                },
-                {
-                    titulo: 'Mejores Goles Jornada 7',
-                    equipos: 'TIGRES vs MONTERREY',
-                    imagen: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=600'
-                },
-                {
-                    titulo: 'Highlights Liga MX',
-                    equipos: 'CHIVAS vs PUMAS',
-                    imagen: 'https://images.unsplash.com/photo-1529900748604-07564a03e7a6?w=600'
-                },
-                {
-                    titulo: 'Resumen de la Semana',
-                    equipos: 'SANTOS vs ATLAS',
-                    imagen: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600'
-                }
-            ];
-            
-            container.innerHTML = videos.map((video, index) => `
-                <div class="match-card">
-                    <div class="match-card-bg">
-                        <img src="${video.imagen}" alt="${video.titulo}">
-                    </div>
-                    <div class="match-card-content">
-                        <div class="teams">
-                            <h4 style="font-size: 13px; margin-bottom: 8px; color: var(--text);">${video.titulo}</h4>
-                        </div>
-                        <div class="match-score-mini">
-                            <span class="match-time">Liga MX</span>
-                        </div>
-                        <button class="watch-btn" onclick="watchMatch('ligamx-video-${index}')">
-                            <span>VER VIDEO</span>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
+            container.innerHTML = '<div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">No hay videos disponibles</div>';
         }
     } catch (error) {
         console.error('Error loading replays:', error);
@@ -371,618 +567,129 @@ async function loadReplays() {
     }
 }
 
-async function loadLiveMatches() {
-    const container = document.getElementById('liveMatches');
-    if (!container) return;
-    
+async function loadStandings() {
     try {
-        const response = await fetch('https://ultragol-api3.onrender.com/transmisiones');
+        const response = await fetch('https://ultragol-api3.onrender.com/tabla');
         const data = await response.json();
         
-        // Filtrar solo partidos de Liga MX
-        const partidosLigaMX = (data.transmisiones || []).filter(t => 
-            t.evento && t.evento.toLowerCase().includes('liga mx')
-        );
+        const standingsTable = document.getElementById('standingsTable');
+        if (!standingsTable) return;
         
-        if (partidosLigaMX.length === 0) {
-            container.innerHTML = `
-                <div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px;">
-                    <div style="font-size: 48px; margin-bottom: 16px;">⚽</div>
-                    <div style="color: rgba(255,255,255,0.8); font-size: 18px; margin-bottom: 8px;">No hay partidos de Liga MX en vivo</div>
-                    <div style="color: rgba(255,255,255,0.5); font-size: 14px;">Revisa la sección UPCOMING para próximos partidos</div>
-                </div>
-            `;
+        if (!data.equipos || data.equipos.length === 0) {
+            standingsTable.innerHTML = '<div class="standings-loading">No hay datos de tabla disponibles</div>';
             return;
         }
         
-        container.innerHTML = partidosLigaMX.map(partido => {
-            // Extraer equipos del evento (ej: "Liga Mx : Club America - Puebla")
-            const equipos = partido.evento.split(':')[1]?.trim() || partido.evento;
-            const [equipoLocal, equipoVisitante] = equipos.split(' - ').map(e => e?.trim() || 'TBD');
-            
-            // Extraer el número del primer canal disponible
-            const canalCodigo = partido.canales && partido.canales[0] ? partido.canales[0] : null;
-            const numeroCanal = canalCodigo ? canalCodigo.match(/\d+/)?.[0] : null;
-            
-            // Crear badge de canales disponibles
-            const totalCanales = partido.totalCanales || 1;
-            const canalesInfo = totalCanales > 1 ? 
-                `<div class="multi-channel-badge">
-                    <i class="fas fa-tv"></i> ${totalCanales} canales
-                </div>` : '';
-            
-            return `
-                <div class="match-card-live" data-canal="${numeroCanal}">
-                    <div class="live-badge-floating">
-                        <span class="live-dot-pulse"></span>
-                        <span>EN VIVO</span>
-                    </div>
-                    <div class="match-bg-wrapper">
-                        <img src="ultragol-vs-stadium.jpg" alt="Match" class="match-bg-img">
-                        <div class="match-overlay-gradient"></div>
-                    </div>
-                    <div class="match-info-wrapper">
-                        <div class="match-time-badge">
-                            <i class="fas fa-clock"></i>
-                            <span>${partido.hora}</span>
-                        </div>
-                        <div class="teams-vs-container">
-                            <div class="team-name-live">${equipoLocal}</div>
-                            <div class="vs-separator">
-                                <span class="vs-circle"></span>
-                                <span class="vs-text">VS</span>
-                                <span class="vs-circle"></span>
-                            </div>
-                            <div class="team-name-live">${equipoVisitante}</div>
-                        </div>
-                        ${canalesInfo}
-                        <div class="channel-display">
-                            <i class="fas fa-signal"></i>
-                            Canal ${numeroCanal || 'N/A'}
-                        </div>
-                        <button class="btn-watch-live" onclick="watchLiveChannel(${numeroCanal}, '${equipoLocal} vs ${equipoVisitante}', ${JSON.stringify(partido.canales).replace(/"/g, '&quot;')})">
-                            <div class="btn-glow"></div>
-                            <i class="fas fa-play-circle"></i>
-                            <span>VER AHORA</span>
-                        </button>
-                    </div>
+        const equipos = data.equipos.sort((a, b) => a.posicion - b.posicion);
+        
+        standingsTable.innerHTML = `
+            <div class="standings-header">
+                <div class="standings-row header-row">
+                    <div class="pos">#</div>
+                    <div class="team-cell">Equipo</div>
+                    <div class="stat">PJ</div>
+                    <div class="stat">G</div>
+                    <div class="stat">E</div>
+                    <div class="stat">P</div>
+                    <div class="stat points">PTS</div>
                 </div>
-            `;
-        }).join('');
-    } catch (error) {
-        console.error('Error loading live matches:', error);
-        container.innerHTML = `
-            <div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px;">
-                <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
-                <div style="color: rgba(255,255,255,0.8); font-size: 18px;">Error al cargar transmisiones</div>
+            </div>
+            <div class="standings-body">
+                ${equipos.map((equipo, index) => `
+                    <div class="standings-row ${index < 4 ? 'playoff-zone' : index >= equipos.length - 4 ? 'relegation-zone' : ''}">
+                        <div class="pos">${equipo.posicion}</div>
+                        <div class="team-cell">
+                            <img src="${equipo.logo}" alt="${equipo.nombre}" class="team-logo-small" onerror="this.src='https://via.placeholder.com/30'">
+                            <span class="team-name-standings">${equipo.nombreCorto || equipo.nombre}</span>
+                        </div>
+                        <div class="stat">${equipo.partidosJugados || 0}</div>
+                        <div class="stat">${equipo.ganados || 0}</div>
+                        <div class="stat">${equipo.empatados || 0}</div>
+                        <div class="stat">${equipo.perdidos || 0}</div>
+                        <div class="stat points">${equipo.puntos || 0}</div>
+                    </div>
+                `).join('')}
             </div>
         `;
-    }
-}
-
-// Función para abrir el canal en vivo en ULTRACANALES
-function watchLiveChannel(numeroCanal, nombrePartido, canalesDisponibles) {
-    if (!numeroCanal) {
-        showToast('Canal no disponible');
-        return;
-    }
-    
-    // Abrir ULTRACANALES en el modal flotante con el número de canal
-    const ultracanalesUrl = `../ULTRACANALES/index.html?canal=${numeroCanal}`;
-    
-    // Crear modal flotante elegante
-    const modal = document.getElementById('liveChannelModal') || createLiveChannelModal();
-    const modalTitle = modal.querySelector('.live-modal-title');
-    const modalIframe = modal.querySelector('.live-modal-iframe');
-    const channelsInfo = modal.querySelector('.channels-info');
-    
-    modalTitle.textContent = nombrePartido;
-    modalIframe.src = ultracanalesUrl;
-    
-    // Mostrar información de canales disponibles
-    if (canalesDisponibles && canalesDisponibles.length > 0) {
-        const canalesText = canalesDisponibles.map(c => {
-            const num = c.match(/\d+/)?.[0];
-            return `Canal ${num}`;
-        }).join(' • ');
-        channelsInfo.innerHTML = `
-            <i class="fas fa-broadcast-tower"></i>
-            <span>Disponible en: ${canalesText}</span>
-        `;
-        channelsInfo.style.display = 'flex';
-    } else {
-        channelsInfo.style.display = 'none';
-    }
-    
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-}
-
-// Crear el modal flotante si no existe
-function createLiveChannelModal() {
-    const modal = document.createElement('div');
-    modal.id = 'liveChannelModal';
-    modal.className = 'live-channel-modal';
-    modal.innerHTML = `
-        <div class="live-modal-overlay" onclick="closeLiveChannel()"></div>
-        <div class="live-modal-container">
-            <div class="live-modal-header">
-                <div class="live-modal-header-content">
-                    <div class="live-modal-title-wrapper">
-                        <span class="live-pulse-mini"></span>
-                        <div class="live-modal-title">Transmisión en Vivo</div>
-                    </div>
-                    <div class="channels-info"></div>
-                </div>
-                <button class="live-modal-close" onclick="closeLiveChannel()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="live-modal-body">
-                <div class="live-stream-container">
-                    <iframe class="live-modal-iframe" frameborder="0" allowfullscreen 
-                            allow="autoplay; encrypted-media; picture-in-picture"></iframe>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    return modal;
-}
-
-// Cerrar el modal de canal en vivo
-function closeLiveChannel() {
-    const modal = document.getElementById('liveChannelModal');
-    if (modal) {
-        modal.classList.remove('active');
-        const iframe = modal.querySelector('.live-modal-iframe');
-        iframe.src = '';
-        document.body.style.overflow = '';
-    }
-}
-
-async function loadLeagues() {
-    try {
-        // Configurar botones de liga con eventos
-        const leagueBtns = document.querySelectorAll('.league-btn');
-        leagueBtns.forEach(btn => {
-            btn.addEventListener('click', async function() {
-                leagueBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                const leagueName = this.querySelector('span').textContent;
-                await loadMatchesByLeague(leagueName);
-            });
-        });
     } catch (error) {
-        console.error('Error loading leagues:', error);
-    }
-}
-
-async function loadMatchesByLeague(leagueName) {
-    currentLeague = leagueName;
-    showToast(`Cargando datos de ${leagueName}...`);
-    console.log(`Loading data for ${leagueName}`);
-    
-    // Actualizar el título de la tabla
-    const standingsTitle = document.getElementById('standingsLeagueName');
-    if (standingsTitle) {
-        standingsTitle.textContent = `TABLA DE ${leagueName.toUpperCase()}`;
-    }
-    
-    // Reload matches for current tab
-    if (activeTab === 'live') {
-        await loadLiveMatches();
-    } else if (activeTab === 'upcoming') {
-        await loadUpcomingMatches();
-    }
-    
-    try {
-        // Llamar directamente a las APIs
-        const tablasResponse = await fetch('https://ultragol-api3.onrender.com/ultragol/posiciones');
-        const tablasData = await tablasResponse.json();
-        const tabla = tablasData.tabla || [];
-        
-        const noticiasResponse = await fetch('https://ultragol-api3.onrender.com/Noticias');
-        const noticiasData = await noticiasResponse.json();
-        const noticias = noticiasData.noticias || [];
-        
-        console.log(`Datos de ${leagueName}:`, { tabla, noticias });
-        
-        // Actualizar tabla de posiciones
-        if (tabla && tabla.length > 0) {
-            displayStandings(tabla, leagueName);
-        } else {
-            const standingsTable = document.getElementById('standingsTable');
-            if (standingsTable) {
-                standingsTable.innerHTML = '<div class="standings-loading">No hay datos de tabla disponibles</div>';
-            }
+        console.error('Error loading standings:', error);
+        const standingsTable = document.getElementById('standingsTable');
+        if (standingsTable) {
+            standingsTable.innerHTML = '<div class="standings-loading">Error al cargar la tabla</div>';
         }
-        
-        // Actualizar noticias (LIBRE - SIN RESTRICCIONES)
-        if (noticias.length > 0) {
-            const newsGrid = document.querySelector('.news-grid');
-            if (newsGrid) {
-                newsGrid.innerHTML = noticias.slice(0, 6).map(noticia => `
-                    <div class="news-card">
-                        <img src="${noticia.imagen || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600'}" alt="${noticia.titulo}" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600'">
-                        <div class="news-content">
-                            <h4>${noticia.titulo || noticia.headline || 'Noticia sin título'}</h4>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-    } catch (error) {
-        console.error(`Error loading data for ${leagueName}:`, error);
     }
-}
-
-function displayStandings(tabla, leagueName) {
-    const standingsTable = document.getElementById('standingsTable');
-    if (!standingsTable) return;
-    
-    const standingsHTML = `
-        <div class="standings-row standings-header">
-            <div class="standings-pos">#</div>
-            <div class="standings-team">EQUIPO</div>
-            <div class="standings-stat">PJ</div>
-            <div class="standings-stat">DG</div>
-            <div class="standings-stat">GD</div>
-            <div class="standings-pts">PTS</div>
-        </div>
-        ${tabla.slice(0, 10).map((team, index) => `
-            <div class="standings-row">
-                <div class="standings-pos">${team.posicion || index + 1}</div>
-                <div class="standings-team">
-                    <img src="${team.escudo || 'https://via.placeholder.com/50'}" alt="${team.equipo}" class="standings-team-logo" onerror="this.style.display='none'">
-                    <span class="standings-team-name">${team.equipo}</span>
-                </div>
-                <div class="standings-stat">${team.estadisticas?.pj || team.pj || 0}</div>
-                <div class="standings-stat">${team.estadisticas?.dif || team.dif || 0}</div>
-                <div class="standings-stat">${team.estadisticas?.gd || team.gd || 0}</div>
-                <div class="standings-pts">${team.estadisticas?.pts || team.pts || 0}</div>
-            </div>
-        `).join('')}
-    `;
-    
-    standingsTable.innerHTML = standingsHTML;
 }
 
 async function loadNews() {
-    const newsGrid = document.querySelector('.news-grid');
-    if (!newsGrid) return;
-    
     try {
-        // Llamar directamente a la API de noticias (SIN RESTRICCIONES - LIBRE PARA TODOS)
         const response = await fetch('https://ultragol-api3.onrender.com/Noticias');
         const data = await response.json();
-        const noticias = data.noticias || [];
         
-        if (noticias.length === 0) {
-            console.log('No hay noticias disponibles');
+        const newsGrid = document.getElementById('newsGrid');
+        if (!newsGrid) return;
+        
+        if (!data.noticias || data.noticias.length === 0) {
+            newsGrid.innerHTML = '<div class="news-loading">No hay noticias disponibles</div>';
             return;
         }
         
-        newsGrid.innerHTML = noticias.slice(0, 6).map(noticia => `
-            <div class="news-card">
-                <img src="${noticia.imagen || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600'}" alt="${noticia.titulo}" onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600'">
+        newsGrid.innerHTML = data.noticias.slice(0, 6).map((noticia, index) => `
+            <div class="news-card" onclick='openNewsModal(${JSON.stringify({
+                titulo: noticia.titulo,
+                descripcion: noticia.descripcion || noticia.contenido || '',
+                imagen: noticia.imagen || noticia.urlImagen || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600',
+                fecha: noticia.fecha || ''
+            }).replace(/'/g, "\\'")})'>
+                <div class="news-image">
+                    <img src="${noticia.imagen || noticia.urlImagen || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'}" alt="${noticia.titulo}">
+                </div>
                 <div class="news-content">
-                    <h4>${noticia.titulo || noticia.headline || 'Noticia sin título'}</h4>
-                    ${noticia.liga ? `<span class="news-league">${noticia.liga}</span>` : ''}
+                    <h4>${noticia.titulo}</h4>
+                    <p>${(noticia.descripcion || noticia.contenido || '').substring(0, 100)}...</p>
                 </div>
             </div>
         `).join('');
     } catch (error) {
         console.error('Error loading news:', error);
+        const newsGrid = document.getElementById('newsGrid');
+        if (newsGrid) {
+            newsGrid.innerHTML = '<div class="news-loading">Error al cargar noticias</div>';
+        }
     }
 }
 
-async function updateFeaturedMatch() {
-    try {
-        const response = await fetch('https://ultragol-api3.onrender.com/marcadores');
-        const data = await response.json();
-        
-        const partidoEnVivo = data.partidos?.find(p => p.estado?.enVivo === true);
-        const partido = partidoEnVivo || data.partidos?.[0];
-        
-        if (!partido) return;
-        
-        const featuredMatchScore = document.querySelector('.match-score');
-        const featuredMatchInfo = document.querySelector('.match-info h2');
-        const liveBadge = document.querySelector('.live-badge');
-        
-        if (featuredMatchScore) {
-            featuredMatchScore.innerHTML = `
-                <div class="team-logo">
-                    <img src="${partido.local?.logo || 'https://via.placeholder.com/50'}" alt="${partido.local?.nombre}">
-                </div>
-                <div class="score-display">
-                    <span class="score">${partido.local?.marcador || '0'} - ${partido.visitante?.marcador || '0'}</span>
-                </div>
-                <div class="team-logo">
-                    <img src="${partido.visitante?.logo || 'https://via.placeholder.com/50'}" alt="${partido.visitante?.nombre}">
-                </div>
-            `;
-        }
-        
-        if (featuredMatchInfo) {
-            featuredMatchInfo.textContent = `${partido.local?.nombre || 'TBD'} vs. ${partido.visitante?.nombre || 'TBD'}`;
-        }
-        
-        if (liveBadge) {
-            if (partido.estado?.enVivo) {
-                liveBadge.style.display = 'flex';
-                liveBadge.innerHTML = `
-                    <span class="live-dot"></span>
-                    <span>LIVE - ${partido.reloj || '0\''}</span>
-                `;
-            } else if (partido.estado?.programado) {
-                liveBadge.style.display = 'flex';
-                liveBadge.style.background = '#666';
-                const fecha = new Date(partido.fechaISO);
-                const hora = fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
-                liveBadge.innerHTML = `
-                    <i class="fas fa-clock"></i>
-                    <span>${hora}</span>
-                `;
-            } else {
-                liveBadge.style.display = 'none';
-            }
-        }
-        
-    } catch (error) {
-        console.error('Error updating featured match:', error);
-    }
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-        @keyframes slideDown {
-            from { opacity: 1; transform: translateX(-50%) translateY(0); }
-            to { opacity: 0; transform: translateX(-50%) translateY(20px); }
-        }
-        .loading-spinner {
-            text-align: center;
-            padding: 40px;
-            color: #fff;
-        }
-        .no-matches, .error-message {
-            text-align: center;
-            padding: 40px;
-            color: rgba(255,255,255,0.7);
-        }
-        .live-indicator {
-            background: #ff4500;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-left: 8px;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (darkModeToggle) {
-        darkModeToggle.checked = true;
-    }
-    
-    await updateFeaturedMatch();
-    await loadLeagues();
-    await loadLiveMatches();
-    await loadNews();
-    await loadMatchesByLeague('Liga MX');
-    
-    setInterval(async () => {
-        if (activeTab === 'live') {
-            await loadLiveMatches();
-        }
-        await updateFeaturedMatch();
-    }, 30000);
-});
-
-document.addEventListener('click', (e) => {
-    if (e.target.id === 'playerModal') {
-        closeModal();
-    }
-});
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeModal();
-        const settingsPanel = document.getElementById('settingsPanel');
-        if (settingsPanel.classList.contains('active')) {
-            toggleSettings();
-        }
-    }
-});        
-function showLockedLeagueMessage(leagueName) {
-    const toast = document.createElement('div');
-    toast.className = 'toast-notification';
-    toast.innerHTML = `
-        <i class="fas fa-lock"></i> ${leagueName} solo está disponible en la aplicación móvil de UltraGol
-    `;
-    toast.style.cssText = `
-        position: fixed;
-        bottom: 100px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(255, 69, 0, 0.95);
-        color: white;
-        padding: 15px 24px;
-        border-radius: 25px;
-        font-size: 14px;
-        z-index: 10000;
-        animation: slideUp 0.3s ease;
-        max-width: 90%;
-        text-align: center;
-        box-shadow: 0 4px 15px rgba(255, 69, 0, 0.4);
-    `;
-    
-    document.body.appendChild(toast);
-    
-    setTimeout(() => {
-        toast.style.animation = 'slideDown 0.3s ease';
-        setTimeout(() => {
-            document.body.removeChild(toast);
-        }, 300);
-    }, 3000);
-}
-
-// Función para seleccionar Liga MX
-function selectLeague(leagueName, element) {
-    const leagueBtns = document.querySelectorAll('.league-btn');
-    leagueBtns.forEach(b => b.classList.remove('active'));
-    element.classList.add('active');
-    currentLeague = leagueName;
-    loadMatchesByLeague(leagueName);
-}
-
-// Función para abrir modal de noticia
 function openNewsModal(noticia) {
     const modal = document.getElementById('newsModal');
-    const modalTitle = document.getElementById('newsModalTitle');
-    const modalBody = modal.querySelector('.news-modal-body');
+    const title = document.getElementById('newsModalTitle');
+    const image = document.getElementById('newsModalImage');
+    const text = document.getElementById('newsModalText');
     
-    modalTitle.textContent = noticia.titulo || noticia.headline || 'Noticia';
-    
-    // Si la noticia tiene un link externo, mostrarlo en un iframe
-    if (noticia.link || noticia.url || noticia.enlace) {
-        const newsUrl = noticia.link || noticia.url || noticia.enlace;
-        modalBody.innerHTML = `
-            <div style="position: relative; width: 100%; height: 70vh;">
-                <div class="loading-spinner" style="display: flex; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10;">
-                    <div class="spinner"></div>
-                </div>
-                <iframe src="${newsUrl}" frameborder="0" style="width: 100%; height: 100%; border: none;" onload="this.previousElementSibling.style.display='none'"></iframe>
-            </div>
-            ${noticia.fecha ? `<p style="color: #999; font-size: 12px; margin-top: 15px; padding: 10px;"><i class="fas fa-calendar"></i> ${noticia.fecha}</p>` : ''}
-        `;
-    } else {
-        // Si no hay link, mostrar la información completa de la noticia
-        modalBody.innerHTML = `
-            <img id="newsModalImage" src="${noticia.imagen || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600'}" alt="Noticia" style="width: 100%; border-radius: 8px; margin-bottom: 15px;">
-            <div id="newsModalText" class="news-modal-text">
-                <h3 style="margin-bottom: 15px;">${noticia.titulo || noticia.headline || ''}</h3>
-                ${noticia.descripcion ? `<p style="margin-bottom: 10px;">${noticia.descripcion}</p>` : ''}
-                ${noticia.contenido ? `<p style="margin-bottom: 10px;">${noticia.contenido}</p>` : ''}
-                ${noticia.texto ? `<p style="margin-bottom: 10px;">${noticia.texto}</p>` : ''}
-                ${noticia.cuerpo ? `<div style="margin-bottom: 10px;">${noticia.cuerpo}</div>` : ''}
-                ${noticia.autor ? `<p style="color: #999; font-size: 12px; margin-top: 15px;"><i class="fas fa-user"></i> ${noticia.autor}</p>` : ''}
-                ${noticia.fecha ? `<p style="color: #999; font-size: 12px; margin-top: 15px;"><i class="fas fa-calendar"></i> ${noticia.fecha}</p>` : ''}
-            </div>
-        `;
-    }
+    title.textContent = noticia.titulo;
+    image.src = noticia.imagen;
+    text.innerHTML = `
+        ${noticia.fecha ? `<p class="news-date"><i class="far fa-calendar"></i> ${noticia.fecha}</p>` : ''}
+        <p>${noticia.descripcion}</p>
+    `;
     
     modal.classList.add('active');
 }
 
-// Función para cerrar modal de noticia
 function closeNewsModal() {
     const modal = document.getElementById('newsModal');
     modal.classList.remove('active');
 }
 
-// Cargar noticias de Liga MX desde la API (SIN RESTRICCIONES - LIBRE PARA TODOS)
-async function loadLigaMXNews() {
-    const newsGrid = document.getElementById('newsGrid');
-    if (!newsGrid) return;
-    
-    try {
-        newsGrid.innerHTML = '<div class="news-loading">Cargando noticias de Liga MX...</div>';
-        
-        // Llamar directamente a la API externa (funciona en sitios publicados)
-        const response = await fetch('https://ultragol-api3.onrender.com/Noticias');
-        const data = await response.json();
-        
-        // La API puede devolver un array directamente o un objeto con un array dentro
-        let noticiasArray = Array.isArray(data) ? data : (data.noticias || data.data || []);
-        
-        if (!noticiasArray || noticiasArray.length === 0) {
-            // Mostrar noticias de fallback si no hay datos de la API
-            newsGrid.innerHTML = `
-                <div class="news-card" onclick="showToast('Visita nuestra página principal para más noticias de Liga MX')">
-                    <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600" alt="News">
-                    <div class="news-content">
-                        <h4>Últimas noticias de Liga MX</h4>
-                    </div>
-                </div>
-                <div class="news-card" onclick="showToast('Visita nuestra página principal para más noticias de Liga MX')">
-                    <img src="https://images.unsplash.com/photo-1614632537239-fa46907f6e44?w=600" alt="News">
-                    <div class="news-content">
-                        <h4>Análisis de la jornada</h4>
-                    </div>
-                </div>
-                <div class="news-card" onclick="showToast('Visita nuestra página principal para más noticias de Liga MX')">
-                    <img src="https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=600" alt="News">
-                    <div class="news-content">
-                        <h4>Mejores jugadas</h4>
-                    </div>
-                </div>
-                <div class="news-card" onclick="showToast('Visita nuestra página principal para más noticias de Liga MX')">
-                    <img src="https://images.unsplash.com/photo-1551958219-acbc608c6377?w=600" alt="News">
-                    <div class="news-content">
-                        <h4>Tabla de posiciones actualizada</h4>
-                    </div>
-                </div>
-            `;
-            return;
-        }
-        
-        // Mostrar solo las primeras 4 noticias
-        const noticiasLimitadas = noticiasArray.slice(0, 4);
-        
-        newsGrid.innerHTML = noticiasLimitadas.map((noticia, index) => {
-            const noticiaStr = JSON.stringify(noticia).replace(/'/g, "\\'");
-            return `
-            <div class="news-card" onclick='openNewsModal(${noticiaStr})'>
-                <img src="${noticia.imagen || 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600'}" 
-                     alt="${noticia.titulo || 'Noticia'}" 
-                     onerror="this.src='https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600'">
-                <div class="news-content">
-                    <h4>${noticia.titulo || noticia.headline || 'Noticia sin título'}</h4>
-                </div>
-            </div>
-            `;
-        }).join('');
-    } catch (error) {
-        console.error('Error loading Liga MX news:', error);
-        newsGrid.innerHTML = `
-            <div class="news-card" onclick="showToast('Visita nuestra página principal para más noticias de Liga MX')">
-                <img src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=600" alt="News">
-                <div class="news-content">
-                    <h4>Últimas noticias de Liga MX</h4>
-                </div>
-            </div>
-            <div class="news-card" onclick="showToast('Visita nuestra página principal para más noticias de Liga MX')">
-                <img src="https://images.unsplash.com/photo-1614632537239-fa46907f6e44?w=600" alt="News">
-                <div class="news-content">
-                    <h4>Análisis de la jornada</h4>
-                </div>
-            </div>
-            <div class="news-card" onclick="showToast('Visita nuestra página principal para más noticias de Liga MX')">
-                <img src="https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=600" alt="News">
-                <div class="news-content">
-                    <h4>Mejores jugadas</h4>
-                </div>
-            </div>
-            <div class="news-card" onclick="showToast('Visita nuestra página principal para más noticias de Liga MX')">
-                <img src="https://images.unsplash.com/photo-1551958219-acbc608c6377?w=600" alt="News">
-                <div class="news-content">
-                    <h4>Tabla de posiciones actualizada</h4>
-                </div>
-            </div>
-        `;
+function selectLeague(leagueName, element) {
+    if (leagueName !== 'Liga MX') {
+        showLockedLeagueMessage(leagueName);
+        return;
     }
+    
+    document.querySelectorAll('.league-btn').forEach(btn => btn.classList.remove('active'));
+    element.classList.add('active');
+    currentLeague = leagueName;
 }
 
-// Cerrar modal al hacer clic fuera
-document.addEventListener('click', (e) => {
-    if (e.target.id === 'newsModal') {
-        closeNewsModal();
-    }
-});
+function showLockedLeagueMessage(leagueName) {
+    showToast(`${leagueName} estará disponible próximamente`);
+}
