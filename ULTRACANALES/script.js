@@ -48,8 +48,9 @@ const channelLogos = {
 
 async function loadChannels() {
     try {
-        const response1 = await fetch('attached_assets/channels_1760214639614.json');
+        const response1 = await fetch('attached_assets/ultracanales (1)_1760216153008.json');
         channelsData = await response1.json();
+        console.log('✅ Canales cargados:', channelsData.categories.length, 'categorías');
         renderChannels();
     } catch (error) {
         console.error('Error loading channels:', error);
@@ -296,14 +297,18 @@ function openChannelByNumber(channelNumber) {
         return;
     }
     
-    // Buscar el canal que coincida con el número
+    // Buscar el canal que tenga rereyano.ru/player/3/{channelNumber} en sus fuentes
     let targetChannel = null;
+    const searchUrl = `https://rereyano.ru/player/3/${channelNumber}`;
     
     for (const category of channelsData.categories) {
         for (const channel of category.channels) {
-            // Extraer el número del nombre del canal
-            const match = channel.name.match(/\d+/);
-            if (match && match[0] === channelNumber.toString()) {
+            // Buscar si alguna fuente del canal contiene la URL con el número específico
+            const hasMatchingSource = channel.sources && channel.sources.some(source => 
+                source.includes(`player/3/${channelNumber}`)
+            );
+            
+            if (hasMatchingSource) {
                 targetChannel = {
                     ...channel,
                     categoryIcon: category.icon,
@@ -316,10 +321,20 @@ function openChannelByNumber(channelNumber) {
     }
     
     if (targetChannel) {
-        console.log(`Abriendo canal ${channelNumber}:`, targetChannel.name);
+        console.log(`✅ Abriendo Canal ${channelNumber}:`, targetChannel.name);
         setTimeout(() => openChannel(targetChannel), 500);
     } else {
-        console.warn(`Canal ${channelNumber} no encontrado`);
+        console.warn(`⚠️ Canal ${channelNumber} no encontrado en el JSON. Abriendo directamente...`);
+        // Si no se encuentra el canal en el JSON, crear uno temporal con la URL de rereyano
+        const tempChannel = {
+            id: `canal-${channelNumber}`,
+            name: `Canal ${channelNumber}`,
+            sources: [searchUrl],
+            live: true,
+            categoryIcon: '📺',
+            categoryName: 'Canal Directo'
+        };
+        setTimeout(() => openChannel(tempChannel), 500);
     }
 }
 
