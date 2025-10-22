@@ -57,7 +57,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         };
     } else {
         // Modo de transmisión en vivo (iframe)
-        currentStreamUrl = 'https://servidor-l3ho.github.io/ULTRACANALES.2/index.html';
+        currentStreamUrl = '../ULTRACANALES/index.html';
         
         modalTitle.textContent = 'Transmisión en Vivo - ' + matchId.toUpperCase();
         modal.classList.add('active');
