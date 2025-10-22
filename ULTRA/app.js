@@ -46,17 +46,34 @@ async function loadMarcadores() {
 function updateFeaturedMatch(data) {
     if (!data || !data.partidos || data.partidos.length === 0) return;
     
-    // Guardar todos los partidos para el carrusel
-    featuredMatches = data.partidos;
-    currentFeaturedIndex = 0;
-    
     const carousel = document.getElementById('featuredCarousel');
     if (!carousel) return;
+    
+    // Preservar la posición actual del usuario
+    const previousMatchId = featuredMatches[currentFeaturedIndex]?.id;
+    
+    // Guardar todos los partidos para el carrusel
+    featuredMatches = data.partidos;
+    
+    // Intentar mantener el mismo partido que el usuario estaba viendo
+    if (previousMatchId) {
+        const matchIndex = featuredMatches.findIndex(p => p.id === previousMatchId);
+        if (matchIndex !== -1) {
+            // El partido todavía existe, mantener la posición
+            currentFeaturedIndex = matchIndex;
+        } else {
+            // El partido ya no existe, resetear a 0
+            currentFeaturedIndex = 0;
+        }
+    } else {
+        // Primera carga, empezar en 0
+        currentFeaturedIndex = 0;
+    }
     
     // Crear un slide para cada partido
     carousel.innerHTML = featuredMatches.map((partido, index) => {
         const hora = formatearHora(partido.fecha);
-        const isActive = index === 0 ? 'active' : '';
+        const isActive = index === currentFeaturedIndex ? 'active' : '';
         
         // Determinar el badge apropiado
         let liveBadgeHTML = '';
