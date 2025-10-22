@@ -85,12 +85,110 @@ body {
     transform: scale(1.05);
 }
 
-.featured-match {
+/* Contenedor del carrusel de partidos destacados */
+.featured-match-container {
+    position: relative;
+    margin: 15px;
+}
+
+/* Carrusel de partidos */
+.featured-carousel {
     position: relative;
     height: 280px;
     overflow: hidden;
-    margin: 15px;
     border-radius: 20px;
+}
+
+/* Cada partido en el carrusel */
+.featured-match {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease-in-out, visibility 0.5s ease-in-out;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.featured-match.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Botones de navegación del carrusel */
+.carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.carousel-nav:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.carousel-nav:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.carousel-prev {
+    left: 10px;
+}
+
+.carousel-next {
+    right: 10px;
+}
+
+.carousel-nav i {
+    font-size: 16px;
+}
+
+/* Indicadores del carrusel */
+.carousel-indicators {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+}
+
+.carousel-indicators .indicator {
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.carousel-indicators .indicator:hover {
+    background: rgba(255, 255, 255, 0.7);
+    transform: scale(1.2);
+}
+
+.carousel-indicators .indicator.active {
+    width: 24px;
+    border-radius: 4px;
+    background: var(--primary);
 }
 
 .match-bg {
