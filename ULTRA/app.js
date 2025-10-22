@@ -467,8 +467,8 @@ function watchLiveChannel(numeroCanal, nombrePartido, canalesDisponibles) {
         return;
     }
     
-    // Abrir ULTRACANALES en el modal flotante
-    const ultracanalesUrl = '../ULTRACANALES/index.html';
+    // Abrir ULTRACANALES en el modal flotante con el número de canal
+    const ultracanalesUrl = `../ULTRACANALES/index.html?canal=${numeroCanal}`;
     
     // Crear modal flotante elegante
     const modal = document.getElementById('liveChannelModal') || createLiveChannelModal();

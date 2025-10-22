@@ -283,6 +283,46 @@ function searchChannels(query) {
     });
 }
 
+// Función para obtener parámetros de la URL
+function getUrlParameter(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+// Función para buscar y abrir canal por número
+function openChannelByNumber(channelNumber) {
+    if (!channelsData) {
+        console.error('Datos de canales no cargados');
+        return;
+    }
+    
+    // Buscar el canal que coincida con el número
+    let targetChannel = null;
+    
+    for (const category of channelsData.categories) {
+        for (const channel of category.channels) {
+            // Extraer el número del nombre del canal
+            const match = channel.name.match(/\d+/);
+            if (match && match[0] === channelNumber.toString()) {
+                targetChannel = {
+                    ...channel,
+                    categoryIcon: category.icon,
+                    categoryName: category.name
+                };
+                break;
+            }
+        }
+        if (targetChannel) break;
+    }
+    
+    if (targetChannel) {
+        console.log(`Abriendo canal ${channelNumber}:`, targetChannel.name);
+        setTimeout(() => openChannel(targetChannel), 500);
+    } else {
+        console.warn(`Canal ${channelNumber} no encontrado`);
+    }
+}
+
 onAuthStateChanged(auth, (user) => {
     setupAuthUI(user);
 });
@@ -290,6 +330,15 @@ onAuthStateChanged(auth, (user) => {
 document.addEventListener('DOMContentLoaded', () => {
     loadChannels();
     setInterval(updateLikes, 5000);
+    
+    // Detectar si hay un parámetro de canal en la URL
+    const canalParam = getUrlParameter('canal');
+    if (canalParam) {
+        // Esperar a que los canales se carguen antes de abrir el canal específico
+        setTimeout(() => {
+            openChannelByNumber(canalParam);
+        }, 1000);
+    }
     
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
