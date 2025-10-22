@@ -33,7 +33,15 @@ Preferred communication style: Simple, everyday language.
 - Multi-page application with dedicated pages for teams, standings, calendars, statistics, news, and donations
 - Interactive team profiles with detailed statistics and match history
 - Advanced calendar system with jornada (matchday) and monthly views
-- Real-time match tracking with live updates
+- Real-time match tracking with live updates and automatic 30-second refresh
+- **Featured Match Carousel** (ULTRA Platform):
+  - Swipeable carousel displaying ALL Liga MX matches simultaneously
+  - Touch-enabled swipe gestures for mobile navigation
+  - Previous/Next navigation buttons for desktop
+  - Visual indicators showing total matches and current position
+  - Preserves user's selected match during automatic data refreshes
+  - Shows live match clock, scores, team logos, and match status
+  - Displays goal information (player names and minutes) when available
 - User authentication UI with registration, login, and profile management
 - Comments and social interaction features
 - Picture-in-picture video player for floating stream viewing
