@@ -36,35 +36,53 @@
             </div>
         </header>
 
-        <div class="featured-match">
-            <div class="match-overlay"></div>
-            <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800" alt="Stadium" class="match-bg">
+        <div class="featured-match-container">
+            <!-- Botón navegación izquierda -->
+            <button class="carousel-nav carousel-prev" onclick="prevFeaturedMatch()" style="display: none;">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <!-- Carrusel de partidos -->
+            <div class="featured-carousel" id="featuredCarousel">
+                <div class="featured-match active">
+                    <div class="match-overlay"></div>
+                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800" alt="Stadium" class="match-bg">
 
-            <div class="match-score">
-                <div class="team-logo">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" alt="Team 1">
-                </div>
-                <div class="score-display">
-                    <span class="score">1 - 1</span>
-                </div>
-                <div class="team-logo">
-                    <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" alt="Team 2">
+                    <div class="match-score">
+                        <div class="team-logo">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" alt="Team 1">
+                        </div>
+                        <div class="score-display">
+                            <span class="score">1 - 1</span>
+                        </div>
+                        <div class="team-logo">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" alt="Team 2">
+                        </div>
+                    </div>
+
+                    <div class="match-info">
+                        <h2 class="match-title">MAN. UNITED vs. LIVERPOOL</h2>
+                        <div class="match-badges">
+                            <span class="badge-icon"><i class="fas fa-circle"></i></span>
+                            <span class="badge-icon"><i class="fas fa-users"></i></span>
+                            <span class="badge-icon"><i class="fas fa-wifi"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="live-badge">
+                        <span class="live-dot"></span>
+                        <span>LIVE</span>
+                    </div>
                 </div>
             </div>
-
-            <div class="match-info">
-                <h2 class="match-title">MAN. UNITED vs. LIVERPOOL</h2>
-                <div class="match-badges">
-                    <span class="badge-icon"><i class="fas fa-circle"></i></span>
-                    <span class="badge-icon"><i class="fas fa-users"></i></span>
-                    <span class="badge-icon"><i class="fas fa-wifi"></i></span>
-                </div>
-            </div>
-
-            <div class="live-badge">
-                <span class="live-dot"></span>
-                <span>LIVE</span>
-            </div>
+            
+            <!-- Botón navegación derecha -->
+            <button class="carousel-nav carousel-next" onclick="nextFeaturedMatch()" style="display: none;">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            
+            <!-- Indicadores de posición -->
+            <div class="carousel-indicators" id="carouselIndicators"></div>
         </div>
 
         <div class="tabs-container">
