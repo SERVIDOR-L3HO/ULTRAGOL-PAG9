@@ -3,6 +3,10 @@ let activeTab = 'live';
 let currentLeague = 'Liga MX';
 let marcadoresData = null;
 let updateInterval = null;
+let currentFeaturedIndex = 0;
+let featuredMatches = [];
+let touchStartX = 0;
+let touchEndX = 0;
 
 // Inicializar cuando se carga la página
 document.addEventListener('DOMContentLoaded', async () => {
@@ -38,66 +42,190 @@ async function loadMarcadores() {
     }
 }
 
-// Actualizar el partido destacado
+// Actualizar el carrusel del partido destacado con TODOS los partidos
 function updateFeaturedMatch(data) {
     if (!data || !data.partidos || data.partidos.length === 0) return;
     
-    // Buscar un partido en vivo, si no hay, tomar el primero
-    let featuredMatch = data.partidos.find(p => p.estado?.enVivo) || data.partidos[0];
+    // Guardar todos los partidos para el carrusel
+    featuredMatches = data.partidos;
+    currentFeaturedIndex = 0;
     
-    const matchBg = document.querySelector('.match-bg');
-    const matchScore = document.querySelector('.match-score');
-    const matchInfo = document.querySelector('.match-info');
-    const liveBadge = document.querySelector('.live-badge');
+    const carousel = document.getElementById('featuredCarousel');
+    if (!carousel) return;
     
-    if (!matchScore || !matchInfo) return;
-    
-    // Actualizar logos y marcador
-    matchScore.innerHTML = `
-        <div class="team-logo">
-            <img src="${featuredMatch.local.logo}" alt="${featuredMatch.local.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
-        </div>
-        <div class="score-display">
-            <span class="score">${featuredMatch.local.marcador} - ${featuredMatch.visitante.marcador}</span>
-        </div>
-        <div class="team-logo">
-            <img src="${featuredMatch.visitante.logo}" alt="${featuredMatch.visitante.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
-        </div>
-    `;
-    
-    // Formatear la hora del partido
-    const hora = formatearHora(featuredMatch.fecha);
-    
-    // Actualizar información del partido
-    matchInfo.innerHTML = `
-        <div class="match-time-display">
-            <i class="far fa-clock"></i> ${hora}
-        </div>
-        <h2 class="match-title">${featuredMatch.local.nombreCorto} vs. ${featuredMatch.visitante.nombreCorto}</h2>
-        <div class="match-badges">
-            <span class="badge-icon" title="Marcador"><i class="fas fa-circle"></i></span>
-            <span class="badge-icon" title="Estadio"><i class="fas fa-users"></i></span>
-            <span class="badge-icon" title="Transmisión"><i class="fas fa-wifi"></i></span>
-        </div>
-    `;
-    
-    // Mostrar/ocultar badge de EN VIVO
-    if (liveBadge) {
-        if (featuredMatch.estado?.enVivo) {
-            liveBadge.style.display = 'flex';
-            liveBadge.innerHTML = `
-                <span class="live-dot"></span>
-                <span>EN VIVO - ${featuredMatch.reloj}</span>
+    // Crear un slide para cada partido
+    carousel.innerHTML = featuredMatches.map((partido, index) => {
+        const hora = formatearHora(partido.fecha);
+        const isActive = index === 0 ? 'active' : '';
+        
+        // Determinar el badge apropiado
+        let liveBadgeHTML = '';
+        if (partido.estado?.enVivo) {
+            liveBadgeHTML = `
+                <div class="live-badge">
+                    <span class="live-dot"></span>
+                    <span>EN VIVO - ${partido.reloj}</span>
+                </div>
             `;
-        } else if (featuredMatch.estado?.programado) {
-            liveBadge.style.display = 'flex';
-            liveBadge.innerHTML = `
-                <span class="live-dot" style="background: #ffa500;"></span>
-                <span>${hora}</span>
+        } else if (partido.estado?.programado) {
+            liveBadgeHTML = `
+                <div class="live-badge" style="background: rgba(255, 165, 0, 0.95);">
+                    <span class="live-dot" style="background: #ffa500;"></span>
+                    <span>${hora}</span>
+                </div>
             `;
-        } else {
-            liveBadge.style.display = 'none';
+        } else if (partido.estado?.finalizado) {
+            liveBadgeHTML = `
+                <div class="live-badge" style="background: rgba(128, 128, 128, 0.95);">
+                    <i class="fas fa-check-circle"></i>
+                    <span>FINALIZADO</span>
+                </div>
+            `;
         }
+        
+        return `
+            <div class="featured-match ${isActive}" data-index="${index}">
+                <div class="match-overlay"></div>
+                <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800" alt="Stadium" class="match-bg">
+
+                <div class="match-score">
+                    <div class="team-logo">
+                        <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
+                    </div>
+                    <div class="score-display">
+                        <span class="score">${partido.local.marcador} - ${partido.visitante.marcador}</span>
+                    </div>
+                    <div class="team-logo">
+                        <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
+                    </div>
+                </div>
+
+                <div class="match-info">
+                    <div class="match-time-display">
+                        <i class="far fa-clock"></i> ${hora}
+                    </div>
+                    <h2 class="match-title">${partido.local.nombreCorto} vs. ${partido.visitante.nombreCorto}</h2>
+                    <div class="match-badges">
+                        <span class="badge-icon" title="Marcador"><i class="fas fa-circle"></i></span>
+                        <span class="badge-icon" title="Estadio: ${partido.estadio || 'TBD'}"><i class="fas fa-users"></i></span>
+                        <span class="badge-icon" title="Transmisión"><i class="fas fa-wifi"></i></span>
+                    </div>
+                </div>
+
+                ${liveBadgeHTML}
+            </div>
+        `;
+    }).join('');
+    
+    // Actualizar indicadores
+    updateCarouselIndicators();
+    
+    // Mostrar/ocultar botones de navegación según cantidad de partidos
+    const prevBtn = document.querySelector('.carousel-prev');
+    const nextBtn = document.querySelector('.carousel-next');
+    
+    if (featuredMatches.length > 1) {
+        if (prevBtn) prevBtn.style.display = 'flex';
+        if (nextBtn) nextBtn.style.display = 'flex';
+    } else {
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+    }
+    
+    // Agregar soporte para swipe táctil
+    initTouchSupport();
+}
+
+// Actualizar indicadores del carrusel
+function updateCarouselIndicators() {
+    const indicatorsContainer = document.getElementById('carouselIndicators');
+    if (!indicatorsContainer) return;
+    
+    if (featuredMatches.length <= 1) {
+        indicatorsContainer.innerHTML = '';
+        return;
+    }
+    
+    indicatorsContainer.innerHTML = featuredMatches.map((_, index) => {
+        const isActive = index === currentFeaturedIndex ? 'active' : '';
+        return `<span class="indicator ${isActive}" onclick="goToFeaturedMatch(${index})"></span>`;
+    }).join('');
+}
+
+// Navegar al siguiente partido
+function nextFeaturedMatch() {
+    if (currentFeaturedIndex < featuredMatches.length - 1) {
+        currentFeaturedIndex++;
+        updateCarouselPosition();
+    }
+}
+
+// Navegar al partido anterior
+function prevFeaturedMatch() {
+    if (currentFeaturedIndex > 0) {
+        currentFeaturedIndex--;
+        updateCarouselPosition();
+    }
+}
+
+// Ir a un partido específico
+function goToFeaturedMatch(index) {
+    if (index >= 0 && index < featuredMatches.length) {
+        currentFeaturedIndex = index;
+        updateCarouselPosition();
+    }
+}
+
+// Actualizar posición del carrusel
+function updateCarouselPosition() {
+    const slides = document.querySelectorAll('.featured-match');
+    slides.forEach((slide, index) => {
+        slide.classList.remove('active');
+        if (index === currentFeaturedIndex) {
+            slide.classList.add('active');
+        }
+    });
+    
+    updateCarouselIndicators();
+}
+
+// Inicializar soporte táctil para swipe
+function initTouchSupport() {
+    const carousel = document.getElementById('featuredCarousel');
+    if (!carousel) return;
+    
+    // Remover listeners anteriores si existen
+    carousel.removeEventListener('touchstart', handleTouchStart);
+    carousel.removeEventListener('touchend', handleTouchEnd);
+    
+    // Agregar nuevos listeners
+    carousel.addEventListener('touchstart', handleTouchStart, { passive: true });
+    carousel.addEventListener('touchend', handleTouchEnd, { passive: true });
+}
+
+// Manejar inicio de touch
+function handleTouchStart(e) {
+    touchStartX = e.changedTouches[0].screenX;
+}
+
+// Manejar fin de touch
+function handleTouchEnd(e) {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipeGesture();
+}
+
+// Detectar gesto de swipe
+function handleSwipeGesture() {
+    const swipeThreshold = 50; // Mínimo de píxeles para considerar swipe
+    
+    if (touchEndX < touchStartX - swipeThreshold) {
+        // Swipe izquierda - siguiente partido
+        nextFeaturedMatch();
+    }
+    
+    if (touchEndX > touchStartX + swipeThreshold) {
+        // Swipe derecha - partido anterior
+        prevFeaturedMatch();
     }
 }
 
