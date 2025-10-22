@@ -1040,191 +1040,272 @@ input:checked + .slider:before {
     transform: scale(0.98);
 }
 
-/* ===== ESTILOS PARA PARTIDOS EN VIVO - LIGA MX ===== */
+/* ===== PARTIDOS EN VIVO - DISEÑO REFINADO Y CREATIVO ===== */
 
-.live-match-card {
+.match-card-live {
     position: relative;
     overflow: hidden;
-    border: 2px solid rgba(255, 69, 0, 0.3);
-    box-shadow: 0 0 20px rgba(255, 69, 0, 0.2);
+    background: linear-gradient(135deg, rgba(26, 26, 26, 0.98), rgba(13, 13, 13, 0.98));
+    border-radius: 16px;
+    border: 1px solid rgba(255, 69, 0, 0.2);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.live-match-card:hover {
-    border-color: rgba(255, 69, 0, 0.6);
-    box-shadow: 0 0 30px rgba(255, 69, 0, 0.4);
+.match-card-live:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 69, 0, 0.5);
+    box-shadow: 
+        0 16px 48px rgba(255, 69, 0, 0.25),
+        0 0 0 1px rgba(255, 69, 0, 0.3);
 }
 
-.live-pulse-indicator {
+.live-badge-floating {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 10px;
+    right: 10px;
     z-index: 10;
     display: flex;
     align-items: center;
     gap: 6px;
-    background: rgba(255, 0, 0, 0.9);
-    padding: 6px 12px;
+    background: linear-gradient(135deg, #ff0000, #cc0000);
+    padding: 5px 12px;
     border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    box-shadow: 
+        0 4px 16px rgba(255, 0, 0, 0.4),
+        0 0 20px rgba(255, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
 }
 
-.pulse-dot {
-    width: 8px;
-    height: 8px;
+.live-dot-pulse {
+    width: 6px;
+    height: 6px;
     background: #fff;
     border-radius: 50%;
-    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 1);
+    animation: pulseGlow 1.5s ease-out infinite;
 }
 
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-        transform: scale(1);
+@keyframes pulseGlow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
     }
-    50% {
-        opacity: 0.5;
-        transform: scale(1.2);
+    70% {
+        box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
     }
 }
 
-.live-text {
-    color: #fff;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+.match-bg-wrapper {
+    position: relative;
+    height: 120px;
+    overflow: hidden;
 }
 
-.gradient-overlay {
+.match-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.6) saturate(1.2);
+    transition: all 0.6s ease;
+}
+
+.match-card-live:hover .match-bg-img {
+    transform: scale(1.1);
+    filter: brightness(0.7) saturate(1.4);
+}
+
+.match-overlay-gradient {
     position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60%;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-    z-index: 1;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 0, 0, 0.5) 50%,
+        rgba(13, 13, 13, 0.95) 100%
+    );
 }
 
-.match-time-info {
-    display: flex;
+.match-info-wrapper {
+    padding: 14px;
+    position: relative;
+}
+
+.match-time-badge {
+    display: inline-flex;
     align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
+    gap: 5px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.teams-display {
+.match-time-badge i {
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+.teams-vs-container {
     margin: 12px 0;
-    text-align: center;
 }
 
-.team-name {
-    font-size: 14px;
+.team-name-live {
+    font-size: 13px;
     font-weight: 700;
     color: #fff;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    text-align: center;
     line-height: 1.3;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
 }
 
-.vs-divider {
-    font-size: 11px;
+.vs-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+.vs-circle {
+    width: 4px;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--primary);
+}
+
+.vs-text {
+    font-size: 10px;
+    font-weight: 900;
     color: var(--primary);
-    font-weight: 800;
-    margin: 6px 0;
     letter-spacing: 2px;
+    padding: 0 4px;
 }
 
-.channels-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #FF4500, #FF6B35);
-    color: #fff;
+.multi-channel-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, rgba(255, 69, 0, 0.2), rgba(255, 107, 53, 0.2));
+    border: 1px solid rgba(255, 69, 0, 0.4);
     padding: 4px 10px;
     border-radius: 12px;
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
+    color: #fff;
     margin: 8px 0;
-    box-shadow: 0 2px 8px rgba(255, 69, 0, 0.3);
 }
 
-.channel-info {
+.multi-channel-badge i {
+    font-size: 9px;
+}
+
+.channel-display {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.8);
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
     margin: 10px 0;
-    padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.05);
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.03);
     border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.watch-btn-live {
+.channel-display i {
+    color: var(--primary);
+    font-size: 10px;
+}
+
+.btn-watch-live {
     width: 100%;
     padding: 12px;
     background: linear-gradient(135deg, #FF4500 0%, #FF6B35 100%);
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     color: #fff;
     font-weight: 700;
-    font-size: 13px;
+    font-size: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(255, 69, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 4px 16px rgba(255, 69, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
     position: relative;
     overflow: hidden;
+    letter-spacing: 0.5px;
 }
 
-.watch-btn-live::before {
-    content: '';
+.btn-glow {
     position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transition: left 0.5s;
+    inset: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s;
 }
 
-.watch-btn-live:hover::before {
-    left: 100%;
+.btn-watch-live:hover .btn-glow {
+    transform: translateX(100%);
 }
 
-.watch-btn-live:hover {
+.btn-watch-live:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 69, 0, 0.5);
+    box-shadow: 
+        0 6px 24px rgba(255, 69, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.watch-btn-live:active {
+.btn-watch-live:active {
     transform: translateY(0);
+    box-shadow: 
+        0 2px 8px rgba(255, 69, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.btn-icon {
-    font-size: 14px;
+.btn-watch-live i {
+    font-size: 16px;
 }
 
-.btn-text {
-    letter-spacing: 1px;
+.btn-watch-live span {
+    font-weight: 800;
 }
 
-/* ===== MODAL FLOTANTE ELEGANTE ===== */
+/* ===== MODAL FLOTANTE ULTRACANALES ===== */
 
 .live-channel-modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     z-index: 9999;
     display: none;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .live-channel-modal.active {
@@ -1233,38 +1314,43 @@ input:checked + .slider:before {
 
 .live-modal-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(10px);
-    animation: fadeIn 0.3s ease;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.96);
+    backdrop-filter: blur(12px) saturate(1.2);
+    animation: modalFadeIn 0.3s ease-out;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+@keyframes modalFadeIn {
+    from { 
+        opacity: 0;
+        backdrop-filter: blur(0);
+    }
+    to { 
+        opacity: 1;
+        backdrop-filter: blur(12px) saturate(1.2);
+    }
 }
 
 .live-modal-container {
     position: relative;
-    width: 95%;
+    width: 100%;
     max-width: 900px;
     height: 90vh;
-    max-height: 600px;
-    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
-    border-radius: 20px;
+    max-height: 650px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+    border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    border: 2px solid rgba(255, 69, 0, 0.3);
+    box-shadow: 
+        0 24px 64px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(255, 69, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    animation: modalSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes slideUp {
+@keyframes modalSlideIn {
     from {
         opacity: 0;
-        transform: translateY(50px) scale(0.9);
+        transform: translateY(40px) scale(0.95);
     }
     to {
         opacity: 1;
@@ -1274,81 +1360,113 @@ input:checked + .slider:before {
 
 .live-modal-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    padding: 16px 20px;
-    background: rgba(255, 69, 0, 0.1);
-    border-bottom: 2px solid rgba(255, 69, 0, 0.3);
+    padding: 18px 24px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 69, 0, 0.12) 0%,
+        rgba(255, 107, 53, 0.08) 100%
+    );
+    border-bottom: 1px solid rgba(255, 69, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.live-modal-header-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.live-modal-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.live-pulse-mini {
+    width: 8px;
+    height: 8px;
+    background: #ff0000;
+    border-radius: 50%;
+    box-shadow: 
+        0 0 0 0 rgba(255, 0, 0, 1),
+        0 0 12px rgba(255, 0, 0, 0.8);
+    animation: pulseMini 1.5s ease-out infinite;
+}
+
+@keyframes pulseMini {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7), 0 0 12px rgba(255, 0, 0, 0.8);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 0, 0, 0), 0 0 12px rgba(255, 0, 0, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0), 0 0 12px rgba(255, 0, 0, 0.8);
+    }
 }
 
 .live-modal-title {
-    font-size: 16px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 800;
     color: #fff;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.channels-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 5px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.channels-info i {
+    color: var(--primary);
+    font-size: 10px;
 }
 
 .live-modal-close {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     color: #fff;
     font-size: 18px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
 }
 
 .live-modal-close:hover {
-    background: rgba(255, 69, 0, 0.8);
-    transform: rotate(90deg);
+    background: linear-gradient(135deg, #FF4500, #FF6B35);
+    border-color: #FF4500;
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 4px 16px rgba(255, 69, 0, 0.4);
+}
+
+.live-modal-close:active {
+    transform: rotate(90deg) scale(0.95);
 }
 
 .live-modal-body {
-    height: calc(100% - 60px);
+    height: calc(100% - 76px);
     display: flex;
     flex-direction: column;
-}
-
-.channels-selector {
-    display: flex;
-    gap: 8px;
-    padding: 12px 16px;
-    background: rgba(0, 0, 0, 0.3);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    overflow-x: auto;
-}
-
-.channel-option {
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.channel-option:hover {
-    background: rgba(255, 69, 0, 0.3);
-    border-color: rgba(255, 69, 0, 0.5);
-}
-
-.channel-option.active {
-    background: linear-gradient(135deg, #FF4500, #FF6B35);
-    border-color: #FF4500;
-    box-shadow: 0 4px 12px rgba(255, 69, 0, 0.4);
+    background: #000;
 }
 
 .live-stream-container {
@@ -1361,27 +1479,35 @@ input:checked + .slider:before {
     width: 100%;
     height: 100%;
     border: none;
+    background: #000;
 }
 
-/* Responsive para móviles */
+/* Responsive */
 @media (max-width: 768px) {
     .live-modal-container {
         width: 100%;
-        height: 100%;
+        height: 100vh;
         max-height: 100vh;
         border-radius: 0;
+        max-width: 100%;
+    }
+    
+    .live-modal-header {
+        padding: 14px 16px;
     }
     
     .live-modal-title {
-        font-size: 14px;
+        font-size: 13px;
     }
     
-    .channels-selector {
-        padding: 10px;
+    .channels-info {
+        font-size: 10px;
+        padding: 4px 10px;
     }
     
-    .channel-option {
-        padding: 6px 12px;
-        font-size: 11px;
+    .live-modal-close {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
     }
 }

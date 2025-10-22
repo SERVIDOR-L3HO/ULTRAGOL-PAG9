@@ -406,35 +406,44 @@ async function loadLiveMatches() {
             
             // Crear badge de canales disponibles
             const totalCanales = partido.totalCanales || 1;
-            const canalesBadge = totalCanales > 1 ? 
-                `<span class="channels-badge" title="Canales disponibles">${totalCanales} canales</span>` : '';
+            const canalesInfo = totalCanales > 1 ? 
+                `<div class="multi-channel-badge">
+                    <i class="fas fa-tv"></i> ${totalCanales} canales
+                </div>` : '';
             
             return `
-                <div class="match-card live-match-card" data-canal="${numeroCanal}">
-                    <div class="live-pulse-indicator">
-                        <span class="pulse-dot"></span>
-                        <span class="live-text">EN VIVO</span>
+                <div class="match-card-live" data-canal="${numeroCanal}">
+                    <div class="live-badge-floating">
+                        <span class="live-dot-pulse"></span>
+                        <span>EN VIVO</span>
                     </div>
-                    <div class="match-card-bg">
-                        <img src="ultragol-vs-stadium.jpg" alt="Match">
-                        <div class="gradient-overlay"></div>
+                    <div class="match-bg-wrapper">
+                        <img src="ultragol-vs-stadium.jpg" alt="Match" class="match-bg-img">
+                        <div class="match-overlay-gradient"></div>
                     </div>
-                    <div class="match-card-content">
-                        <div class="match-time-info">
-                            <i class="fas fa-clock"></i> ${partido.hora}
+                    <div class="match-info-wrapper">
+                        <div class="match-time-badge">
+                            <i class="fas fa-clock"></i>
+                            <span>${partido.hora}</span>
                         </div>
-                        <div class="teams-display">
-                            <div class="team-name">${equipoLocal}</div>
-                            <div class="vs-divider">VS</div>
-                            <div class="team-name">${equipoVisitante}</div>
+                        <div class="teams-vs-container">
+                            <div class="team-name-live">${equipoLocal}</div>
+                            <div class="vs-separator">
+                                <span class="vs-circle"></span>
+                                <span class="vs-text">VS</span>
+                                <span class="vs-circle"></span>
+                            </div>
+                            <div class="team-name-live">${equipoVisitante}</div>
                         </div>
-                        ${canalesBadge}
-                        <div class="channel-info">
-                            <i class="fas fa-tv"></i> Canal ${numeroCanal || 'N/A'}
+                        ${canalesInfo}
+                        <div class="channel-display">
+                            <i class="fas fa-signal"></i>
+                            Canal ${numeroCanal || 'N/A'}
                         </div>
-                        <button class="watch-btn-live" onclick="watchLiveChannel(${numeroCanal}, '${equipoLocal} vs ${equipoVisitante}', ${JSON.stringify(partido.canales).replace(/"/g, '&quot;')})">
-                            <span class="btn-icon">▶</span>
-                            <span class="btn-text">VER EN VIVO</span>
+                        <button class="btn-watch-live" onclick="watchLiveChannel(${numeroCanal}, '${equipoLocal} vs ${equipoVisitante}', ${JSON.stringify(partido.canales).replace(/"/g, '&quot;')})">
+                            <div class="btn-glow"></div>
+                            <i class="fas fa-play-circle"></i>
+                            <span>VER AHORA</span>
                         </button>
                     </div>
                 </div>
@@ -458,32 +467,31 @@ function watchLiveChannel(numeroCanal, nombrePartido, canalesDisponibles) {
         return;
     }
     
-    // URL del canal en ULTRACANALES
-    const canalUrl = `https://rereyano.ru/player/3/${numeroCanal}`;
+    // Abrir ULTRACANALES en el modal flotante
+    const ultracanalesUrl = '../ULTRACANALES/index.html';
     
     // Crear modal flotante elegante
     const modal = document.getElementById('liveChannelModal') || createLiveChannelModal();
     const modalTitle = modal.querySelector('.live-modal-title');
     const modalIframe = modal.querySelector('.live-modal-iframe');
-    const channelsSelector = modal.querySelector('.channels-selector');
+    const channelsInfo = modal.querySelector('.channels-info');
     
     modalTitle.textContent = nombrePartido;
-    modalIframe.src = canalUrl;
+    modalIframe.src = ultracanalesUrl;
     
-    // Mostrar selector de canales si hay múltiples opciones
-    if (canalesDisponibles && canalesDisponibles.length > 1) {
-        channelsSelector.innerHTML = canalesDisponibles.map((canal, index) => {
-            const num = canal.match(/\d+/)?.[0];
-            return `
-                <button class="channel-option ${index === 0 ? 'active' : ''}" 
-                        onclick="switchChannel(${num}, '${nombrePartido}')">
-                    <i class="fas fa-tv"></i> Canal ${num}
-                </button>
-            `;
-        }).join('');
-        channelsSelector.style.display = 'flex';
+    // Mostrar información de canales disponibles
+    if (canalesDisponibles && canalesDisponibles.length > 0) {
+        const canalesText = canalesDisponibles.map(c => {
+            const num = c.match(/\d+/)?.[0];
+            return `Canal ${num}`;
+        }).join(' • ');
+        channelsInfo.innerHTML = `
+            <i class="fas fa-broadcast-tower"></i>
+            <span>Disponible en: ${canalesText}</span>
+        `;
+        channelsInfo.style.display = 'flex';
     } else {
-        channelsSelector.style.display = 'none';
+        channelsInfo.style.display = 'none';
     }
     
     modal.classList.add('active');
@@ -499,13 +507,18 @@ function createLiveChannelModal() {
         <div class="live-modal-overlay" onclick="closeLiveChannel()"></div>
         <div class="live-modal-container">
             <div class="live-modal-header">
-                <div class="live-modal-title">Transmisión en Vivo</div>
+                <div class="live-modal-header-content">
+                    <div class="live-modal-title-wrapper">
+                        <span class="live-pulse-mini"></span>
+                        <div class="live-modal-title">Transmisión en Vivo</div>
+                    </div>
+                    <div class="channels-info"></div>
+                </div>
                 <button class="live-modal-close" onclick="closeLiveChannel()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="live-modal-body">
-                <div class="channels-selector"></div>
                 <div class="live-stream-container">
                     <iframe class="live-modal-iframe" frameborder="0" allowfullscreen 
                             allow="autoplay; encrypted-media; picture-in-picture"></iframe>
@@ -515,18 +528,6 @@ function createLiveChannelModal() {
     `;
     document.body.appendChild(modal);
     return modal;
-}
-
-// Cambiar de canal en el modal
-function switchChannel(numeroCanal, nombrePartido) {
-    const modal = document.getElementById('liveChannelModal');
-    const iframe = modal.querySelector('.live-modal-iframe');
-    const buttons = modal.querySelectorAll('.channel-option');
-    
-    iframe.src = `https://rereyano.ru/player/3/${numeroCanal}`;
-    
-    buttons.forEach(btn => btn.classList.remove('active'));
-    event.target.closest('.channel-option').classList.add('active');
 }
 
 // Cerrar el modal de canal en vivo
