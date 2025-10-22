@@ -1039,3 +1039,349 @@ input:checked + .slider:before {
 .news-card:active {
     transform: scale(0.98);
 }
+
+/* ===== ESTILOS PARA PARTIDOS EN VIVO - LIGA MX ===== */
+
+.live-match-card {
+    position: relative;
+    overflow: hidden;
+    border: 2px solid rgba(255, 69, 0, 0.3);
+    box-shadow: 0 0 20px rgba(255, 69, 0, 0.2);
+}
+
+.live-match-card:hover {
+    border-color: rgba(255, 69, 0, 0.6);
+    box-shadow: 0 0 30px rgba(255, 69, 0, 0.4);
+}
+
+.live-pulse-indicator {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 0, 0, 0.9);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(255, 0, 0, 0.4);
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+}
+
+.live-text {
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.gradient-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+    z-index: 1;
+}
+
+.match-time-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+.teams-display {
+    margin: 12px 0;
+    text-align: center;
+}
+
+.team-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+}
+
+.vs-divider {
+    font-size: 11px;
+    color: var(--primary);
+    font-weight: 800;
+    margin: 6px 0;
+    letter-spacing: 2px;
+}
+
+.channels-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #FF4500, #FF6B35);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    margin: 8px 0;
+    box-shadow: 0 2px 8px rgba(255, 69, 0, 0.3);
+}
+
+.channel-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 10px 0;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.watch-btn-live {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #FF4500 0%, #FF6B35 100%);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 69, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.watch-btn-live::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.watch-btn-live:hover::before {
+    left: 100%;
+}
+
+.watch-btn-live:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 69, 0, 0.5);
+}
+
+.watch-btn-live:active {
+    transform: translateY(0);
+}
+
+.btn-icon {
+    font-size: 14px;
+}
+
+.btn-text {
+    letter-spacing: 1px;
+}
+
+/* ===== MODAL FLOTANTE ELEGANTE ===== */
+
+.live-channel-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.live-channel-modal.active {
+    display: flex;
+}
+
+.live-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.live-modal-container {
+    position: relative;
+    width: 95%;
+    max-width: 900px;
+    height: 90vh;
+    max-height: 600px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 2px solid rgba(255, 69, 0, 0.3);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.live-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: rgba(255, 69, 0, 0.1);
+    border-bottom: 2px solid rgba(255, 69, 0, 0.3);
+}
+
+.live-modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.live-modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.live-modal-close:hover {
+    background: rgba(255, 69, 0, 0.8);
+    transform: rotate(90deg);
+}
+
+.live-modal-body {
+    height: calc(100% - 60px);
+    display: flex;
+    flex-direction: column;
+}
+
+.channels-selector {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    overflow-x: auto;
+}
+
+.channel-option {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.channel-option:hover {
+    background: rgba(255, 69, 0, 0.3);
+    border-color: rgba(255, 69, 0, 0.5);
+}
+
+.channel-option.active {
+    background: linear-gradient(135deg, #FF4500, #FF6B35);
+    border-color: #FF4500;
+    box-shadow: 0 4px 12px rgba(255, 69, 0, 0.4);
+}
+
+.live-stream-container {
+    flex: 1;
+    position: relative;
+    background: #000;
+}
+
+.live-modal-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .live-modal-container {
+        width: 100%;
+        height: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+    
+    .live-modal-title {
+        font-size: 14px;
+    }
+    
+    .channels-selector {
+        padding: 10px;
+    }
+    
+    .channel-option {
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+}

@@ -376,44 +376,167 @@ async function loadLiveMatches() {
     if (!container) return;
     
     try {
-        const response = await fetch('https://ultragol-api3.onrender.com/marcadores');
+        const response = await fetch('https://ultragol-api3.onrender.com/transmisiones');
         const data = await response.json();
-        const partidosEnVivo = (data.partidos || []).filter(p => p.estado?.enVivo === true);
         
-        if (partidosEnVivo.length === 0) {
-            container.innerHTML = '<div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">No hay partidos en vivo en este momento</div>';
+        // Filtrar solo partidos de Liga MX
+        const partidosLigaMX = (data.transmisiones || []).filter(t => 
+            t.evento && t.evento.toLowerCase().includes('liga mx')
+        );
+        
+        if (partidosLigaMX.length === 0) {
+            container.innerHTML = `
+                <div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">⚽</div>
+                    <div style="color: rgba(255,255,255,0.8); font-size: 18px; margin-bottom: 8px;">No hay partidos de Liga MX en vivo</div>
+                    <div style="color: rgba(255,255,255,0.5); font-size: 14px;">Revisa la sección UPCOMING para próximos partidos</div>
+                </div>
+            `;
             return;
         }
         
-        container.innerHTML = partidosEnVivo.map(partido => `
-            <div class="match-card">
-                <div class="match-card-bg">
-                    <img src="ultragol-vs-stadium.jpg" alt="Match">
-                </div>
-                <div class="match-card-content">
-                    <div class="teams">
-                        <div class="team">
-                            <img src="${partido.local?.logo || 'https://via.placeholder.com/50'}" alt="${partido.local?.nombreCorto}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
-                            <span>${partido.local?.nombreCorto || 'TBD'}</span>
-                        </div>
-                        <div class="team">
-                            <img src="${partido.visitante?.logo || 'https://via.placeholder.com/50'}" alt="${partido.visitante?.nombreCorto}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
-                            <span>${partido.visitante?.nombreCorto || 'TBD'}</span>
-                        </div>
+        container.innerHTML = partidosLigaMX.map(partido => {
+            // Extraer equipos del evento (ej: "Liga Mx : Club America - Puebla")
+            const equipos = partido.evento.split(':')[1]?.trim() || partido.evento;
+            const [equipoLocal, equipoVisitante] = equipos.split(' - ').map(e => e?.trim() || 'TBD');
+            
+            // Extraer el número del primer canal disponible
+            const canalCodigo = partido.canales && partido.canales[0] ? partido.canales[0] : null;
+            const numeroCanal = canalCodigo ? canalCodigo.match(/\d+/)?.[0] : null;
+            
+            // Crear badge de canales disponibles
+            const totalCanales = partido.totalCanales || 1;
+            const canalesBadge = totalCanales > 1 ? 
+                `<span class="channels-badge" title="Canales disponibles">${totalCanales} canales</span>` : '';
+            
+            return `
+                <div class="match-card live-match-card" data-canal="${numeroCanal}">
+                    <div class="live-pulse-indicator">
+                        <span class="pulse-dot"></span>
+                        <span class="live-text">EN VIVO</span>
                     </div>
-                    <div class="match-score-mini">
-                        ${partido.local?.marcador || '0'} - ${partido.visitante?.marcador || '0'}
-                        <span class="match-time" style="background: #00ff00; color: #000;">${partido.reloj || 'LIVE'}</span>
+                    <div class="match-card-bg">
+                        <img src="ultragol-vs-stadium.jpg" alt="Match">
+                        <div class="gradient-overlay"></div>
                     </div>
-                    <button class="watch-btn" onclick="watchMatch('${partido.id || 'live-match'}')">
-                        <span>WATCH NOW</span>
-                    </button>
+                    <div class="match-card-content">
+                        <div class="match-time-info">
+                            <i class="fas fa-clock"></i> ${partido.hora}
+                        </div>
+                        <div class="teams-display">
+                            <div class="team-name">${equipoLocal}</div>
+                            <div class="vs-divider">VS</div>
+                            <div class="team-name">${equipoVisitante}</div>
+                        </div>
+                        ${canalesBadge}
+                        <div class="channel-info">
+                            <i class="fas fa-tv"></i> Canal ${numeroCanal || 'N/A'}
+                        </div>
+                        <button class="watch-btn-live" onclick="watchLiveChannel(${numeroCanal}, '${equipoLocal} vs ${equipoVisitante}', ${JSON.stringify(partido.canales).replace(/"/g, '&quot;')})">
+                            <span class="btn-icon">▶</span>
+                            <span class="btn-text">VER EN VIVO</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     } catch (error) {
         console.error('Error loading live matches:', error);
-        container.innerHTML = '<div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">Error al cargar partidos en vivo</div>';
+        container.innerHTML = `
+            <div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                <div style="font-size: 48px; margin-bottom: 16px;">⚠️</div>
+                <div style="color: rgba(255,255,255,0.8); font-size: 18px;">Error al cargar transmisiones</div>
+            </div>
+        `;
+    }
+}
+
+// Función para abrir el canal en vivo en ULTRACANALES
+function watchLiveChannel(numeroCanal, nombrePartido, canalesDisponibles) {
+    if (!numeroCanal) {
+        showToast('Canal no disponible');
+        return;
+    }
+    
+    // URL del canal en ULTRACANALES
+    const canalUrl = `https://rereyano.ru/player/3/${numeroCanal}`;
+    
+    // Crear modal flotante elegante
+    const modal = document.getElementById('liveChannelModal') || createLiveChannelModal();
+    const modalTitle = modal.querySelector('.live-modal-title');
+    const modalIframe = modal.querySelector('.live-modal-iframe');
+    const channelsSelector = modal.querySelector('.channels-selector');
+    
+    modalTitle.textContent = nombrePartido;
+    modalIframe.src = canalUrl;
+    
+    // Mostrar selector de canales si hay múltiples opciones
+    if (canalesDisponibles && canalesDisponibles.length > 1) {
+        channelsSelector.innerHTML = canalesDisponibles.map((canal, index) => {
+            const num = canal.match(/\d+/)?.[0];
+            return `
+                <button class="channel-option ${index === 0 ? 'active' : ''}" 
+                        onclick="switchChannel(${num}, '${nombrePartido}')">
+                    <i class="fas fa-tv"></i> Canal ${num}
+                </button>
+            `;
+        }).join('');
+        channelsSelector.style.display = 'flex';
+    } else {
+        channelsSelector.style.display = 'none';
+    }
+    
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Crear el modal flotante si no existe
+function createLiveChannelModal() {
+    const modal = document.createElement('div');
+    modal.id = 'liveChannelModal';
+    modal.className = 'live-channel-modal';
+    modal.innerHTML = `
+        <div class="live-modal-overlay" onclick="closeLiveChannel()"></div>
+        <div class="live-modal-container">
+            <div class="live-modal-header">
+                <div class="live-modal-title">Transmisión en Vivo</div>
+                <button class="live-modal-close" onclick="closeLiveChannel()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="live-modal-body">
+                <div class="channels-selector"></div>
+                <div class="live-stream-container">
+                    <iframe class="live-modal-iframe" frameborder="0" allowfullscreen 
+                            allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+}
+
+// Cambiar de canal en el modal
+function switchChannel(numeroCanal, nombrePartido) {
+    const modal = document.getElementById('liveChannelModal');
+    const iframe = modal.querySelector('.live-modal-iframe');
+    const buttons = modal.querySelectorAll('.channel-option');
+    
+    iframe.src = `https://rereyano.ru/player/3/${numeroCanal}`;
+    
+    buttons.forEach(btn => btn.classList.remove('active'));
+    event.target.closest('.channel-option').classList.add('active');
+}
+
+// Cerrar el modal de canal en vivo
+function closeLiveChannel() {
+    const modal = document.getElementById('liveChannelModal');
+    if (modal) {
+        modal.classList.remove('active');
+        const iframe = modal.querySelector('.live-modal-iframe');
+        iframe.src = '';
+        document.body.style.overflow = '';
     }
 }
 
