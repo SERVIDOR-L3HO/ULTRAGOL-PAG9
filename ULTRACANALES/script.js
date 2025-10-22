@@ -299,7 +299,7 @@ function openChannelByNumber(channelNumber) {
     
     // Buscar el canal que tenga rereyano.ru/player/3/{channelNumber} en sus fuentes
     let targetChannel = null;
-    const searchUrl = `https://rereyano.ru/player/3/${channelNumber}`;
+    const searchUrl = `https://golazotvhd.com/evento.html?get=https://rereyano.ru/player/3/${channelNumber}`;
     
     for (const category of channelsData.categories) {
         for (const channel of category.channels) {
