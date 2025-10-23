@@ -2,6 +2,7 @@ let currentStreamUrl = '';
 let activeTab = 'live';
 let currentLeague = 'Liga MX';
 let marcadoresData = null;
+let transmisionesData = null;
 let updateInterval = null;
 let currentFeaturedIndex = 0;
 let featuredMatches = [];
@@ -11,6 +12,7 @@ let touchEndX = 0;
 // Inicializar cuando se carga la página
 document.addEventListener('DOMContentLoaded', async () => {
     await loadMarcadores();
+    await loadTransmisiones();
     startAutoUpdate();
     await loadStandings();
     await loadNews();
@@ -38,6 +40,21 @@ async function loadMarcadores() {
         return data;
     } catch (error) {
         console.error('❌ Error cargando marcadores:', error);
+        return null;
+    }
+}
+
+// Función para cargar transmisiones desde la API
+async function loadTransmisiones() {
+    try {
+        const response = await fetch('https://ultragol-api3.onrender.com/transmisiones');
+        const data = await response.json();
+        transmisionesData = data;
+        
+        console.log('✅ Transmisiones cargadas:', data);
+        return data;
+    } catch (error) {
+        console.error('❌ Error cargando transmisiones:', error);
         return null;
     }
 }
@@ -499,14 +516,26 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         };
     } else {
         let canalNumero = null;
+        let partido = null;
         
         if (marcadoresData && marcadoresData.partidos) {
-            const partido = marcadoresData.partidos.find(p => p.id === matchId);
-            if (partido && partido.detalles && partido.detalles.transmisiones && partido.detalles.transmisiones.length > 0) {
-                const primeraTransmision = partido.detalles.transmisiones[0];
-                if (primeraTransmision.canal) {
-                    canalNumero = primeraTransmision.canal;
-                    console.log(`✅ Partido encontrado con canal de transmisión: ${canalNumero}`);
+            partido = marcadoresData.partidos.find(p => p.id === matchId);
+            
+            if (partido && transmisionesData && transmisionesData.transmisiones) {
+                const nombreLocal = partido.local.nombre.toLowerCase();
+                const nombreVisitante = partido.visitante.nombre.toLowerCase();
+                
+                const transmision = transmisionesData.transmisiones.find(t => {
+                    const evento = t.evento.toLowerCase();
+                    return (evento.includes(nombreLocal) || evento.includes(nombreVisitante) ||
+                            evento.includes(partido.local.nombreCorto.toLowerCase()) ||
+                            evento.includes(partido.visitante.nombreCorto.toLowerCase()));
+                });
+                
+                if (transmision && transmision.canales && transmision.canales.length > 0) {
+                    const canalRaw = transmision.canales[0];
+                    canalNumero = canalRaw.replace(/[a-z]+$/i, '');
+                    console.log(`✅ Transmisión encontrada: ${transmision.evento}, Canal: ${canalNumero} (raw: ${canalRaw})`);
                 }
             }
         }
@@ -514,8 +543,10 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         const urlParam = canalNumero || matchId;
         console.log(`🔴 Abriendo transmisión con parámetro: ${urlParam}`);
         
+        const partidoNombre = partido ? `${partido.local.nombreCorto} vs ${partido.visitante.nombreCorto}` : matchId;
+        
         currentStreamUrl = `../ULTRACANALES/index.html?canal=${urlParam}`;
-        modalTitle.textContent = 'Transmisión en Vivo - ' + (canalNumero ? `Canal ${canalNumero}` : matchId);
+        modalTitle.textContent = `Transmisión en Vivo - ${partidoNombre}`;
         modal.classList.add('active');
         loader.style.display = 'flex';
         
