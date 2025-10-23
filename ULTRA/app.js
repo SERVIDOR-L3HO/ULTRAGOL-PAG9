@@ -498,7 +498,22 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
             }, 500);
         };
     } else {
-        window.open(`../ULTRACANALES/index.html?match=${matchId}`, '_blank');
+        let canalNumero = null;
+        
+        if (marcadoresData && marcadoresData.partidos) {
+            const partido = marcadoresData.partidos.find(p => p.id === matchId);
+            if (partido && partido.detalles && partido.detalles.transmisiones && partido.detalles.transmisiones.length > 0) {
+                const primeraTransmision = partido.detalles.transmisiones[0];
+                if (primeraTransmision.canal) {
+                    canalNumero = primeraTransmision.canal;
+                    console.log(`✅ Partido encontrado con canal de transmisión: ${canalNumero}`);
+                }
+            }
+        }
+        
+        const urlParam = canalNumero || matchId;
+        console.log(`🔴 Abriendo transmisión con parámetro: ${urlParam}`);
+        window.open(`../ULTRACANALES/index.html?canal=${urlParam}`, '_blank');
     }
 }
 
