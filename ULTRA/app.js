@@ -462,12 +462,12 @@ function startAutoUpdate() {
 }
 
 function watchMatch(matchId, videoUrl = null, videoTitle = null) {
-    const modal = document.getElementById('playerModal');
-    const modalBody = modal.querySelector('.modal-body');
-    const modalTitle = document.getElementById('modalTitle');
-    const loader = document.getElementById('modalLoader');
-    
     if (videoUrl) {
+        const modal = document.getElementById('playerModal');
+        const modalBody = modal.querySelector('.modal-body');
+        const modalTitle = document.getElementById('modalTitle');
+        const loader = document.getElementById('modalLoader');
+        
         modalTitle.textContent = videoTitle || 'Video';
         modal.classList.add('active');
         loader.style.display = 'flex';
@@ -495,26 +495,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
             }, 500);
         };
     } else {
-        currentStreamUrl = '../ULTRACANALES/index.html';
-        
-        modalTitle.textContent = 'Transmisión en Vivo - ' + matchId.toUpperCase();
-        modal.classList.add('active');
-        loader.style.display = 'flex';
-        
-        modalBody.innerHTML = `
-            <div class="loading-spinner" id="modalLoader" style="display: flex;">
-                <div class="spinner"></div>
-            </div>
-            <iframe id="modalIframe" src="${currentStreamUrl}" frameborder="0" allowfullscreen style="width: 100%; height: 100%;"></iframe>
-        `;
-        
-        const iframe = document.getElementById('modalIframe');
-        iframe.onload = () => {
-            setTimeout(() => {
-                const loaderEl = document.getElementById('modalLoader');
-                if (loaderEl) loaderEl.style.display = 'none';
-            }, 500);
-        };
+        window.open(`../ULTRACANALES/index.html?match=${matchId}`, '_blank');
     }
 }
 

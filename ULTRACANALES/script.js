@@ -346,12 +346,19 @@ document.addEventListener('DOMContentLoaded', () => {
     loadChannels();
     setInterval(updateLikes, 5000);
     
-    // Detectar si hay un parámetro de canal en la URL
+    // Detectar si hay un parámetro de canal o match en la URL
     const canalParam = getUrlParameter('canal');
+    const matchParam = getUrlParameter('match');
+    
     if (canalParam) {
         // Esperar a que los canales se carguen antes de abrir el canal específico
         setTimeout(() => {
             openChannelByNumber(canalParam);
+        }, 1000);
+    } else if (matchParam) {
+        // Esperar a que los canales se carguen antes de abrir el partido específico
+        setTimeout(() => {
+            openChannelByNumber(matchParam);
         }, 1000);
     }
     
