@@ -251,7 +251,10 @@ function updateLiveMatches(data) {
     const container = document.getElementById('liveMatches');
     if (!container) return;
     
-    const partidosEnVivo = data.partidos.filter(p => p.estado?.enVivo);
+    const partidosEnVivo = data.partidos.filter(p => {
+        return p.estado?.enVivo || 
+               (!p.estado?.finalizado && !p.estado?.programado && p.reloj && p.reloj !== '0\'');
+    });
     
     if (partidosEnVivo.length === 0) {
         container.innerHTML = `
