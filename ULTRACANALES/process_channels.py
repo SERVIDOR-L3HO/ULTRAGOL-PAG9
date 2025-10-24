@@ -74,7 +74,7 @@ def main():
             new_channels_data.append({
                 'number': channel_num,
                 'name': channel_name,
-                'url': f'https://golazotvhd.com/evento.html?get=https://rereyano.ru/player/3/{channel_num}'
+                'url': f'https://rereyano.ru/player/3/{channel_num}'
             })
     
     print(f"Encontrados {len(new_channels_data)} canales nuevos")
