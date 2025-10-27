@@ -58,6 +58,30 @@
         </div>
     </div>
 
+    <!-- Cuadro Flotante En Tendencia -->
+    <div id="trending-box" class="trending-box">
+        <div class="trending-header">
+            <h3 class="trending-title">🔥 En tendencia</h3>
+            <button class="trending-close" onclick="closeTrending()">✕</button>
+        </div>
+        <div class="trending-content">
+            <div class="trending-match-info">
+                <span class="trending-badge">EN VIVO</span>
+                <p class="trending-match-title">Toluca vs Pachuca</p>
+            </div>
+            <div class="trending-player-wrapper">
+                <iframe 
+                    src="https://voodc.com/embed/85818c92a1899f8c847a8595a08a9888857a.html" 
+                    frameborder="0" 
+                    allowfullscreen 
+                    allow="autoplay; encrypted-media"
+                    class="trending-iframe">
+                </iframe>
+            </div>
+        </div>
+        <button class="trending-expand" onclick="expandTrending()">⛶ Expandir</button>
+    </div>
+
     <main class="main-content">
         <div class="filter-tabs">
             <button class="filter-tab active">⚽ Todos los canales</button>
