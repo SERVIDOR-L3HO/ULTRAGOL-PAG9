@@ -150,8 +150,24 @@ function openChannel(channel) {
     playerSection.classList.remove('hidden');
 
     sourceButtons.innerHTML = '';
-    const maxSources = Math.min(channel.sources.length, 4);
-    channel.sources.slice(0, maxSources).forEach((source, index) => {
+    
+    // Crear array de fuentes con el nuevo dominio al inicio
+    let sourcesArray = [...channel.sources];
+    
+    // Buscar si hay un link de rereyano.ru y extraer el número
+    const rereyanoLink = sourcesArray.find(s => s.includes('rereyano.ru/player/3/'));
+    if (rereyanoLink) {
+        const match = rereyanoLink.match(/\/player\/3\/(\d+)/);
+        if (match) {
+            const channelNumber = match[1];
+            const newLink = `https://golazotvhd.com/evento.html?get=https://rereyano.ru/player/3/${channelNumber}`;
+            // Insertar el nuevo link al inicio
+            sourcesArray.unshift(newLink);
+        }
+    }
+    
+    const maxSources = Math.min(sourcesArray.length, 4);
+    sourcesArray.slice(0, maxSources).forEach((source, index) => {
         const btn = document.createElement('button');
         btn.className = 'source-btn';
         if (index === 0) btn.classList.add('active');
@@ -166,7 +182,7 @@ function openChannel(channel) {
         sourceButtons.appendChild(btn);
     });
 
-    loadSource(channel.sources[0]);
+    loadSource(sourcesArray[0]);
 
     playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
