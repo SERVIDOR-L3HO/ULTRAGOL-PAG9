@@ -150,21 +150,13 @@ function openChannel(channel) {
     playerSection.classList.remove('hidden');
 
     sourceButtons.innerHTML = '';
-    channel.sources.forEach((source, index) => {
+    const maxSources = Math.min(channel.sources.length, 4);
+    channel.sources.slice(0, maxSources).forEach((source, index) => {
         const btn = document.createElement('button');
         btn.className = 'source-btn';
         if (index === 0) btn.classList.add('active');
         
-        if (index === 0 && source.includes('rereyano.ru')) {
-            btn.textContent = 'Opción 1';
-        } else if (source.includes('rereyano.ru')) {
-            btn.textContent = 'Opción 1';
-        } else if (index === 0) {
-            btn.textContent = 'Fuente 1';
-        } else {
-            const officialIndex = channel.sources.slice(0, index).filter(s => !s.includes('rereyano.ru')).length;
-            btn.textContent = officialIndex === 0 ? 'OPCIÓN OFICIAL' : `OPCIÓN OFICIAL ${officialIndex}`;
-        }
+        btn.textContent = `Fuente ${index + 1}`;
         
         btn.addEventListener('click', () => {
             loadSource(source);

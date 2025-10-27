@@ -140,7 +140,8 @@ function openChannel(channel) {
     playerSection.classList.remove('hidden');
 
     sourceButtons.innerHTML = '';
-    channel.sources.forEach((source, index) => {
+    const maxSources = Math.min(channel.sources.length, 4);
+    channel.sources.slice(0, maxSources).forEach((source, index) => {
         const btn = document.createElement('button');
         btn.className = 'source-btn';
         if (index === 0) btn.classList.add('active');
