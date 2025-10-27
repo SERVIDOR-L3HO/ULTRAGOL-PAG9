@@ -7,6 +7,7 @@
     <title>ULTRAGOL - Live Streaming</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="trending-box.css">
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3612607805789879"
@@ -347,6 +348,66 @@
         </div>
     </div>
 
+    <!-- Cuadro Flotante En Tendencia -->
+    <div id="trending-box" class="trending-box">
+        <div class="trending-header">
+            <h3 class="trending-title">🔥 En tendencia</h3>
+            <button class="trending-close" onclick="closeTrending()">✕</button>
+        </div>
+        <div class="trending-content">
+            <div class="trending-match-info">
+                <span class="trending-badge">EN VIVO</span>
+                <p class="trending-match-title">Toluca vs Pachuca</p>
+            </div>
+            <div class="trending-player-wrapper">
+                <iframe 
+                    src="https://voodc.com/embed/85818c92a1899f8c847a8595a08a9888857a.html" 
+                    frameborder="0" 
+                    allowfullscreen 
+                    allow="autoplay; encrypted-media"
+                    class="trending-iframe">
+                </iframe>
+            </div>
+        </div>
+        <button class="trending-expand" onclick="expandTrending()">⛶ Expandir</button>
+    </div>
+
     <script src="app.js"></script>
+    
+    <!-- Trending Box Scripts -->
+    <script>
+        function closeTrending() {
+            const trendingBox = document.getElementById('trending-box');
+            if (trendingBox) {
+                trendingBox.classList.add('hidden');
+                setTimeout(() => {
+                    trendingBox.style.display = 'none';
+                }, 400);
+            }
+        }
+
+        function expandTrending() {
+            const trendingBox = document.getElementById('trending-box');
+            if (trendingBox) {
+                trendingBox.classList.toggle('expanded');
+                const expandBtn = trendingBox.querySelector('.trending-expand');
+                if (trendingBox.classList.contains('expanded')) {
+                    expandBtn.textContent = '⛶ Minimizar';
+                } else {
+                    expandBtn.textContent = '⛶ Expandir';
+                }
+            }
+        }
+
+        // Auto-mostrar el cuadro después de 3 segundos
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const trendingBox = document.getElementById('trending-box');
+                if (trendingBox) {
+                    trendingBox.style.display = 'block';
+                }
+            }, 3000);
+        });
+    </script>
 </body>
 </html>

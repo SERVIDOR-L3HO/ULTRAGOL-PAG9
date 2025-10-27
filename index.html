@@ -19,7 +19,6 @@
     <link rel="stylesheet" href="css/professional-hero.css?v=2025091401">
     <link rel="stylesheet" href="css/gemini-chat.css">
     <link rel="stylesheet" href="css/live-scoreboard.css">
-    <link rel="stylesheet" href="css/trending-box.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
@@ -92,30 +91,6 @@
             </div>
         </div>
     </nav>
-
-    <!-- Cuadro Flotante En Tendencia -->
-    <div id="trending-box" class="trending-box">
-        <div class="trending-header">
-            <h3 class="trending-title">🔥 En tendencia</h3>
-            <button class="trending-close" onclick="closeTrending()">✕</button>
-        </div>
-        <div class="trending-content">
-            <div class="trending-match-info">
-                <span class="trending-badge">EN VIVO</span>
-                <p class="trending-match-title">Toluca vs Pachuca</p>
-            </div>
-            <div class="trending-player-wrapper">
-                <iframe 
-                    src="https://voodc.com/embed/85818c92a1899f8c847a8595a08a9888857a.html" 
-                    frameborder="0" 
-                    allowfullscreen 
-                    allow="autoplay; encrypted-media"
-                    class="trending-iframe">
-                </iframe>
-            </div>
-        </div>
-        <button class="trending-expand" onclick="expandTrending()">⛶ Expandir</button>
-    </div>
 
     <!-- Professional Football Hero Section -->
     <section class="professional-hero">
@@ -1522,41 +1497,5 @@
     
     <script src="js/gemini-chat.js"></script>
     <script src="js/simple-auth.js"></script>
-    
-    <!-- Trending Box Scripts -->
-    <script>
-        function closeTrending() {
-            const trendingBox = document.getElementById('trending-box');
-            if (trendingBox) {
-                trendingBox.classList.add('hidden');
-                setTimeout(() => {
-                    trendingBox.style.display = 'none';
-                }, 400);
-            }
-        }
-
-        function expandTrending() {
-            const trendingBox = document.getElementById('trending-box');
-            if (trendingBox) {
-                trendingBox.classList.toggle('expanded');
-                const expandBtn = trendingBox.querySelector('.trending-expand');
-                if (trendingBox.classList.contains('expanded')) {
-                    expandBtn.textContent = '⛶ Minimizar';
-                } else {
-                    expandBtn.textContent = '⛶ Expandir';
-                }
-            }
-        }
-
-        // Auto-mostrar el cuadro después de 3 segundos
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const trendingBox = document.getElementById('trending-box');
-                if (trendingBox) {
-                    trendingBox.style.display = 'block';
-                }
-            }, 3000);
-        });
-    </script>
 </body>
 </html>
