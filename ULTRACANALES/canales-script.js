@@ -145,16 +145,7 @@ function openChannel(channel) {
         btn.className = 'source-btn';
         if (index === 0) btn.classList.add('active');
         
-        if (index === 0 && source.includes('rereyano.ru')) {
-            btn.textContent = 'Opción 1';
-        } else if (source.includes('rereyano.ru')) {
-            btn.textContent = 'Opción 1';
-        } else if (index === 0) {
-            btn.textContent = 'Fuente 1';
-        } else {
-            const officialIndex = channel.sources.slice(0, index).filter(s => !s.includes('rereyano.ru')).length;
-            btn.textContent = officialIndex === 0 ? 'OPCIÓN OFICIAL' : `OPCIÓN OFICIAL ${officialIndex}`;
-        }
+        btn.textContent = `Fuente ${index + 1}`;
         
         btn.addEventListener('click', () => {
             loadSource(source);
