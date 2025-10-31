@@ -660,11 +660,6 @@
         </div>
     </footer>
 
-    
-
-    <!-- UltraGol Authentication System -->
-    <script src="js/auth-service.js"></script>
-    
     <!-- Enhanced Main Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -1477,7 +1472,18 @@
         });
     </script>
     
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+    
+    <!-- Firebase Authentication -->
+    <script src="js/firebase-auth.js"></script>
+    
     <script src="js/gemini-chat.js"></script>
-    <script src="js/simple-auth.js"></script>
 </body>
 </html>
