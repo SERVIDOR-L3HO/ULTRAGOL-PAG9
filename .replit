@@ -38,10 +38,6 @@ localPort = 33535
 externalPort = 6000
 
 [[ports]]
-localPort = 36083
-externalPort = 8099
-
-[[ports]]
 localPort = 36463
 externalPort = 5173
 
@@ -99,3 +95,5 @@ run = ["node", "server.js"]
 API_BASE_URL = "https://472832aade2073.lhr.life"
 API_FALLBACK_URL = "http://192.168.100.15:5000"
 USE_FALLBACK_API = "false"
+AUTH_API_URL = "https://472832aade2073.lhr.life"
+AUTH_API_FALLBACK_URL = "http://192.168.100.15:5000"

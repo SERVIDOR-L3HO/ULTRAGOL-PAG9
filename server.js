@@ -43,6 +43,146 @@ app.use((req, res, next) => {
 // UltraGol API Proxy (para evitar problemas de CORS)
 const API_BASE_URL = 'https://ultragol-api3.onrender.com';
 
+// Authentication API Configuration
+const AUTH_API_URL = process.env.AUTH_API_URL || 'https://472832aade2073.lhr.life';
+const AUTH_API_FALLBACK = process.env.AUTH_API_FALLBACK_URL || 'http://192.168.100.15:5000';
+
+async function callAuthAPI(endpoint, options = {}) {
+    const urls = [AUTH_API_URL, AUTH_API_FALLBACK];
+    
+    for (const baseUrl of urls) {
+        try {
+            const response = await fetch(`${baseUrl}${endpoint}`, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                },
+                credentials: 'include'
+            });
+            return response;
+        } catch (error) {
+            console.error(`Error calling ${baseUrl}${endpoint}:`, error.message);
+            if (baseUrl === urls[urls.length - 1]) {
+                throw error;
+            }
+        }
+    }
+}
+
+app.post('/api/auth/register', async (req, res) => {
+    try {
+        const { username, password, email } = req.body;
+        
+        if (!username || !password) {
+            return res.status(400).json({ error: 'Username y password son requeridos' });
+        }
+
+        const response = await callAuthAPI('/register', {
+            method: 'POST',
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            req.session.user = data.user;
+            req.session.isAuthenticated = true;
+            res.status(201).json(data);
+        } else {
+            res.status(response.status).json(data);
+        }
+    } catch (error) {
+        console.error('Error en registro:', error);
+        res.status(500).json({ error: 'Error del servidor al registrar usuario' });
+    }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        if (!username || !password) {
+            return res.status(400).json({ error: 'Username y password son requeridos' });
+        }
+
+        const response = await callAuthAPI('/login', {
+            method: 'POST',
+            body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            req.session.user = data.user;
+            req.session.isAuthenticated = true;
+            res.json(data);
+        } else {
+            res.status(response.status).json(data);
+        }
+    } catch (error) {
+        console.error('Error en login:', error);
+        res.status(500).json({ error: 'Error del servidor al iniciar sesión' });
+    }
+});
+
+app.post('/api/auth/logout', async (req, res) => {
+    try {
+        await callAuthAPI('/logout', {
+            method: 'POST'
+        });
+        
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Error destroying session:', err);
+            }
+            res.json({ message: 'Sesión cerrada exitosamente' });
+        });
+    } catch (error) {
+        console.error('Error en logout:', error);
+        req.session.destroy();
+        res.json({ message: 'Sesión cerrada exitosamente' });
+    }
+});
+
+app.get('/api/auth/perfil', async (req, res) => {
+    try {
+        if (!req.session.isAuthenticated) {
+            return res.status(401).json({ error: 'No autenticado' });
+        }
+
+        const response = await callAuthAPI('/perfil', {
+            method: 'GET'
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+            res.json(data);
+        } else {
+            res.status(response.status).json(data);
+        }
+    } catch (error) {
+        console.error('Error obteniendo perfil:', error);
+        res.status(500).json({ error: 'Error del servidor al obtener perfil' });
+    }
+});
+
+app.get('/api/auth/session', (req, res) => {
+    if (req.session.isAuthenticated && req.session.user) {
+        res.json({
+            authenticated: true,
+            user: req.session.user
+        });
+    } else {
+        res.json({
+            authenticated: false
+        });
+    }
+});
+
+console.log('✅ Authentication API proxy enabled');
+
 app.get('/api/ultragol/tabla', async (req, res) => {
     try {
         const response = await fetch(`${API_BASE_URL}/tabla`);
