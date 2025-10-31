@@ -92,3 +92,10 @@ externalPort = 3001
 [deployment]
 deploymentTarget = "vm"
 run = ["node", "server.js"]
+
+[userenv]
+
+[userenv.shared]
+API_BASE_URL = "https://472832aade2073.lhr.life"
+API_FALLBACK_URL = "http://192.168.100.15:5000"
+USE_FALLBACK_API = "false"
