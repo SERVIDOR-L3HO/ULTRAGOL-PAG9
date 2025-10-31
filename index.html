@@ -22,12 +22,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Firebase CDN -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3612607805789879"
      crossorigin="anonymous"></script>
@@ -668,37 +662,25 @@
 
     
 
-    <!-- Firebase Configuration -->
-    <script type="module" src="js/firebase-config.js"></script>
+    <!-- UltraGol Authentication System -->
+    <script src="js/auth-service.js"></script>
     
     <!-- Enhanced Main Scripts -->
     <script>
-        // Simple initialization without errors
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('UltraGol loaded with Firebase features');
+            console.log('UltraGol loaded with new authentication system');
             
-            // Show auth buttons by ensuring they're visible
             const authButtons = document.getElementById('authButtons');
             if (authButtons) {
                 authButtons.style.display = 'flex';
                 authButtons.style.gap = '10px';
                 authButtons.style.alignItems = 'center';
             }
-            
-            // Basic functionality loaded
         });
     </script>
     
-    <!-- Simplified Firebase Loading -->
+    <!-- Authentication Modal Functions -->
     <script>
-        // Load Firebase modules safely
-        setTimeout(() => {
-            if (typeof firebase !== 'undefined') {
-                console.log('Firebase loaded successfully');
-            } else {
-                console.log('Firebase loading in demo mode');
-            }
-        }, 2000);
         
         // Global functions for authentication modal
         window.openAuthModal = function(mode = 'login') {
