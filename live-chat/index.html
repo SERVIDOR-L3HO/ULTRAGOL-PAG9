@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>UltraGol Live Chat - Chat en Vivo Profesional</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="chat-header">
+        <div class="header-left">
+            <div class="live-indicator">
+                <span class="live-dot"></span>
+                <span class="live-text">EN VIVO</span>
+            </div>
+            <h1 class="chat-title">
+                <i class="fas fa-comments"></i>
+                UltraGol Live Chat
+            </h1>
+        </div>
+        <div class="header-right">
+            <div class="viewer-count">
+                <i class="fas fa-eye"></i>
+                <span id="viewerCount">0</span> espectadores
+            </div>
+            <button id="authBtn" class="auth-btn">
+                <i class="fab fa-google"></i>
+                Iniciar Sesión
+            </button>
+            <div id="userInfo" class="user-info" style="display: none;">
+                <img id="userAvatar" class="user-avatar" src="" alt="">
+                <span id="userName" class="user-name"></span>
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Chat Container -->
+    <div class="chat-container">
+        <!-- Video/Stream Preview (Optional) -->
+        <div class="stream-preview">
+            <div class="preview-placeholder">
+                <i class="fas fa-futbol"></i>
+                <p>Transmisión en vivo de Liga MX</p>
+                <span class="match-info">⚽ América vs Chivas - Clásico Nacional</span>
+            </div>
+        </div>
+
+        <!-- Chat Section -->
+        <div class="chat-section">
+            <!-- Chat Stats Bar -->
+            <div class="chat-stats">
+                <div class="stat-item">
+                    <i class="fas fa-fire"></i>
+                    <span id="messageCount">0</span> mensajes
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-users"></i>
+                    <span id="activeUsers">0</span> activos
+                </div>
+                <div class="stat-item online-status">
+                    <span class="status-dot"></span>
+                    Conectado
+                </div>
+            </div>
+
+            <!-- Messages Container -->
+            <div id="messagesContainer" class="messages-container">
+                <div class="welcome-message">
+                    <i class="fas fa-comments"></i>
+                    <h2>¡Bienvenido al chat en vivo!</h2>
+                    <p>Únete a la conversación sobre la Liga MX</p>
+                </div>
+            </div>
+
+            <!-- Message Input -->
+            <div class="message-input-container">
+                <div class="input-wrapper">
+                    <button class="emoji-btn" id="emojiBtn">
+                        <i class="far fa-smile"></i>
+                    </button>
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        class="message-input" 
+                        placeholder="Enviar un mensaje..."
+                        maxlength="200"
+                        disabled
+                    />
+                    <div class="input-actions">
+                        <span id="charCount" class="char-count">0/200</span>
+                        <button id="sendBtn" class="send-btn" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Emoji Picker -->
+                <div id="emojiPicker" class="emoji-picker" style="display: none;">
+                    <div class="emoji-header">
+                        <span>Emojis</span>
+                        <button class="emoji-close" id="emojiClose">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="emoji-grid" id="emojiGrid"></div>
+                </div>
+
+                <div class="input-hint">
+                    <i class="fas fa-info-circle"></i>
+                    Inicia sesión para participar en el chat
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="../js/firebase-config.js"></script>
+    <script src="chat.js"></script>
+</body>
+</html>
