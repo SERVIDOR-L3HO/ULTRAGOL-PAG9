@@ -72,23 +72,34 @@ async function callAuthAPI(endpoint, options = {}) {
 
 app.post('/api/auth/register', async (req, res) => {
     try {
-        const { username, password, email } = req.body;
+        const { username, password, email, favoriteTeam } = req.body;
         
         if (!username || !password) {
             return res.status(400).json({ error: 'Username y password son requeridos' });
         }
 
+        const registerData = { username, password };
+        if (email) registerData.email = email;
+        if (favoriteTeam) registerData.favoriteTeam = favoriteTeam;
+
         const response = await callAuthAPI('/register', {
             method: 'POST',
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify(registerData)
         });
 
         const data = await response.json();
         
         if (response.ok) {
-            req.session.user = data.user;
+            req.session.user = {
+                ...data.user,
+                email: email || data.user.email,
+                favoriteTeam: favoriteTeam || data.user.favoriteTeam
+            };
             req.session.isAuthenticated = true;
-            res.status(201).json(data);
+            res.status(201).json({
+                ...data,
+                user: req.session.user
+            });
         } else {
             res.status(response.status).json(data);
         }
@@ -114,9 +125,19 @@ app.post('/api/auth/login', async (req, res) => {
         const data = await response.json();
         
         if (response.ok) {
-            req.session.user = data.user;
+            req.session.user = {
+                id: data.user.id,
+                username: data.user.username,
+                role: data.user.role,
+                created_at: data.user.created_at,
+                email: data.user.email,
+                favoriteTeam: data.user.favoriteTeam
+            };
             req.session.isAuthenticated = true;
-            res.json(data);
+            res.json({
+                ...data,
+                user: req.session.user
+            });
         } else {
             res.status(response.status).json(data);
         }
