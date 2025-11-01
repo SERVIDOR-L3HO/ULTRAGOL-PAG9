@@ -2095,3 +2095,172 @@ input:checked + .slider:before {
         opacity: 0;
     }
 }
+
+/* Modal de Selección de Canales */
+.channel-selector-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 2500;
+    align-items: center;
+    justify-content: center;
+}
+
+.channel-selector-modal.active {
+    display: flex;
+}
+
+.channel-selector-content {
+    width: 95%;
+    max-width: 600px;
+    max-height: 80vh;
+    background: var(--secondary);
+    border-radius: 20px;
+    overflow: hidden;
+    animation: modalIn 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.channel-selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13, 13, 13, 0.98);
+}
+
+.channel-selector-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.close-channel-selector {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.3s ease;
+}
+
+.close-channel-selector:hover {
+    background: var(--primary);
+    transform: rotate(90deg);
+}
+
+.channel-selector-body {
+    padding: 15px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.channel-option {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.channel-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.channel-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.channel-number {
+    background: var(--primary);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    min-width: 60px;
+    text-align: center;
+}
+
+.channel-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+}
+
+.stream-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.stream-option-btn {
+    flex: 1;
+    min-width: 100px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.stream-option-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+}
+
+.stream-option-btn:active {
+    transform: translateY(0);
+}
+
+.stream-option-btn i {
+    font-size: 14px;
+}
+
+@media (max-width: 480px) {
+    .channel-selector-header h3 {
+        font-size: 14px;
+    }
+    
+    .channel-number {
+        min-width: 50px;
+        font-size: 12px;
+        padding: 6px 10px;
+    }
+    
+    .channel-name {
+        font-size: 13px;
+    }
+    
+    .stream-option-btn {
+        min-width: 80px;
+        font-size: 12px;
+        padding: 8px 12px;
+    }
+}

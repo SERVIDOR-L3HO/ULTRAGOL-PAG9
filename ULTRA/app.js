@@ -482,89 +482,142 @@ function startAutoUpdate() {
 }
 
 function watchMatch(matchId, videoUrl = null, videoTitle = null) {
+    if (videoUrl) {
+        playStreamInModal(videoUrl, videoTitle || 'Video', true);
+        return;
+    }
+    
+    let partido = null;
+    
+    if (marcadoresData && marcadoresData.partidos) {
+        partido = marcadoresData.partidos.find(p => p.id === matchId);
+    }
+    
+    if (!partido) {
+        showToast('No se pudo encontrar el partido');
+        return;
+    }
+    
+    if (!transmisionesData || !transmisionesData.transmisiones) {
+        showToast('No hay transmisiones disponibles');
+        return;
+    }
+    
+    const nombreLocal = partido.local.nombre.toLowerCase();
+    const nombreVisitante = partido.visitante.nombre.toLowerCase();
+    const nombreCortoLocal = partido.local.nombreCorto.toLowerCase();
+    const nombreCortoVisitante = partido.visitante.nombreCorto.toLowerCase();
+    
+    const transmision = transmisionesData.transmisiones.find(t => {
+        const evento = t.evento.toLowerCase();
+        return (evento.includes(nombreLocal) || evento.includes(nombreVisitante) ||
+                evento.includes(nombreCortoLocal) || evento.includes(nombreCortoVisitante));
+    });
+    
+    if (!transmision) {
+        showToast('No hay transmisión disponible para este partido');
+        console.log(`❌ No se encontró transmisión para: ${partido.local.nombre} vs ${partido.visitante.nombre}`);
+        return;
+    }
+    
+    console.log(`✅ Transmisión encontrada: ${transmision.evento}`);
+    console.log(`📺 Total canales: ${transmision.canales?.length || 0}`);
+    
+    if (!transmision.canales || transmision.canales.length === 0) {
+        showToast('No hay canales disponibles para esta transmisión');
+        return;
+    }
+    
+    const partidoNombre = `${partido.local.nombreCorto} vs ${partido.visitante.nombreCorto}`;
+    
+    if (transmision.canales.length === 1) {
+        const canal = transmision.canales[0];
+        const streamUrl = canal.links.hoca || canal.links.caster || canal.links.wigi;
+        console.log(`🎬 Reproduciendo en: ${canal.nombre}`);
+        playStreamInModal(streamUrl, `${partidoNombre} - ${canal.nombre}`, false);
+    } else {
+        showChannelSelector(transmision, partidoNombre);
+    }
+}
+
+function showChannelSelector(transmision, partidoNombre) {
+    const modal = document.getElementById('channelSelectorModal');
+    const body = document.getElementById('channelSelectorBody');
+    const title = document.getElementById('channelSelectorTitle');
+    
+    title.textContent = `${partidoNombre} - Seleccionar Canal`;
+    
+    body.innerHTML = transmision.canales.map((canal, index) => {
+        const streamTypes = [];
+        if (canal.links.hoca) streamTypes.push({ name: 'Hoca', url: canal.links.hoca });
+        if (canal.links.caster) streamTypes.push({ name: 'Caster', url: canal.links.caster });
+        if (canal.links.wigi) streamTypes.push({ name: 'Wigi', url: canal.links.wigi });
+        
+        return `
+            <div class="channel-option">
+                <div class="channel-info">
+                    <div class="channel-number">${canal.numero}</div>
+                    <div class="channel-name">${canal.nombre}</div>
+                </div>
+                <div class="stream-options">
+                    ${streamTypes.map(type => `
+                        <button class="stream-option-btn" onclick='selectStream("${type.url}", "${partidoNombre} - ${canal.nombre} (${type.name})")'>
+                            <i class="fas fa-play-circle"></i>
+                            ${type.name}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    modal.classList.add('active');
+}
+
+function closeChannelSelector() {
+    const modal = document.getElementById('channelSelectorModal');
+    modal.classList.remove('active');
+}
+
+function selectStream(streamUrl, streamTitle) {
+    closeChannelSelector();
+    playStreamInModal(streamUrl, streamTitle, false);
+}
+
+function playStreamInModal(streamUrl, title, isYouTube = false) {
     const modal = document.getElementById('playerModal');
     const modalBody = modal.querySelector('.modal-body');
     const modalTitle = document.getElementById('modalTitle');
     const loader = document.getElementById('modalLoader');
     
-    if (videoUrl) {
-        modalTitle.textContent = videoTitle || 'Video';
-        modal.classList.add('active');
-        loader.style.display = 'flex';
-        
-        let embedUrl = videoUrl;
-        if (videoUrl.includes('youtube.com/watch')) {
-            const videoId = videoUrl.split('v=')[1]?.split('&')[0];
-            if (videoId) {
-                embedUrl = `https://www.youtube.com/embed/${videoId}`;
-            }
+    let embedUrl = streamUrl;
+    
+    if (isYouTube && streamUrl.includes('youtube.com/watch')) {
+        const videoId = streamUrl.split('v=')[1]?.split('&')[0];
+        if (videoId) {
+            embedUrl = `https://www.youtube.com/embed/${videoId}`;
         }
-        
-        modalBody.innerHTML = `
-            <div class="loading-spinner" id="modalLoader" style="display: flex;">
-                <div class="spinner"></div>
-            </div>
-            <iframe id="modalIframe" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%;"></iframe>
-        `;
-        
-        const iframe = document.getElementById('modalIframe');
-        iframe.onload = () => {
-            setTimeout(() => {
-                const loaderEl = document.getElementById('modalLoader');
-                if (loaderEl) loaderEl.style.display = 'none';
-            }, 500);
-        };
-    } else {
-        let canalNumero = null;
-        let partido = null;
-        
-        if (marcadoresData && marcadoresData.partidos) {
-            partido = marcadoresData.partidos.find(p => p.id === matchId);
-            
-            if (partido && transmisionesData && transmisionesData.transmisiones) {
-                const nombreLocal = partido.local.nombre.toLowerCase();
-                const nombreVisitante = partido.visitante.nombre.toLowerCase();
-                
-                const transmision = transmisionesData.transmisiones.find(t => {
-                    const evento = t.evento.toLowerCase();
-                    return (evento.includes(nombreLocal) || evento.includes(nombreVisitante) ||
-                            evento.includes(partido.local.nombreCorto.toLowerCase()) ||
-                            evento.includes(partido.visitante.nombreCorto.toLowerCase()));
-                });
-                
-                if (transmision && transmision.canales && transmision.canales.length > 0) {
-                    const canalRaw = transmision.canales[0];
-                    canalNumero = canalRaw.replace(/[a-z]+$/i, '');
-                    console.log(`✅ Transmisión encontrada: ${transmision.evento}, Canal: ${canalNumero} (raw: ${canalRaw})`);
-                }
-            }
-        }
-        
-        const urlParam = canalNumero || matchId;
-        console.log(`🔴 Abriendo transmisión con parámetro: ${urlParam}`);
-        
-        const partidoNombre = partido ? `${partido.local.nombreCorto} vs ${partido.visitante.nombreCorto}` : matchId;
-        
-        currentStreamUrl = `../ULTRACANALES/index.html?canal=${urlParam}`;
-        modalTitle.textContent = `Transmisión en Vivo - ${partidoNombre}`;
-        modal.classList.add('active');
-        loader.style.display = 'flex';
-        
-        modalBody.innerHTML = `
-            <div class="loading-spinner" id="modalLoader" style="display: flex;">
-                <div class="spinner"></div>
-            </div>
-            <iframe id="modalIframe" src="${currentStreamUrl}" frameborder="0" allowfullscreen style="width: 100%; height: 100%;"></iframe>
-        `;
-        
-        const iframe = document.getElementById('modalIframe');
-        iframe.onload = () => {
-            setTimeout(() => {
-                const loaderEl = document.getElementById('modalLoader');
-                if (loaderEl) loaderEl.style.display = 'none';
-            }, 500);
-        };
     }
+    
+    currentStreamUrl = embedUrl;
+    modalTitle.textContent = title;
+    modal.classList.add('active');
+    loader.style.display = 'flex';
+    
+    modalBody.innerHTML = `
+        <div class="loading-spinner" id="modalLoader" style="display: flex;">
+            <div class="spinner"></div>
+        </div>
+        <iframe id="modalIframe" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%;"></iframe>
+    `;
+    
+    const iframe = document.getElementById('modalIframe');
+    iframe.onload = () => {
+        setTimeout(() => {
+            const loaderEl = document.getElementById('modalLoader');
+            if (loaderEl) loaderEl.style.display = 'none';
+        }, 500);
+    };
 }
 
 function closeModal() {
