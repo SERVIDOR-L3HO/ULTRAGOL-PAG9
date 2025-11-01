@@ -936,3 +936,31 @@ function selectLeague(leagueName, element) {
 function showLockedLeagueMessage(leagueName) {
     showToast(`${leagueName} estará disponible próximamente`);
 }
+
+// Modo oscuro
+function initDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    
+    if (savedDarkMode) {
+        document.body.classList.add('dark-mode');
+        if (darkModeToggle) darkModeToggle.checked = true;
+    }
+    
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', function() {
+            if (this.checked) {
+                document.body.classList.add('dark-mode');
+                localStorage.setItem('darkMode', 'true');
+            } else {
+                document.body.classList.remove('dark-mode');
+                localStorage.setItem('darkMode', 'false');
+            }
+        });
+    }
+}
+
+// Inicializar modo oscuro cuando se carga la página
+document.addEventListener('DOMContentLoaded', () => {
+    initDarkMode();
+});

@@ -2264,3 +2264,153 @@ input:checked + .slider:before {
         padding: 8px 12px;
     }
 }
+
+/* ==================== MODO OSCURO ==================== */
+body.dark-mode {
+    --bg: #0a0a0a;
+    --bg-secondary: #1a1a1a;
+    --bg-card: #1e1e1e;
+    --text: #e5e5e5;
+    --text-secondary: #a0a0a0;
+    --border: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .header {
+    background: rgba(10, 10, 10, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .match-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+}
+
+body.dark-mode .match-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .featured-match {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+}
+
+body.dark-mode .tab-button {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .tab-button.active {
+    color: var(--primary);
+}
+
+body.dark-mode .league-btn {
+    background: var(--bg-card);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+body.dark-mode .league-btn.active {
+    background: var(--primary);
+    color: white;
+}
+
+body.dark-mode .standings-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+}
+
+body.dark-mode .standings-table th {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+}
+
+body.dark-mode .standings-table td {
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border);
+}
+
+body.dark-mode .standings-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .news-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+}
+
+body.dark-mode .news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(255, 69, 0, 0.3);
+}
+
+body.dark-mode .settings-panel {
+    background: rgba(10, 10, 10, 0.98);
+    border-left: 1px solid var(--border);
+}
+
+body.dark-mode .settings-option {
+    border-bottom: 1px solid var(--border);
+}
+
+body.dark-mode .settings-option h4 {
+    color: var(--text);
+}
+
+body.dark-mode .settings-option p {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .modal-content,
+body.dark-mode .player-modal-content,
+body.dark-mode .channel-selector-content {
+    background: var(--bg-secondary);
+}
+
+body.dark-mode .modal-header,
+body.dark-mode .channel-selector-header {
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+}
+
+body.dark-mode .modal-body,
+body.dark-mode .channel-selector-body {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .channel-option {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+}
+
+body.dark-mode .channel-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--primary);
+}
+
+body.dark-mode .bottom-nav {
+    background: rgba(10, 10, 10, 0.98);
+    border-top: 1px solid var(--border);
+}
+
+body.dark-mode .nav-button {
+    color: var(--text-secondary);
+}
+
+body.dark-mode .nav-button.active {
+    color: var(--primary);
+}
+
+body.dark-mode h2, 
+body.dark-mode h3 {
+    color: var(--text);
+}
+
+body.dark-mode .section-header h2 {
+    color: var(--text);
+}
+
+body.dark-mode .news-content h4 {
+    color: var(--text);
+}
+
+body.dark-mode .news-content p {
+    color: var(--text-secondary);
+}
