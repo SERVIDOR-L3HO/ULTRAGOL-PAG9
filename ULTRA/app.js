@@ -530,14 +530,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     
     const partidoNombre = `${partido.local.nombreCorto} vs ${partido.visitante.nombreCorto}`;
     
-    if (transmision.canales.length === 1) {
-        const canal = transmision.canales[0];
-        const streamUrl = canal.links.hoca || canal.links.caster || canal.links.wigi;
-        console.log(`🎬 Reproduciendo en: ${canal.nombre}`);
-        playStreamInModal(streamUrl, `${partidoNombre} - ${canal.nombre}`, false);
-    } else {
-        showChannelSelector(transmision, partidoNombre);
-    }
+    showChannelSelector(transmision, partidoNombre);
 }
 
 function showChannelSelector(transmision, partidoNombre) {
