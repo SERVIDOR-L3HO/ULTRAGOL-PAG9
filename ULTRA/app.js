@@ -510,8 +510,11 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     
     const transmision = transmisionesData.transmisiones.find(t => {
         const evento = t.evento.toLowerCase();
-        return (evento.includes(nombreLocal) || evento.includes(nombreVisitante) ||
-                evento.includes(nombreCortoLocal) || evento.includes(nombreCortoVisitante));
+        
+        const tieneLocal = evento.includes(nombreLocal) || evento.includes(nombreCortoLocal);
+        const tieneVisitante = evento.includes(nombreVisitante) || evento.includes(nombreCortoVisitante);
+        
+        return tieneLocal && tieneVisitante;
     });
     
     if (!transmision) {
