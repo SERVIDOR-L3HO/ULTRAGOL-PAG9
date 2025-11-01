@@ -508,11 +508,36 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     const nombreCortoLocal = partido.local.nombreCorto.toLowerCase();
     const nombreCortoVisitante = partido.visitante.nombreCorto.toLowerCase();
     
+    // Función auxiliar para extraer palabras clave del nombre
+    const extraerPalabrasClaves = (nombre) => {
+        // Remover todos los prefijos comunes en un solo paso
+        return nombre
+            .replace(/^(fc|cf|cd|club|atletico|atlético|deportivo|sporting|de|del|la|los|las)\s+/gi, '')
+            .replace(/^(fc|cf|cd|club|atletico|atlético|deportivo|sporting|de|del|la|los|las)\s+/gi, '')
+            .replace(/\s+(fc|cf|cd|club)$/gi, '')
+            .trim();
+    };
+    
+    const palabrasLocal = extraerPalabrasClaves(nombreLocal);
+    const palabrasVisitante = extraerPalabrasClaves(nombreVisitante);
+    
+    console.log(`🔍 Buscando transmisión para:`);
+    console.log(`   Local: "${nombreLocal}" → palabras clave: "${palabrasLocal}"`);
+    console.log(`   Visitante: "${nombreVisitante}" → palabras clave: "${palabrasVisitante}"`);
+    
     const transmision = transmisionesData.transmisiones.find(t => {
         const evento = t.evento.toLowerCase();
         
-        const tieneLocal = evento.includes(nombreLocal) || evento.includes(nombreCortoLocal);
-        const tieneVisitante = evento.includes(nombreVisitante) || evento.includes(nombreCortoVisitante);
+        // Buscar coincidencias usando múltiples estrategias
+        const tieneLocal = 
+            evento.includes(nombreLocal) || 
+            evento.includes(nombreCortoLocal) ||
+            evento.includes(palabrasLocal);
+            
+        const tieneVisitante = 
+            evento.includes(nombreVisitante) || 
+            evento.includes(nombreCortoVisitante) ||
+            evento.includes(palabrasVisitante);
         
         return tieneLocal && tieneVisitante;
     });
