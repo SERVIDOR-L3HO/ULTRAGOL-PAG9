@@ -57,20 +57,39 @@ Navega a: `live-chat/index.html`
 
 ## 🔧 Configuración de Firebase
 
-### Reglas de Firestore Recomendadas
+### Reglas de Firestore REQUERIDAS
+
+**IMPORTANTE:** Debes configurar estas reglas en Firebase Console para que el chat funcione:
+
+1. Ve a **Firebase Console** → **Firestore Database** → **Reglas**
+2. Copia y pega las siguientes reglas:
 
 \`\`\`javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Mensajes del chat - Lectura pública, escritura autenticada
     match /liveChat/{messageId} {
       allow read: if true;
       allow create: if request.auth != null 
         && request.resource.data.text.size() <= 200
         && request.resource.data.userId == request.auth.uid;
       allow update, delete: if false;
+      
+      // Reacciones a mensajes
+      match /reactions/{userId} {
+        allow read: if true;
+        allow write: if request.auth != null && request.auth.uid == userId;
+      }
     }
     
+    // Indicador de usuarios escribiendo
+    match /typing/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Presencia de usuarios
     match /presence/{userId} {
       allow read: if true;
       allow write: if request.auth != null && request.auth.uid == userId;
@@ -78,6 +97,20 @@ service cloud.firestore {
   }
 }
 \`\`\`
+
+3. Haz clic en **Publicar**
+
+### Índice de Firestore (Opcional pero Recomendado)
+
+El chat intentará funcionar sin índice, pero para mejor rendimiento:
+
+1. Ve a **Firestore Database** → **Índices**
+2. Crea un índice compuesto:
+   - **Colección:** `liveChat`
+   - **Campos:** `timestamp` (Descendente)
+   - **Estado de consulta:** Habilitado
+
+**Nota:** Si no creas el índice, el chat funcionará igualmente pero mostrará los mensajes sin ordenar por fecha.
 
 ### Dominios Autorizados
 En Firebase Console → Authentication → Settings → Authorized domains:

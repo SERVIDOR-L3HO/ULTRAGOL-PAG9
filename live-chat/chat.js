@@ -366,7 +366,10 @@ function disableChat() {
 }
 
 function listenToMessages() {
-    if (!window.db) return;
+    if (!window.db) {
+        console.error('Database not available');
+        return;
+    }
     
     const messagesContainer = document.getElementById('messagesContainer');
     messagesContainer.innerHTML = `
@@ -376,11 +379,45 @@ function listenToMessages() {
         </div>
     `;
     
-    const messagesRef = window.db.collection('liveChat')
-        .orderBy('timestamp', 'desc')
-        .limit(100);
+    tryListenWithIndex();
     
-    messagesListener = messagesRef.onSnapshot((snapshot) => {
+    function tryListenWithIndex() {
+        const messagesRef = window.db.collection('liveChat')
+            .orderBy('timestamp', 'desc')
+            .limit(100);
+        
+        messagesListener = messagesRef.onSnapshot((snapshot) => {
+            handleMessagesSnapshot(snapshot);
+        }, (error) => {
+            console.error('Error with indexed query:', error);
+            
+            if (error.code === 'failed-precondition' || error.message?.includes('index')) {
+                console.log('⚠️ Index not found, trying without orderBy...');
+                tryListenWithoutIndex();
+            } else if (error.code === 'permission-denied') {
+                handlePermissionError();
+            } else {
+                handleGeneralError(error);
+            }
+        });
+    }
+    
+    function tryListenWithoutIndex() {
+        const messagesRef = window.db.collection('liveChat').limit(50);
+        
+        messagesListener = messagesRef.onSnapshot((snapshot) => {
+            handleMessagesSnapshot(snapshot);
+        }, (error) => {
+            console.error('Error without index:', error);
+            if (error.code === 'permission-denied') {
+                handlePermissionError();
+            } else {
+                handleGeneralError(error);
+            }
+        });
+    }
+    
+    function handleMessagesSnapshot(snapshot) {
         const loadingContainer = messagesContainer.querySelector('.loading-container');
         if (loadingContainer) {
             loadingContainer.remove();
@@ -389,6 +426,16 @@ function listenToMessages() {
         const welcomeMsg = messagesContainer.querySelector('.welcome-message');
         if (welcomeMsg && !snapshot.empty) {
             welcomeMsg.remove();
+        }
+        
+        if (snapshot.empty && !messagesContainer.querySelector('.welcome-message')) {
+            messagesContainer.innerHTML = `
+                <div class="welcome-message">
+                    <i class="fas fa-comments"></i>
+                    <h2>¡Bienvenido al chat en vivo!</h2>
+                    <p>Sé el primero en enviar un mensaje</p>
+                </div>
+            `;
         }
         
         snapshot.docChanges().forEach((change) => {
@@ -405,17 +452,33 @@ function listenToMessages() {
         });
         
         updateMessageCount();
-    }, (error) => {
-        console.error('Error listening to messages:', error);
-        showToast('Error', 'No se pueden cargar los mensajes', 'error');
+    }
+    
+    function handlePermissionError() {
+        console.error('Permission denied - Check Firestore rules');
+        messagesContainer.innerHTML = `
+            <div class="welcome-message">
+                <i class="fas fa-lock"></i>
+                <h2>Acceso denegado</h2>
+                <p>Inicia sesión para ver el chat</p>
+            </div>
+        `;
+    }
+    
+    function handleGeneralError(error) {
+        console.error('General error:', error);
+        showToast('Error', 'Problema al conectar con el chat', 'error');
         messagesContainer.innerHTML = `
             <div class="welcome-message">
                 <i class="fas fa-exclamation-triangle"></i>
-                <h2>Error al cargar mensajes</h2>
-                <p>Por favor, recarga la página</p>
+                <h2>Error de conexión</h2>
+                <p>Verifica tu conexión e intenta nuevamente</p>
+                <button onclick="location.reload()" style="margin-top: 20px; padding: 12px 24px; background: var(--primary-color); color: var(--bg-dark); border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">
+                    Recargar página
+                </button>
             </div>
         `;
-    });
+    }
     
     listenToTyping();
 }
@@ -520,12 +583,25 @@ window.addReaction = async function(messageId, reaction) {
 };
 
 async function sendMessage() {
-    if (!currentUser || !window.db) return;
+    if (!currentUser) {
+        showToast('Error', 'Debes iniciar sesión para enviar mensajes', 'error');
+        return;
+    }
+    
+    if (!window.db) {
+        showToast('Error', 'Conexión no disponible', 'error');
+        return;
+    }
     
     const messageInput = document.getElementById('messageInput');
     const text = messageInput.value.trim();
     
     if (!text) return;
+    
+    const sendBtn = document.getElementById('sendBtn');
+    const originalBtnContent = sendBtn.innerHTML;
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     
     try {
         await window.db.collection('liveChat').add({
@@ -537,9 +613,9 @@ async function sendMessage() {
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         
-        if (window.db.collection('typing').doc(currentUser.uid)) {
-            await window.db.collection('typing').doc(currentUser.uid).delete();
-        }
+        try {
+            await window.db.collection('typing').doc(currentUser.uid).delete().catch(() => {});
+        } catch (e) {}
         
         messageInput.value = '';
         document.getElementById('charCount').textContent = '0/200';
@@ -551,7 +627,18 @@ async function sendMessage() {
         
     } catch (error) {
         console.error('Error sending message:', error);
-        showToast('Error', 'No se pudo enviar el mensaje', 'error');
+        
+        let errorMsg = 'No se pudo enviar el mensaje';
+        if (error.code === 'permission-denied') {
+            errorMsg = 'No tienes permiso para enviar mensajes. Verifica tu sesión.';
+        } else if (error.code === 'unavailable') {
+            errorMsg = 'Sin conexión. Verifica tu internet.';
+        }
+        
+        showToast('Error', errorMsg, 'error');
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = originalBtnContent;
     }
 }
 
