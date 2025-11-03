@@ -7,6 +7,10 @@ let activeUsers = new Set();
 let soundEnabled = true;
 let typingTimeout = null;
 let allMessages = [];
+let isInitialized = false;
+let viewerCountInterval = null;
+let firebaseRetryCount = 0;
+let maxRetries = 10;
 
 const emojis = ['⚽', '🔥', '👏', '😂', '😍', '🎉', '💪', '👀', '🤔', '😱', 
                 '🙌', '💯', '❤️', '⚡', '🏆', '🎯', '👑', '💥', '🌟', '✨',
@@ -23,23 +27,41 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeChat() {
-    console.log('Initializing chat system...');
+    if (isInitialized) {
+        console.log('⚠️ Chat already initialized, skipping...');
+        return;
+    }
     
-    setTimeout(() => {
-        if (typeof window.auth !== 'undefined' && typeof window.db !== 'undefined') {
-            console.log('✅ Firebase loaded, setting up chat');
-            setupFirebaseChat();
-        } else {
-            console.warn('⚠️ Firebase not available, retrying...');
-            initializeChat();
-        }
-    }, 500);
+    console.log('Initializing chat system...');
     
     setupEventListeners();
     setupEmojiPicker();
     setupQuickReactions();
+    
+    if (viewerCountInterval) {
+        clearInterval(viewerCountInterval);
+    }
     updateViewerCount();
-    setInterval(updateViewerCount, 30000);
+    viewerCountInterval = setInterval(updateViewerCount, 30000);
+    
+    checkFirebaseReady();
+}
+
+function checkFirebaseReady() {
+    if (typeof window.auth !== 'undefined' && typeof window.db !== 'undefined') {
+        console.log('✅ Firebase loaded, setting up chat');
+        isInitialized = true;
+        firebaseRetryCount = 0;
+        setupFirebaseChat();
+    } else if (firebaseRetryCount < maxRetries) {
+        firebaseRetryCount++;
+        const delay = Math.min(1000 * Math.pow(1.5, firebaseRetryCount), 5000);
+        console.warn(`⚠️ Firebase not available, retrying in ${delay}ms (attempt ${firebaseRetryCount}/${maxRetries})...`);
+        setTimeout(checkFirebaseReady, delay);
+    } else {
+        console.error('❌ Firebase failed to load after maximum retries');
+        showToast('Error', 'No se pudo conectar con el sistema de chat', 'error');
+    }
 }
 
 function setupFirebaseChat() {
