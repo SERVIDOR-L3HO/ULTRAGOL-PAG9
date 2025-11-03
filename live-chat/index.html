@@ -59,20 +59,56 @@
 
         <!-- Chat Section -->
         <div class="chat-section">
-            <!-- Chat Stats Bar -->
-            <div class="chat-stats">
-                <div class="stat-item">
-                    <i class="fas fa-fire"></i>
-                    <span id="messageCount">0</span> mensajes
+            <!-- Chat Toolbar -->
+            <div class="chat-toolbar">
+                <div class="chat-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-fire"></i>
+                        <span id="messageCount">0</span> mensajes
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-users"></i>
+                        <span id="activeUsers">0</span> activos
+                    </div>
+                    <div class="stat-item online-status">
+                        <span class="status-dot"></span>
+                        Conectado
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <i class="fas fa-users"></i>
-                    <span id="activeUsers">0</span> activos
+                
+                <!-- Chat Options -->
+                <div class="chat-options">
+                    <button class="option-btn" id="searchBtn" title="Buscar mensajes">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="option-btn" id="soundBtn" title="Sonidos">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <button class="option-btn" id="settingsBtn" title="Configuración">
+                        <i class="fas fa-cog"></i>
+                    </button>
                 </div>
-                <div class="stat-item online-status">
-                    <span class="status-dot"></span>
-                    Conectado
+            </div>
+            
+            <!-- Search Bar (Hidden by default) -->
+            <div class="search-container" id="searchContainer" style="display: none;">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Buscar en el chat..." />
+                    <button class="search-close" id="searchClose">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
+            </div>
+            
+            <!-- Typing Indicator -->
+            <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                <span class="typing-text">
+                    <span id="typingUsers">Alguien</span> está escribiendo
+                    <span class="typing-dots">
+                        <span></span><span></span><span></span>
+                    </span>
+                </span>
             </div>
 
             <!-- Messages Container -->
@@ -86,6 +122,16 @@
 
             <!-- Message Input -->
             <div class="message-input-container">
+                <!-- Quick Reactions Bar -->
+                <div class="quick-reactions" id="quickReactions">
+                    <button class="quick-reaction" data-reaction="⚽">⚽</button>
+                    <button class="quick-reaction" data-reaction="🔥">🔥</button>
+                    <button class="quick-reaction" data-reaction="👏">👏</button>
+                    <button class="quick-reaction" data-reaction="😂">😂</button>
+                    <button class="quick-reaction" data-reaction="❤️">❤️</button>
+                    <button class="quick-reaction" data-reaction="💪">💪</button>
+                </div>
+                
                 <div class="input-wrapper">
                     <button class="emoji-btn" id="emojiBtn">
                         <i class="far fa-smile"></i>
@@ -99,6 +145,9 @@
                         disabled
                     />
                     <div class="input-actions">
+                        <button class="gif-btn" id="gifBtn" title="GIF" disabled>
+                            <i class="fas fa-gift"></i>
+                        </button>
                         <span id="charCount" class="char-count">0/200</span>
                         <button id="sendBtn" class="send-btn" disabled>
                             <i class="fas fa-paper-plane"></i>
