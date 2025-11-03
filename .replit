@@ -26,7 +26,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd ULTRA && npm start"
+args = "node server.js"
 waitForPort = 5000
 
 [[ports]]
@@ -34,7 +34,7 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 36463
+localPort = 33397
 externalPort = 5173
 
 [[ports]]
