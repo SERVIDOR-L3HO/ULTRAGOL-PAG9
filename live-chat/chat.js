@@ -499,14 +499,43 @@ function listenToMessages() {
     }
     
     function handlePermissionError() {
-        console.error('Permission denied - User needs to be authenticated');
+        console.error('Permission denied - Firestore rules need to be configured');
+        console.log('ℹ️ User is authenticated, but Firestore rules are blocking access');
+        console.log('📝 Please configure Firestore rules in Firebase Console');
+        
         messagesContainer.innerHTML = `
             <div class="welcome-message">
-                <i class="fas fa-lock"></i>
-                <h2>Chat en vivo</h2>
-                <p>Inicia sesión con Google para ver y participar en el chat</p>
-                <button onclick="document.getElementById('authBtn').click()" style="margin-top: 20px; padding: 12px 24px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: var(--bg-dark); border: none; border-radius: 12px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-left: auto; margin-right: auto;">
-                    <i class="fab fa-google"></i> Iniciar Sesión
+                <i class="fas fa-exclamation-circle" style="color: #ff9800;"></i>
+                <h2 style="color: #ff9800;">Configuración Requerida</h2>
+                <p style="margin-bottom: 15px;">Firestore necesita permisos configurados</p>
+                <div style="text-align: left; background: var(--bg-darker); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 12px; line-height: 1.6;">
+                    <strong style="color: var(--primary-color);">Pasos para configurar:</strong><br>
+                    1. Ve a <a href="https://console.firebase.google.com" target="_blank" style="color: var(--secondary-color);">Firebase Console</a><br>
+                    2. Selecciona tu proyecto: <strong>ligamx-daf3d</strong><br>
+                    3. Ve a <strong>Firestore Database</strong> → <strong>Reglas</strong><br>
+                    4. Copia y pega estas reglas:<br>
+                    <pre style="background: var(--bg-card); padding: 10px; margin-top: 5px; border-radius: 4px; overflow-x: auto; font-size: 11px;">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /liveChat/{messageId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      match /reactions/{reactionId} {
+        allow read, write: if request.auth != null;
+      }
+    }
+    match /typing/{userId} {
+      allow read, write: if request.auth != null;
+    }
+    match /presence/{userId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}</pre>
+                    5. Click <strong>"Publicar"</strong>
+                </div>
+                <button onclick="location.reload()" style="margin-top: 10px; padding: 12px 24px; background: var(--primary-color); color: var(--bg-dark); border: none; border-radius: 12px; cursor: pointer; font-weight: 700;">
+                    <i class="fas fa-sync"></i> Recargar después de configurar
                 </button>
             </div>
         `;
