@@ -44,6 +44,9 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeChat() {
     console.log('Initializing chat system...');
     
+    // Limpiar datos corruptos automáticamente
+    cleanCorruptedData();
+    
     setupEventListeners();
     setupEmojiPicker();
     setupQuickReactions();
@@ -55,12 +58,43 @@ function initializeChat() {
     console.log('✅ Chat initialized successfully');
 }
 
+function cleanCorruptedData() {
+    try {
+        const storedMessages = localStorage.getItem('chatMessages');
+        if (storedMessages) {
+            const messages = JSON.parse(storedMessages);
+            // Verificar si hay mensajes corruptos
+            const hasCorrupted = messages.some(msg => 
+                !msg || typeof msg !== 'object' || !msg.username || typeof msg.text !== 'string'
+            );
+            
+            if (hasCorrupted) {
+                console.log('⚠️ Datos corruptos detectados, limpiando...');
+                // Filtrar solo mensajes válidos
+                const validMessages = messages.filter(msg => 
+                    msg && 
+                    typeof msg === 'object' && 
+                    msg.username && 
+                    (typeof msg.text === 'string' || msg.image)
+                );
+                localStorage.setItem('chatMessages', JSON.stringify(validMessages));
+                showToast('Limpieza', 'Mensajes corruptos eliminados', 'success');
+            }
+        }
+    } catch (error) {
+        console.error('Error limpiando datos:', error);
+        // Si hay error, limpiar todo
+        localStorage.removeItem('chatMessages');
+    }
+}
+
 function setupEventListeners() {
     // Botones de configuración
     document.getElementById('changeNameBtn')?.addEventListener('click', handleChangeName);
     document.getElementById('anonymousBtn')?.addEventListener('click', toggleAnonymous);
     document.getElementById('soundBtn')?.addEventListener('click', toggleSound);
     document.getElementById('searchBtn')?.addEventListener('click', toggleSearch);
+    document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
     
     // Enviar mensaje
     document.getElementById('sendBtn')?.addEventListener('click', sendMessage);
@@ -128,6 +162,25 @@ function handleChangeName() {
         localStorage.setItem('chatAvatar', currentUser.avatar);
         updateAuthUI();
         showToast('Éxito', `Tu nombre ahora es: ${currentUser.name}`, 'success');
+    }
+}
+
+function handleLogout() {
+    if (confirm('¿Deseas cerrar sesión y limpiar tus datos?\n\nEsto eliminará tu nombre, mensajes guardados y preferencias.')) {
+        // Limpiar todo el localStorage
+        localStorage.removeItem('chatUsername');
+        localStorage.removeItem('chatAvatar');
+        localStorage.removeItem('chatAnonymous');
+        localStorage.removeItem('chatMessages');
+        localStorage.removeItem('chatSound');
+        
+        // Reiniciar el chat
+        showToast('Sesión cerrada', 'Datos eliminados correctamente', 'success');
+        
+        // Recargar la página después de un momento
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
     }
 }
 
@@ -214,8 +267,9 @@ async function handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
     
-    if (file.size > 1 * 1024 * 1024) {
-        showToast('Error', 'La imagen es muy grande (máx 1MB)', 'error');
+    // Aumentar límite a 5MB para permitir mejor calidad
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('Error', 'La imagen es muy grande (máx 5MB)', 'error');
         e.target.value = '';
         return;
     }
@@ -229,8 +283,8 @@ async function handleImageUpload(e) {
             let width = img.width;
             let height = img.height;
             
-            // Reducir dimensiones si es muy grande
-            const maxDimension = 800;
+            // Reducir dimensiones solo si es extremadamente grande
+            const maxDimension = 1920;
             if (width > maxDimension || height > maxDimension) {
                 if (width > height) {
                     height = (height / width) * maxDimension;
@@ -246,8 +300,8 @@ async function handleImageUpload(e) {
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
             
-            // Convertir a JPEG con calidad reducida para comprimir
-            const compressedData = canvas.toDataURL('image/jpeg', 0.7);
+            // Convertir a JPEG con alta calidad
+            const compressedData = canvas.toDataURL('image/jpeg', 0.92);
             sendMessage(null, compressedData);
             e.target.value = '';
         };
@@ -338,6 +392,12 @@ function loadMessages() {
 function addMessageToUI(message, animate = true) {
     const messagesContainer = document.getElementById('messagesContainer');
     
+    // Validar que el mensaje tenga la estructura correcta
+    if (!message || typeof message !== 'object' || !message.username) {
+        console.warn('Mensaje inválido ignorado:', message);
+        return;
+    }
+    
     // Remover mensaje de bienvenida si existe
     const welcomeMsg = messagesContainer.querySelector('.welcome-message');
     if (welcomeMsg) welcomeMsg.remove();
@@ -347,26 +407,29 @@ function addMessageToUI(message, animate = true) {
     if (animate) {
         messageDiv.style.animation = 'messageSlideIn 0.3s ease';
     }
-    messageDiv.dataset.id = message.id;
+    messageDiv.dataset.id = message.id || Date.now();
     
     const timestamp = new Date(message.timestamp).toLocaleTimeString('es-ES', { 
         hour: '2-digit', 
         minute: '2-digit' 
     });
     
+    // Validar que text sea string
+    const messageText = typeof message.text === 'string' ? message.text : '';
+    
     const imageHTML = message.image ? `
         <img src="${message.image}" class="message-image" alt="Imagen enviada" onclick="openImageModal('${message.image}')">
     ` : '';
     
     messageDiv.innerHTML = `
-        <img class="message-avatar" src="${message.avatar}" alt="${message.username}">
+        <img class="message-avatar" src="${message.avatar || 'https://ui-avatars.com/api/?name=User&background=9d4edd&color=fff'}" alt="${message.username}">
         <div class="message-content">
             <div class="message-header">
                 <span class="message-username">${escapeHtml(message.username)}</span>
                 ${message.isAnonymous ? '<span class="message-badge" style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">ANÓNIMO</span>' : ''}
                 <span class="message-timestamp">${timestamp}</span>
             </div>
-            ${message.text ? `<div class="message-text">${escapeHtml(message.text)}</div>` : ''}
+            ${messageText ? `<div class="message-text">${escapeHtml(messageText)}</div>` : ''}
             ${imageHTML}
         </div>
     `;
