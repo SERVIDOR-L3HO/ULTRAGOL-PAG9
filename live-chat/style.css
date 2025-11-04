@@ -5,17 +5,17 @@
 }
 
 :root {
-    --primary-color: #53fc18;
-    --secondary-color: #00e5ff;
-    --bg-dark: #0e0e10;
-    --bg-darker: #18181b;
-    --bg-card: #1f1f23;
-    --text-primary: #efeff1;
-    --text-secondary: #adadb8;
+    --primary-color: #9d4edd;
+    --secondary-color: #10b981;
+    --bg-dark: #1a1625;
+    --bg-darker: #0f0b16;
+    --bg-card: #241b2f;
+    --text-primary: #f3f0ff;
+    --text-secondary: #b4a5d8;
     --accent-red: #ff4655;
-    --accent-purple: #9147ff;
+    --accent-purple: #c77dff;
     --accent-gold: #ffd700;
-    --hover-color: #2c2c35;
+    --hover-color: #342947;
 }
 
 body {
@@ -620,7 +620,7 @@ body {
     border-top: 2px solid rgba(83, 252, 24, 0.2);
 }
 
-.gif-btn {
+.gif-btn, .image-btn {
     background: none;
     border: none;
     color: var(--text-secondary);
@@ -628,9 +628,12 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.gif-btn:hover:not(:disabled) {
+.gif-btn:hover:not(:disabled), .image-btn:hover {
     color: var(--primary-color);
     transform: scale(1.2);
 }
@@ -638,6 +641,19 @@ body {
 .gif-btn:disabled {
     opacity: 0.3;
     cursor: not-allowed;
+}
+
+.message-image {
+    max-width: 300px;
+    max-height: 200px;
+    border-radius: 8px;
+    margin-top: 8px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.message-image:hover {
+    transform: scale(1.05);
 }
 
 .input-wrapper {

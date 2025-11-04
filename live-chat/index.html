@@ -78,14 +78,17 @@
                 
                 <!-- Chat Options -->
                 <div class="chat-options">
+                    <button class="option-btn" id="changeNameBtn" title="Cambiar nombre">
+                        <i class="fas fa-user-edit"></i>
+                    </button>
+                    <button class="option-btn" id="anonymousBtn" title="Modo anónimo">
+                        <i class="fas fa-user-secret"></i>
+                    </button>
                     <button class="option-btn" id="searchBtn" title="Buscar mensajes">
                         <i class="fas fa-search"></i>
                     </button>
                     <button class="option-btn" id="soundBtn" title="Sonidos">
                         <i class="fas fa-volume-up"></i>
-                    </button>
-                    <button class="option-btn" id="settingsBtn" title="Configuración">
-                        <i class="fas fa-cog"></i>
                     </button>
                 </div>
             </div>
@@ -142,14 +145,14 @@
                         class="message-input" 
                         placeholder="Enviar un mensaje..."
                         maxlength="200"
-                        disabled
                     />
                     <div class="input-actions">
-                        <button class="gif-btn" id="gifBtn" title="GIF" disabled>
-                            <i class="fas fa-gift"></i>
-                        </button>
+                        <label for="imageInput" class="image-btn" title="Subir imagen">
+                            <i class="fas fa-image"></i>
+                        </label>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;" />
                         <span id="charCount" class="char-count">0/200</span>
-                        <button id="sendBtn" class="send-btn" disabled>
+                        <button id="sendBtn" class="send-btn">
                             <i class="fas fa-paper-plane"></i>
                         </button>
                     </div>

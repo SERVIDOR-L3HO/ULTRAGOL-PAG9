@@ -1,217 +1,143 @@
 console.log('🚀 UltraGol Live Chat initializing...');
 
-let currentUser = null;
-let messagesListener = null;
+// Estado del chat
+let currentUser = {
+    name: localStorage.getItem('chatUsername') || 'Usuario' + Math.floor(Math.random() * 1000),
+    avatar: localStorage.getItem('chatAvatar') || `https://ui-avatars.com/api/?name=${localStorage.getItem('chatUsername') || 'User'}&background=9d4edd&color=fff`,
+    isAnonymous: localStorage.getItem('chatAnonymous') === 'true'
+};
+
+let messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+let soundEnabled = localStorage.getItem('chatSound') !== 'false';
 let messageCount = 0;
-let activeUsers = new Set();
-let soundEnabled = true;
-let typingTimeout = null;
-let allMessages = [];
-let isInitialized = false;
-let viewerCountInterval = null;
-let firebaseRetryCount = 0;
-let maxRetries = 10;
 
 const emojis = ['⚽', '🔥', '👏', '😂', '😍', '🎉', '💪', '👀', '🤔', '😱', 
                 '🙌', '💯', '❤️', '⚡', '🏆', '🎯', '👑', '💥', '🌟', '✨',
                 '😎', '🤩', '😤', '🥳', '🔴', '🟢', '🔵', '🟡', '⭐', '💚'];
 
-const notificationSounds = {
-    message: () => playSound(800, 100),
-    send: () => playSound(600, 80),
-    reaction: () => playSound(1000, 60)
-};
-
+// Inicializar al cargar
 document.addEventListener('DOMContentLoaded', function() {
     initializeChat();
 });
 
 function initializeChat() {
-    if (isInitialized) {
-        console.log('⚠️ Chat already initialized, skipping...');
-        return;
-    }
-    
     console.log('Initializing chat system...');
     
     setupEventListeners();
     setupEmojiPicker();
     setupQuickReactions();
-    
-    if (viewerCountInterval) {
-        clearInterval(viewerCountInterval);
-    }
+    updateAuthUI();
+    loadMessages();
     updateViewerCount();
-    viewerCountInterval = setInterval(updateViewerCount, 30000);
     
-    checkFirebaseReady();
-}
-
-function checkFirebaseReady() {
-    if (typeof window.auth !== 'undefined' && typeof window.db !== 'undefined') {
-        console.log('✅ Firebase loaded, setting up chat');
-        isInitialized = true;
-        firebaseRetryCount = 0;
-        setupFirebaseChat();
-    } else if (firebaseRetryCount < maxRetries) {
-        firebaseRetryCount++;
-        const delay = Math.min(1000 * Math.pow(1.5, firebaseRetryCount), 5000);
-        console.warn(`⚠️ Firebase not available, retrying in ${delay}ms (attempt ${firebaseRetryCount}/${maxRetries})...`);
-        setTimeout(checkFirebaseReady, delay);
-    } else {
-        console.error('❌ Firebase failed to load after maximum retries');
-        showToast('Error', 'No se pudo conectar con el sistema de chat', 'error');
-    }
-}
-
-function setupFirebaseChat() {
-    window.auth.onAuthStateChanged((user) => {
-        currentUser = user;
-        updateAuthUI(user);
-        
-        if (user) {
-            console.log('✅ User authenticated:', user.displayName);
-            enableChat();
-            listenToMessages();
-            updateUserPresence(true).catch(err => {
-                console.warn('Could not update presence on login:', err);
-            });
-        } else {
-            console.log('❌ User not authenticated');
-            disableChat();
-            showWelcomeMessage();
-            if (messagesListener) {
-                messagesListener();
-                messagesListener = null;
-            }
-        }
-    });
-}
-
-function showWelcomeMessage() {
-    const messagesContainer = document.getElementById('messagesContainer');
-    if (messagesContainer) {
-        messagesContainer.innerHTML = `
-            <div class="welcome-message">
-                <i class="fas fa-lock"></i>
-                <h2>Chat en vivo</h2>
-                <p>Inicia sesión con Google para unirte a la conversación</p>
-                <button onclick="document.getElementById('authBtn').click()" style="margin-top: 20px; padding: 12px 24px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: var(--bg-dark); border: none; border-radius: 12px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-left: auto; margin-right: auto;">
-                    <i class="fab fa-google"></i> Iniciar Sesión
-                </button>
-            </div>
-        `;
-    }
+    setInterval(updateViewerCount, 30000);
+    console.log('✅ Chat initialized successfully');
 }
 
 function setupEventListeners() {
-    const authBtn = document.getElementById('authBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const sendBtn = document.getElementById('sendBtn');
-    const messageInput = document.getElementById('messageInput');
-    const emojiBtn = document.getElementById('emojiBtn');
-    const searchBtn = document.getElementById('searchBtn');
-    const soundBtn = document.getElementById('soundBtn');
-    const searchInput = document.getElementById('searchInput');
-    const searchClose = document.getElementById('searchClose');
+    // Botones de configuración
+    document.getElementById('changeNameBtn')?.addEventListener('click', handleChangeName);
+    document.getElementById('anonymousBtn')?.addEventListener('click', toggleAnonymous);
+    document.getElementById('soundBtn')?.addEventListener('click', toggleSound);
+    document.getElementById('searchBtn')?.addEventListener('click', toggleSearch);
     
-    if (authBtn) {
-        authBtn.addEventListener('click', handleLogin);
-    }
+    // Enviar mensaje
+    document.getElementById('sendBtn')?.addEventListener('click', sendMessage);
+    document.getElementById('messageInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
     
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', handleLogout);
-    }
+    // Contador de caracteres
+    document.getElementById('messageInput')?.addEventListener('input', (e) => {
+        document.getElementById('charCount').textContent = `${e.target.value.length}/200`;
+    });
     
-    if (sendBtn) {
-        sendBtn.addEventListener('click', sendMessage);
-    }
+    // Subir imagen
+    document.getElementById('imageInput')?.addEventListener('change', handleImageUpload);
     
-    if (messageInput) {
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-        
-        messageInput.addEventListener('input', (e) => {
-            const charCount = document.getElementById('charCount');
-            if (charCount) {
-                charCount.textContent = `${e.target.value.length}/200`;
-            }
-            
-            if (currentUser && e.target.value.length > 0) {
-                handleTyping();
-            }
-        });
-    }
+    // Emoji picker
+    document.getElementById('emojiBtn')?.addEventListener('click', toggleEmojiPicker);
+    document.getElementById('emojiClose')?.addEventListener('click', () => {
+        document.getElementById('emojiPicker').style.display = 'none';
+    });
     
-    if (emojiBtn) {
-        emojiBtn.addEventListener('click', toggleEmojiPicker);
-    }
+    // Búsqueda
+    document.getElementById('searchInput')?.addEventListener('input', (e) => {
+        filterMessages(e.target.value);
+    });
     
-    if (searchBtn) {
-        searchBtn.addEventListener('click', toggleSearch);
-    }
-    
-    if (soundBtn) {
-        soundBtn.addEventListener('click', toggleSound);
-    }
-    
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            filterMessages(e.target.value);
-        });
-    }
-    
-    if (searchClose) {
-        searchClose.addEventListener('click', () => {
-            document.getElementById('searchContainer').style.display = 'none';
-            document.getElementById('searchBtn').classList.remove('active');
-            document.getElementById('searchInput').value = '';
-            filterMessages('');
-        });
-    }
+    document.getElementById('searchClose')?.addEventListener('click', () => {
+        document.getElementById('searchContainer').style.display = 'none';
+        document.getElementById('searchBtn').classList.remove('active');
+        document.getElementById('searchInput').value = '';
+        filterMessages('');
+    });
 }
 
 function setupEmojiPicker() {
     const emojiGrid = document.getElementById('emojiGrid');
-    const emojiClose = document.getElementById('emojiClose');
-    
     if (emojiGrid) {
         emojis.forEach(emoji => {
             const emojiItem = document.createElement('div');
             emojiItem.className = 'emoji-item';
             emojiItem.textContent = emoji;
-            emojiItem.addEventListener('click', () => {
-                insertEmoji(emoji);
-            });
+            emojiItem.addEventListener('click', () => insertEmoji(emoji));
             emojiGrid.appendChild(emojiItem);
-        });
-    }
-    
-    if (emojiClose) {
-        emojiClose.addEventListener('click', () => {
-            document.getElementById('emojiPicker').style.display = 'none';
         });
     }
 }
 
 function setupQuickReactions() {
-    const quickReactions = document.querySelectorAll('.quick-reaction');
-    quickReactions.forEach(btn => {
+    document.querySelectorAll('.quick-reaction').forEach(btn => {
         btn.addEventListener('click', () => {
-            const reaction = btn.dataset.reaction;
-            insertEmoji(reaction);
+            insertEmoji(btn.dataset.reaction);
         });
     });
 }
 
-function toggleEmojiPicker() {
-    const emojiPicker = document.getElementById('emojiPicker');
-    if (emojiPicker) {
-        emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
+function handleChangeName() {
+    const newName = prompt('Ingresa tu nuevo nombre:', currentUser.name);
+    if (newName && newName.trim()) {
+        currentUser.name = newName.trim();
+        currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=9d4edd&color=fff`;
+        localStorage.setItem('chatUsername', currentUser.name);
+        localStorage.setItem('chatAvatar', currentUser.avatar);
+        updateAuthUI();
+        showToast('Éxito', `Tu nombre ahora es: ${currentUser.name}`, 'success');
+    }
+}
+
+function toggleAnonymous() {
+    currentUser.isAnonymous = !currentUser.isAnonymous;
+    localStorage.setItem('chatAnonymous', currentUser.isAnonymous);
+    updateAuthUI();
+    
+    const btn = document.getElementById('anonymousBtn');
+    if (currentUser.isAnonymous) {
+        btn.classList.add('active');
+        showToast('Modo Anónimo', 'Ahora apareces como anónimo', 'success');
+    } else {
+        btn.classList.remove('active');
+        showToast('Modo Público', 'Ahora apareces con tu nombre', 'success');
+    }
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem('chatSound', soundEnabled);
+    const soundBtn = document.getElementById('soundBtn');
+    
+    if (soundEnabled) {
+        soundBtn.classList.remove('active');
+        soundBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+        showToast('Sonido', 'Sonidos activados', 'success');
+    } else {
+        soundBtn.classList.add('active');
+        soundBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+        showToast('Silencio', 'Sonidos desactivados', 'success');
     }
 }
 
@@ -231,34 +157,11 @@ function toggleSearch() {
     }
 }
 
-function toggleSound() {
-    soundEnabled = !soundEnabled;
-    const soundBtn = document.getElementById('soundBtn');
-    if (soundEnabled) {
-        soundBtn.classList.remove('active');
-        soundBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-        showToast('Sonido', 'Notificaciones de sonido activadas', 'success');
-    } else {
-        soundBtn.classList.add('active');
-        soundBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
-        showToast('Silencio', 'Notificaciones de sonido desactivadas', 'success');
+function toggleEmojiPicker() {
+    const emojiPicker = document.getElementById('emojiPicker');
+    if (emojiPicker) {
+        emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
     }
-}
-
-function filterMessages(searchText) {
-    const messages = document.querySelectorAll('.message-item');
-    const searchLower = searchText.toLowerCase();
-    
-    messages.forEach(msg => {
-        const text = msg.querySelector('.message-text')?.textContent.toLowerCase() || '';
-        const username = msg.querySelector('.message-username')?.textContent.toLowerCase() || '';
-        
-        if (text.includes(searchLower) || username.includes(searchLower) || !searchText) {
-            msg.style.display = 'flex';
-        } else {
-            msg.style.display = 'none';
-        }
-    });
 }
 
 function insertEmoji(emoji) {
@@ -270,356 +173,180 @@ function insertEmoji(emoji) {
     }
 }
 
-function handleTyping() {
-    if (!currentUser || !window.db) return;
+function filterMessages(searchText) {
+    const messageItems = document.querySelectorAll('.message-item');
+    const searchLower = searchText.toLowerCase();
     
-    clearTimeout(typingTimeout);
-    
-    window.db.collection('typing').doc(currentUser.uid).set({
-        username: currentUser.displayName,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    messageItems.forEach(msg => {
+        const text = msg.querySelector('.message-text')?.textContent.toLowerCase() || '';
+        const username = msg.querySelector('.message-username')?.textContent.toLowerCase() || '';
+        
+        if (text.includes(searchLower) || username.includes(searchLower) || !searchText) {
+            msg.style.display = 'flex';
+        } else {
+            msg.style.display = 'none';
+        }
     });
-    
-    typingTimeout = setTimeout(() => {
-        if (currentUser && window.db) {
-            window.db.collection('typing').doc(currentUser.uid).delete();
-        }
-    }, 3000);
 }
 
-async function handleLogin() {
-    if (typeof window.signInWithGoogle === 'undefined') {
-        showToast('Error', 'Firebase no está disponible', 'error');
+async function handleImageUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (file.size > 1 * 1024 * 1024) {
+        showToast('Error', 'La imagen es muy grande (máx 1MB)', 'error');
+        e.target.value = '';
         return;
     }
     
-    const authBtn = document.getElementById('authBtn');
-    authBtn.disabled = true;
-    authBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando...';
-    
-    try {
-        const result = await window.signInWithGoogle();
-        if (result.success) {
-            showToast('¡Bienvenido!', `Hola ${result.user.displayName}`, 'success');
-            playSound(600, 100);
-        } else {
-            throw new Error(result.error);
-        }
-    } catch (error) {
-        console.error('Login error:', error);
-        showToast('Error', 'No se pudo iniciar sesión', 'error');
-        authBtn.disabled = false;
-        authBtn.innerHTML = '<i class="fab fa-google"></i> Iniciar Sesión';
-    }
-}
-
-async function handleLogout() {
-    if (!confirm('¿Cerrar sesión?')) return;
-    
-    try {
-        // Intentar actualizar presencia, pero no fallar si no funciona
-        try {
-            await updateUserPresence(false);
-        } catch (presenceError) {
-            console.warn('Could not update presence:', presenceError);
-        }
-        
-        // Intentar eliminar typing status, pero no fallar si no funciona
-        try {
-            if (window.db && currentUser) {
-                await window.db.collection('typing').doc(currentUser.uid).delete();
-            }
-        } catch (typingError) {
-            console.warn('Could not delete typing status:', typingError);
-        }
-        
-        // Cerrar sesión de Firebase - esto es lo más importante
-        if (window.signOutUser) {
-            const result = await window.signOutUser();
-            if (result.success) {
-                showToast('Adiós', 'Sesión cerrada correctamente', 'success');
-            } else {
-                throw new Error(result.error);
-            }
-        } else {
-            // Si no hay función disponible, intentar directamente
-            if (window.auth) {
-                await window.auth.signOut();
-                showToast('Adiós', 'Sesión cerrada correctamente', 'success');
-            } else {
-                throw new Error('Sistema de autenticación no disponible');
-            }
-        }
-    } catch (error) {
-        console.error('Logout error:', error);
-        showToast('Error', error.message || 'No se pudo cerrar sesión', 'error');
-    }
-}
-
-function updateAuthUI(user) {
-    const authBtn = document.getElementById('authBtn');
-    const userInfo = document.getElementById('userInfo');
-    const userName = document.getElementById('userName');
-    const userAvatar = document.getElementById('userAvatar');
-    
-    if (user) {
-        authBtn.style.display = 'none';
-        userInfo.style.display = 'flex';
-        userName.textContent = user.displayName || 'Usuario';
-        if (userAvatar && user.photoURL) {
-            userAvatar.src = user.photoURL;
-        }
-    } else {
-        authBtn.style.display = 'flex';
-        userInfo.style.display = 'none';
-        authBtn.innerHTML = '<i class="fab fa-google"></i> Iniciar Sesión';
-        authBtn.disabled = false;
-    }
-}
-
-function enableChat() {
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const gifBtn = document.getElementById('gifBtn');
-    
-    if (messageInput) {
-        messageInput.disabled = false;
-        messageInput.placeholder = 'Enviar un mensaje...';
-    }
-    if (sendBtn) sendBtn.disabled = false;
-    if (gifBtn) gifBtn.disabled = false;
-    
-    const hint = document.querySelector('.input-hint');
-    if (hint) hint.style.display = 'none';
-}
-
-function disableChat() {
-    const messageInput = document.getElementById('messageInput');
-    const sendBtn = document.getElementById('sendBtn');
-    const gifBtn = document.getElementById('gifBtn');
-    
-    if (messageInput) {
-        messageInput.disabled = true;
-        messageInput.placeholder = 'Inicia sesión para chatear...';
-    }
-    if (sendBtn) sendBtn.disabled = true;
-    if (gifBtn) gifBtn.disabled = true;
-    
-    const hint = document.querySelector('.input-hint');
-    if (hint) hint.style.display = 'flex';
-}
-
-function listenToMessages() {
-    if (!window.db) {
-        console.error('Database not available');
-        return;
-    }
-    
-    const messagesContainer = document.getElementById('messagesContainer');
-    messagesContainer.innerHTML = `
-        <div class="loading-container">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">Cargando mensajes...</div>
-        </div>
-    `;
-    
-    tryListenWithIndex();
-    
-    function tryListenWithIndex() {
-        const messagesRef = window.db.collection('liveChat')
-            .orderBy('timestamp', 'desc')
-            .limit(100);
-        
-        messagesListener = messagesRef.onSnapshot((snapshot) => {
-            handleMessagesSnapshot(snapshot);
-        }, (error) => {
-            console.error('Error with indexed query:', error);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+            // Comprimir imagen
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
             
-            if (error.code === 'failed-precondition' || error.message?.includes('index')) {
-                console.log('⚠️ Index not found, trying without orderBy...');
-                tryListenWithoutIndex();
-            } else if (error.code === 'permission-denied') {
-                handlePermissionError();
-            } else {
-                handleGeneralError(error);
-            }
-        });
-    }
-    
-    function tryListenWithoutIndex() {
-        const messagesRef = window.db.collection('liveChat').limit(50);
-        
-        messagesListener = messagesRef.onSnapshot((snapshot) => {
-            handleMessagesSnapshot(snapshot);
-        }, (error) => {
-            console.error('Error without index:', error);
-            if (error.code === 'permission-denied') {
-                handlePermissionError();
-            } else {
-                handleGeneralError(error);
-            }
-        });
-    }
-    
-    function handleMessagesSnapshot(snapshot) {
-        const loadingContainer = messagesContainer.querySelector('.loading-container');
-        if (loadingContainer) {
-            loadingContainer.remove();
-        }
-        
-        const welcomeMsg = messagesContainer.querySelector('.welcome-message');
-        if (welcomeMsg && !snapshot.empty) {
-            welcomeMsg.remove();
-        }
-        
-        if (snapshot.empty && !messagesContainer.querySelector('.welcome-message')) {
-            messagesContainer.innerHTML = `
-                <div class="welcome-message">
-                    <i class="fas fa-comments"></i>
-                    <h2>¡Bienvenido al chat en vivo!</h2>
-                    <p>Sé el primero en enviar un mensaje</p>
-                </div>
-            `;
-        }
-        
-        snapshot.docChanges().forEach((change) => {
-            if (change.type === 'added') {
-                const message = { id: change.doc.id, ...change.doc.data() };
-                allMessages.push(message);
-                addMessageToUI(message);
-                messageCount++;
-                
-                if (soundEnabled && message.userId !== currentUser?.uid) {
-                    notificationSounds.message();
+            // Reducir dimensiones si es muy grande
+            const maxDimension = 800;
+            if (width > maxDimension || height > maxDimension) {
+                if (width > height) {
+                    height = (height / width) * maxDimension;
+                    width = maxDimension;
+                } else {
+                    width = (width / height) * maxDimension;
+                    height = maxDimension;
                 }
             }
-        });
-        
-        updateMessageCount();
-    }
-    
-    function handlePermissionError() {
-        console.error('Permission denied - Firestore rules need to be configured');
-        console.log('ℹ️ User is authenticated, but Firestore rules are blocking access');
-        console.log('📝 Please configure Firestore rules in Firebase Console');
-        
-        messagesContainer.innerHTML = `
-            <div class="welcome-message">
-                <i class="fas fa-exclamation-circle" style="color: #ff9800;"></i>
-                <h2 style="color: #ff9800;">Configuración Requerida</h2>
-                <p style="margin-bottom: 15px;">Firestore necesita permisos configurados</p>
-                <div style="text-align: left; background: var(--bg-darker); padding: 15px; border-radius: 8px; margin: 15px 0; font-size: 12px; line-height: 1.6;">
-                    <strong style="color: var(--primary-color);">Pasos para configurar:</strong><br>
-                    1. Ve a <a href="https://console.firebase.google.com" target="_blank" style="color: var(--secondary-color);">Firebase Console</a><br>
-                    2. Selecciona tu proyecto: <strong>ligamx-daf3d</strong><br>
-                    3. Ve a <strong>Firestore Database</strong> → <strong>Reglas</strong><br>
-                    4. Copia y pega estas reglas:<br>
-                    <pre style="background: var(--bg-card); padding: 10px; margin-top: 5px; border-radius: 4px; overflow-x: auto; font-size: 11px;">rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /liveChat/{messageId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      match /reactions/{reactionId} {
-        allow read, write: if request.auth != null;
-      }
-    }
-    match /typing/{userId} {
-      allow read, write: if request.auth != null;
-    }
-    match /presence/{userId} {
-      allow read, write: if request.auth != null;
-    }
-  }
-}</pre>
-                    5. Click <strong>"Publicar"</strong>
-                </div>
-                <button onclick="location.reload()" style="margin-top: 10px; padding: 12px 24px; background: var(--primary-color); color: var(--bg-dark); border: none; border-radius: 12px; cursor: pointer; font-weight: 700;">
-                    <i class="fas fa-sync"></i> Recargar después de configurar
-                </button>
-            </div>
-        `;
-    }
-    
-    function handleGeneralError(error) {
-        console.error('General error:', error);
-        showToast('Error', 'Problema al conectar con el chat', 'error');
-        messagesContainer.innerHTML = `
-            <div class="welcome-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h2>Error de conexión</h2>
-                <p>Verifica tu conexión e intenta nuevamente</p>
-                <button onclick="location.reload()" style="margin-top: 20px; padding: 12px 24px; background: var(--primary-color); color: var(--bg-dark); border: none; border-radius: 8px; cursor: pointer; font-weight: 700;">
-                    Recargar página
-                </button>
-            </div>
-        `;
-    }
-    
-    listenToTyping();
+            
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convertir a JPEG con calidad reducida para comprimir
+            const compressedData = canvas.toDataURL('image/jpeg', 0.7);
+            sendMessage(null, compressedData);
+            e.target.value = '';
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
-function listenToTyping() {
-    if (!window.db) return;
+function sendMessage(text = null, imageData = null) {
+    const messageInput = document.getElementById('messageInput');
+    const messageText = text || messageInput?.value.trim();
     
-    window.db.collection('typing').onSnapshot((snapshot) => {
-        const typingIndicator = document.getElementById('typingIndicator');
-        const typingUsers = document.getElementById('typingUsers');
+    if (!messageText && !imageData) return;
+    
+    const message = {
+        id: Date.now() + '_' + Math.random(),
+        text: messageText || '',
+        image: imageData || null,
+        username: currentUser.isAnonymous ? 'Anónimo' : currentUser.name,
+        avatar: currentUser.isAnonymous ? 'https://ui-avatars.com/api/?name=?&background=6c757d&color=fff' : currentUser.avatar,
+        timestamp: new Date().toISOString(),
+        isAnonymous: currentUser.isAnonymous
+    };
+    
+    messages.unshift(message);
+    
+    // Guardar solo últimos 50 mensajes para evitar exceder localStorage
+    if (messages.length > 50) {
+        messages = messages.slice(0, 50);
+    }
+    
+    try {
+        localStorage.setItem('chatMessages', JSON.stringify(messages));
+    } catch (error) {
+        console.error('Error saving to localStorage:', error);
         
-        const users = [];
-        snapshot.forEach((doc) => {
-            if (doc.id !== currentUser?.uid) {
-                users.push(doc.data().username);
-            }
-        });
-        
-        if (users.length > 0) {
-            typingUsers.textContent = users.length === 1 ? users[0] : `${users.length} personas`;
-            typingIndicator.style.display = 'block';
-        } else {
-            typingIndicator.style.display = 'none';
+        // Si falla, limpiar mensajes antiguos y reintentar
+        messages = messages.slice(0, 20);
+        try {
+            localStorage.setItem('chatMessages', JSON.stringify(messages));
+            showToast('Advertencia', 'Espacio limitado. Se guardaron solo los mensajes recientes.', 'error');
+        } catch (retryError) {
+            showToast('Error', 'No se pudo guardar el mensaje. Storage lleno.', 'error');
+            console.error('Failed to save even after cleanup:', retryError);
         }
-    });
+    }
+    
+    addMessageToUI(message);
+    
+    if (messageInput) {
+        messageInput.value = '';
+        document.getElementById('charCount').textContent = '0/200';
+    }
+    
+    document.getElementById('emojiPicker').style.display = 'none';
+    
+    if (soundEnabled) {
+        playSound(600, 80);
+    }
+    
+    messageCount++;
+    updateMessageCount();
 }
 
-function addMessageToUI(message) {
+function loadMessages() {
     const messagesContainer = document.getElementById('messagesContainer');
+    messagesContainer.innerHTML = '';
+    
+    if (messages.length === 0) {
+        messagesContainer.innerHTML = `
+            <div class="welcome-message">
+                <i class="fas fa-comments"></i>
+                <h2>¡Bienvenido al chat en vivo!</h2>
+                <p>Sé el primero en enviar un mensaje</p>
+            </div>
+        `;
+        return;
+    }
+    
+    messages.forEach(message => {
+        addMessageToUI(message, false);
+    });
+    
+    messageCount = messages.length;
+    updateMessageCount();
+}
+
+function addMessageToUI(message, animate = true) {
+    const messagesContainer = document.getElementById('messagesContainer');
+    
+    // Remover mensaje de bienvenida si existe
+    const welcomeMsg = messagesContainer.querySelector('.welcome-message');
+    if (welcomeMsg) welcomeMsg.remove();
+    
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message-item';
+    if (animate) {
+        messageDiv.style.animation = 'messageSlideIn 0.3s ease';
+    }
     messageDiv.dataset.id = message.id;
     
-    const isVIP = message.userId && message.userId.includes('vip');
-    const timestamp = message.timestamp ? 
-        new Date(message.timestamp.toDate()).toLocaleTimeString('es-ES', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        }) : '';
+    const timestamp = new Date(message.timestamp).toLocaleTimeString('es-ES', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+    
+    const imageHTML = message.image ? `
+        <img src="${message.image}" class="message-image" alt="Imagen enviada" onclick="window.open('${message.image}', '_blank')">
+    ` : '';
     
     messageDiv.innerHTML = `
-        <img class="message-avatar" src="${message.photoURL || 'https://via.placeholder.com/36'}" alt="">
+        <img class="message-avatar" src="${message.avatar}" alt="${message.username}">
         <div class="message-content">
             <div class="message-header">
                 <span class="message-username">${escapeHtml(message.username)}</span>
-                ${isVIP ? '<span class="message-badge badge-vip">⭐ VIP</span>' : ''}
-                ${message.verified ? '<span class="message-badge badge-verified"><i class="fas fa-check-circle"></i></span>' : ''}
+                ${message.isAnonymous ? '<span class="message-badge" style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">ANÓNIMO</span>' : ''}
                 <span class="message-timestamp">${timestamp}</span>
             </div>
-            <div class="message-text">${escapeHtml(message.text)}</div>
-            <div class="message-actions">
-                <button class="reaction-btn" data-reaction="👍" onclick="addReaction('${message.id}', '👍')">
-                    👍
-                </button>
-                <button class="reaction-btn" data-reaction="❤️" onclick="addReaction('${message.id}', '❤️')">
-                    ❤️
-                </button>
-                <button class="reaction-btn" data-reaction="🔥" onclick="addReaction('${message.id}', '🔥')">
-                    🔥
-                </button>
-                <button class="reaction-btn" data-reaction="😂" onclick="addReaction('${message.id}', '😂')">
-                    😂
-                </button>
-            </div>
-            <div class="message-reactions" id="reactions-${message.id}"></div>
+            ${message.text ? `<div class="message-text">${escapeHtml(message.text)}</div>` : ''}
+            ${imageHTML}
         </div>
     `;
     
@@ -629,154 +356,59 @@ function addMessageToUI(message) {
         messagesContainer.appendChild(messageDiv);
     }
     
-    if (messagesContainer.children.length > 100) {
+    // Limitar mensajes en UI
+    while (messagesContainer.children.length > 100) {
         messagesContainer.lastChild.remove();
     }
 }
 
-window.addReaction = async function(messageId, reaction) {
-    if (!currentUser || !window.db) {
-        showToast('Error', 'Debes iniciar sesión para reaccionar', 'error');
-        return;
+function updateAuthUI() {
+    const userInfo = document.getElementById('userInfo');
+    const userName = document.getElementById('userName');
+    const userAvatar = document.getElementById('userAvatar');
+    
+    if (userInfo && userName && userAvatar) {
+        userInfo.style.display = 'flex';
+        userName.textContent = currentUser.isAnonymous ? 'Anónimo' : currentUser.name;
+        userAvatar.src = currentUser.avatar;
     }
     
-    try {
-        const reactionRef = window.db.collection('liveChat').doc(messageId)
-            .collection('reactions').doc(currentUser.uid);
-        
-        await reactionRef.set({
-            reaction: reaction,
-            username: currentUser.displayName,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        if (soundEnabled) {
-            notificationSounds.reaction();
-        }
-    } catch (error) {
-        console.error('Error adding reaction:', error);
-    }
-};
-
-async function sendMessage() {
-    if (!currentUser) {
-        showToast('Error', 'Debes iniciar sesión para enviar mensajes', 'error');
-        return;
-    }
-    
-    if (!window.db) {
-        showToast('Error', 'Conexión no disponible', 'error');
-        return;
-    }
-    
-    const messageInput = document.getElementById('messageInput');
-    const text = messageInput.value.trim();
-    
-    if (!text) return;
-    
-    const sendBtn = document.getElementById('sendBtn');
-    const originalBtnContent = sendBtn.innerHTML;
-    sendBtn.disabled = true;
-    sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-    
-    try {
-        await window.db.collection('liveChat').add({
-            text: text,
-            username: currentUser.displayName || 'Usuario',
-            userId: currentUser.uid,
-            photoURL: currentUser.photoURL || '',
-            verified: currentUser.emailVerified,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        
-        try {
-            await window.db.collection('typing').doc(currentUser.uid).delete().catch(() => {});
-        } catch (e) {}
-        
-        messageInput.value = '';
-        document.getElementById('charCount').textContent = '0/200';
-        document.getElementById('emojiPicker').style.display = 'none';
-        
-        if (soundEnabled) {
-            notificationSounds.send();
-        }
-        
-    } catch (error) {
-        console.error('Error sending message:', error);
-        
-        let errorMsg = 'No se pudo enviar el mensaje';
-        if (error.code === 'permission-denied') {
-            errorMsg = 'No tienes permiso para enviar mensajes. Verifica tu sesión.';
-        } else if (error.code === 'unavailable') {
-            errorMsg = 'Sin conexión. Verifica tu internet.';
-        }
-        
-        showToast('Error', errorMsg, 'error');
-    } finally {
-        sendBtn.disabled = false;
-        sendBtn.innerHTML = originalBtnContent;
+    const authBtn = document.getElementById('authBtn');
+    if (authBtn) {
+        authBtn.style.display = 'none';
     }
 }
 
-async function updateUserPresence(online) {
-    if (!currentUser || !window.db) {
-        console.warn('Cannot update presence: user or db not available');
-        return;
-    }
-    
-    try {
-        const userRef = window.db.collection('presence').doc(currentUser.uid);
-        
-        if (online) {
-            await userRef.set({
-                username: currentUser.displayName,
-                online: true,
-                lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            activeUsers.add(currentUser.uid);
-        } else {
-            await userRef.delete();
-            activeUsers.delete(currentUser.uid);
-        }
-        
-        updateActiveUsers();
-    } catch (error) {
-        console.error('Error updating presence:', error);
+function updateMessageCount() {
+    const countEl = document.getElementById('messageCount');
+    if (countEl) {
+        countEl.textContent = messageCount;
     }
 }
 
 function updateViewerCount() {
     const viewerCount = document.getElementById('viewerCount');
     if (viewerCount) {
-        const count = Math.floor(Math.random() * 500) + 100;
-        viewerCount.textContent = count.toLocaleString();
+        // Simulación de espectadores
+        const count = Math.floor(50 + Math.random() * 200);
+        viewerCount.textContent = count;
     }
-}
-
-function updateMessageCount() {
-    const messageCountEl = document.getElementById('messageCount');
-    if (messageCountEl) {
-        messageCountEl.textContent = messageCount.toLocaleString();
-    }
-}
-
-function updateActiveUsers() {
-    const activeUsersEl = document.getElementById('activeUsers');
-    if (activeUsersEl) {
-        activeUsersEl.textContent = activeUsers.size;
+    
+    const activeUsers = document.getElementById('activeUsers');
+    if (activeUsers) {
+        const count = Math.floor(5 + Math.random() * 20);
+        activeUsers.textContent = count;
     }
 }
 
 function showToast(title, message, type = 'success') {
     const toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) return;
+    
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    
-    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-    
     toast.innerHTML = `
-        <i class="fas ${icon}"></i>
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
         <div class="toast-content">
             <div class="toast-title">${title}</div>
             <div class="toast-message">${message}</div>
@@ -786,16 +418,23 @@ function showToast(title, message, type = 'success') {
     toastContainer.appendChild(toast);
     
     setTimeout(() => {
-        toast.style.animation = 'toastSlideIn 0.3s ease reverse';
+        toast.style.animation = 'toastSlideOut 0.3s ease';
         setTimeout(() => toast.remove(), 300);
     }, 3000);
 }
 
-function playSound(frequency, duration) {
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function playSound(frequency = 800, duration = 100) {
     if (!soundEnabled) return;
     
     try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioContext = new AudioContext();
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
         
@@ -805,28 +444,30 @@ function playSound(frequency, duration) {
         oscillator.frequency.value = frequency;
         oscillator.type = 'sine';
         
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
         
         oscillator.start(audioContext.currentTime);
         oscillator.stop(audioContext.currentTime + duration / 1000);
     } catch (error) {
-        console.error('Sound playback error:', error);
+        console.log('Sound playback not supported');
     }
 }
 
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-window.addEventListener('beforeunload', () => {
-    if (currentUser && window.db) {
-        updateUserPresence(false);
-        window.db.collection('typing').doc(currentUser.uid).delete().catch(() => {});
+// Animación de toast slide out
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes toastSlideOut {
+        from {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateX(100px);
+        }
     }
-});
+`;
+document.head.appendChild(style);
 
-console.log('✅ Live Chat system ready with enhanced features');
-console.log('🎨 New features: Typing indicator, search, sounds, reactions, quick emojis');
+console.log('✅ UltraGol Live Chat ready!');
