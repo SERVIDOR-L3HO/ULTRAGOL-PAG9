@@ -36,10 +36,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize Groups System
 function initializeGroupsSystem() {
-    // Groups button click
+    // Groups button click - redirect to groups page
     const groupsBtn = document.getElementById('groupsBtn');
     if (groupsBtn) {
-        groupsBtn.addEventListener('click', openGroupsModal);
+        groupsBtn.addEventListener('click', () => {
+            window.location.href = 'groups-page.html';
+        });
     }
     
     // Tabs functionality

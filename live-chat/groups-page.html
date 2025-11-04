@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>Grupos - L3HO Interactive</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="groups.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <header class="chat-header">
+        <div class="header-left">
+            <div class="brand-container">
+                <img src="../attached_assets/375969-removebg-preview_1762273801238.png" alt="L3HO Interactive" class="brand-logo">
+                <div class="brand-info">
+                    <span class="brand-subtitle">Powered by</span>
+                    <span class="brand-name">L3HO Interactive</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-right">
+            <button onclick="window.location.href='index.html'" class="groups-btn">
+                <i class="fas fa-arrow-left"></i>
+                <span>Volver al Chat</span>
+            </button>
+            <button id="authBtn" class="auth-btn">
+                <i class="fab fa-google"></i>
+                Iniciar Sesión
+            </button>
+            <div id="userInfo" class="user-info" style="display: none;">
+                <img id="userAvatar" class="user-avatar" src="" alt="">
+                <span id="userName" class="user-name"></span>
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="chat-container">
+        <div class="groups-main-container">
+            <div class="groups-header">
+                <h1><i class="fas fa-users"></i> Grupos de Chat</h1>
+                <button class="create-group-btn" onclick="openCreateGroupModal()">
+                    <i class="fas fa-plus-circle"></i>
+                    Crear Nuevo Grupo
+                </button>
+            </div>
+
+            <div class="groups-tabs">
+                <button class="groups-tab active" data-tab="my-groups">
+                    <i class="fas fa-user-friends"></i> Mis Grupos
+                </button>
+                <button class="groups-tab" data-tab="public-groups">
+                    <i class="fas fa-globe"></i> Públicos
+                </button>
+                <button class="groups-tab" data-tab="discover">
+                    <i class="fas fa-compass"></i> Descubrir
+                </button>
+            </div>
+
+            <div class="groups-search">
+                <i class="fas fa-search"></i>
+                <input type="text" id="groupsSearchInput" placeholder="Buscar grupos...">
+            </div>
+
+            <div class="tab-content active" id="my-groups-tab">
+                <div id="myGroupsList" class="groups-list">
+                    <div class="empty-state">
+                        <i class="fas fa-users-slash"></i>
+                        <p>No has creado ni te has unido a ningún grupo</p>
+                        <button onclick="openCreateGroupModal()" class="empty-action-btn">
+                            Crear tu primer grupo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="public-groups-tab">
+                <div id="publicGroupsList" class="groups-list">
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <p>No hay grupos públicos disponibles</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="discover-tab">
+                <div id="discoverGroupsList" class="groups-list">
+                    <div class="empty-state">
+                        <i class="fas fa-compass"></i>
+                        <p>Descubre grupos recomendados para ti</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <div id="createGroupModal" class="modal">
+        <div class="modal-overlay" onclick="closeCreateGroupModal()"></div>
+        <div class="modal-content create-group-modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-plus-circle"></i> Crear Nuevo Grupo</h2>
+                <button class="modal-close" onclick="closeCreateGroupModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="createGroupForm" class="create-group-form">
+                    <div class="form-group avatar-upload">
+                        <label>Foto del Grupo</label>
+                        <div class="avatar-preview-container">
+                            <div class="avatar-preview" id="groupAvatarPreview">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <label for="groupAvatarInput" class="avatar-upload-btn">
+                                <i class="fas fa-camera"></i>
+                                Subir Foto
+                            </label>
+                            <input type="file" id="groupAvatarInput" accept="image/*" style="display: none;">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="groupName">
+                            <i class="fas fa-signature"></i> Nombre del Grupo *
+                        </label>
+                        <input type="text" id="groupName" placeholder="Ej: Fans del América" maxlength="50" required>
+                        <span class="char-counter">0/50</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="groupDescription">
+                            <i class="fas fa-align-left"></i> Descripción
+                        </label>
+                        <textarea id="groupDescription" placeholder="Describe de qué trata tu grupo..." maxlength="200" rows="3"></textarea>
+                        <span class="char-counter">0/200</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-lock"></i> Privacidad</label>
+                        <div class="privacy-options">
+                            <label class="radio-option">
+                                <input type="radio" name="privacy" value="public" checked>
+                                <div class="radio-card">
+                                    <i class="fas fa-globe"></i>
+                                    <span>Público</span>
+                                    <small>Cualquiera puede unirse</small>
+                                </div>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="privacy" value="private">
+                                <div class="radio-card">
+                                    <i class="fas fa-lock"></i>
+                                    <span>Privado</span>
+                                    <small>Requiere aprobación</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="groupLimit">
+                            <i class="fas fa-users-cog"></i> Límite de Miembros
+                        </label>
+                        <select id="groupLimit">
+                            <option value="50">50 miembros</option>
+                            <option value="100" selected>100 miembros</option>
+                            <option value="250">250 miembros</option>
+                            <option value="500">500 miembros</option>
+                            <option value="1000">1000 miembros</option>
+                            <option value="unlimited">Sin límite</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-shield-alt"></i> Permisos</label>
+                        <div class="permissions-list">
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="allowMemberInvites" checked>
+                                <span>Permitir que miembros inviten a otros</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="allowFileSharing" checked>
+                                <span>Permitir compartir archivos/imágenes</span>
+                            </label>
+                            <label class="checkbox-option">
+                                <input type="checkbox" id="moderationEnabled">
+                                <span>Activar moderación de mensajes</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="closeCreateGroupModal()">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn-create">
+                            <i class="fas fa-check"></i>
+                            Crear Grupo
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="groupDetailsModal" class="modal">
+        <div class="modal-overlay" onclick="closeGroupDetailsModal()"></div>
+        <div class="modal-content group-details-modal-content">
+            <div class="group-details-header">
+                <div class="group-cover"></div>
+                <div class="group-info">
+                    <img id="groupDetailAvatar" class="group-detail-avatar" src="" alt="">
+                    <div class="group-main-info">
+                        <h2 id="groupDetailName"></h2>
+                        <p id="groupDetailDescription"></p>
+                        <div class="group-stats">
+                            <span><i class="fas fa-users"></i> <span id="groupMemberCount">0</span> miembros</span>
+                            <span><i class="fas fa-comments"></i> <span id="groupMessageCount">0</span> mensajes</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeGroupDetailsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="group-details-tabs">
+                <button class="group-detail-tab active" data-tab="chat">
+                    <i class="fas fa-comments"></i> Chat
+                </button>
+                <button class="group-detail-tab" data-tab="members">
+                    <i class="fas fa-users"></i> Miembros
+                </button>
+                <button class="group-detail-tab" data-tab="settings" id="groupSettingsTab" style="display: none;">
+                    <i class="fas fa-cog"></i> Configuración
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <div class="group-tab-content active" id="chat-tab">
+                    <div id="groupMessages" class="group-messages">
+                        <div class="welcome-message">
+                            <i class="fas fa-comments"></i>
+                            <p>¡Bienvenido al grupo! Empieza la conversación</p>
+                        </div>
+                    </div>
+                    <div class="group-message-input">
+                        <input type="text" id="groupMessageInput" placeholder="Escribe un mensaje...">
+                        <button id="sendGroupMessageBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="group-tab-content" id="members-tab">
+                    <div class="members-header">
+                        <h3>Miembros del Grupo</h3>
+                        <button class="invite-btn" onclick="openInviteModal()">
+                            <i class="fas fa-user-plus"></i> Invitar
+                        </button>
+                    </div>
+                    <div id="groupMembersList" class="members-list"></div>
+                </div>
+
+                <div class="group-tab-content" id="settings-tab">
+                    <div class="settings-section">
+                        <h3><i class="fas fa-cog"></i> Configuración del Grupo</h3>
+                        <button class="edit-group-btn">
+                            <i class="fas fa-edit"></i> Editar Información
+                        </button>
+                        <button class="pending-requests-btn" onclick="openPendingRequestsModal()">
+                            <i class="fas fa-clock"></i> Solicitudes Pendientes
+                            <span class="badge" id="pendingRequestsBadge">0</span>
+                        </button>
+                        <button class="delete-group-btn">
+                            <i class="fas fa-trash"></i> Eliminar Grupo
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="group-action-bar">
+                <button id="leaveGroupBtn" class="btn-leave">
+                    <i class="fas fa-sign-out-alt"></i> Salir del Grupo
+                </button>
+                <button id="joinGroupBtn" class="btn-join" style="display: none;">
+                    <i class="fas fa-sign-in-alt"></i> Unirse al Grupo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="inviteModal" class="modal">
+        <div class="modal-overlay" onclick="closeInviteModal()"></div>
+        <div class="modal-content invite-modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-share-alt"></i> Invitar al Grupo</h2>
+                <button class="modal-close" onclick="closeInviteModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="invite-methods">
+                    <div class="invite-method">
+                        <h3><i class="fas fa-link"></i> Link de Invitación</h3>
+                        <div class="invite-link-container">
+                            <input type="text" id="inviteLink" readonly>
+                            <button class="copy-btn" onclick="copyInviteLink()">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="invite-method">
+                        <h3><i class="fas fa-qrcode"></i> Código QR</h3>
+                        <div class="qr-code-container">
+                            <canvas id="qrCodeCanvas"></canvas>
+                            <button class="download-qr-btn" onclick="downloadQR()">
+                                <i class="fas fa-download"></i> Descargar QR
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pendingRequestsModal" class="modal">
+        <div class="modal-overlay" onclick="closePendingRequestsModal()"></div>
+        <div class="modal-content pending-requests-modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-clock"></i> Solicitudes Pendientes</h2>
+                <button class="modal-close" onclick="closePendingRequestsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="pendingRequestsList" class="requests-list">
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No hay solicitudes pendientes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="groups.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const authBtn = document.getElementById('authBtn');
+            if (authBtn) {
+                authBtn.addEventListener('click', () => {
+                    window.location.href = 'auth.html';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

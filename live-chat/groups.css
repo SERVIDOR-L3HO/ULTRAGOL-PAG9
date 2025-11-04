@@ -1321,3 +1321,79 @@
         padding: 16px;
     }
 }
+
+/* ==========================================
+   GROUPS MAIN PAGE STYLES
+   ========================================== */
+
+.groups-main-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.groups-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.groups-header h1 {
+    color: var(--text-primary);
+    font-size: 32px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.groups-header h1 i {
+    color: var(--primary-color);
+}
+
+.groups-main-container .create-group-btn {
+    background: linear-gradient(135deg, var(--primary-color), #c77dff);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(157, 78, 221, 0.3);
+}
+
+.groups-main-container .create-group-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(157, 78, 221, 0.4);
+}
+
+.groups-main-container .groups-search {
+    margin-bottom: 25px;
+}
+
+.groups-main-container .tab-content {
+    display: none;
+}
+
+.groups-main-container .tab-content.active {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .groups-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .groups-header h1 {
+        font-size: 24px;
+    }
+}
