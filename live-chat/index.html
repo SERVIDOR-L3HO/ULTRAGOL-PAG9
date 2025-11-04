@@ -204,6 +204,20 @@
     <!-- Toast Notifications -->
     <div id="toastContainer" class="toast-container"></div>
 
+    <!-- Custom Dialog Modal -->
+    <div id="customDialog" class="custom-dialog-overlay">
+        <div class="custom-dialog-container">
+            <div class="custom-dialog-icon" id="dialogIcon"></div>
+            <h3 id="dialogTitle" class="custom-dialog-title"></h3>
+            <p id="dialogMessage" class="custom-dialog-message"></p>
+            <input type="text" id="dialogInput" class="custom-dialog-input" style="display: none;" />
+            <div class="custom-dialog-actions">
+                <button id="dialogCancel" class="custom-dialog-btn btn-cancel">Cancelar</button>
+                <button id="dialogConfirm" class="custom-dialog-btn btn-confirm">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Groups Modal -->
     <div id="groupsModal" class="modal groups-modal">
         <div class="modal-overlay" onclick="closeGroupsModal()"></div>

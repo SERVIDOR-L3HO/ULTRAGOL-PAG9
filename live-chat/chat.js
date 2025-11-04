@@ -172,7 +172,7 @@ function setupQuickReactions() {
 }
 
 async function handleChangeName() {
-    const newName = prompt('Ingresa tu nuevo nombre:', currentUser.name);
+    const newName = await customPrompt('Ingresa tu nuevo nombre:', 'Cambiar Nombre', currentUser.name);
     if (newName && newName.trim()) {
         try {
             const trimmedName = newName.trim();
@@ -203,7 +203,8 @@ async function handleChangeName() {
 }
 
 async function handleLogout() {
-    if (confirm('¿Deseas cerrar sesión?')) {
+    const confirmed = await customConfirm('¿Deseas cerrar sesión?', 'Cerrar Sesión');
+    if (confirmed) {
         try {
             await auth.signOut();
             showToast('Éxito', 'Sesión cerrada correctamente', 'success');
@@ -1072,3 +1073,105 @@ style.textContent = `
 document.head.appendChild(style);
 
 console.log('✅ UltraGol Live Chat ready!');
+
+// ==========================================
+// CUSTOM DIALOG FUNCTIONS
+// ==========================================
+
+function showCustomDialog(options) {
+    return new Promise((resolve) => {
+        const overlay = document.getElementById('customDialog');
+        const iconEl = document.getElementById('dialogIcon');
+        const titleEl = document.getElementById('dialogTitle');
+        const messageEl = document.getElementById('dialogMessage');
+        const inputEl = document.getElementById('dialogInput');
+        const cancelBtn = document.getElementById('dialogCancel');
+        const confirmBtn = document.getElementById('dialogConfirm');
+        
+        // Configure dialog
+        titleEl.textContent = options.title || '';
+        messageEl.textContent = options.message || '';
+        
+        // Set icon with appropriate emoji
+        const iconMap = {
+            'confirm': '❓',
+            'prompt': '✏️',
+            'success': '✅',
+            'warning': '⚠️',
+            'error': '❌'
+        };
+        iconEl.textContent = iconMap[options.type] || '💬';
+        
+        // Handle input for prompt
+        if (options.type === 'prompt') {
+            inputEl.style.display = 'block';
+            inputEl.value = options.defaultValue || '';
+            setTimeout(() => {
+                inputEl.focus();
+                inputEl.select();
+            }, 100);
+        } else {
+            inputEl.style.display = 'none';
+        }
+        
+        // Show dialog
+        overlay.classList.add('active');
+        
+        // Handle confirm
+        const handleConfirm = () => {
+            overlay.classList.remove('active');
+            if (options.type === 'prompt') {
+                resolve(inputEl.value.trim() || null);
+            } else {
+                resolve(true);
+            }
+            cleanup();
+        };
+        
+        // Handle cancel
+        const handleCancel = () => {
+            overlay.classList.remove('active');
+            resolve(false);
+            cleanup();
+        };
+        
+        // Handle Enter key for input
+        const handleEnterKey = (e) => {
+            if (e.key === 'Enter') {
+                handleConfirm();
+            } else if (e.key === 'Escape') {
+                handleCancel();
+            }
+        };
+        
+        // Attach event listeners
+        confirmBtn.onclick = handleConfirm;
+        cancelBtn.onclick = handleCancel;
+        inputEl.onkeydown = handleEnterKey;
+        
+        // Cleanup function
+        function cleanup() {
+            confirmBtn.onclick = null;
+            cancelBtn.onclick = null;
+            inputEl.onkeydown = null;
+        }
+    });
+}
+
+function customConfirm(message, title = 'Confirmación') {
+    return showCustomDialog({
+        type: 'confirm',
+        title: title,
+        message: message
+    });
+}
+
+function customPrompt(message, title = 'Ingresa información', defaultValue = '') {
+    return showCustomDialog({
+        type: 'prompt',
+        title: title,
+        message: message,
+        defaultValue: defaultValue
+    });
+}
+
