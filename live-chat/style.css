@@ -530,13 +530,21 @@ body {
 }
 
 .message-actions {
-    display: none;
+    display: flex;
     gap: 4px;
     margin-top: 8px;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
 }
 
 .message-item:hover .message-actions {
-    display: flex;
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .message-actions {
+        opacity: 1;
+    }
 }
 
 .reaction-btn {
@@ -1219,5 +1227,219 @@ body {
     .download-image-btn {
         padding: 10px 20px;
         font-size: 13px;
+    }
+}
+
+/* Nuevas funcionalidades - Botones de acción */
+.action-btn {
+    background: var(--bg-darker);
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    background: var(--hover-color);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.action-btn.delete-btn:hover {
+    color: var(--accent-red);
+    border-color: var(--accent-red);
+}
+
+/* Indicador de respuesta */
+.reply-indicator {
+    background: var(--bg-card);
+    border-left: 3px solid var(--primary-color);
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideInDown 0.3s ease;
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reply-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.reply-content i {
+    color: var(--primary-color);
+    font-size: 16px;
+}
+
+.reply-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.reply-to {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.reply-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 300px;
+}
+
+.reply-cancel {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    transition: all 0.2s;
+}
+
+.reply-cancel:hover {
+    color: var(--accent-red);
+    transform: rotate(90deg);
+}
+
+/* Reply mostrado en mensajes */
+.message-reply {
+    background: var(--bg-darker);
+    border-left: 3px solid var(--primary-color);
+    padding: 8px 12px;
+    margin: 6px 0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.message-reply i {
+    color: var(--primary-color);
+    font-size: 12px;
+}
+
+.reply-content-display {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.reply-username {
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.reply-message {
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+/* Selector de reacciones */
+.reaction-picker {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background: var(--bg-card);
+    border: 2px solid var(--primary-color);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    gap: 6px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    animation: popIn 0.2s ease;
+    margin-bottom: 5px;
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.reaction-emoji {
+    background: var(--bg-darker);
+    border: 2px solid transparent;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.reaction-emoji:hover {
+    background: var(--hover-color);
+    border-color: var(--primary-color);
+    transform: scale(1.2);
+}
+
+/* Badge de editado */
+.edited-badge {
+    font-size: 10px;
+    color: var(--text-secondary);
+    font-style: italic;
+    margin-left: 4px;
+}
+
+/* Animación para eliminar mensajes */
+@keyframes messageSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+}
+
+/* Responsive para nuevos elementos */
+@media (max-width: 768px) {
+    .reply-text {
+        max-width: 200px;
+    }
+    
+    .reaction-picker {
+        right: auto;
+        left: 0;
+    }
+    
+    .action-btn {
+        padding: 5px 8px;
+        font-size: 12px;
     }
 }

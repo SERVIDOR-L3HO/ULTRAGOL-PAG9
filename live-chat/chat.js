@@ -15,11 +15,19 @@ let currentUser = {
     name: localStorage.getItem('chatUsername') || 'Usuario' + Math.floor(Math.random() * 1000),
     avatar: localStorage.getItem('chatAvatar') || `https://ui-avatars.com/api/?name=${localStorage.getItem('chatUsername') || 'User'}&background=9d4edd&color=fff`,
     isAnonymous: localStorage.getItem('chatAnonymous') === 'true',
-    isAuthenticated: false
+    isAuthenticated: false,
+    uid: localStorage.getItem('chatUserId') || 'user_' + Math.random().toString(36).substr(2, 9)
 };
+
+// Guardar userId inmediatamente si es nuevo
+if (!localStorage.getItem('chatUserId')) {
+    localStorage.setItem('chatUserId', currentUser.uid);
+    console.log('✅ User ID generado y guardado:', currentUser.uid);
+}
 
 let soundEnabled = localStorage.getItem('chatSound') !== 'false';
 let messageCount = 0;
+let replyingTo = null;
 
 const emojis = ['⚽', '🔥', '👏', '😂', '😍', '🎉', '💪', '👀', '🤔', '😱', 
                 '🙌', '💯', '❤️', '⚡', '🏆', '🎯', '👑', '💥', '🌟', '✨',
@@ -125,6 +133,7 @@ function handleChangeName() {
         currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=9d4edd&color=fff`;
         localStorage.setItem('chatUsername', currentUser.name);
         localStorage.setItem('chatAvatar', currentUser.avatar);
+        localStorage.setItem('chatUserId', currentUser.uid);
         currentUser.isAuthenticated = true;
         updateAuthUI();
         showToast('Éxito', `Tu nombre ahora es: ${currentUser.name}`, 'success');
@@ -312,7 +321,15 @@ async function sendMessage(text = null, imageData = null) {
         username: currentUser.isAnonymous ? 'Anónimo' : currentUser.name,
         avatar: currentUser.isAnonymous ? 'https://ui-avatars.com/api/?name=?&background=6c757d&color=fff' : currentUser.avatar,
         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        isAnonymous: currentUser.isAnonymous
+        isAnonymous: currentUser.isAnonymous,
+        userId: currentUser.uid,
+        reactions: {},
+        replyTo: replyingTo ? {
+            id: replyingTo.id,
+            username: replyingTo.username,
+            text: replyingTo.text,
+            image: replyingTo.image || null
+        } : null
     };
     
     // Guardar en Firestore
@@ -324,6 +341,11 @@ async function sendMessage(text = null, imageData = null) {
             if (messageInput) {
                 messageInput.value = '';
                 document.getElementById('charCount').textContent = '0/200';
+            }
+            
+            // Limpiar el reply
+            if (replyingTo) {
+                cancelReply();
             }
             
             document.getElementById('emojiPicker').style.display = 'none';
@@ -379,6 +401,9 @@ function loadMessages() {
                     if (isNewMessage && soundEnabled) {
                         playSound(600, 80);
                     }
+                } else if (change.type === 'modified') {
+                    // Actualizar mensaje existente
+                    updateMessageInUI(message);
                 }
             });
             
@@ -432,16 +457,65 @@ function addMessageToUI(message, animate = true) {
         <img src="${message.image}" class="message-image" alt="Imagen enviada" onclick="openImageModal('${message.image}')">
     ` : '';
     
+    // Reply HTML
+    const replyHTML = message.replyTo ? `
+        <div class="message-reply">
+            <i class="fas fa-reply"></i>
+            <div class="reply-content-display">
+                <span class="reply-username">${escapeHtml(message.replyTo.username)}</span>
+                <span class="reply-message">${message.replyTo.text ? escapeHtml(message.replyTo.text.substring(0, 50)) + (message.replyTo.text.length > 50 ? '...' : '') : '[Imagen]'}</span>
+            </div>
+        </div>
+    ` : '';
+    
+    // Reacciones HTML
+    const reactionsHTML = message.reactions && Object.keys(message.reactions).length > 0 ? `
+        <div class="message-reactions">
+            ${Object.entries(message.reactions).map(([emoji, data]) => {
+                const isActive = data.users && data.users.includes(currentUser.uid);
+                return `<button class="reaction-btn ${isActive ? 'active' : ''}" onclick="toggleReaction('${message.id}', '${emoji}')">
+                    ${emoji} <span class="reaction-count">${data.count || 0}</span>
+                </button>`;
+            }).join('')}
+        </div>
+    ` : '';
+    
+    // Botones de acción (solo si el mensaje es del usuario actual)
+    const isOwnMessage = message.userId === currentUser.uid;
+    const actionsHTML = `
+        <div class="message-actions">
+            <button class="action-btn" onclick="replyToMessage({id: '${message.id}', username: '${escapeHtml(message.username)}', text: '${escapeHtml(messageText)}', image: ${message.image ? `'${message.image}'` : 'null'}})" title="Responder">
+                <i class="fas fa-reply"></i>
+            </button>
+            ${isOwnMessage ? `
+                <button class="action-btn" onclick="editMessage('${message.id}')" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="action-btn delete-btn" onclick="deleteMessage('${message.id}')" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </button>
+            ` : ''}
+            <button class="action-btn" onclick="showReactionPicker('${message.id}')" title="Reaccionar">
+                <i class="fas fa-smile"></i>
+            </button>
+        </div>
+    `;
+    
+    const editedBadge = message.edited ? '<span class="edited-badge">(editado)</span>' : '';
+    
     messageDiv.innerHTML = `
         <img class="message-avatar" src="${message.avatar || 'https://ui-avatars.com/api/?name=User&background=9d4edd&color=fff'}" alt="${message.username}">
         <div class="message-content">
             <div class="message-header">
                 <span class="message-username">${escapeHtml(message.username)}</span>
                 ${message.isAnonymous ? '<span class="message-badge" style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">ANÓNIMO</span>' : ''}
-                <span class="message-timestamp">${timestamp}</span>
+                <span class="message-timestamp">${timestamp} ${editedBadge}</span>
             </div>
+            ${replyHTML}
             ${messageText ? `<div class="message-text">${escapeHtml(messageText)}</div>` : ''}
             ${imageHTML}
+            ${actionsHTML}
+            ${reactionsHTML}
         </div>
     `;
     
@@ -454,6 +528,53 @@ function addMessageToUI(message, animate = true) {
     // Limitar mensajes en UI
     while (messagesContainer.children.length > 100) {
         messagesContainer.lastChild.remove();
+    }
+}
+
+function updateMessageInUI(message) {
+    const messageElement = document.querySelector(`[data-id="${message.id}"]`);
+    if (!messageElement) return;
+    
+    // Actualizar texto si fue editado
+    const messageTextEl = messageElement.querySelector('.message-text');
+    if (messageTextEl && message.text) {
+        messageTextEl.textContent = message.text;
+    }
+    
+    // Actualizar badge de editado
+    const timestampEl = messageElement.querySelector('.message-timestamp');
+    if (timestampEl && message.edited) {
+        if (!timestampEl.querySelector('.edited-badge')) {
+            const editedBadge = document.createElement('span');
+            editedBadge.className = 'edited-badge';
+            editedBadge.textContent = '(editado)';
+            timestampEl.appendChild(document.createTextNode(' '));
+            timestampEl.appendChild(editedBadge);
+        }
+    }
+    
+    // Actualizar reacciones
+    const reactionsContainer = messageElement.querySelector('.message-reactions');
+    if (message.reactions && Object.keys(message.reactions).length > 0) {
+        const reactionsHTML = Object.entries(message.reactions).map(([emoji, data]) => {
+            const isActive = data.users && data.users.includes(currentUser.uid);
+            return `<button class="reaction-btn ${isActive ? 'active' : ''}" onclick="toggleReaction('${message.id}', '${emoji}')">
+                ${emoji} <span class="reaction-count">${data.count || 0}</span>
+            </button>`;
+        }).join('');
+        
+        if (reactionsContainer) {
+            reactionsContainer.innerHTML = reactionsHTML;
+        } else {
+            // Crear contenedor de reacciones si no existe
+            const messageContent = messageElement.querySelector('.message-content');
+            const newReactionsContainer = document.createElement('div');
+            newReactionsContainer.className = 'message-reactions';
+            newReactionsContainer.innerHTML = reactionsHTML;
+            messageContent.appendChild(newReactionsContainer);
+        }
+    } else if (reactionsContainer) {
+        reactionsContainer.remove();
     }
 }
 
@@ -552,6 +673,231 @@ function playSound(frequency = 800, duration = 100) {
     } catch (error) {
         console.log('Sound playback not supported');
     }
+}
+
+// IMPORTANTE: SEGURIDAD - Para producción, implementa Firebase Authentication y reglas de Firestore
+// Actualmente, userId se almacena en localStorage y puede ser modificado por el usuario
+// Reglas de Firestore recomendadas:
+// rules_version = '2';
+// service cloud.firestore {
+//   match /databases/{database}/documents {
+//     match /liveChatMessages/{messageId} {
+//       allow read: if true;
+//       allow create: if request.auth != null;
+//       allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
+//     }
+//   }
+// }
+
+// Funciones para editar, eliminar, responder y reaccionar mensajes
+async function editMessage(messageId) {
+    const messageElement = document.querySelector(`[data-id="${messageId}"]`);
+    if (!messageElement) return;
+    
+    // Verificación básica del mensaje (NOTA: No es seguro sin Firebase Auth)
+    try {
+        const doc = await messagesRef.doc(messageId).get();
+        if (!doc.exists) {
+            showToast('Error', 'Mensaje no encontrado', 'error');
+            return;
+        }
+        
+        const messageData = doc.data();
+        if (messageData.userId !== currentUser.uid) {
+            showToast('Error', 'No tienes permiso para editar este mensaje', 'error');
+            return;
+        }
+    } catch (error) {
+        console.error('Error verificando permisos:', error);
+        showToast('Error', 'No se pudo verificar permisos', 'error');
+        return;
+    }
+    
+    const messageTextEl = messageElement.querySelector('.message-text');
+    const currentText = messageTextEl ? messageTextEl.textContent : '';
+    
+    const newText = prompt('Editar mensaje:', currentText);
+    if (newText === null || newText.trim() === '') return;
+    
+    try {
+        await messagesRef.doc(messageId).update({
+            text: newText.trim(),
+            edited: true,
+            editedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        showToast('Éxito', 'Mensaje editado correctamente', 'success');
+        
+        if (soundEnabled) {
+            playSound(500, 60);
+        }
+    } catch (error) {
+        console.error('Error editando mensaje:', error);
+        showToast('Error', 'No se pudo editar el mensaje', 'error');
+    }
+}
+
+async function deleteMessage(messageId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar este mensaje?')) return;
+    
+    // Verificación básica del mensaje (NOTA: No es seguro sin Firebase Auth)
+    try {
+        const doc = await messagesRef.doc(messageId).get();
+        if (!doc.exists) {
+            showToast('Error', 'Mensaje no encontrado', 'error');
+            return;
+        }
+        
+        const messageData = doc.data();
+        if (messageData.userId !== currentUser.uid) {
+            showToast('Error', 'No tienes permiso para eliminar este mensaje', 'error');
+            return;
+        }
+    } catch (error) {
+        console.error('Error verificando permisos:', error);
+        showToast('Error', 'No se pudo verificar permisos', 'error');
+        return;
+    }
+    
+    try {
+        await messagesRef.doc(messageId).delete();
+        
+        // Remover del UI
+        const messageElement = document.querySelector(`[data-id="${messageId}"]`);
+        if (messageElement) {
+            messageElement.style.animation = 'messageSlideOut 0.3s ease';
+            setTimeout(() => messageElement.remove(), 300);
+        }
+        
+        showToast('Eliminado', 'Mensaje eliminado correctamente', 'success');
+        
+        if (soundEnabled) {
+            playSound(400, 60);
+        }
+    } catch (error) {
+        console.error('Error eliminando mensaje:', error);
+        showToast('Error', 'No se pudo eliminar el mensaje', 'error');
+    }
+}
+
+function replyToMessage(message) {
+    replyingTo = message;
+    
+    // Mostrar indicador de reply
+    const messageInput = document.getElementById('messageInput');
+    const inputContainer = document.querySelector('.input-wrapper');
+    
+    // Remover reply anterior si existe
+    const existingReply = document.querySelector('.reply-indicator');
+    if (existingReply) existingReply.remove();
+    
+    // Crear indicador de reply
+    const replyIndicator = document.createElement('div');
+    replyIndicator.className = 'reply-indicator';
+    replyIndicator.innerHTML = `
+        <div class="reply-content">
+            <i class="fas fa-reply"></i>
+            <div class="reply-info">
+                <span class="reply-to">Respondiendo a ${escapeHtml(message.username)}</span>
+                <span class="reply-text">${message.text ? escapeHtml(message.text.substring(0, 50)) + (message.text.length > 50 ? '...' : '') : '[Imagen]'}</span>
+            </div>
+        </div>
+        <button class="reply-cancel" onclick="cancelReply()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    inputContainer.parentNode.insertBefore(replyIndicator, inputContainer);
+    messageInput.focus();
+    
+    showToast('Responder', `Respondiendo a ${message.username}`, 'success');
+}
+
+function cancelReply() {
+    replyingTo = null;
+    const replyIndicator = document.querySelector('.reply-indicator');
+    if (replyIndicator) {
+        replyIndicator.remove();
+    }
+}
+
+async function toggleReaction(messageId, emoji) {
+    const messageDoc = messagesRef.doc(messageId);
+    
+    try {
+        const doc = await messageDoc.get();
+        if (!doc.exists) return;
+        
+        const message = doc.data();
+        const reactions = message.reactions || {};
+        const reactionKey = emoji;
+        
+        // Inicializar reacción si no existe
+        if (!reactions[reactionKey]) {
+            reactions[reactionKey] = {
+                count: 0,
+                users: []
+            };
+        }
+        
+        // Verificar si el usuario ya reaccionó
+        const userIndex = reactions[reactionKey].users.indexOf(currentUser.uid);
+        
+        if (userIndex > -1) {
+            // Remover reacción
+            reactions[reactionKey].users.splice(userIndex, 1);
+            reactions[reactionKey].count--;
+            
+            // Si no hay más usuarios con esta reacción, eliminar el emoji
+            if (reactions[reactionKey].count <= 0) {
+                delete reactions[reactionKey];
+            }
+        } else {
+            // Agregar reacción
+            reactions[reactionKey].users.push(currentUser.uid);
+            reactions[reactionKey].count++;
+        }
+        
+        await messageDoc.update({ reactions });
+        
+        if (soundEnabled) {
+            playSound(700, 50);
+        }
+    } catch (error) {
+        console.error('Error toggling reaction:', error);
+        showToast('Error', 'No se pudo agregar la reacción', 'error');
+    }
+}
+
+function showReactionPicker(messageId) {
+    // Remover picker anterior si existe
+    const existingPicker = document.querySelector('.reaction-picker');
+    if (existingPicker) existingPicker.remove();
+    
+    const messageElement = document.querySelector(`[data-id="${messageId}"]`);
+    if (!messageElement) return;
+    
+    const picker = document.createElement('div');
+    picker.className = 'reaction-picker';
+    
+    const quickReactions = ['⚽', '🔥', '👏', '😂', '❤️', '👍', '🎉', '💪'];
+    
+    picker.innerHTML = quickReactions.map(emoji => 
+        `<button class="reaction-emoji" onclick="toggleReaction('${messageId}', '${emoji}')">${emoji}</button>`
+    ).join('');
+    
+    messageElement.appendChild(picker);
+    
+    // Cerrar al hacer clic fuera
+    setTimeout(() => {
+        const closePickerOnClick = (e) => {
+            if (!picker.contains(e.target)) {
+                picker.remove();
+                document.removeEventListener('click', closePickerOnClick);
+            }
+        };
+        document.addEventListener('click', closePickerOnClick);
+    }, 100);
 }
 
 // Funciones para el modal de imágenes
