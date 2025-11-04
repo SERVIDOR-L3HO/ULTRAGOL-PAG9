@@ -7,7 +7,28 @@ let currentUser = {
     isAnonymous: localStorage.getItem('chatAnonymous') === 'true'
 };
 
-let messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+// Validar y cargar mensajes del localStorage
+let messages = [];
+try {
+    const storedMessages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+    // Validar que cada mensaje tenga la estructura correcta
+    messages = storedMessages.filter(msg => {
+        return msg && 
+               typeof msg === 'object' && 
+               typeof msg.id !== 'undefined' &&
+               typeof msg.username !== 'undefined';
+    });
+    // Si se filtraron mensajes inválidos, actualizar localStorage
+    if (messages.length !== storedMessages.length) {
+        localStorage.setItem('chatMessages', JSON.stringify(messages));
+        console.log('✅ Mensajes inválidos eliminados del localStorage');
+    }
+} catch (error) {
+    console.error('Error cargando mensajes:', error);
+    messages = [];
+    localStorage.removeItem('chatMessages');
+}
+
 let soundEnabled = localStorage.getItem('chatSound') !== 'false';
 let messageCount = 0;
 
@@ -334,7 +355,7 @@ function addMessageToUI(message, animate = true) {
     });
     
     const imageHTML = message.image ? `
-        <img src="${message.image}" class="message-image" alt="Imagen enviada" onclick="window.open('${message.image}', '_blank')">
+        <img src="${message.image}" class="message-image" alt="Imagen enviada" onclick="openImageModal('${message.image}')">
     ` : '';
     
     messageDiv.innerHTML = `
@@ -453,6 +474,55 @@ function playSound(frequency = 800, duration = 100) {
         console.log('Sound playback not supported');
     }
 }
+
+// Funciones para el modal de imágenes
+function openImageModal(imageSrc) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const downloadBtn = document.getElementById('downloadImageBtn');
+    
+    if (modal && modalImage) {
+        modalImage.src = imageSrc;
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Configurar botón de descarga
+        if (downloadBtn) {
+            downloadBtn.onclick = () => downloadImage(imageSrc);
+        }
+    }
+}
+
+function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function downloadImage(imageSrc) {
+    try {
+        const link = document.createElement('a');
+        link.href = imageSrc;
+        link.download = `ultragol-chat-image-${Date.now()}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('Descarga', 'Imagen descargada correctamente', 'success');
+    } catch (error) {
+        console.error('Error descargando imagen:', error);
+        showToast('Error', 'No se pudo descargar la imagen', 'error');
+    }
+}
+
+// Cerrar modal al hacer clic fuera de la imagen
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('imageModal');
+    if (event.target === modal) {
+        closeImageModal();
+    }
+});
 
 // Animación de toast slide out
 const style = document.createElement('style');
