@@ -6,24 +6,11 @@ if (typeof firebase === 'undefined') {
 }
 
 // Variables globales
+let auth = null;
 let db = null;
 let messagesRef = null;
 let unsubscribe = null;
-
-// Estado del usuario local
-let currentUser = {
-    name: localStorage.getItem('chatUsername') || 'Usuario' + Math.floor(Math.random() * 1000),
-    avatar: localStorage.getItem('chatAvatar') || `https://ui-avatars.com/api/?name=${localStorage.getItem('chatUsername') || 'User'}&background=9d4edd&color=fff`,
-    isAnonymous: localStorage.getItem('chatAnonymous') === 'true',
-    isAuthenticated: false,
-    uid: localStorage.getItem('chatUserId') || 'user_' + Math.random().toString(36).substr(2, 9)
-};
-
-// Guardar userId inmediatamente si es nuevo
-if (!localStorage.getItem('chatUserId')) {
-    localStorage.setItem('chatUserId', currentUser.uid);
-    console.log('✅ User ID generado y guardado:', currentUser.uid);
-}
+let currentUser = null;
 
 let soundEnabled = localStorage.getItem('chatSound') !== 'false';
 let messageCount = 0;
@@ -41,24 +28,82 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeChat() {
     console.log('Initializing chat system...');
     
-    // Esperar a que Firebase esté listo
-    if (typeof firebase !== 'undefined' && firebase.firestore) {
-        db = firebase.firestore();
-        messagesRef = db.collection('liveChatMessages');
-        console.log('✅ Firebase Firestore conectado');
-    } else {
-        console.warn('⚠️ Firebase no disponible, usando modo local');
+    // Verificar Firebase
+    if (typeof firebase === 'undefined') {
+        console.error('❌ Firebase no está cargado');
+        return;
     }
     
-    setupEventListeners();
-    setupEmojiPicker();
-    setupQuickReactions();
-    updateAuthUI();
-    loadMessages();
-    updateViewerCount();
+    auth = firebase.auth();
+    db = firebase.firestore();
+    messagesRef = db.collection('liveChatMessages');
     
-    setInterval(updateViewerCount, 30000);
-    console.log('✅ Chat initialized successfully');
+    console.log('✅ Firebase conectado');
+    
+    // Verificar autenticación
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            console.log('✅ Usuario autenticado:', user.email);
+            
+            // Obtener datos del usuario desde Firestore
+            try {
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    currentUser = {
+                        uid: user.uid,
+                        name: userData.name || user.displayName || user.email,
+                        email: user.email,
+                        avatar: userData.avatar || user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=9d4edd&color=fff`,
+                        isAnonymous: false,
+                        isAuthenticated: true
+                    };
+                } else {
+                    // Si no existe el documento del usuario, crearlo
+                    currentUser = {
+                        uid: user.uid,
+                        name: user.displayName || user.email,
+                        email: user.email,
+                        avatar: user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=9d4edd&color=fff`,
+                        isAnonymous: false,
+                        isAuthenticated: true
+                    };
+                    
+                    await db.collection('users').doc(user.uid).set({
+                        uid: user.uid,
+                        name: currentUser.name,
+                        email: currentUser.email,
+                        avatar: currentUser.avatar,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        isAnonymous: false
+                    });
+                }
+                
+                console.log('✅ Usuario cargado:', currentUser.name);
+                setupEventListeners();
+                setupEmojiPicker();
+                setupQuickReactions();
+                updateAuthUI();
+                loadMessages();
+                updateViewerCount();
+                
+                setInterval(updateViewerCount, 30000);
+                console.log('✅ Chat initialized successfully');
+                
+            } catch (error) {
+                console.error('❌ Error cargando datos del usuario:', error);
+                redirectToLogin();
+            }
+        } else {
+            console.log('⚠️ Usuario no autenticado');
+            redirectToLogin();
+        }
+    });
+}
+
+function redirectToLogin() {
+    console.log('🔄 Redirigiendo a login...');
+    window.location.href = 'auth.html';
 }
 
 function setupEventListeners() {
@@ -126,35 +171,50 @@ function setupQuickReactions() {
     });
 }
 
-function handleChangeName() {
+async function handleChangeName() {
     const newName = prompt('Ingresa tu nuevo nombre:', currentUser.name);
     if (newName && newName.trim()) {
-        currentUser.name = newName.trim();
-        currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=9d4edd&color=fff`;
-        localStorage.setItem('chatUsername', currentUser.name);
-        localStorage.setItem('chatAvatar', currentUser.avatar);
-        localStorage.setItem('chatUserId', currentUser.uid);
-        currentUser.isAuthenticated = true;
-        updateAuthUI();
-        showToast('Éxito', `Tu nombre ahora es: ${currentUser.name}`, 'success');
+        try {
+            const trimmedName = newName.trim();
+            const newAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(trimmedName)}&background=9d4edd&color=fff`;
+            
+            // Actualizar en Firestore
+            await db.collection('users').doc(currentUser.uid).update({
+                name: trimmedName,
+                avatar: newAvatar
+            });
+            
+            // Actualizar perfil de Firebase Auth
+            await auth.currentUser.updateProfile({
+                displayName: trimmedName
+            });
+            
+            // Actualizar localmente
+            currentUser.name = trimmedName;
+            currentUser.avatar = newAvatar;
+            
+            updateAuthUI();
+            showToast('Éxito', `Tu nombre ahora es: ${currentUser.name}`, 'success');
+        } catch (error) {
+            console.error('❌ Error actualizando nombre:', error);
+            showToast('Error', 'No se pudo actualizar el nombre', 'error');
+        }
     }
 }
 
-function handleLogout() {
-    if (confirm('¿Deseas cerrar sesión?\n\nEsto solo eliminará tu nombre local. Los mensajes públicos se mantendrán.')) {
-        // Limpiar solo datos del usuario local
-        localStorage.removeItem('chatUsername');
-        localStorage.removeItem('chatAvatar');
-        localStorage.removeItem('chatAnonymous');
-        localStorage.removeItem('chatSound');
-        
-        // Reiniciar el chat
-        showToast('Sesión cerrada', 'Datos locales eliminados', 'success');
-        
-        // Recargar la página después de un momento
-        setTimeout(() => {
-            window.location.reload();
-        }, 1000);
+async function handleLogout() {
+    if (confirm('¿Deseas cerrar sesión?')) {
+        try {
+            await auth.signOut();
+            showToast('Éxito', 'Sesión cerrada correctamente', 'success');
+            
+            setTimeout(() => {
+                redirectToLogin();
+            }, 1000);
+        } catch (error) {
+            console.error('❌ Error al cerrar sesión:', error);
+            showToast('Error', 'No se pudo cerrar la sesión', 'error');
+        }
     }
 }
 
