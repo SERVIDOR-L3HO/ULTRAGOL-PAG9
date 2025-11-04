@@ -239,9 +239,9 @@ async function handleImageUpload(e) {
         return;
     }
     
-    // Aumentar límite a 5MB para permitir mejor calidad
-    if (file.size > 5 * 1024 * 1024) {
-        showToast('Error', 'La imagen es muy grande (máx 5MB)', 'error');
+    // Límite de 2MB para el archivo original (resultará en ~500-700KB después de compresión)
+    if (file.size > 2 * 1024 * 1024) {
+        showToast('Error', 'La imagen es muy grande (máx 2MB)', 'error');
         e.target.value = '';
         return;
     }
@@ -255,8 +255,8 @@ async function handleImageUpload(e) {
             let width = img.width;
             let height = img.height;
             
-            // Reducir dimensiones solo si es extremadamente grande
-            const maxDimension = 1920;
+            // Reducir dimensiones para mantener bajo 700KB en Firestore
+            const maxDimension = 1200;
             if (width > maxDimension || height > maxDimension) {
                 if (width > height) {
                     height = (height / width) * maxDimension;
@@ -272,8 +272,20 @@ async function handleImageUpload(e) {
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
             
-            // Convertir a JPEG con alta calidad
-            const compressedData = canvas.toDataURL('image/jpeg', 0.92);
+            // Convertir a JPEG con buena calidad pero optimizada para Firestore (límite 1MB)
+            let compressedData = canvas.toDataURL('image/jpeg', 0.85);
+            
+            // Si aún es muy grande, reducir calidad
+            if (compressedData.length > 700000) {
+                compressedData = canvas.toDataURL('image/jpeg', 0.7);
+            }
+            
+            // Verificar que no exceda 700KB
+            if (compressedData.length > 700000) {
+                showToast('Error', 'La imagen es demasiado compleja. Intenta con una más simple.', 'error');
+                e.target.value = '';
+                return;
+            }
             sendMessage(null, compressedData);
             e.target.value = '';
         };
