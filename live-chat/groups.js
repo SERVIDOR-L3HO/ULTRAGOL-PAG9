@@ -91,7 +91,7 @@ function initializeGroupsSystem() {
 
 function openGroupsModal() {
     if (!currentUser) {
-        showToast('Por favor inicia sesión para ver los grupos', 'error');
+        showGroupToast('Por favor inicia sesión para ver los grupos', 'error');
         return;
     }
     
@@ -261,13 +261,13 @@ function handleAvatarUpload(event) {
     
     // Validate file type
     if (!file.type.startsWith('image/')) {
-        showToast('Por favor selecciona una imagen válida', 'error');
+        showGroupToast('Por favor selecciona una imagen válida', 'error');
         return;
     }
     
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-        showToast('La imagen no debe superar los 5MB', 'error');
+        showGroupToast('La imagen no debe superar los 5MB', 'error');
         return;
     }
     
@@ -287,7 +287,7 @@ async function handleCreateGroup(event) {
     event.preventDefault();
     
     if (!currentUser) {
-        showToast('Debes iniciar sesión para crear un grupo', 'error');
+        showGroupToast('Debes iniciar sesión para crear un grupo', 'error');
         return;
     }
     
@@ -300,12 +300,12 @@ async function handleCreateGroup(event) {
     const moderationEnabled = document.getElementById('moderationEnabled')?.checked;
     
     if (!name) {
-        showToast('El nombre del grupo es obligatorio', 'error');
+        showGroupToast('El nombre del grupo es obligatorio', 'error');
         return;
     }
     
     try {
-        showToast('Creando grupo...', 'info');
+        showGroupToast('Creando grupo...', 'info');
         
         // Upload avatar if selected
         let avatarURL = null;
@@ -353,7 +353,7 @@ async function handleCreateGroup(event) {
                 joinedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            showToast('¡Grupo creado exitosamente!', 'success');
+            showGroupToast('¡Grupo creado exitosamente!', 'success');
             closeCreateGroupModal();
             loadUserGroups();
             
@@ -363,7 +363,7 @@ async function handleCreateGroup(event) {
         
     } catch (error) {
         console.error('Error creating group:', error);
-        showToast('Error al crear el grupo. Intenta de nuevo.', 'error');
+        showGroupToast('Error al crear el grupo. Intenta de nuevo.', 'error');
     }
 }
 
@@ -492,7 +492,7 @@ async function loadGroupDetails(groupId) {
         const groupDoc = await db.collection('groups').doc(groupId).get();
         
         if (!groupDoc.exists) {
-            showToast('Grupo no encontrado', 'error');
+            showGroupToast('Grupo no encontrado', 'error');
             return;
         }
         
@@ -535,7 +535,7 @@ async function loadGroupDetails(groupId) {
         
     } catch (error) {
         console.error('Error loading group details:', error);
-        showToast('Error al cargar los detalles del grupo', 'error');
+        showGroupToast('Error al cargar los detalles del grupo', 'error');
     }
 }
 
@@ -616,7 +616,7 @@ async function sendGroupMessage() {
         if (input) input.value = '';
     } catch (error) {
         console.error('Error sending message:', error);
-        showToast('Error al enviar el mensaje', 'error');
+        showGroupToast('Error al enviar el mensaje', 'error');
     }
 }
 
@@ -695,11 +695,11 @@ async function removeMember(memberId) {
         // Delete member document
         await groupRef.collection('members').doc(memberId).delete();
         
-        showToast('Miembro eliminado del grupo', 'success');
+        showGroupToast('Miembro eliminado del grupo', 'success');
         loadGroupMembers();
     } catch (error) {
         console.error('Error removing member:', error);
-        showToast('Error al eliminar el miembro', 'error');
+        showGroupToast('Error al eliminar el miembro', 'error');
     }
 }
 
@@ -719,11 +719,11 @@ async function promoteMember(memberId) {
             role: 'admin'
         });
         
-        showToast('Miembro promovido a administrador', 'success');
+        showGroupToast('Miembro promovido a administrador', 'success');
         loadGroupMembers();
     } catch (error) {
         console.error('Error promoting member:', error);
-        showToast('Error al promover el miembro', 'error');
+        showGroupToast('Error al promover el miembro', 'error');
     }
 }
 
@@ -747,7 +747,7 @@ async function joinGroup() {
                 status: 'pending'
             });
             
-            showToast('Solicitud enviada. Espera la aprobación del administrador.', 'success');
+            showGroupToast('Solicitud enviada. Espera la aprobación del administrador.', 'success');
         } else {
             // Join directly
             await groupRef.update({
@@ -763,13 +763,13 @@ async function joinGroup() {
                 joinedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
             
-            showToast('¡Te has unido al grupo!', 'success');
+            showGroupToast('¡Te has unido al grupo!', 'success');
             loadGroupDetails(currentGroup.id);
             loadUserGroups();
         }
     } catch (error) {
         console.error('Error joining group:', error);
-        showToast('Error al unirse al grupo', 'error');
+        showGroupToast('Error al unirse al grupo', 'error');
     }
 }
 
@@ -789,12 +789,12 @@ async function leaveGroup() {
         
         await groupRef.collection('members').doc(currentUser.uid).delete();
         
-        showToast('Has salido del grupo', 'success');
+        showGroupToast('Has salido del grupo', 'success');
         closeGroupDetailsModal();
         loadUserGroups();
     } catch (error) {
         console.error('Error leaving group:', error);
-        showToast('Error al salir del grupo', 'error');
+        showGroupToast('Error al salir del grupo', 'error');
     }
 }
 
@@ -882,12 +882,12 @@ async function acceptRequest(userId) {
         // Delete request
         await groupRef.collection('requests').doc(userId).delete();
         
-        showToast('Solicitud aceptada', 'success');
+        showGroupToast('Solicitud aceptada', 'success');
         loadPendingRequests();
         updatePendingRequestsBadge(currentGroup.id);
     } catch (error) {
         console.error('Error accepting request:', error);
-        showToast('Error al aceptar la solicitud', 'error');
+        showGroupToast('Error al aceptar la solicitud', 'error');
     }
 }
 
@@ -897,12 +897,12 @@ async function rejectRequest(userId) {
     try {
         await db.collection('groups').doc(currentGroup.id).collection('requests').doc(userId).delete();
         
-        showToast('Solicitud rechazada', 'success');
+        showGroupToast('Solicitud rechazada', 'success');
         loadPendingRequests();
         updatePendingRequestsBadge(currentGroup.id);
     } catch (error) {
         console.error('Error rejecting request:', error);
-        showToast('Error al rechazar la solicitud', 'error');
+        showGroupToast('Error al rechazar la solicitud', 'error');
     }
 }
 
@@ -944,7 +944,7 @@ function copyInviteLink() {
     if (input) {
         input.select();
         document.execCommand('copy');
-        showToast('Link copiado al portapapeles', 'success');
+        showGroupToast('Link copiado al portapapeles', 'success');
     }
 }
 
@@ -977,7 +977,7 @@ function downloadQR() {
         link.download = `grupo-${currentGroup?.name || 'qr'}.png`;
         link.href = canvas.toDataURL();
         link.click();
-        showToast('QR descargado', 'success');
+        showGroupToast('QR descargado', 'success');
     }
 }
 
@@ -1059,9 +1059,12 @@ function formatTimestamp(timestamp) {
     });
 }
 
-function showToast(message, type = 'info') {
+function showGroupToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
-    if (!container) return;
+    if (!container) {
+        console.log('Toast:', message, type);
+        return;
+    }
     
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
@@ -1089,7 +1092,7 @@ window.addEventListener('load', () => {
             if (currentUser) {
                 openGroupDetailsModal(joinGroupId);
             } else {
-                showToast('Por favor inicia sesión para unirte al grupo', 'info');
+                showGroupToast('Por favor inicia sesión para unirte al grupo', 'info');
             }
         }, 2000);
     }
