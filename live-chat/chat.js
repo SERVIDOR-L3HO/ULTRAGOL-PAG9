@@ -73,16 +73,35 @@ function setupFirebaseChat() {
             console.log('✅ User authenticated:', user.displayName);
             enableChat();
             listenToMessages();
-            updateUserPresence(true);
+            updateUserPresence(true).catch(err => {
+                console.warn('Could not update presence on login:', err);
+            });
         } else {
             console.log('❌ User not authenticated');
             disableChat();
+            showWelcomeMessage();
             if (messagesListener) {
                 messagesListener();
                 messagesListener = null;
             }
         }
     });
+}
+
+function showWelcomeMessage() {
+    const messagesContainer = document.getElementById('messagesContainer');
+    if (messagesContainer) {
+        messagesContainer.innerHTML = `
+            <div class="welcome-message">
+                <i class="fas fa-lock"></i>
+                <h2>Chat en vivo</h2>
+                <p>Inicia sesión con Google para unirte a la conversación</p>
+                <button onclick="document.getElementById('authBtn').click()" style="margin-top: 20px; padding: 12px 24px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: var(--bg-dark); border: none; border-radius: 12px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-left: auto; margin-right: auto;">
+                    <i class="fab fa-google"></i> Iniciar Sesión
+                </button>
+            </div>
+        `;
+    }
 }
 
 function setupEventListeners() {
@@ -298,17 +317,42 @@ async function handleLogout() {
     if (!confirm('¿Cerrar sesión?')) return;
     
     try {
-        await updateUserPresence(false);
-        
-        if (window.db && currentUser) {
-            await window.db.collection('typing').doc(currentUser.uid).delete();
+        // Intentar actualizar presencia, pero no fallar si no funciona
+        try {
+            await updateUserPresence(false);
+        } catch (presenceError) {
+            console.warn('Could not update presence:', presenceError);
         }
         
-        await window.signOutUser();
-        showToast('Adiós', 'Sesión cerrada correctamente', 'success');
+        // Intentar eliminar typing status, pero no fallar si no funciona
+        try {
+            if (window.db && currentUser) {
+                await window.db.collection('typing').doc(currentUser.uid).delete();
+            }
+        } catch (typingError) {
+            console.warn('Could not delete typing status:', typingError);
+        }
+        
+        // Cerrar sesión de Firebase - esto es lo más importante
+        if (window.signOutUser) {
+            const result = await window.signOutUser();
+            if (result.success) {
+                showToast('Adiós', 'Sesión cerrada correctamente', 'success');
+            } else {
+                throw new Error(result.error);
+            }
+        } else {
+            // Si no hay función disponible, intentar directamente
+            if (window.auth) {
+                await window.auth.signOut();
+                showToast('Adiós', 'Sesión cerrada correctamente', 'success');
+            } else {
+                throw new Error('Sistema de autenticación no disponible');
+            }
+        }
     } catch (error) {
         console.error('Logout error:', error);
-        showToast('Error', 'No se pudo cerrar sesión', 'error');
+        showToast('Error', error.message || 'No se pudo cerrar sesión', 'error');
     }
 }
 
@@ -455,12 +499,15 @@ function listenToMessages() {
     }
     
     function handlePermissionError() {
-        console.error('Permission denied - Check Firestore rules');
+        console.error('Permission denied - User needs to be authenticated');
         messagesContainer.innerHTML = `
             <div class="welcome-message">
                 <i class="fas fa-lock"></i>
-                <h2>Acceso denegado</h2>
-                <p>Inicia sesión para ver el chat</p>
+                <h2>Chat en vivo</h2>
+                <p>Inicia sesión con Google para ver y participar en el chat</p>
+                <button onclick="document.getElementById('authBtn').click()" style="margin-top: 20px; padding: 12px 24px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: var(--bg-dark); border: none; border-radius: 12px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-left: auto; margin-right: auto;">
+                    <i class="fab fa-google"></i> Iniciar Sesión
+                </button>
             </div>
         `;
     }
@@ -643,7 +690,10 @@ async function sendMessage() {
 }
 
 async function updateUserPresence(online) {
-    if (!currentUser || !window.db) return;
+    if (!currentUser || !window.db) {
+        console.warn('Cannot update presence: user or db not available');
+        return;
+    }
     
     try {
         const userRef = window.db.collection('presence').doc(currentUser.uid);
