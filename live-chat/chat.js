@@ -1,33 +1,22 @@
 console.log('🚀 UltraGol Live Chat initializing...');
 
-// Estado del chat
+// Verificar que Firebase esté disponible
+if (typeof firebase === 'undefined') {
+    console.error('❌ Firebase no está cargado');
+}
+
+// Variables globales
+let db = null;
+let messagesRef = null;
+let unsubscribe = null;
+
+// Estado del usuario local
 let currentUser = {
     name: localStorage.getItem('chatUsername') || 'Usuario' + Math.floor(Math.random() * 1000),
     avatar: localStorage.getItem('chatAvatar') || `https://ui-avatars.com/api/?name=${localStorage.getItem('chatUsername') || 'User'}&background=9d4edd&color=fff`,
-    isAnonymous: localStorage.getItem('chatAnonymous') === 'true'
+    isAnonymous: localStorage.getItem('chatAnonymous') === 'true',
+    isAuthenticated: false
 };
-
-// Validar y cargar mensajes del localStorage
-let messages = [];
-try {
-    const storedMessages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
-    // Validar que cada mensaje tenga la estructura correcta
-    messages = storedMessages.filter(msg => {
-        return msg && 
-               typeof msg === 'object' && 
-               typeof msg.id !== 'undefined' &&
-               typeof msg.username !== 'undefined';
-    });
-    // Si se filtraron mensajes inválidos, actualizar localStorage
-    if (messages.length !== storedMessages.length) {
-        localStorage.setItem('chatMessages', JSON.stringify(messages));
-        console.log('✅ Mensajes inválidos eliminados del localStorage');
-    }
-} catch (error) {
-    console.error('Error cargando mensajes:', error);
-    messages = [];
-    localStorage.removeItem('chatMessages');
-}
 
 let soundEnabled = localStorage.getItem('chatSound') !== 'false';
 let messageCount = 0;
@@ -44,8 +33,14 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializeChat() {
     console.log('Initializing chat system...');
     
-    // Limpiar datos corruptos automáticamente
-    cleanCorruptedData();
+    // Esperar a que Firebase esté listo
+    if (typeof firebase !== 'undefined' && firebase.firestore) {
+        db = firebase.firestore();
+        messagesRef = db.collection('liveChatMessages');
+        console.log('✅ Firebase Firestore conectado');
+    } else {
+        console.warn('⚠️ Firebase no disponible, usando modo local');
+    }
     
     setupEventListeners();
     setupEmojiPicker();
@@ -58,36 +53,6 @@ function initializeChat() {
     console.log('✅ Chat initialized successfully');
 }
 
-function cleanCorruptedData() {
-    try {
-        const storedMessages = localStorage.getItem('chatMessages');
-        if (storedMessages) {
-            const messages = JSON.parse(storedMessages);
-            // Verificar si hay mensajes corruptos
-            const hasCorrupted = messages.some(msg => 
-                !msg || typeof msg !== 'object' || !msg.username || typeof msg.text !== 'string'
-            );
-            
-            if (hasCorrupted) {
-                console.log('⚠️ Datos corruptos detectados, limpiando...');
-                // Filtrar solo mensajes válidos
-                const validMessages = messages.filter(msg => 
-                    msg && 
-                    typeof msg === 'object' && 
-                    msg.username && 
-                    (typeof msg.text === 'string' || msg.image)
-                );
-                localStorage.setItem('chatMessages', JSON.stringify(validMessages));
-                showToast('Limpieza', 'Mensajes corruptos eliminados', 'success');
-            }
-        }
-    } catch (error) {
-        console.error('Error limpiando datos:', error);
-        // Si hay error, limpiar todo
-        localStorage.removeItem('chatMessages');
-    }
-}
-
 function setupEventListeners() {
     // Botones de configuración
     document.getElementById('changeNameBtn')?.addEventListener('click', handleChangeName);
@@ -97,7 +62,7 @@ function setupEventListeners() {
     document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
     
     // Enviar mensaje
-    document.getElementById('sendBtn')?.addEventListener('click', sendMessage);
+    document.getElementById('sendBtn')?.addEventListener('click', () => sendMessage());
     document.getElementById('messageInput')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -160,22 +125,22 @@ function handleChangeName() {
         currentUser.avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=9d4edd&color=fff`;
         localStorage.setItem('chatUsername', currentUser.name);
         localStorage.setItem('chatAvatar', currentUser.avatar);
+        currentUser.isAuthenticated = true;
         updateAuthUI();
         showToast('Éxito', `Tu nombre ahora es: ${currentUser.name}`, 'success');
     }
 }
 
 function handleLogout() {
-    if (confirm('¿Deseas cerrar sesión y limpiar tus datos?\n\nEsto eliminará tu nombre, mensajes guardados y preferencias.')) {
-        // Limpiar todo el localStorage
+    if (confirm('¿Deseas cerrar sesión?\n\nEsto solo eliminará tu nombre local. Los mensajes públicos se mantendrán.')) {
+        // Limpiar solo datos del usuario local
         localStorage.removeItem('chatUsername');
         localStorage.removeItem('chatAvatar');
         localStorage.removeItem('chatAnonymous');
-        localStorage.removeItem('chatMessages');
         localStorage.removeItem('chatSound');
         
         // Reiniciar el chat
-        showToast('Sesión cerrada', 'Datos eliminados correctamente', 'success');
+        showToast('Sesión cerrada', 'Datos locales eliminados', 'success');
         
         // Recargar la página después de un momento
         setTimeout(() => {
@@ -267,6 +232,13 @@ async function handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
     
+    // Verificar autenticación
+    if (!currentUser.isAuthenticated && !localStorage.getItem('chatUsername')) {
+        showToast('Error', 'Debes ingresar un nombre primero. Toca el ícono de usuario.', 'error');
+        e.target.value = '';
+        return;
+    }
+    
     // Aumentar límite a 5MB para permitir mejor calidad
     if (file.size > 5 * 1024 * 1024) {
         showToast('Error', 'La imagen es muy grande (máx 5MB)', 'error');
@@ -310,83 +282,101 @@ async function handleImageUpload(e) {
     reader.readAsDataURL(file);
 }
 
-function sendMessage(text = null, imageData = null) {
+async function sendMessage(text = null, imageData = null) {
     const messageInput = document.getElementById('messageInput');
     const messageText = text || messageInput?.value.trim();
     
     if (!messageText && !imageData) return;
     
+    // Verificar que el usuario tenga un nombre
+    if (!currentUser.isAuthenticated && !localStorage.getItem('chatUsername')) {
+        showToast('Error', 'Debes ingresar un nombre primero. Toca el ícono de usuario.', 'error');
+        return;
+    }
+    
     const message = {
-        id: Date.now() + '_' + Math.random(),
         text: messageText || '',
         image: imageData || null,
         username: currentUser.isAnonymous ? 'Anónimo' : currentUser.name,
         avatar: currentUser.isAnonymous ? 'https://ui-avatars.com/api/?name=?&background=6c757d&color=fff' : currentUser.avatar,
-        timestamp: new Date().toISOString(),
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
         isAnonymous: currentUser.isAnonymous
     };
     
-    messages.unshift(message);
-    
-    // Guardar solo últimos 50 mensajes para evitar exceder localStorage
-    if (messages.length > 50) {
-        messages = messages.slice(0, 50);
-    }
-    
-    try {
-        localStorage.setItem('chatMessages', JSON.stringify(messages));
-    } catch (error) {
-        console.error('Error saving to localStorage:', error);
-        
-        // Si falla, limpiar mensajes antiguos y reintentar
-        messages = messages.slice(0, 20);
+    // Guardar en Firestore
+    if (messagesRef) {
         try {
-            localStorage.setItem('chatMessages', JSON.stringify(messages));
-            showToast('Advertencia', 'Espacio limitado. Se guardaron solo los mensajes recientes.', 'error');
-        } catch (retryError) {
-            showToast('Error', 'No se pudo guardar el mensaje. Storage lleno.', 'error');
-            console.error('Failed to save even after cleanup:', retryError);
+            await messagesRef.add(message);
+            console.log('✅ Mensaje enviado a Firestore');
+            
+            if (messageInput) {
+                messageInput.value = '';
+                document.getElementById('charCount').textContent = '0/200';
+            }
+            
+            document.getElementById('emojiPicker').style.display = 'none';
+            
+            if (soundEnabled) {
+                playSound(600, 80);
+            }
+        } catch (error) {
+            console.error('Error enviando mensaje:', error);
+            showToast('Error', 'No se pudo enviar el mensaje', 'error');
         }
+    } else {
+        showToast('Error', 'Chat no disponible', 'error');
     }
-    
-    addMessageToUI(message);
-    
-    if (messageInput) {
-        messageInput.value = '';
-        document.getElementById('charCount').textContent = '0/200';
-    }
-    
-    document.getElementById('emojiPicker').style.display = 'none';
-    
-    if (soundEnabled) {
-        playSound(600, 80);
-    }
-    
-    messageCount++;
-    updateMessageCount();
 }
 
 function loadMessages() {
     const messagesContainer = document.getElementById('messagesContainer');
-    messagesContainer.innerHTML = '';
     
-    if (messages.length === 0) {
+    if (!messagesRef) {
         messagesContainer.innerHTML = `
             <div class="welcome-message">
-                <i class="fas fa-comments"></i>
-                <h2>¡Bienvenido al chat en vivo!</h2>
-                <p>Sé el primero en enviar un mensaje</p>
+                <i class="fas fa-exclamation-triangle"></i>
+                <h2>Chat no disponible</h2>
+                <p>Firebase no está configurado</p>
             </div>
         `;
         return;
     }
     
-    messages.forEach(message => {
-        addMessageToUI(message, false);
-    });
+    messagesContainer.innerHTML = `
+        <div class="welcome-message">
+            <i class="fas fa-comments"></i>
+            <h2>¡Bienvenido al chat en vivo!</h2>
+            <p>Los mensajes aparecerán aquí en tiempo real</p>
+        </div>
+    `;
     
-    messageCount = messages.length;
-    updateMessageCount();
+    // Escuchar mensajes en tiempo real
+    // Cargar últimos 100 mensajes ordenados por tiempo
+    unsubscribe = messagesRef
+        .orderBy('timestamp', 'desc')
+        .limit(100)
+        .onSnapshot((snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                const message = change.doc.data();
+                message.id = change.doc.id;
+                
+                if (change.type === 'added') {
+                    // Solo animar si es un mensaje nuevo (no carga inicial)
+                    const isNewMessage = snapshot.docChanges().length === 1;
+                    addMessageToUI(message, isNewMessage);
+                    if (isNewMessage && soundEnabled) {
+                        playSound(600, 80);
+                    }
+                }
+            });
+            
+            // Actualizar contador
+            messageCount = snapshot.size;
+            updateMessageCount();
+        }, (error) => {
+            console.error('Error cargando mensajes:', error);
+            showToast('Error', 'No se pudieron cargar los mensajes', 'error');
+        });
 }
 
 function addMessageToUI(message, animate = true) {
@@ -402,6 +392,11 @@ function addMessageToUI(message, animate = true) {
     const welcomeMsg = messagesContainer.querySelector('.welcome-message');
     if (welcomeMsg) welcomeMsg.remove();
     
+    // Verificar si el mensaje ya existe
+    if (message.id && document.querySelector(`[data-id="${message.id}"]`)) {
+        return;
+    }
+    
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message-item';
     if (animate) {
@@ -409,10 +404,14 @@ function addMessageToUI(message, animate = true) {
     }
     messageDiv.dataset.id = message.id || Date.now();
     
-    const timestamp = new Date(message.timestamp).toLocaleTimeString('es-ES', { 
-        hour: '2-digit', 
-        minute: '2-digit' 
-    });
+    // Formatear timestamp
+    let timestamp = 'Ahora';
+    if (message.timestamp && message.timestamp.toDate) {
+        timestamp = message.timestamp.toDate().toLocaleTimeString('es-ES', { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+    }
     
     // Validar que text sea string
     const messageText = typeof message.text === 'string' ? message.text : '';
@@ -450,6 +449,11 @@ function updateAuthUI() {
     const userInfo = document.getElementById('userInfo');
     const userName = document.getElementById('userName');
     const userAvatar = document.getElementById('userAvatar');
+    
+    // Marcar como autenticado si tiene nombre
+    if (localStorage.getItem('chatUsername')) {
+        currentUser.isAuthenticated = true;
+    }
     
     if (userInfo && userName && userAvatar) {
         userInfo.style.display = 'flex';
@@ -598,6 +602,17 @@ style.textContent = `
         to {
             opacity: 0;
             transform: translateX(100px);
+        }
+    }
+    
+    @keyframes messageSlideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
         }
     }
 `;
