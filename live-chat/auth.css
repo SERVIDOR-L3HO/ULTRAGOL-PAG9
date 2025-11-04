@@ -75,6 +75,19 @@ body::before {
     animation: pulse 2s ease-in-out infinite;
 }
 
+.auth-logo {
+    height: 80px;
+    width: auto;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 6px 20px rgba(157, 78, 221, 0.5));
+    animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
 @keyframes pulse {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.05); }
