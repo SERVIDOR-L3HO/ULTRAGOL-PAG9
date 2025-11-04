@@ -114,6 +114,11 @@ function setupEventListeners() {
     document.getElementById('searchBtn')?.addEventListener('click', toggleSearch);
     document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
     
+    // Botón de grupos - redirigir a la página de grupos
+    document.getElementById('groupsBtn')?.addEventListener('click', () => {
+        window.location.href = 'groups-page.html';
+    });
+    
     // Enviar mensaje
     document.getElementById('sendBtn')?.addEventListener('click', () => sendMessage());
     document.getElementById('messageInput')?.addEventListener('keypress', (e) => {
