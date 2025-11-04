@@ -370,7 +370,7 @@ async function sendMessage(text = null, imageData = null) {
     if (!messageText && !imageData) return;
     
     // Verificar que el usuario tenga un nombre
-    if (!currentUser.isAuthenticated && !localStorage.getItem('chatUsername')) {
+    if (!currentUser || (!currentUser.isAuthenticated && !localStorage.getItem('chatUsername'))) {
         showToast('Error', 'Debes ingresar un nombre primero. Toca el ícono de usuario.', 'error');
         return;
     }
@@ -415,10 +415,21 @@ async function sendMessage(text = null, imageData = null) {
             }
         } catch (error) {
             console.error('Error enviando mensaje:', error);
-            showToast('Error', 'No se pudo enviar el mensaje', 'error');
+            
+            // Mensajes de error más específicos
+            if (error.code === 'permission-denied') {
+                showToast('Error de Permisos', 'Firestore no está configurado correctamente. Configura las reglas de seguridad en Firebase Console.', 'error');
+                console.error('⚠️ SOLUCIÓN: Ve a Firebase Console → Firestore Database → Reglas');
+                console.error('⚠️ Sigue las instrucciones del archivo INSTRUCCIONES_CONFIGURACION.md en la carpeta live-chat');
+            } else if (error.code === 'unavailable') {
+                showToast('Error de Conexión', 'No hay conexión a internet o Firestore no está disponible', 'error');
+            } else {
+                showToast('Error', 'No se pudo enviar el mensaje: ' + error.message, 'error');
+            }
         }
     } else {
-        showToast('Error', 'Chat no disponible', 'error');
+        showToast('Error', 'Chat no disponible - Firestore no inicializado', 'error');
+        console.error('❌ messagesRef es null - Firebase no está inicializado correctamente');
     }
 }
 
@@ -735,26 +746,21 @@ function playSound(frequency = 800, duration = 100) {
     }
 }
 
-// IMPORTANTE: SEGURIDAD - Para producción, implementa Firebase Authentication y reglas de Firestore
-// Actualmente, userId se almacena en localStorage y puede ser modificado por el usuario
-// Reglas de Firestore recomendadas:
-// rules_version = '2';
-// service cloud.firestore {
-//   match /databases/{database}/documents {
-//     match /liveChatMessages/{messageId} {
-//       allow read: if true;
-//       allow create: if request.auth != null;
-//       allow update, delete: if request.auth != null && request.auth.uid == resource.data.userId;
-//     }
-//   }
-// }
+// IMPORTANTE: SEGURIDAD - Firebase Authentication implementado
+// Reglas de Firestore configuradas en Firebase Console
+// Ver archivo INSTRUCCIONES_CONFIGURACION.md para configurar las reglas correctamente
+// Reglas recomendadas permiten:
+// - Lectura: Todos (chat público)
+// - Creación: Solo usuarios autenticados
+// - Edición/Eliminación: Solo el autor del mensaje
+// - Reacciones: Solo usuarios autenticados
 
 // Funciones para editar, eliminar, responder y reaccionar mensajes
 async function editMessage(messageId) {
     const messageElement = document.querySelector(`[data-id="${messageId}"]`);
     if (!messageElement) return;
     
-    // Verificación básica del mensaje (NOTA: No es seguro sin Firebase Auth)
+    // Verificación básica del mensaje
     try {
         const doc = await messagesRef.doc(messageId).get();
         if (!doc.exists) {
@@ -769,7 +775,11 @@ async function editMessage(messageId) {
         }
     } catch (error) {
         console.error('Error verificando permisos:', error);
-        showToast('Error', 'No se pudo verificar permisos', 'error');
+        if (error.code === 'permission-denied') {
+            showToast('Error de Permisos', 'Las reglas de Firestore no están configuradas. Configura en Firebase Console.', 'error');
+        } else {
+            showToast('Error', 'No se pudo verificar permisos: ' + error.message, 'error');
+        }
         return;
     }
     
@@ -793,14 +803,20 @@ async function editMessage(messageId) {
         }
     } catch (error) {
         console.error('Error editando mensaje:', error);
-        showToast('Error', 'No se pudo editar el mensaje', 'error');
+        if (error.code === 'permission-denied') {
+            showToast('Error de Permisos', 'Las reglas de Firestore bloquean esta acción. Configura las reglas en Firebase Console.', 'error');
+            console.error('⚠️ SOLUCIÓN: Ve a Firebase Console → Firestore Database → Reglas');
+            console.error('⚠️ Sigue las instrucciones del archivo INSTRUCCIONES_CONFIGURACION.md en la carpeta live-chat');
+        } else {
+            showToast('Error', 'No se pudo editar el mensaje: ' + error.message, 'error');
+        }
     }
 }
 
 async function deleteMessage(messageId) {
     if (!confirm('¿Estás seguro de que quieres eliminar este mensaje?')) return;
     
-    // Verificación básica del mensaje (NOTA: No es seguro sin Firebase Auth)
+    // Verificación básica del mensaje
     try {
         const doc = await messagesRef.doc(messageId).get();
         if (!doc.exists) {
@@ -815,7 +831,11 @@ async function deleteMessage(messageId) {
         }
     } catch (error) {
         console.error('Error verificando permisos:', error);
-        showToast('Error', 'No se pudo verificar permisos', 'error');
+        if (error.code === 'permission-denied') {
+            showToast('Error de Permisos', 'Las reglas de Firestore no están configuradas. Configura en Firebase Console.', 'error');
+        } else {
+            showToast('Error', 'No se pudo verificar permisos: ' + error.message, 'error');
+        }
         return;
     }
     
@@ -836,7 +856,13 @@ async function deleteMessage(messageId) {
         }
     } catch (error) {
         console.error('Error eliminando mensaje:', error);
-        showToast('Error', 'No se pudo eliminar el mensaje', 'error');
+        if (error.code === 'permission-denied') {
+            showToast('Error de Permisos', 'Las reglas de Firestore bloquean esta acción. Configura las reglas en Firebase Console.', 'error');
+            console.error('⚠️ SOLUCIÓN: Ve a Firebase Console → Firestore Database → Reglas');
+            console.error('⚠️ Sigue las instrucciones del archivo INSTRUCCIONES_CONFIGURACION.md en la carpeta live-chat');
+        } else {
+            showToast('Error', 'No se pudo eliminar el mensaje: ' + error.message, 'error');
+        }
     }
 }
 
@@ -886,7 +912,10 @@ async function toggleReaction(messageId, emoji) {
     
     try {
         const doc = await messageDoc.get();
-        if (!doc.exists) return;
+        if (!doc.exists) {
+            showToast('Error', 'Mensaje no encontrado', 'error');
+            return;
+        }
         
         const message = doc.data();
         const reactions = message.reactions || {};
@@ -925,7 +954,13 @@ async function toggleReaction(messageId, emoji) {
         }
     } catch (error) {
         console.error('Error toggling reaction:', error);
-        showToast('Error', 'No se pudo agregar la reacción', 'error');
+        if (error.code === 'permission-denied') {
+            showToast('Error de Permisos', 'Las reglas de Firestore bloquean esta acción. Configura las reglas en Firebase Console.', 'error');
+            console.error('⚠️ SOLUCIÓN: Ve a Firebase Console → Firestore Database → Reglas');
+            console.error('⚠️ Sigue las instrucciones del archivo INSTRUCCIONES_CONFIGURACION.md en la carpeta live-chat');
+        } else {
+            showToast('Error', 'No se pudo agregar la reacción: ' + error.message, 'error');
+        }
     }
 }
 

@@ -1,4 +1,14 @@
-# Configuración de Reglas de Firebase para Chat Público
+# ⚠️ ARCHIVO DESACTUALIZADO
+
+## 📌 IMPORTANTE: USA EL NUEVO ARCHIVO
+
+Este archivo contiene reglas antiguas que **bloquean** editar y eliminar mensajes.
+
+**👉 Por favor usa el archivo `INSTRUCCIONES_CONFIGURACION.md` en su lugar.**
+
+---
+
+# Configuración de Reglas de Firebase para Chat Público (DESACTUALIZADO)
 
 ## ⚠️ IMPORTANTE: Configurar Reglas de Firestore
 
