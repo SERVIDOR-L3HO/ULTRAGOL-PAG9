@@ -350,10 +350,17 @@ async function sendMessage(text = null, imageData = null) {
     
     if (!messageText && !imageData) return;
     
-    // Verificar que el usuario tenga un nombre
-    if (!currentUser || (!currentUser.isAuthenticated && !localStorage.getItem('chatUsername'))) {
-        showToast('Error', 'Debes ingresar un nombre primero. Toca el ícono de usuario.', 'error');
-        return;
+    // MODO PÚBLICO - Todos pueden enviar mensajes
+    // Si no tiene usuario, crear uno automático
+    if (!currentUser) {
+        const randomName = 'Usuario' + Math.floor(Math.random() * 1000);
+        currentUser = {
+            uid: 'anon-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+            name: randomName,
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(randomName)}&background=9d4edd&color=fff`,
+            isAnonymous: false,
+            isAuthenticated: false
+        };
     }
     
     const message = {

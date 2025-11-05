@@ -10,7 +10,7 @@ let userGroups = [];
 let publicGroups = [];
 
 // Firebase references
-let db, auth, storage;
+let db, auth;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
@@ -19,15 +19,21 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
             db = firebase.firestore();
             auth = firebase.auth();
-            storage = firebase.storage();
             
-            // Setup auth listener
-            auth.onAuthStateChanged((user) => {
-                currentUser = user;
-                if (user) {
-                    loadUserGroups();
-                }
-            });
+            // MODO PÚBLICO - Crear usuario anónimo automáticamente
+            const savedUsername = localStorage.getItem('chatUsername') || 'Usuario' + Math.floor(Math.random() * 1000);
+            const savedAvatar = localStorage.getItem('chatAvatar') || `https://ui-avatars.com/api/?name=${encodeURIComponent(savedUsername)}&background=9d4edd&color=fff`;
+            
+            currentUser = {
+                uid: 'anon-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                displayName: savedUsername,
+                photoURL: savedAvatar,
+                email: null,
+                isAnonymous: true
+            };
+            
+            console.log('✅ Grupos en modo público - Usuario:', savedUsername);
+            loadUserGroups();
         }
         
         initializeGroupsSystem();
@@ -92,9 +98,18 @@ function initializeGroupsSystem() {
 // ==========================================
 
 function openGroupsModal() {
+    // MODO PÚBLICO - Crear usuario si no existe
     if (!currentUser) {
-        showGroupToast('Por favor inicia sesión para ver los grupos', 'error');
-        return;
+        const savedUsername = localStorage.getItem('chatUsername') || 'Usuario' + Math.floor(Math.random() * 1000);
+        const savedAvatar = localStorage.getItem('chatAvatar') || `https://ui-avatars.com/api/?name=${encodeURIComponent(savedUsername)}&background=9d4edd&color=fff`;
+        
+        currentUser = {
+            uid: 'anon-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+            displayName: savedUsername,
+            photoURL: savedAvatar,
+            email: null,
+            isAnonymous: true
+        };
     }
     
     const modal = document.getElementById('groupsModal');
