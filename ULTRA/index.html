@@ -85,6 +85,21 @@
             <div class="carousel-indicators" id="carouselIndicators"></div>
         </div>
 
+        <!-- Botón Partidos Importantes -->
+        <div class="important-matches-btn-container">
+            <button class="important-matches-btn" onclick="openImportantMatchesModal()">
+                <div class="btn-icon-wrapper">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-futbol"></i>
+                </div>
+                <div class="btn-text-wrapper">
+                    <span class="btn-title">PARTIDOS IMPORTANTES</span>
+                    <span class="btn-subtitle">Ver todos los partidos y canales</span>
+                </div>
+                <i class="fas fa-chevron-right btn-arrow"></i>
+            </button>
+        </div>
+
         <div class="tabs-container">
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('live', this)">EN VIVO</button>
@@ -356,6 +371,31 @@
                 </button>
             </div>
             <div class="channel-selector-body" id="channelSelectorBody">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Partidos Importantes -->
+    <div id="importantMatchesModal" class="important-matches-modal">
+        <div class="important-modal-overlay" onclick="closeImportantMatchesModal()"></div>
+        <div class="important-modal-container">
+            <div class="important-modal-header">
+                <div class="important-modal-header-content">
+                    <div class="important-modal-title-wrapper">
+                        <i class="fas fa-star" style="color: #FFD700;"></i>
+                        <h3 class="important-modal-title">PARTIDOS IMPORTANTES</h3>
+                    </div>
+                    <p class="important-modal-subtitle">Selecciona un partido para ver los canales disponibles</p>
+                </div>
+                <button class="close-important-modal" onclick="closeImportantMatchesModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="important-modal-body" id="importantMatchesBody">
+                <div class="loading-matches">
+                    <div class="spinner"></div>
+                    <p>Cargando partidos...</p>
+                </div>
             </div>
         </div>
     </div>

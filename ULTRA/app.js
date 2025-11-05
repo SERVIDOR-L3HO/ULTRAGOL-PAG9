@@ -989,3 +989,215 @@ function initDarkMode() {
 document.addEventListener('DOMContentLoaded', () => {
     initDarkMode();
 });
+
+// ==================== PARTIDOS IMPORTANTES MODAL ====================
+
+function openImportantMatchesModal() {
+    const modal = document.getElementById('importantMatchesModal');
+    const body = document.getElementById('importantMatchesBody');
+    
+    modal.classList.add('active');
+    
+    body.innerHTML = `
+        <div class="loading-matches">
+            <div class="spinner"></div>
+            <p>Cargando partidos...</p>
+        </div>
+    `;
+    
+    loadImportantMatches();
+}
+
+function closeImportantMatchesModal() {
+    const modal = document.getElementById('importantMatchesModal');
+    modal.classList.remove('active');
+}
+
+async function loadImportantMatches() {
+    try {
+        if (!marcadoresData || !marcadoresData.partidos) {
+            await loadMarcadores();
+        }
+        
+        if (!transmisionesData || !transmisionesData.transmisiones) {
+            await loadTransmisiones();
+        }
+        
+        renderImportantMatches();
+    } catch (error) {
+        console.error('Error cargando partidos importantes:', error);
+        showNoMatchesMessage();
+    }
+}
+
+function renderImportantMatches() {
+    const body = document.getElementById('importantMatchesBody');
+    
+    if (!marcadoresData || !marcadoresData.partidos || marcadoresData.partidos.length === 0) {
+        showNoMatchesMessage();
+        return;
+    }
+    
+    const partidosConTransmision = marcadoresData.partidos.map(partido => {
+        const transmision = findTransmisionForMatch(partido);
+        return {
+            ...partido,
+            transmision: transmision,
+            canalesCount: transmision?.canales?.length || 0
+        };
+    });
+    
+    partidosConTransmision.sort((a, b) => {
+        if (a.estado?.enVivo && !b.estado?.enVivo) return -1;
+        if (!a.estado?.enVivo && b.estado?.enVivo) return 1;
+        
+        if (a.canalesCount > 0 && b.canalesCount === 0) return -1;
+        if (a.canalesCount === 0 && b.canalesCount > 0) return 1;
+        
+        return 0;
+    });
+    
+    body.innerHTML = partidosConTransmision.map(partido => {
+        const hora = formatearHora(partido.fecha);
+        
+        let statusHTML = '';
+        if (partido.estado?.enVivo) {
+            statusHTML = `
+                <span class="important-match-status status-live">
+                    <span class="live-dot"></span>
+                    EN VIVO - ${partido.reloj}
+                </span>
+            `;
+        } else if (partido.estado?.programado) {
+            statusHTML = `
+                <span class="important-match-status status-upcoming">
+                    <i class="far fa-clock"></i>
+                    PRÓXIMO
+                </span>
+            `;
+        } else if (partido.estado?.finalizado) {
+            statusHTML = `
+                <span class="important-match-status status-finished">
+                    <i class="fas fa-check-circle"></i>
+                    FINALIZADO
+                </span>
+            `;
+        }
+        
+        let channelsHTML = '';
+        if (partido.canalesCount > 0) {
+            channelsHTML = `
+                <div class="important-match-channels">
+                    <i class="fas fa-tv"></i>
+                    <span class="important-channels-count">${partido.canalesCount} canal${partido.canalesCount > 1 ? 'es' : ''} disponible${partido.canalesCount > 1 ? 's' : ''}</span>
+                </div>
+            `;
+        } else {
+            channelsHTML = `
+                <div class="important-match-channels">
+                    <span class="important-no-channels">Sin canales disponibles</span>
+                </div>
+            `;
+        }
+        
+        const scoreOrVsHTML = (partido.estado?.enVivo || partido.estado?.finalizado) 
+            ? `<span class="important-match-score">${partido.local.marcador} - ${partido.visitante.marcador}</span>`
+            : `<span class="important-match-vs">VS</span>`;
+        
+        return `
+            <div class="important-match-card" onclick='${partido.canalesCount > 0 ? `selectImportantMatch("${partido.id}")` : `showToast("No hay canales disponibles para este partido")`}'>
+                <div class="important-match-header">
+                    ${statusHTML}
+                    <span class="important-match-time">${hora}</span>
+                </div>
+                
+                <div class="important-match-teams">
+                    <div class="important-team">
+                        <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" class="important-team-logo" onerror="this.src='https://via.placeholder.com/50'">
+                        <span class="important-team-name">${partido.local.nombreCorto}</span>
+                    </div>
+                    
+                    ${scoreOrVsHTML}
+                    
+                    <div class="important-team">
+                        <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" class="important-team-logo" onerror="this.src='https://via.placeholder.com/50'">
+                        <span class="important-team-name">${partido.visitante.nombreCorto}</span>
+                    </div>
+                </div>
+                
+                ${channelsHTML}
+            </div>
+        `;
+    }).join('');
+}
+
+function findTransmisionForMatch(partido) {
+    if (!transmisionesData || !transmisionesData.transmisiones) {
+        return null;
+    }
+    
+    const nombreLocal = partido.local.nombre.toLowerCase();
+    const nombreVisitante = partido.visitante.nombre.toLowerCase();
+    const nombreCortoLocal = partido.local.nombreCorto.toLowerCase();
+    const nombreCortoVisitante = partido.visitante.nombreCorto.toLowerCase();
+    
+    const extraerPalabrasClaves = (nombre) => {
+        return nombre
+            .replace(/^(fc|cf|cd|club|atletico|atlético|deportivo|sporting|de|del|la|los|las)\s+/gi, '')
+            .replace(/^(fc|cf|cd|club|atletico|atlético|deportivo|sporting|de|del|la|los|las)\s+/gi, '')
+            .replace(/\s+(fc|cf|cd|club)$/gi, '')
+            .trim();
+    };
+    
+    const palabrasLocal = extraerPalabrasClaves(nombreLocal);
+    const palabrasVisitante = extraerPalabrasClaves(nombreVisitante);
+    
+    const transmision = transmisionesData.transmisiones.find(t => {
+        const evento = t.evento.toLowerCase();
+        
+        const tieneLocal = 
+            evento.includes(nombreLocal) || 
+            evento.includes(nombreCortoLocal) ||
+            evento.includes(palabrasLocal);
+            
+        const tieneVisitante = 
+            evento.includes(nombreVisitante) || 
+            evento.includes(nombreCortoVisitante) ||
+            evento.includes(palabrasVisitante);
+        
+        return tieneLocal && tieneVisitante;
+    });
+    
+    return transmision;
+}
+
+function selectImportantMatch(matchId) {
+    const partido = marcadoresData.partidos.find(p => p.id === matchId);
+    
+    if (!partido) {
+        showToast('No se pudo encontrar el partido');
+        return;
+    }
+    
+    const transmision = findTransmisionForMatch(partido);
+    
+    if (!transmision || !transmision.canales || transmision.canales.length === 0) {
+        showToast('No hay canales disponibles para este partido');
+        return;
+    }
+    
+    closeImportantMatchesModal();
+    
+    const partidoNombre = `${partido.local.nombreCorto} vs ${partido.visitante.nombreCorto}`;
+    showChannelSelector(transmision, partidoNombre);
+}
+
+function showNoMatchesMessage() {
+    const body = document.getElementById('importantMatchesBody');
+    body.innerHTML = `
+        <div class="important-no-matches">
+            <i class="fas fa-futbol"></i>
+            <p>No hay partidos disponibles en este momento.<br>Por favor, intenta más tarde.</p>
+        </div>
+    `;
+}
