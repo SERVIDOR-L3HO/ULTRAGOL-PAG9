@@ -81,6 +81,8 @@ function updateAuthUI() {
     const userInfo = document.getElementById('userInfo');
     const userAvatar = document.getElementById('userAvatar');
     const userName = document.getElementById('userName');
+    const changeNameBtn = document.getElementById('changeNameBtn');
+    const anonymousBtn = document.getElementById('anonymousBtn');
     
     if (currentUser && currentUser.isAuthenticated) {
         // Usuario autenticado - mostrar info
@@ -88,10 +90,15 @@ function updateAuthUI() {
         if (userInfo) userInfo.style.display = 'flex';
         if (userAvatar) userAvatar.src = currentUser.avatar;
         if (userName) userName.textContent = currentUser.name;
+        // Ocultar botones que no se usan con autenticación
+        if (changeNameBtn) changeNameBtn.style.display = 'none';
+        if (anonymousBtn) anonymousBtn.style.display = 'none';
     } else {
         // No autenticado - mostrar botón de login
         if (authBtn) authBtn.style.display = 'flex';
         if (userInfo) userInfo.style.display = 'none';
+        if (changeNameBtn) changeNameBtn.style.display = 'none';
+        if (anonymousBtn) anonymousBtn.style.display = 'none';
     }
 }
 
@@ -169,30 +176,12 @@ function setupQuickReactions() {
 }
 
 async function handleChangeName() {
-    const newName = await customPrompt('Ingresa tu nuevo nombre:', 'Cambiar Nombre', currentUser.name);
-    if (newName && newName.trim()) {
-        try {
-            const trimmedName = newName.trim();
-            const newAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(trimmedName)}&background=9d4edd&color=fff`;
-            
-            // Actualizar localmente y guardar en localStorage
-            currentUser.name = trimmedName;
-            currentUser.avatar = newAvatar;
-            localStorage.setItem('chatUsername', trimmedName);
-            localStorage.setItem('chatAvatar', newAvatar);
-            
-            // Actualizar UI
-            const userAvatar = document.getElementById('userAvatar');
-            const userName = document.getElementById('userName');
-            if (userAvatar) userAvatar.src = newAvatar;
-            if (userName) userName.textContent = trimmedName;
-            
-            showToast('Éxito', `Tu nombre ahora es: ${currentUser.name}`, 'success');
-        } catch (error) {
-            console.error('❌ Error actualizando nombre:', error);
-            showToast('Error', 'No se pudo actualizar el nombre', 'error');
-        }
+    // Esta función ya no se usa con autenticación de Firebase
+    if (!currentUser) {
+        showToast('Error', 'Debes iniciar sesión primero', 'error');
+        return;
     }
+    showToast('Info', 'El nombre se obtiene de tu cuenta de Google', 'info');
 }
 
 async function handleGoogleSignIn() {
@@ -228,18 +217,12 @@ async function handleLogout() {
 }
 
 function toggleAnonymous() {
-    currentUser.isAnonymous = !currentUser.isAnonymous;
-    localStorage.setItem('chatAnonymous', currentUser.isAnonymous);
-    updateAuthUI();
-    
-    const btn = document.getElementById('anonymousBtn');
-    if (currentUser.isAnonymous) {
-        btn.classList.add('active');
-        showToast('Modo Anónimo', 'Ahora apareces como anónimo', 'success');
-    } else {
-        btn.classList.remove('active');
-        showToast('Modo Público', 'Ahora apareces con tu nombre', 'success');
+    // Esta función ya no se usa con autenticación de Firebase
+    if (!currentUser) {
+        showToast('Error', 'Debes iniciar sesión primero', 'error');
+        return;
     }
+    showToast('Info', 'Tu nombre es el de tu cuenta de Google', 'info');
 }
 
 function toggleSound() {
@@ -311,8 +294,8 @@ async function handleImageUpload(e) {
     if (!file) return;
     
     // Verificar autenticación
-    if (!currentUser.isAuthenticated && !localStorage.getItem('chatUsername')) {
-        showToast('Error', 'Debes ingresar un nombre primero. Toca el ícono de usuario.', 'error');
+    if (!currentUser || !currentUser.isAuthenticated) {
+        showToast('Error', 'Debes iniciar sesión para enviar imágenes', 'error');
         e.target.value = '';
         return;
     }
@@ -590,7 +573,7 @@ function addMessageToUI(message, animate = true) {
     const reactionsHTML = message.reactions && Object.keys(message.reactions).length > 0 ? `
         <div class="message-reactions">
             ${Object.entries(message.reactions).map(([emoji, data]) => {
-                const isActive = data.users && data.users.includes(currentUser.uid);
+                const isActive = currentUser && data.users && data.users.includes(currentUser.uid);
                 return `<button class="reaction-btn ${isActive ? 'active' : ''}" onclick="toggleReaction('${message.id}', '${emoji}')">
                     ${emoji} <span class="reaction-count">${data.count || 0}</span>
                 </button>`;
@@ -599,7 +582,7 @@ function addMessageToUI(message, animate = true) {
     ` : '';
     
     // Botones de acción (solo si el mensaje es del usuario actual)
-    const isOwnMessage = message.userId === currentUser.uid;
+    const isOwnMessage = currentUser && message.userId === currentUser.uid;
     const actionsHTML = `
         <div class="message-actions">
             <button class="action-btn" onclick="replyToMessage({id: '${message.id}', username: '${escapeHtml(message.username)}', text: '${escapeHtml(messageText)}', image: ${message.image ? `'${message.image}'` : 'null'}})" title="Responder">
@@ -678,7 +661,7 @@ function updateMessageInUI(message) {
     const reactionsContainer = messageElement.querySelector('.message-reactions');
     if (message.reactions && Object.keys(message.reactions).length > 0) {
         const reactionsHTML = Object.entries(message.reactions).map(([emoji, data]) => {
-            const isActive = data.users && data.users.includes(currentUser.uid);
+            const isActive = currentUser && data.users && data.users.includes(currentUser.uid);
             return `<button class="reaction-btn ${isActive ? 'active' : ''}" onclick="toggleReaction('${message.id}', '${emoji}')">
                 ${emoji} <span class="reaction-count">${data.count || 0}</span>
             </button>`;
@@ -699,27 +682,6 @@ function updateMessageInUI(message) {
     }
 }
 
-function updateAuthUI() {
-    const userInfo = document.getElementById('userInfo');
-    const userName = document.getElementById('userName');
-    const userAvatar = document.getElementById('userAvatar');
-    
-    // Marcar como autenticado si tiene nombre
-    if (localStorage.getItem('chatUsername')) {
-        currentUser.isAuthenticated = true;
-    }
-    
-    if (userInfo && userName && userAvatar) {
-        userInfo.style.display = 'flex';
-        userName.textContent = currentUser.isAnonymous ? 'Anónimo' : currentUser.name;
-        userAvatar.src = currentUser.avatar;
-    }
-    
-    const authBtn = document.getElementById('authBtn');
-    if (authBtn) {
-        authBtn.style.display = 'none';
-    }
-}
 
 function updateMessageCount() {
     const countEl = document.getElementById('messageCount');
@@ -807,6 +769,12 @@ function playSound(frequency = 800, duration = 100) {
 
 // Funciones para editar, eliminar, responder y reaccionar mensajes
 async function editMessage(messageId) {
+    // Verificar que el usuario esté autenticado
+    if (!currentUser || !currentUser.uid) {
+        showToast('Error', 'Debes iniciar sesión para editar mensajes', 'error');
+        return;
+    }
+    
     const messageElement = document.querySelector(`[data-id="${messageId}"]`);
     if (!messageElement) return;
     
@@ -864,6 +832,12 @@ async function editMessage(messageId) {
 }
 
 async function deleteMessage(messageId) {
+    // Verificar que el usuario esté autenticado
+    if (!currentUser || !currentUser.uid) {
+        showToast('Error', 'Debes iniciar sesión para eliminar mensajes', 'error');
+        return;
+    }
+    
     if (!confirm('¿Estás seguro de que quieres eliminar este mensaje?')) return;
     
     // Verificación básica del mensaje
@@ -958,6 +932,12 @@ function cancelReply() {
 }
 
 async function toggleReaction(messageId, emoji) {
+    // Verificar que el usuario esté autenticado
+    if (!currentUser || !currentUser.isAuthenticated) {
+        showToast('Error', 'Debes iniciar sesión para reaccionar', 'error');
+        return;
+    }
+    
     const messageDoc = messagesRef.doc(messageId);
     
     try {
