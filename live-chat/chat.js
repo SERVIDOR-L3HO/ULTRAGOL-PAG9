@@ -475,6 +475,44 @@ function loadMessages() {
         });
 }
 
+// Generar color único para cada usuario basado en su nombre
+function getUsernameColor(username) {
+    // Colores vibrantes estilo Kick.com
+    const colors = [
+        '#FF1744', // Rojo vibrante
+        '#FF9100', // Naranja
+        '#FFEA00', // Amarillo
+        '#00E676', // Verde lima
+        '#00E5FF', // Cyan
+        '#2979FF', // Azul
+        '#D500F9', // Magenta
+        '#FF4081', // Rosa
+        '#00BFA5', // Turquesa
+        '#FF6E40', // Naranja rojizo
+        '#76FF03', // Verde brillante
+        '#18FFFF', // Cyan claro
+        '#E040FB', // Púrpura
+        '#69F0AE', // Verde menta
+        '#FFD740', // Ámbar
+        '#FF5252', // Rojo claro
+        '#448AFF', // Azul índigo
+        '#EEFF41', // Lima
+        '#40C4FF', // Azul claro
+        '#B388FF'  // Púrpura claro
+    ];
+    
+    // Crear hash del nombre
+    let hash = 0;
+    for (let i = 0; i < username.length; i++) {
+        hash = username.charCodeAt(i) + ((hash << 5) - hash);
+        hash = hash & hash;
+    }
+    
+    // Usar el hash para seleccionar un color
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
+}
+
 function addMessageToUI(message, animate = true) {
     const messagesContainer = document.getElementById('messagesContainer');
     
@@ -562,11 +600,14 @@ function addMessageToUI(message, animate = true) {
     
     const editedBadge = message.edited ? '<span class="edited-badge">(editado)</span>' : '';
     
+    // Generar color único para el usuario
+    const userColor = getUsernameColor(message.username);
+    
     messageDiv.innerHTML = `
         <img class="message-avatar" src="${message.avatar || 'https://ui-avatars.com/api/?name=User&background=9d4edd&color=fff'}" alt="${message.username}">
         <div class="message-content">
             <div class="message-header">
-                <span class="message-username">${escapeHtml(message.username)}</span>
+                <span class="message-username" style="color: ${userColor}; font-weight: 600;">${escapeHtml(message.username)}</span>
                 ${message.isAnonymous ? '<span class="message-badge" style="background: #6c757d; color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px;">ANÓNIMO</span>' : ''}
                 <span class="message-timestamp">${timestamp} ${editedBadge}</span>
             </div>
