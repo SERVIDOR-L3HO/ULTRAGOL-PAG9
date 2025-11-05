@@ -40,70 +40,45 @@ function initializeChat() {
     
     console.log('✅ Firebase conectado');
     
-    // Verificar autenticación
-    auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            console.log('✅ Usuario autenticado:', user.email);
-            
-            // Obtener datos del usuario desde Firestore
-            try {
-                const userDoc = await db.collection('users').doc(user.uid).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    currentUser = {
-                        uid: user.uid,
-                        name: userData.name || user.displayName || user.email,
-                        email: user.email,
-                        avatar: userData.avatar || user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=9d4edd&color=fff`,
-                        isAnonymous: false,
-                        isAuthenticated: true
-                    };
-                } else {
-                    // Si no existe el documento del usuario, crearlo
-                    currentUser = {
-                        uid: user.uid,
-                        name: user.displayName || user.email,
-                        email: user.email,
-                        avatar: user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'User')}&background=9d4edd&color=fff`,
-                        isAnonymous: false,
-                        isAuthenticated: true
-                    };
-                    
-                    await db.collection('users').doc(user.uid).set({
-                        uid: user.uid,
-                        name: currentUser.name,
-                        email: currentUser.email,
-                        avatar: currentUser.avatar,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        isAnonymous: false
-                    });
-                }
-                
-                console.log('✅ Usuario cargado:', currentUser.name);
-                setupEventListeners();
-                setupEmojiPicker();
-                setupQuickReactions();
-                updateAuthUI();
-                loadMessages();
-                updateViewerCount();
-                
-                setInterval(updateViewerCount, 30000);
-                console.log('✅ Chat initialized successfully');
-                
-            } catch (error) {
-                console.error('❌ Error cargando datos del usuario:', error);
-                redirectToLogin();
-            }
-        } else {
-            console.log('⚠️ Usuario no autenticado');
-            redirectToLogin();
-        }
-    });
-}
-
-function redirectToLogin() {
-    console.log('🔄 Redirigiendo a login...');
-    window.location.href = 'auth.html';
+    // MODO PÚBLICO - No requiere autenticación
+    // Crear usuario anónimo automáticamente
+    const savedUsername = localStorage.getItem('chatUsername') || 'Usuario' + Math.floor(Math.random() * 1000);
+    const savedAvatar = localStorage.getItem('chatAvatar') || `https://ui-avatars.com/api/?name=${encodeURIComponent(savedUsername)}&background=9d4edd&color=fff`;
+    
+    currentUser = {
+        uid: 'anon-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+        name: savedUsername,
+        email: null,
+        avatar: savedAvatar,
+        isAnonymous: true,
+        isAuthenticated: false
+    };
+    
+    console.log('✅ Modo público activado - Usuario:', currentUser.name);
+    
+    // Ocultar botón de login y mostrar info de usuario anónimo
+    const authBtn = document.getElementById('authBtn');
+    if (authBtn) authBtn.style.display = 'none';
+    
+    const userInfo = document.getElementById('userInfo');
+    const userAvatar = document.getElementById('userAvatar');
+    const userName = document.getElementById('userName');
+    
+    if (userInfo && userAvatar && userName) {
+        userAvatar.src = currentUser.avatar;
+        userName.textContent = currentUser.name;
+        userInfo.style.display = 'flex';
+    }
+    
+    // Inicializar todo
+    setupEventListeners();
+    setupEmojiPicker();
+    setupQuickReactions();
+    loadMessages();
+    updateViewerCount();
+    
+    setInterval(updateViewerCount, 30000);
+    console.log('✅ Chat initialized successfully');
 }
 
 function setupEventListeners() {
@@ -183,22 +158,18 @@ async function handleChangeName() {
             const trimmedName = newName.trim();
             const newAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(trimmedName)}&background=9d4edd&color=fff`;
             
-            // Actualizar en Firestore
-            await db.collection('users').doc(currentUser.uid).update({
-                name: trimmedName,
-                avatar: newAvatar
-            });
-            
-            // Actualizar perfil de Firebase Auth
-            await auth.currentUser.updateProfile({
-                displayName: trimmedName
-            });
-            
-            // Actualizar localmente
+            // Actualizar localmente y guardar en localStorage
             currentUser.name = trimmedName;
             currentUser.avatar = newAvatar;
+            localStorage.setItem('chatUsername', trimmedName);
+            localStorage.setItem('chatAvatar', newAvatar);
             
-            updateAuthUI();
+            // Actualizar UI
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            if (userAvatar) userAvatar.src = newAvatar;
+            if (userName) userName.textContent = trimmedName;
+            
             showToast('Éxito', `Tu nombre ahora es: ${currentUser.name}`, 'success');
         } catch (error) {
             console.error('❌ Error actualizando nombre:', error);
@@ -208,18 +179,22 @@ async function handleChangeName() {
 }
 
 async function handleLogout() {
-    const confirmed = await customConfirm('¿Deseas cerrar sesión?', 'Cerrar Sesión');
+    const confirmed = await customConfirm('¿Deseas cambiar de usuario?', 'Cambiar Usuario');
     if (confirmed) {
         try {
-            await auth.signOut();
-            showToast('Éxito', 'Sesión cerrada correctamente', 'success');
+            // Limpiar datos locales
+            localStorage.removeItem('chatUsername');
+            localStorage.removeItem('chatAvatar');
+            localStorage.removeItem('chatAnonymous');
+            
+            showToast('Éxito', 'Datos limpiados. Recarga la página.', 'success');
             
             setTimeout(() => {
-                redirectToLogin();
-            }, 1000);
+                window.location.reload();
+            }, 1500);
         } catch (error) {
-            console.error('❌ Error al cerrar sesión:', error);
-            showToast('Error', 'No se pudo cerrar la sesión', 'error');
+            console.error('❌ Error:', error);
+            showToast('Error', 'Ocurrió un error', 'error');
         }
     }
 }
