@@ -1049,90 +1049,74 @@ function renderImportantMatches() {
     
     body.innerHTML = transmisionesSorted.map((transmision, index) => {
         const equipos = transmision.evento.split(' vs ');
-        const equipoLocal = equipos[0] || 'Equipo 1';
-        const equipoVisitante = equipos[1] || 'Equipo 2';
+        const equipoLocal = equipos[0]?.trim() || 'Equipo 1';
+        const equipoVisitante = equipos[1]?.trim() || 'Equipo 2';
         const canalesCount = transmision.canales?.length || 0;
         
         const isLive = transmision.estado?.toLowerCase().includes('vivo') || transmision.estado?.toLowerCase().includes('live');
         const isUpcoming = transmision.estado?.toLowerCase().includes('próximo') || transmision.estado?.toLowerCase().includes('programado');
         const isFinished = transmision.estado?.toLowerCase().includes('finalizado') || transmision.estado?.toLowerCase().includes('finished');
         
-        let statusHTML = '';
+        let statusBadge = '';
         if (isLive) {
-            statusHTML = `
-                <span class="important-match-status status-live">
-                    <span class="live-dot"></span>
-                    EN VIVO
-                </span>
-            `;
-        } else if (isUpcoming) {
-            statusHTML = `
-                <span class="important-match-status status-upcoming">
-                    <i class="far fa-clock"></i>
-                    PRÓXIMO
-                </span>
-            `;
+            statusBadge = `<span class="status-badge status-live">EN VIVO</span>`;
         } else if (isFinished) {
-            statusHTML = `
-                <span class="important-match-status status-finished">
-                    <i class="fas fa-check-circle"></i>
-                    FINALIZADO
-                </span>
-            `;
+            statusBadge = `<span class="status-badge status-finished">Finalizado</span>`;
         } else {
-            statusHTML = `
-                <span class="important-match-status status-upcoming">
-                    <i class="far fa-clock"></i>
-                    ${transmision.estado || 'PRÓXIMO'}
-                </span>
-            `;
-        }
-        
-        let channelsHTML = '';
-        if (canalesCount > 0) {
-            channelsHTML = `
-                <div class="important-match-channels">
-                    <i class="fas fa-tv"></i>
-                    <span class="important-channels-count">${canalesCount} canal${canalesCount > 1 ? 'es' : ''} disponible${canalesCount > 1 ? 's' : ''}</span>
-                </div>
-            `;
-        } else {
-            channelsHTML = `
-                <div class="important-match-channels">
-                    <span class="important-no-channels">Sin canales disponibles</span>
-                </div>
-            `;
+            statusBadge = `<span class="status-badge status-upcoming"><i class="far fa-clock"></i> PRÓXIMO</span>`;
         }
         
         const deporte = transmision.deporte || 'Fútbol';
         const liga = transmision.liga || '';
         
+        let backgroundImage = 'futbol-bg.jpg';
+        if (deporte.toLowerCase().includes('basket') || deporte.toLowerCase().includes('nba')) {
+            backgroundImage = 'basquet-bg.jpg';
+        } else if (deporte.toLowerCase().includes('moto') || deporte.toLowerCase().includes('motogp')) {
+            backgroundImage = 'motos-bg.jpg';
+        }
+        
+        const fecha = transmision.fecha ? new Date(transmision.fecha).toLocaleDateString('es-MX', { 
+            day: 'numeric', 
+            month: 'short',
+            hour: '2-digit',
+            minute: '2-digit'
+        }) : '';
+        
+        const inicialLocal = equipoLocal.substring(0, 2).toUpperCase();
+        const inicialVisitante = equipoVisitante.substring(0, 2).toUpperCase();
+        
         return `
-            <div class="important-match-card" onclick='${canalesCount > 0 ? `selectImportantMatchByTransmision(${index})` : `showToast("No hay canales disponibles para este partido")`}'>
-                <div class="important-match-header">
-                    ${statusHTML}
-                    <span class="important-match-time">${deporte}${liga ? ' • ' + liga : ''}</span>
+            <div class="important-match-card-new" onclick='${canalesCount > 0 ? `selectImportantMatchByTransmision(${index})` : `showToast("No hay canales disponibles para este partido")`}'>
+                <div class="match-image-container">
+                    <img src="${backgroundImage}" alt="${deporte}" class="match-bg-image">
+                    <div class="match-image-overlay"></div>
                 </div>
                 
-                <div class="important-match-teams">
-                    <div class="important-team">
-                        <div class="important-team-logo" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF4500, #FF6B35); font-size: 16px; font-weight: 800; color: white;">
-                            ${equipoLocal.substring(0, 2).toUpperCase()}
-                        </div>
-                        <span class="important-team-name">${equipoLocal}</span>
+                <div class="match-info-container">
+                    <div class="match-badges">
+                        ${liga ? `<span class="league-badge">${liga.toUpperCase()}</span>` : ''}
+                        ${statusBadge}
                     </div>
                     
-                    <span class="important-match-vs">VS</span>
+                    <h3 class="match-title">${transmision.evento}</h3>
                     
-                    <div class="important-team">
-                        <div class="important-team-logo" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF6B35, #FFD700); font-size: 16px; font-weight: 800; color: white;">
-                            ${equipoVisitante.substring(0, 2).toUpperCase()}
-                        </div>
-                        <span class="important-team-name">${equipoVisitante}</span>
+                    ${fecha ? `<div class="match-date"><i class="far fa-clock"></i> ${fecha}</div>` : ''}
+                    
+                    <div class="match-footer">
+                        ${canalesCount > 0 ? `
+                            <div class="channel-info">
+                                <i class="fas fa-tv"></i>
+                                <span>Canal ${transmision.canales[0]?.numero || transmision.canales[0]?.nombre || ''}</span>
+                            </div>
+                            <button class="btn-ver">
+                                <i class="fas fa-play"></i> Ver
+                            </button>
+                        ` : `
+                            <div class="no-channels-text">Sin canales disponibles</div>
+                        `}
                     </div>
                 </div>
-                
-                ${channelsHTML}
             </div>
         `;
     }).join('');
