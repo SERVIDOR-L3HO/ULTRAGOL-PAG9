@@ -16,9 +16,24 @@ let soundEnabled = localStorage.getItem('chatSound') !== 'false';
 let messageCount = 0;
 let replyingTo = null;
 
-const emojis = ['⚽', '🔥', '👏', '😂', '😍', '🎉', '💪', '👀', '🤔', '😱', 
-                '🙌', '💯', '❤️', '⚡', '🏆', '🎯', '👑', '💥', '🌟', '✨',
-                '😎', '🤩', '😤', '🥳', '🔴', '🟢', '🔵', '🟡', '⭐', '💚'];
+// Emojis organizados por categorías
+const emojiCategories = {
+    futbol: ['⚽', '🥅', '🏟️', '🏆', '🥇', '🥈', '🥉', '🎯', '📊', '📈', '🔴', '🟡', '🟢', '⚪', '🟣', '🔵'],
+    celebracion: ['🎉', '🎊', '🥳', '🍾', '🎈', '🎆', '🎇', '✨', '💫', '⭐', '🌟', '💥', '🔥', '💯', '👑', '🏅'],
+    gestos: ['👏', '💪', '🙌', '👍', '👊', '✌️', '🤝', '🤘', '🤙', '👌', '🤞', '🙏', '💅', '🤳', '💃', '🕺'],
+    emociones: ['😂', '😍', '😎', '🤩', '😤', '😱', '🤔', '😳', '😅', '😆', '🥰', '😘', '🤗', '😏', '😌', '🥺'],
+    amor: ['❤️', '💚', '💙', '💜', '🧡', '💛', '🤍', '🖤', '💖', '💗', '💓', '💞', '💕', '💝', '❣️', '💟']
+};
+
+// Stickers de fútbol creativos
+const footballStickers = [
+    '⚽🔥', '🏆✨', '⚡🥅', '👑⚽', '💪🏟️', '🎯⚽', '🔥⚡', '✨🏆',
+    '⚽💯', '🌟⚽', '🏅⚽', '⚽🎉', '🥇⚽', '⚽💥', '🏟️🔥', '⚽👑',
+    '💪⚡', '🎊🏆', '⚽🌟', '🔥💯', '⚡🏆', '⚽✨', '🏟️⚡', '🎯🔥'
+];
+
+// Emojis por defecto (futbol)
+let currentEmojis = emojiCategories.futbol;
 
 // Inicializar al cargar
 document.addEventListener('DOMContentLoaded', function() {
@@ -155,16 +170,83 @@ function setupEventListeners() {
 }
 
 function setupEmojiPicker() {
+    // Cargar emojis iniciales
+    loadEmojis(currentEmojis);
+    
+    // Cargar stickers
+    loadStickers();
+    
+    // Configurar pestañas
+    document.querySelectorAll('.emoji-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.dataset.tab;
+            switchEmojiTab(tabName);
+        });
+    });
+    
+    // Configurar categorías
+    document.querySelectorAll('.emoji-category').forEach(categoryBtn => {
+        categoryBtn.addEventListener('click', () => {
+            const category = categoryBtn.dataset.category;
+            switchEmojiCategory(category);
+        });
+    });
+}
+
+function loadEmojis(emojis) {
     const emojiGrid = document.getElementById('emojiGrid');
     if (emojiGrid) {
-        emojis.forEach(emoji => {
+        emojiGrid.innerHTML = '';
+        emojis.forEach((emoji, index) => {
             const emojiItem = document.createElement('div');
             emojiItem.className = 'emoji-item';
             emojiItem.textContent = emoji;
+            emojiItem.style.animationDelay = `${index * 0.02}s`;
             emojiItem.addEventListener('click', () => insertEmoji(emoji));
             emojiGrid.appendChild(emojiItem);
         });
     }
+}
+
+function loadStickers() {
+    const stickerGrid = document.getElementById('stickerGrid');
+    if (stickerGrid) {
+        stickerGrid.innerHTML = '';
+        footballStickers.forEach((sticker, index) => {
+            const stickerItem = document.createElement('div');
+            stickerItem.className = 'sticker-item';
+            stickerItem.innerHTML = `<div class="sticker-icon">${sticker}</div>`;
+            stickerItem.style.animationDelay = `${index * 0.03}s`;
+            stickerItem.addEventListener('click', () => insertEmoji(sticker));
+            stickerGrid.appendChild(stickerItem);
+        });
+    }
+}
+
+function switchEmojiTab(tabName) {
+    // Cambiar pestañas activas
+    document.querySelectorAll('.emoji-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelector(`.emoji-tab[data-tab="${tabName}"]`).classList.add('active');
+    
+    // Cambiar contenido
+    document.querySelectorAll('.emoji-content').forEach(content => {
+        content.classList.remove('active');
+    });
+    document.getElementById(`${tabName}-content`).classList.add('active');
+}
+
+function switchEmojiCategory(category) {
+    // Cambiar categoría activa
+    document.querySelectorAll('.emoji-category').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`.emoji-category[data-category="${category}"]`).classList.add('active');
+    
+    // Cargar emojis de la categoría
+    currentEmojis = emojiCategories[category];
+    loadEmojis(currentEmojis);
 }
 
 function setupQuickReactions() {

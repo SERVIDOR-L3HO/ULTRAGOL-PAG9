@@ -166,15 +166,40 @@
                     </div>
                 </div>
                 
-                <!-- Emoji Picker -->
+                <!-- Emoji & Sticker Picker -->
                 <div id="emojiPicker" class="emoji-picker" style="display: none;">
                     <div class="emoji-header">
-                        <span>Emojis</span>
+                        <div class="emoji-tabs">
+                            <button class="emoji-tab active" data-tab="emojis">
+                                <i class="far fa-smile"></i>
+                                <span>Emojis</span>
+                            </button>
+                            <button class="emoji-tab" data-tab="stickers">
+                                <i class="fas fa-futbol"></i>
+                                <span>Stickers</span>
+                            </button>
+                        </div>
                         <button class="emoji-close" id="emojiClose">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                    <div class="emoji-grid" id="emojiGrid"></div>
+                    
+                    <!-- Emojis Tab -->
+                    <div id="emojis-content" class="emoji-content active">
+                        <div class="emoji-categories">
+                            <button class="emoji-category active" data-category="futbol" title="Fútbol">⚽</button>
+                            <button class="emoji-category" data-category="celebracion" title="Celebración">🎉</button>
+                            <button class="emoji-category" data-category="gestos" title="Gestos">👍</button>
+                            <button class="emoji-category" data-category="emociones" title="Emociones">😊</button>
+                            <button class="emoji-category" data-category="amor" title="Amor">❤️</button>
+                        </div>
+                        <div class="emoji-grid" id="emojiGrid"></div>
+                    </div>
+                    
+                    <!-- Stickers Tab -->
+                    <div id="stickers-content" class="emoji-content">
+                        <div class="sticker-grid" id="stickerGrid"></div>
+                    </div>
                 </div>
 
                 <div class="input-hint">
