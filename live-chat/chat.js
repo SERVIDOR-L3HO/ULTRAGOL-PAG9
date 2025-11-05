@@ -40,54 +40,71 @@ function initializeChat() {
     
     console.log('✅ Firebase conectado');
     
-    // MODO PÚBLICO - No requiere autenticación
-    // Crear usuario anónimo automáticamente
-    const savedUsername = localStorage.getItem('chatUsername') || 'Usuario' + Math.floor(Math.random() * 1000);
-    const savedAvatar = localStorage.getItem('chatAvatar') || `https://ui-avatars.com/api/?name=${encodeURIComponent(savedUsername)}&background=9d4edd&color=fff`;
-    
-    currentUser = {
-        uid: 'anon-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
-        name: savedUsername,
-        email: null,
-        avatar: savedAvatar,
-        isAnonymous: true,
-        isAuthenticated: false
-    };
-    
-    console.log('✅ Modo público activado - Usuario:', currentUser.name);
-    
-    // Ocultar botón de login y mostrar info de usuario anónimo
+    // Escuchar cambios de autenticación
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            // Usuario autenticado con Firebase
+            currentUser = {
+                uid: user.uid,
+                name: user.displayName || 'Usuario',
+                email: user.email,
+                avatar: user.photoURL || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.displayName || 'Usuario')}&background=9d4edd&color=fff`,
+                isAnonymous: false,
+                isAuthenticated: true
+            };
+            
+            console.log('✅ Usuario autenticado:', currentUser.name);
+            updateAuthUI();
+        } else {
+            // No hay usuario autenticado - mostrar botón de login
+            currentUser = null;
+            console.log('⚠️ No hay usuario autenticado');
+            updateAuthUI();
+        }
+        
+        // Inicializar todo (solo la primera vez)
+        if (!window.chatInitialized) {
+            setupEventListeners();
+            setupEmojiPicker();
+            setupQuickReactions();
+            loadMessages();
+            updateViewerCount();
+            setInterval(updateViewerCount, 30000);
+            window.chatInitialized = true;
+            console.log('✅ Chat initialized successfully');
+        }
+    });
+}
+
+function updateAuthUI() {
     const authBtn = document.getElementById('authBtn');
-    if (authBtn) authBtn.style.display = 'none';
-    
     const userInfo = document.getElementById('userInfo');
     const userAvatar = document.getElementById('userAvatar');
     const userName = document.getElementById('userName');
     
-    if (userInfo && userAvatar && userName) {
-        userAvatar.src = currentUser.avatar;
-        userName.textContent = currentUser.name;
-        userInfo.style.display = 'flex';
+    if (currentUser && currentUser.isAuthenticated) {
+        // Usuario autenticado - mostrar info
+        if (authBtn) authBtn.style.display = 'none';
+        if (userInfo) userInfo.style.display = 'flex';
+        if (userAvatar) userAvatar.src = currentUser.avatar;
+        if (userName) userName.textContent = currentUser.name;
+    } else {
+        // No autenticado - mostrar botón de login
+        if (authBtn) authBtn.style.display = 'flex';
+        if (userInfo) userInfo.style.display = 'none';
     }
-    
-    // Inicializar todo
-    setupEventListeners();
-    setupEmojiPicker();
-    setupQuickReactions();
-    loadMessages();
-    updateViewerCount();
-    
-    setInterval(updateViewerCount, 30000);
-    console.log('✅ Chat initialized successfully');
 }
 
 function setupEventListeners() {
+    // Botones de autenticación
+    document.getElementById('authBtn')?.addEventListener('click', handleGoogleSignIn);
+    document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
+    
     // Botones de configuración
     document.getElementById('changeNameBtn')?.addEventListener('click', handleChangeName);
     document.getElementById('anonymousBtn')?.addEventListener('click', toggleAnonymous);
     document.getElementById('soundBtn')?.addEventListener('click', toggleSound);
     document.getElementById('searchBtn')?.addEventListener('click', toggleSearch);
-    document.getElementById('logoutBtn')?.addEventListener('click', handleLogout);
     
     // Botón de grupos - redirigir a la página de grupos
     document.getElementById('groupsBtn')?.addEventListener('click', () => {
@@ -178,23 +195,34 @@ async function handleChangeName() {
     }
 }
 
+async function handleGoogleSignIn() {
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({
+            prompt: 'select_account'
+        });
+        
+        await auth.signInWithPopup(provider);
+        showToast('¡Bienvenido!', 'Has iniciado sesión correctamente', 'success');
+    } catch (error) {
+        console.error('❌ Error en login:', error);
+        if (error.code === 'auth/popup-closed-by-user') {
+            showToast('Cancelado', 'Inicio de sesión cancelado', 'info');
+        } else {
+            showToast('Error', 'No se pudo iniciar sesión: ' + error.message, 'error');
+        }
+    }
+}
+
 async function handleLogout() {
-    const confirmed = await customConfirm('¿Deseas cambiar de usuario?', 'Cambiar Usuario');
+    const confirmed = await customConfirm('¿Deseas cerrar sesión?', 'Cerrar Sesión');
     if (confirmed) {
         try {
-            // Limpiar datos locales
-            localStorage.removeItem('chatUsername');
-            localStorage.removeItem('chatAvatar');
-            localStorage.removeItem('chatAnonymous');
-            
-            showToast('Éxito', 'Datos limpiados. Recarga la página.', 'success');
-            
-            setTimeout(() => {
-                window.location.reload();
-            }, 1500);
+            await auth.signOut();
+            showToast('Éxito', 'Sesión cerrada correctamente', 'success');
         } catch (error) {
             console.error('❌ Error:', error);
-            showToast('Error', 'Ocurrió un error', 'error');
+            showToast('Error', 'Ocurrió un error al cerrar sesión', 'error');
         }
     }
 }
@@ -350,17 +378,10 @@ async function sendMessage(text = null, imageData = null) {
     
     if (!messageText && !imageData) return;
     
-    // MODO PÚBLICO - Todos pueden enviar mensajes
-    // Si no tiene usuario, crear uno automático
-    if (!currentUser) {
-        const randomName = 'Usuario' + Math.floor(Math.random() * 1000);
-        currentUser = {
-            uid: 'anon-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
-            name: randomName,
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(randomName)}&background=9d4edd&color=fff`,
-            isAnonymous: false,
-            isAuthenticated: false
-        };
+    // Verificar que el usuario esté autenticado
+    if (!currentUser || !currentUser.isAuthenticated) {
+        showToast('Error', 'Debes iniciar sesión para enviar mensajes', 'error');
+        return;
     }
     
     const message = {
