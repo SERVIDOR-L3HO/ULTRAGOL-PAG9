@@ -46,6 +46,16 @@ Preferred communication style: Simple, everyday language.
 - Comments and social interaction features
 - Picture-in-picture video player for floating stream viewing
 - Cookie consent banner (GDPR compliant)
+- **Settings/Configuration System** (Live Chat):
+  - Professional settings modal with gray, white, and black color scheme
+  - Typography customization: font family, size, and weight selection
+  - Color customization: text color, accent color with preset palettes
+  - Background options: solid colors and gradient backgrounds
+  - Custom gradient builder with angle control
+  - 8 predefined themes (Default, Dark, Ocean, Forest, Sunset, Rose, Minimal, Neon)
+  - Real-time preview of all changes
+  - Settings persistence using localStorage
+  - Accessible via gear icon in chat toolbar
 
 ### Backend Architecture
 
