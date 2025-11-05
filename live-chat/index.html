@@ -36,10 +36,6 @@
                 <i class="fas fa-eye"></i>
                 <span id="viewerCount">0</span> espectadores
             </div>
-            <button id="groupsBtn" class="groups-btn" title="Grupos">
-                <i class="fas fa-users"></i>
-                <span>Grupos</span>
-            </button>
             <button id="authBtn" class="auth-btn">
                 <i class="fab fa-google"></i>
                 Iniciar Sesión
@@ -198,7 +194,21 @@
                     
                     <!-- Stickers Tab -->
                     <div id="stickers-content" class="emoji-content">
-                        <div class="sticker-grid" id="stickerGrid"></div>
+                        <div class="sticker-header">
+                            <span class="sticker-title">Tus Stickers</span>
+                            <label for="stickerUpload" class="add-sticker-btn" title="Agregar tu sticker">
+                                <i class="fas fa-plus"></i>
+                                <span>Subir Sticker</span>
+                            </label>
+                            <input type="file" id="stickerUpload" accept="image/*,image/gif" style="display: none;" />
+                        </div>
+                        <div class="sticker-grid" id="stickerGrid">
+                            <div class="sticker-placeholder">
+                                <i class="fas fa-images"></i>
+                                <p>Agrega tus propios stickers</p>
+                                <small>Haz clic en "Subir Sticker" para comenzar</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

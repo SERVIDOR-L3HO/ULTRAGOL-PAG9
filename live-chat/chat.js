@@ -25,12 +25,8 @@ const emojiCategories = {
     amor: ['❤️', '💚', '💙', '💜', '🧡', '💛', '🤍', '🖤', '💖', '💗', '💓', '💞', '💕', '💝', '❣️', '💟']
 };
 
-// Stickers de fútbol creativos
-const footballStickers = [
-    '⚽🔥', '🏆✨', '⚡🥅', '👑⚽', '💪🏟️', '🎯⚽', '🔥⚡', '✨🏆',
-    '⚽💯', '🌟⚽', '🏅⚽', '⚽🎉', '🥇⚽', '⚽💥', '🏟️🔥', '⚽👑',
-    '💪⚡', '🎊🏆', '⚽🌟', '🔥💯', '⚡🏆', '⚽✨', '🏟️⚡', '🎯🔥'
-];
+// Stickers guardados en localStorage
+let userStickers = JSON.parse(localStorage.getItem('userStickers') || '[]');
 
 // Emojis por defecto (futbol)
 let currentEmojis = emojiCategories.futbol;
@@ -128,10 +124,8 @@ function setupEventListeners() {
     document.getElementById('soundBtn')?.addEventListener('click', toggleSound);
     document.getElementById('searchBtn')?.addEventListener('click', toggleSearch);
     
-    // Botón de grupos - redirigir a la página de grupos
-    document.getElementById('groupsBtn')?.addEventListener('click', () => {
-        window.location.href = 'groups-page.html';
-    });
+    // Event listener para subir stickers
+    document.getElementById('stickerUpload')?.addEventListener('change', handleStickerUpload);
     
     // Enviar mensaje
     document.getElementById('sendBtn')?.addEventListener('click', () => sendMessage());
@@ -210,18 +204,131 @@ function loadEmojis(emojis) {
 
 function loadStickers() {
     const stickerGrid = document.getElementById('stickerGrid');
-    if (stickerGrid) {
-        stickerGrid.innerHTML = '';
-        footballStickers.forEach((sticker, index) => {
-            const stickerItem = document.createElement('div');
-            stickerItem.className = 'sticker-item';
-            stickerItem.innerHTML = `<div class="sticker-icon">${sticker}</div>`;
-            stickerItem.style.animationDelay = `${index * 0.03}s`;
-            stickerItem.addEventListener('click', () => insertEmoji(sticker));
-            stickerGrid.appendChild(stickerItem);
+    if (!stickerGrid) return;
+    
+    // Si no hay stickers, mostrar placeholder
+    if (userStickers.length === 0) {
+        stickerGrid.innerHTML = `
+            <div class="sticker-placeholder">
+                <i class="fas fa-images"></i>
+                <p>Agrega tus propios stickers</p>
+                <small>Haz clic en "Subir Sticker" para comenzar</small>
+            </div>
+        `;
+        return;
+    }
+    
+    // Cargar stickers del usuario
+    stickerGrid.innerHTML = '';
+    userStickers.forEach((sticker, index) => {
+        const stickerItem = document.createElement('div');
+        stickerItem.className = 'sticker-item';
+        stickerItem.style.animationDelay = `${index * 0.03}s`;
+        
+        stickerItem.innerHTML = `
+            <img src="${sticker.url}" alt="Sticker" />
+            <button class="sticker-delete-btn" onclick="deleteSticker(${index})" title="Eliminar">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        // Al hacer clic en la imagen, insertar el sticker
+        const img = stickerItem.querySelector('img');
+        img.addEventListener('click', (e) => {
+            if (e.target.tagName === 'IMG') {
+                insertSticker(sticker.url);
+            }
         });
+        
+        stickerGrid.appendChild(stickerItem);
+    });
+}
+
+async function handleStickerUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Validar que sea una imagen
+    if (!file.type.startsWith('image/')) {
+        showToast('Error', 'Por favor selecciona una imagen válida', 'error');
+        e.target.value = '';
+        return;
+    }
+    
+    // Límite de 2MB
+    if (file.size > 2 * 1024 * 1024) {
+        showToast('Error', 'La imagen es muy grande (máx 2MB)', 'error');
+        e.target.value = '';
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+            // Comprimir imagen
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            
+            // Redimensionar para stickers (máximo 200x200)
+            const maxSize = 200;
+            if (width > maxSize || height > maxSize) {
+                if (width > height) {
+                    height = (height / width) * maxSize;
+                    width = maxSize;
+                } else {
+                    width = (width / height) * maxSize;
+                    height = maxSize;
+                }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Convertir a base64
+            const stickerData = canvas.toDataURL('image/png', 0.9);
+            
+            // Agregar al array de stickers
+            userStickers.push({
+                id: Date.now(),
+                url: stickerData,
+                addedAt: new Date().toISOString()
+            });
+            
+            // Guardar en localStorage
+            localStorage.setItem('userStickers', JSON.stringify(userStickers));
+            
+            // Recargar stickers
+            loadStickers();
+            
+            showToast('¡Genial!', 'Sticker agregado exitosamente', 'success');
+            e.target.value = '';
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function insertSticker(stickerUrl) {
+    // Para stickers, los enviamos como imágenes en los mensajes
+    sendMessage(null, stickerUrl);
+    document.getElementById('emojiPicker').style.display = 'none';
+}
+
+function deleteSticker(index) {
+    if (confirm('¿Eliminar este sticker?')) {
+        userStickers.splice(index, 1);
+        localStorage.setItem('userStickers', JSON.stringify(userStickers));
+        loadStickers();
+        showToast('Eliminado', 'Sticker eliminado correctamente', 'success');
     }
 }
+
+// Hacer las funciones accesibles globalmente
+window.deleteSticker = deleteSticker;
 
 function switchEmojiTab(tabName) {
     // Cambiar pestañas activas
