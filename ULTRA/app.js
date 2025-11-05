@@ -1015,10 +1015,6 @@ function closeImportantMatchesModal() {
 
 async function loadImportantMatches() {
     try {
-        if (!marcadoresData || !marcadoresData.partidos) {
-            await loadMarcadores();
-        }
-        
         if (!transmisionesData || !transmisionesData.transmisiones) {
             await loadTransmisiones();
         }
@@ -1033,63 +1029,71 @@ async function loadImportantMatches() {
 function renderImportantMatches() {
     const body = document.getElementById('importantMatchesBody');
     
-    if (!marcadoresData || !marcadoresData.partidos || marcadoresData.partidos.length === 0) {
+    if (!transmisionesData || !transmisionesData.transmisiones || transmisionesData.transmisiones.length === 0) {
         showNoMatchesMessage();
         return;
     }
     
-    const partidosConTransmision = marcadoresData.partidos.map(partido => {
-        const transmision = findTransmisionForMatch(partido);
-        return {
-            ...partido,
-            transmision: transmision,
-            canalesCount: transmision?.canales?.length || 0
-        };
+    const transmisionesSorted = [...transmisionesData.transmisiones].sort((a, b) => {
+        const aLive = a.estado?.toLowerCase().includes('vivo') || a.estado?.toLowerCase().includes('live');
+        const bLive = b.estado?.toLowerCase().includes('vivo') || b.estado?.toLowerCase().includes('live');
+        
+        if (aLive && !bLive) return -1;
+        if (!aLive && bLive) return 1;
+        
+        const aCanales = a.canales?.length || 0;
+        const bCanales = b.canales?.length || 0;
+        
+        return bCanales - aCanales;
     });
     
-    partidosConTransmision.sort((a, b) => {
-        if (a.estado?.enVivo && !b.estado?.enVivo) return -1;
-        if (!a.estado?.enVivo && b.estado?.enVivo) return 1;
+    body.innerHTML = transmisionesSorted.map((transmision, index) => {
+        const equipos = transmision.evento.split(' vs ');
+        const equipoLocal = equipos[0] || 'Equipo 1';
+        const equipoVisitante = equipos[1] || 'Equipo 2';
+        const canalesCount = transmision.canales?.length || 0;
         
-        if (a.canalesCount > 0 && b.canalesCount === 0) return -1;
-        if (a.canalesCount === 0 && b.canalesCount > 0) return 1;
-        
-        return 0;
-    });
-    
-    body.innerHTML = partidosConTransmision.map(partido => {
-        const hora = formatearHora(partido.fecha);
+        const isLive = transmision.estado?.toLowerCase().includes('vivo') || transmision.estado?.toLowerCase().includes('live');
+        const isUpcoming = transmision.estado?.toLowerCase().includes('próximo') || transmision.estado?.toLowerCase().includes('programado');
+        const isFinished = transmision.estado?.toLowerCase().includes('finalizado') || transmision.estado?.toLowerCase().includes('finished');
         
         let statusHTML = '';
-        if (partido.estado?.enVivo) {
+        if (isLive) {
             statusHTML = `
                 <span class="important-match-status status-live">
                     <span class="live-dot"></span>
-                    EN VIVO - ${partido.reloj}
+                    EN VIVO
                 </span>
             `;
-        } else if (partido.estado?.programado) {
+        } else if (isUpcoming) {
             statusHTML = `
                 <span class="important-match-status status-upcoming">
                     <i class="far fa-clock"></i>
                     PRÓXIMO
                 </span>
             `;
-        } else if (partido.estado?.finalizado) {
+        } else if (isFinished) {
             statusHTML = `
                 <span class="important-match-status status-finished">
                     <i class="fas fa-check-circle"></i>
                     FINALIZADO
                 </span>
             `;
+        } else {
+            statusHTML = `
+                <span class="important-match-status status-upcoming">
+                    <i class="far fa-clock"></i>
+                    ${transmision.estado || 'PRÓXIMO'}
+                </span>
+            `;
         }
         
         let channelsHTML = '';
-        if (partido.canalesCount > 0) {
+        if (canalesCount > 0) {
             channelsHTML = `
                 <div class="important-match-channels">
                     <i class="fas fa-tv"></i>
-                    <span class="important-channels-count">${partido.canalesCount} canal${partido.canalesCount > 1 ? 'es' : ''} disponible${partido.canalesCount > 1 ? 's' : ''}</span>
+                    <span class="important-channels-count">${canalesCount} canal${canalesCount > 1 ? 'es' : ''} disponible${canalesCount > 1 ? 's' : ''}</span>
                 </div>
             `;
         } else {
@@ -1100,28 +1104,31 @@ function renderImportantMatches() {
             `;
         }
         
-        const scoreOrVsHTML = (partido.estado?.enVivo || partido.estado?.finalizado) 
-            ? `<span class="important-match-score">${partido.local.marcador} - ${partido.visitante.marcador}</span>`
-            : `<span class="important-match-vs">VS</span>`;
+        const deporte = transmision.deporte || 'Fútbol';
+        const liga = transmision.liga || '';
         
         return `
-            <div class="important-match-card" onclick='${partido.canalesCount > 0 ? `selectImportantMatch("${partido.id}")` : `showToast("No hay canales disponibles para este partido")`}'>
+            <div class="important-match-card" onclick='${canalesCount > 0 ? `selectImportantMatchByTransmision(${index})` : `showToast("No hay canales disponibles para este partido")`}'>
                 <div class="important-match-header">
                     ${statusHTML}
-                    <span class="important-match-time">${hora}</span>
+                    <span class="important-match-time">${deporte}${liga ? ' • ' + liga : ''}</span>
                 </div>
                 
                 <div class="important-match-teams">
                     <div class="important-team">
-                        <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" class="important-team-logo" onerror="this.src='https://via.placeholder.com/50'">
-                        <span class="important-team-name">${partido.local.nombreCorto}</span>
+                        <div class="important-team-logo" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF4500, #FF6B35); font-size: 16px; font-weight: 800; color: white;">
+                            ${equipoLocal.substring(0, 2).toUpperCase()}
+                        </div>
+                        <span class="important-team-name">${equipoLocal}</span>
                     </div>
                     
-                    ${scoreOrVsHTML}
+                    <span class="important-match-vs">VS</span>
                     
                     <div class="important-team">
-                        <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" class="important-team-logo" onerror="this.src='https://via.placeholder.com/50'">
-                        <span class="important-team-name">${partido.visitante.nombreCorto}</span>
+                        <div class="important-team-logo" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #FF6B35, #FFD700); font-size: 16px; font-weight: 800; color: white;">
+                            ${equipoVisitante.substring(0, 2).toUpperCase()}
+                        </div>
+                        <span class="important-team-name">${equipoVisitante}</span>
                     </div>
                 </div>
                 
@@ -1171,15 +1178,13 @@ function findTransmisionForMatch(partido) {
     return transmision;
 }
 
-function selectImportantMatch(matchId) {
-    const partido = marcadoresData.partidos.find(p => p.id === matchId);
-    
-    if (!partido) {
-        showToast('No se pudo encontrar el partido');
+function selectImportantMatchByTransmision(transmisionIndex) {
+    if (!transmisionesData || !transmisionesData.transmisiones) {
+        showToast('No se pudo encontrar la transmisión');
         return;
     }
     
-    const transmision = findTransmisionForMatch(partido);
+    const transmision = transmisionesData.transmisiones[transmisionIndex];
     
     if (!transmision || !transmision.canales || transmision.canales.length === 0) {
         showToast('No hay canales disponibles para este partido');
@@ -1188,8 +1193,7 @@ function selectImportantMatch(matchId) {
     
     closeImportantMatchesModal();
     
-    const partidoNombre = `${partido.local.nombreCorto} vs ${partido.visitante.nombreCorto}`;
-    showChannelSelector(transmision, partidoNombre);
+    showChannelSelector(transmision, transmision.evento);
 }
 
 function showNoMatchesMessage() {
