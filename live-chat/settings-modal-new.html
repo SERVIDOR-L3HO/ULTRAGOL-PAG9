@@ -1,0 +1,267 @@
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal settings-modal">
+        <div class="modal-overlay" onclick="closeSettingsModal()"></div>
+        <div class="modal-content settings-modal-content-v2">
+            <!-- Header Mejorado -->
+            <div class="settings-modal-header-v2">
+                <div class="settings-header-left">
+                    <div class="settings-icon-animated">
+                        <i class="fas fa-cog fa-spin"></i>
+                    </div>
+                    <div class="settings-header-text">
+                        <h2>Configuración de Apariencia</h2>
+                        <p>Personaliza tu experiencia de chat</p>
+                    </div>
+                </div>
+                <button class="modal-close-v2" onclick="closeSettingsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Tabs Modernos -->
+            <div class="settings-tabs-v2">
+                <button class="settings-tab-v2 active" data-tab="themes">
+                    <i class="fas fa-magic"></i>
+                    <span>Temas</span>
+                </button>
+                <button class="settings-tab-v2" data-tab="customize">
+                    <i class="fas fa-sliders-h"></i>
+                    <span>Personalizar</span>
+                </button>
+            </div>
+
+            <div class="settings-body-v2">
+                <!-- Tab de Temas -->
+                <div class="settings-tab-content-v2 active" id="themes-tab">
+                    <!-- Sección Más Usados -->
+                    <div class="popular-themes-section">
+                        <h3><i class="fas fa-fire"></i> Más Usados</h3>
+                        <div class="popular-themes-grid">
+                            <button class="popular-theme-card" data-theme="default">
+                                <div class="theme-preview-large" style="background: linear-gradient(135deg, #9d4edd 0%, #1a1625 100%);">
+                                    <i class="fas fa-futbol"></i>
+                                </div>
+                                <div class="theme-badge most-popular">Más Popular</div>
+                                <h4>UltraGol Original</h4>
+                            </button>
+                            
+                            <button class="popular-theme-card" data-theme="dark">
+                                <div class="theme-preview-large" style="background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);">
+                                    <i class="fas fa-moon"></i>
+                                </div>
+                                <div class="theme-badge trending">Trending</div>
+                                <h4>Oscuro Puro</h4>
+                            </button>
+                            
+                            <button class="popular-theme-card" data-theme="ocean">
+                                <div class="theme-preview-large" style="background: linear-gradient(135deg, #0ea5e9 0%, #0c4a6e 100%);">
+                                    <i class="fas fa-water"></i>
+                                </div>
+                                <h4>Océano Profundo</h4>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Todos los Temas -->
+                    <div class="all-themes-section">
+                        <h3><i class="fas fa-palette"></i> Todos los Temas</h3>
+                        <div class="all-themes-grid">
+                            <!-- Tema Default -->
+                            <button class="theme-card-v2 active" data-theme="default">
+                                <div class="theme-gradient-preview" style="background: linear-gradient(135deg, #9d4edd 0%, #1a1625 100%);"></div>
+                                <div class="theme-info-v2">
+                                    <h4>UltraGol Original</h4>
+                                    <div class="theme-colors-mini">
+                                        <span style="background: #9d4edd;"></span>
+                                        <span style="background: #1a1625;"></span>
+                                        <span style="background: #f3f0ff;"></span>
+                                    </div>
+                                </div>
+                                <div class="theme-check"><i class="fas fa-check-circle"></i></div>
+                            </button>
+
+                            <!-- Tema Dark -->
+                            <button class="theme-card-v2" data-theme="dark">
+                                <div class="theme-gradient-preview" style="background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);"></div>
+                                <div class="theme-info-v2">
+                                    <h4>Oscuro Puro</h4>
+                                    <div class="theme-colors-mini">
+                                        <span style="background: #000000;"></span>
+                                        <span style="background: #1a1a1a;"></span>
+                                        <span style="background: #ffffff;"></span>
+                                    </div>
+                                </div>
+                                <div class="theme-check"><i class="fas fa-check-circle"></i></div>
+                            </button>
+
+                            <!-- Tema Ocean -->
+                            <button class="theme-card-v2" data-theme="ocean">
+                                <div class="theme-gradient-preview" style="background: linear-gradient(135deg, #0ea5e9 0%, #0c4a6e 100%);"></div>
+                                <div class="theme-info-v2">
+                                    <h4>Océano Profundo</h4>
+                                    <div class="theme-colors-mini">
+                                        <span style="background: #0ea5e9;"></span>
+                                        <span style="background: #0c4a6e;"></span>
+                                        <span style="background: #e0f2fe;"></span>
+                                    </div>
+                                </div>
+                                <div class="theme-check"><i class="fas fa-check-circle"></i></div>
+                            </button>
+
+                            <!-- Tema Forest -->
+                            <button class="theme-card-v2" data-theme="forest">
+                                <div class="theme-gradient-preview" style="background: linear-gradient(135deg, #10b981 0%, #064e3b 100%);"></div>
+                                <div class="theme-info-v2">
+                                    <h4>Bosque Natural</h4>
+                                    <div class="theme-colors-mini">
+                                        <span style="background: #10b981;"></span>
+                                        <span style="background: #064e3b;"></span>
+                                        <span style="background: #d1fae5;"></span>
+                                    </div>
+                                </div>
+                                <div class="theme-check"><i class="fas fa-check-circle"></i></div>
+                            </button>
+
+                            <!-- Tema Sunset -->
+                            <button class="theme-card-v2" data-theme="sunset">
+                                <div class="theme-gradient-preview" style="background: linear-gradient(135deg, #f59e0b 0%, #78350f 100%);"></div>
+                                <div class="theme-info-v2">
+                                    <h4>Atardecer Cálido</h4>
+                                    <div class="theme-colors-mini">
+                                        <span style="background: #f59e0b;"></span>
+                                        <span style="background: #78350f;"></span>
+                                        <span style="background: #fef3c7;"></span>
+                                    </div>
+                                </div>
+                                <div class="theme-check"><i class="fas fa-check-circle"></i></div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab de Personalizar -->
+                <div class="settings-tab-content-v2" id="customize-tab">
+                    <!-- Tipografía -->
+                    <div class="customize-section">
+                        <h3><i class="fas fa-font"></i> Tipografía</h3>
+                        <div class="customize-grid">
+                            <!-- Tamaño de Fuente -->
+                            <div class="customize-control">
+                                <label>
+                                    <i class="fas fa-text-height"></i>
+                                    Tamaño de Fuente
+                                </label>
+                                <div class="font-size-control">
+                                    <span class="font-size-label">A-</span>
+                                    <input type="range" id="fontSizeRange" min="12" max="20" value="14" class="modern-range">
+                                    <span class="font-size-label">A+</span>
+                                    <span class="font-size-value" id="fontSizeValue">14px</span>
+                                </div>
+                            </div>
+
+                            <!-- Familia de Fuente -->
+                            <div class="customize-control">
+                                <label>
+                                    <i class="fas fa-font"></i>
+                                    Familia de Fuente
+                                </label>
+                                <div class="font-family-grid">
+                                    <button class="font-btn active" data-font="Inter, 'Segoe UI', sans-serif">Inter</button>
+                                    <button class="font-btn" data-font="'Arial', sans-serif">Arial</button>
+                                    <button class="font-btn" data-font="'Courier New', monospace">Courier</button>
+                                    <button class="font-btn" data-font="'Georgia', serif">Georgia</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Colores -->
+                    <div class="customize-section">
+                        <h3><i class="fas fa-palette"></i> Colores</h3>
+                        <div class="customize-grid">
+                            <!-- Color Principal -->
+                            <div class="customize-control">
+                                <label>
+                                    <i class="fas fa-brush"></i>
+                                    Color Principal
+                                </label>
+                                <div class="color-control-modern">
+                                    <input type="color" id="accentColorPicker" value="#9d4edd" class="modern-color-picker">
+                                    <div class="color-presets-modern">
+                                        <button class="color-dot" style="background: #9d4edd;" data-color="#9d4edd" title="Púrpura"></button>
+                                        <button class="color-dot" style="background: #0ea5e9;" data-color="#0ea5e9" title="Azul"></button>
+                                        <button class="color-dot" style="background: #10b981;" data-color="#10b981" title="Verde"></button>
+                                        <button class="color-dot" style="background: #f59e0b;" data-color="#f59e0b" title="Naranja"></button>
+                                        <button class="color-dot" style="background: #ef4444;" data-color="#ef4444" title="Rojo"></button>
+                                        <button class="color-dot" style="background: #ec4899;" data-color="#ec4899" title="Rosa"></button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Color de Fondo -->
+                            <div class="customize-control">
+                                <label>
+                                    <i class="fas fa-fill-drip"></i>
+                                    Color de Fondo
+                                </label>
+                                <div class="color-control-modern">
+                                    <input type="color" id="bgColorPicker" value="#1a1625" class="modern-color-picker">
+                                    <div class="color-presets-modern">
+                                        <button class="color-dot" style="background: #1a1625;" data-color="#1a1625" title="Oscuro Original"></button>
+                                        <button class="color-dot" style="background: #000000;" data-color="#000000" title="Negro"></button>
+                                        <button class="color-dot" style="background: #1e293b;" data-color="#1e293b" title="Azul Oscuro"></button>
+                                        <button class="color-dot" style="background: #1f2937;" data-color="#1f2937" title="Gris Oscuro"></button>
+                                        <button class="color-dot" style="background: #18181b;" data-color="#18181b" title="Zinc"></button>
+                                        <button class="color-dot" style="background: #f8fafc;" data-color="#f8fafc" title="Claro"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Degradados Rápidos -->
+                    <div class="customize-section">
+                        <h3><i class="fas fa-layer-group"></i> Fondos con Degradado</h3>
+                        <div class="gradient-quick-grid">
+                            <button class="gradient-quick-btn" data-gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+                                <div class="gradient-preview-small" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                                <span>Púrpura</span>
+                            </button>
+                            <button class="gradient-quick-btn" data-gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
+                                <div class="gradient-preview-small" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+                                <span>Rosa</span>
+                            </button>
+                            <button class="gradient-quick-btn" data-gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">
+                                <div class="gradient-preview-small" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+                                <span>Azul</span>
+                            </button>
+                            <button class="gradient-quick-btn" data-gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+                                <div class="gradient-preview-small" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
+                                <span>Verde</span>
+                            </button>
+                            <button class="gradient-quick-btn" data-gradient="linear-gradient(135deg, #fa709a 0%, #fee140 100%)">
+                                <div class="gradient-preview-small" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"></div>
+                                <span>Atardecer</span>
+                            </button>
+                            <button class="gradient-quick-btn" data-gradient="linear-gradient(135deg, #30cfd0 0%, #330867 100%)">
+                                <div class="gradient-preview-small" style="background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);"></div>
+                                <span>Océano</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Mejorado -->
+            <div class="settings-footer-v2">
+                <button class="btn-reset-v2" id="resetSettings">
+                    <i class="fas fa-undo-alt"></i>
+                    <span>Restaurar</span>
+                </button>
+                <button class="btn-apply-v2" onclick="closeSettingsModal()">
+                    <i class="fas fa-check"></i>
+                    <span>Aplicar y Cerrar</span>
+                </button>
+            </div>
+        </div>
+    </div>

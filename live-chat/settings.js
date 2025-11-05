@@ -1,5 +1,6 @@
 // ======================================
-// SETTINGS MODAL SYSTEM
+// SETTINGS MODAL SYSTEM V2
+// Professional & Creative Configuration
 // ======================================
 
 const defaultSettings = {
@@ -14,6 +15,60 @@ const defaultSettings = {
 };
 
 let currentSettings = { ...defaultSettings };
+
+// 5 Temas Profesionales Principales
+const themes = {
+    default: {
+        name: 'UltraGol Original',
+        accentColor: '#9d4edd',
+        bgColor: '#1a1625',
+        bgDarker: '#0f0b16',
+        bgCard: '#241b2f',
+        textColor: '#f3f0ff',
+        textSecondary: '#b4a5d8',
+        bgGradient: null
+    },
+    dark: {
+        name: 'Oscuro Puro',
+        accentColor: '#ffffff',
+        bgColor: '#000000',
+        bgDarker: '#0a0a0a',
+        bgCard: '#1a1a1a',
+        textColor: '#ffffff',
+        textSecondary: '#a3a3a3',
+        bgGradient: null
+    },
+    ocean: {
+        name: 'Océano Profundo',
+        accentColor: '#0ea5e9',
+        bgColor: '#0c4a6e',
+        bgDarker: '#082f49',
+        bgCard: '#164e63',
+        textColor: '#e0f2fe',
+        textSecondary: '#7dd3fc',
+        bgGradient: null
+    },
+    forest: {
+        name: 'Bosque Natural',
+        accentColor: '#10b981',
+        bgColor: '#064e3b',
+        bgDarker: '#022c22',
+        bgCard: '#065f46',
+        textColor: '#d1fae5',
+        textSecondary: '#6ee7b7',
+        bgGradient: null
+    },
+    sunset: {
+        name: 'Atardecer Cálido',
+        accentColor: '#f59e0b',
+        bgColor: '#78350f',
+        bgDarker: '#451a03',
+        bgCard: '#92400e',
+        textColor: '#fef3c7',
+        textSecondary: '#fcd34d',
+        bgGradient: null
+    }
+};
 
 // Load saved settings on page load
 function loadSavedSettings() {
@@ -35,22 +90,67 @@ function saveSettings() {
 
 // Apply all settings to the page
 function applyAllSettings() {
+    // Typography
     document.body.style.fontSize = currentSettings.fontSize + 'px';
     document.body.style.fontFamily = currentSettings.fontFamily;
     document.body.style.fontWeight = currentSettings.fontWeight;
     
-    // Apply colors
-    document.documentElement.style.setProperty('--text-primary', currentSettings.textColor);
-    document.documentElement.style.setProperty('--primary-color', currentSettings.accentColor);
+    // Colors - Apply to CSS variables
+    const root = document.documentElement;
+    root.style.setProperty('--text-primary', currentSettings.textColor);
+    root.style.setProperty('--primary-color', currentSettings.accentColor);
+    root.style.setProperty('--secondary-color', currentSettings.accentColor);
     
-    // Apply background
+    // Background
     if (currentSettings.bgGradient) {
         document.body.style.background = currentSettings.bgGradient;
-        document.documentElement.style.setProperty('--bg-dark', 'transparent');
+        root.style.setProperty('--bg-dark', 'transparent');
+        root.style.setProperty('--bg-darker', 'transparent');
+        
+        // Apply gradient to chat section too
+        const chatSection = document.querySelector('.chat-section');
+        if (chatSection) {
+            chatSection.style.background = currentSettings.bgGradient;
+        }
     } else {
         document.body.style.background = currentSettings.bgColor;
-        document.documentElement.style.setProperty('--bg-dark', currentSettings.bgColor);
+        root.style.setProperty('--bg-dark', currentSettings.bgColor);
+        
+        // Apply theme colors if using a predefined theme
+        if (themes[currentSettings.theme]) {
+            const theme = themes[currentSettings.theme];
+            root.style.setProperty('--bg-darker', theme.bgDarker);
+            root.style.setProperty('--bg-card', theme.bgCard);
+            root.style.setProperty('--text-secondary', theme.textSecondary);
+            root.style.setProperty('--accent-purple', theme.accentColor);
+        }
     }
+    
+    // Update other accent-dependent properties
+    updateAccentColors();
+}
+
+// Update all accent color dependent elements
+function updateAccentColors() {
+    const root = document.documentElement;
+    const accentColor = currentSettings.accentColor;
+    
+    // Update various accent uses throughout the app
+    root.style.setProperty('--hover-color', adjustColorBrightness(accentColor, -20));
+    root.style.setProperty('--accent-red', '#ff4655'); // Keep red for certain elements
+    root.style.setProperty('--accent-gold', '#ffd700'); // Keep gold for VIP badges
+}
+
+// Helper function to adjust color brightness
+function adjustColorBrightness(color, percent) {
+    const num = parseInt(color.replace("#",""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = (num >> 8 & 0x00FF) + amt;
+    const B = (num & 0x0000FF) + amt;
+    return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 +
+           (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255))
+           .toString(16).slice(1);
 }
 
 // Open Settings Modal
@@ -77,32 +177,70 @@ function updateSettingsUI() {
     const fontSizeValue = document.getElementById('fontSizeValue');
     if (fontSizeRange && fontSizeValue) {
         fontSizeRange.value = currentSettings.fontSize;
-        fontSizeValue.textContent = currentSettings.fontSize;
+        fontSizeValue.textContent = currentSettings.fontSize + 'px';
     }
 
     // Font family
-    document.querySelectorAll('.font-option').forEach(option => {
-        option.classList.toggle('active', option.dataset.font === currentSettings.fontFamily);
-    });
-
-    // Font weight
-    document.querySelectorAll('.weight-option').forEach(option => {
-        option.classList.toggle('active', option.dataset.weight == currentSettings.fontWeight);
+    document.querySelectorAll('.font-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.font === currentSettings.fontFamily);
     });
 
     // Color pickers
-    const textColorPicker = document.getElementById('textColorPicker');
     const accentColorPicker = document.getElementById('accentColorPicker');
     const bgColorPicker = document.getElementById('bgColorPicker');
     
-    if (textColorPicker) textColorPicker.value = currentSettings.textColor;
     if (accentColorPicker) accentColorPicker.value = currentSettings.accentColor;
     if (bgColorPicker) bgColorPicker.value = currentSettings.bgColor;
 
-    // Theme cards
-    document.querySelectorAll('.theme-card').forEach(card => {
+    // Theme cards - both popular and all themes
+    document.querySelectorAll('[data-theme]').forEach(card => {
         card.classList.toggle('active', card.dataset.theme === currentSettings.theme);
     });
+}
+
+// Apply a predefined theme
+function applyTheme(themeName) {
+    if (themes[themeName]) {
+        const theme = themes[themeName];
+        currentSettings.theme = themeName;
+        currentSettings.accentColor = theme.accentColor;
+        currentSettings.bgColor = theme.bgColor;
+        currentSettings.textColor = theme.textColor;
+        currentSettings.bgGradient = theme.bgGradient;
+        
+        applyAllSettings();
+        updateSettingsUI();
+        saveSettings();
+        
+        // Visual feedback
+        showToast(`Tema "${theme.name}" aplicado`);
+    }
+}
+
+// Show toast notification
+function showToast(message) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+        color: white;
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+        z-index: 10000;
+        animation: slideIn 0.3s ease;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
 }
 
 // Initialize Settings System
@@ -116,8 +254,8 @@ function initializeSettings() {
         settingsBtn.addEventListener('click', openSettingsModal);
     }
 
-    // Settings tabs
-    const settingsTabs = document.querySelectorAll('.settings-tab');
+    // Settings tabs V2
+    const settingsTabs = document.querySelectorAll('.settings-tab-v2');
     settingsTabs.forEach(tab => {
         tab.addEventListener('click', () => {
             const targetTab = tab.dataset.tab;
@@ -127,7 +265,7 @@ function initializeSettings() {
             tab.classList.add('active');
             
             // Update content
-            document.querySelectorAll('.settings-tab-content').forEach(content => {
+            document.querySelectorAll('.settings-tab-content-v2').forEach(content => {
                 content.classList.remove('active');
             });
             document.getElementById(targetTab + '-tab')?.classList.add('active');
@@ -140,57 +278,21 @@ function initializeSettings() {
     if (fontSizeRange) {
         fontSizeRange.addEventListener('input', (e) => {
             const size = e.target.value;
-            fontSizeValue.textContent = size;
+            fontSizeValue.textContent = size + 'px';
             currentSettings.fontSize = parseInt(size);
             document.body.style.fontSize = size + 'px';
             saveSettings();
         });
     }
 
-    // Font family options
-    document.querySelectorAll('.font-option').forEach(option => {
-        option.addEventListener('click', () => {
-            document.querySelectorAll('.font-option').forEach(opt => opt.classList.remove('active'));
-            option.classList.add('active');
+    // Font family buttons
+    document.querySelectorAll('.font-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.font-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             
-            currentSettings.fontFamily = option.dataset.font;
-            document.body.style.fontFamily = option.dataset.font;
-            saveSettings();
-        });
-    });
-
-    // Font weight options
-    document.querySelectorAll('.weight-option').forEach(option => {
-        option.addEventListener('click', () => {
-            document.querySelectorAll('.weight-option').forEach(opt => opt.classList.remove('active'));
-            option.classList.add('active');
-            
-            currentSettings.fontWeight = parseInt(option.dataset.weight);
-            document.body.style.fontWeight = option.dataset.weight;
-            saveSettings();
-        });
-    });
-
-    // Text color picker
-    const textColorPicker = document.getElementById('textColorPicker');
-    if (textColorPicker) {
-        textColorPicker.addEventListener('input', (e) => {
-            currentSettings.textColor = e.target.value;
-            document.documentElement.style.setProperty('--text-primary', e.target.value);
-            saveSettings();
-        });
-    }
-
-    // Text color presets
-    document.querySelectorAll('#colors-tab .color-picker-container:first-child .color-preset').forEach(preset => {
-        preset.addEventListener('click', () => {
-            const color = preset.dataset.color;
-            document.querySelectorAll('#colors-tab .color-picker-container:first-child .color-preset').forEach(p => p.classList.remove('active'));
-            preset.classList.add('active');
-            
-            currentSettings.textColor = color;
-            textColorPicker.value = color;
-            document.documentElement.style.setProperty('--text-primary', color);
+            currentSettings.fontFamily = btn.dataset.font;
+            document.body.style.fontFamily = btn.dataset.font;
             saveSettings();
         });
     });
@@ -200,21 +302,20 @@ function initializeSettings() {
     if (accentColorPicker) {
         accentColorPicker.addEventListener('input', (e) => {
             currentSettings.accentColor = e.target.value;
-            document.documentElement.style.setProperty('--primary-color', e.target.value);
+            currentSettings.theme = 'custom';
+            applyAllSettings();
             saveSettings();
         });
     }
 
     // Accent color presets
-    document.querySelectorAll('#colors-tab .color-picker-container:nth-child(2) .color-preset').forEach(preset => {
-        preset.addEventListener('click', () => {
-            const color = preset.dataset.color;
-            document.querySelectorAll('#colors-tab .color-picker-container:nth-child(2) .color-preset').forEach(p => p.classList.remove('active'));
-            preset.classList.add('active');
-            
+    document.querySelectorAll('.color-control-modern:first-child .color-dot').forEach(dot => {
+        dot.addEventListener('click', () => {
+            const color = dot.dataset.color;
             currentSettings.accentColor = color;
-            accentColorPicker.value = color;
-            document.documentElement.style.setProperty('--primary-color', color);
+            currentSettings.theme = 'custom';
+            if (accentColorPicker) accentColorPicker.value = color;
+            applyAllSettings();
             saveSettings();
         });
     });
@@ -225,126 +326,42 @@ function initializeSettings() {
         bgColorPicker.addEventListener('input', (e) => {
             currentSettings.bgColor = e.target.value;
             currentSettings.bgGradient = null;
-            document.body.style.background = e.target.value;
-            document.documentElement.style.setProperty('--bg-dark', e.target.value);
+            currentSettings.theme = 'custom';
+            applyAllSettings();
             saveSettings();
         });
     }
 
     // Background color presets
-    document.querySelectorAll('#background-tab .color-picker-container .color-preset').forEach(preset => {
-        preset.addEventListener('click', () => {
-            const color = preset.dataset.color;
-            document.querySelectorAll('#background-tab .color-picker-container .color-preset').forEach(p => p.classList.remove('active'));
-            preset.classList.add('active');
-            
+    document.querySelectorAll('.color-control-modern:nth-child(2) .color-dot').forEach(dot => {
+        dot.addEventListener('click', () => {
+            const color = dot.dataset.color;
             currentSettings.bgColor = color;
             currentSettings.bgGradient = null;
-            bgColorPicker.value = color;
-            document.body.style.background = color;
-            document.documentElement.style.setProperty('--bg-dark', color);
+            currentSettings.theme = 'custom';
+            if (bgColorPicker) bgColorPicker.value = color;
+            applyAllSettings();
             saveSettings();
         });
     });
 
-    // Gradient options
-    document.querySelectorAll('.gradient-option').forEach(option => {
-        option.addEventListener('click', () => {
-            const gradient = option.dataset.gradient;
+    // Gradient quick buttons
+    document.querySelectorAll('.gradient-quick-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const gradient = btn.dataset.gradient;
             currentSettings.bgGradient = gradient;
-            document.body.style.background = gradient;
-            document.documentElement.style.setProperty('--bg-dark', 'transparent');
+            currentSettings.theme = 'custom';
+            applyAllSettings();
             saveSettings();
+            showToast('Degradado aplicado');
         });
     });
 
-    // Custom gradient
-    const applyCustomGradient = document.getElementById('applyCustomGradient');
-    if (applyCustomGradient) {
-        applyCustomGradient.addEventListener('click', () => {
-            const color1 = document.getElementById('gradientColor1').value;
-            const color2 = document.getElementById('gradientColor2').value;
-            const angle = document.getElementById('gradientAngle').value;
-            
-            const gradient = `linear-gradient(${angle}deg, ${color1} 0%, ${color2} 100%)`;
-            currentSettings.bgGradient = gradient;
-            document.body.style.background = gradient;
-            document.documentElement.style.setProperty('--bg-dark', 'transparent');
-            saveSettings();
-        });
-    }
-
-    // Theme cards
-    const themeConfigs = {
-        default: {
-            accentColor: '#9d4edd',
-            bgColor: '#1a1625',
-            textColor: '#f3f0ff',
-            bgGradient: null
-        },
-        dark: {
-            accentColor: '#ffffff',
-            bgColor: '#000000',
-            textColor: '#ffffff',
-            bgGradient: null
-        },
-        ocean: {
-            accentColor: '#0ea5e9',
-            bgColor: '#0c4a6e',
-            textColor: '#e0f2fe',
-            bgGradient: null
-        },
-        forest: {
-            accentColor: '#10b981',
-            bgColor: '#064e3b',
-            textColor: '#d1fae5',
-            bgGradient: null
-        },
-        sunset: {
-            accentColor: '#f59e0b',
-            bgColor: '#78350f',
-            textColor: '#fef3c7',
-            bgGradient: null
-        },
-        rose: {
-            accentColor: '#ec4899',
-            bgColor: '#831843',
-            textColor: '#fce7f3',
-            bgGradient: null
-        },
-        minimal: {
-            accentColor: '#6b7280',
-            bgColor: '#f3f4f6',
-            textColor: '#111827',
-            bgGradient: null
-        },
-        neon: {
-            accentColor: '#22d3ee',
-            bgColor: '#0f172a',
-            textColor: '#67e8f9',
-            bgGradient: null
-        }
-    };
-
-    document.querySelectorAll('.theme-card').forEach(card => {
+    // Theme cards - both popular and regular
+    document.querySelectorAll('[data-theme]').forEach(card => {
         card.addEventListener('click', () => {
             const themeName = card.dataset.theme;
-            const theme = themeConfigs[themeName];
-            
-            if (theme) {
-                document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('active'));
-                card.classList.add('active');
-                
-                currentSettings.theme = themeName;
-                currentSettings.accentColor = theme.accentColor;
-                currentSettings.bgColor = theme.bgColor;
-                currentSettings.textColor = theme.textColor;
-                currentSettings.bgGradient = theme.bgGradient;
-                
-                applyAllSettings();
-                updateSettingsUI();
-                saveSettings();
-            }
+            applyTheme(themeName);
         });
     });
 
@@ -357,6 +374,7 @@ function initializeSettings() {
                 applyAllSettings();
                 updateSettingsUI();
                 saveSettings();
+                showToast('Configuración restaurada');
             }
         });
     }
@@ -369,6 +387,25 @@ function initializeSettings() {
             overlay.addEventListener('click', closeSettingsModal);
         }
     }
+    
+    // Add CSS animations
+    addAnimationStyles();
+}
+
+// Add animation styles dynamically
+function addAnimationStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // Initialize when DOM is ready
@@ -377,3 +414,7 @@ if (document.readyState === 'loading') {
 } else {
     initializeSettings();
 }
+
+// Expose functions globally
+window.openSettingsModal = openSettingsModal;
+window.closeSettingsModal = closeSettingsModal;
