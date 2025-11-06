@@ -20,7 +20,14 @@ Preferred communication style: Simple, everyday language.
 - Pure HTML5, CSS3, and vanilla JavaScript (no framework dependencies)
 - Modern ES6+ modules for code organization
 - Responsive design with mobile-first approach
-- Progressive Web App (PWA) capabilities
+- **Progressive Web App (PWA)** with complete installation capabilities:
+  - Professional install banner on both main site and ULTRA platform
+  - Service Workers for offline functionality and caching
+  - Web App Manifests with custom app icons
+  - Installable as native-like app on mobile devices
+  - Smart caching strategy that ignores query string parameters
+  - Banner auto-displays after 3 seconds on compatible browsers
+  - 7-day dismissal memory to avoid annoying users
 
 **Design System:**
 - **Main Site**: Orange (#ff9933) and blue gradient theme with professional sports aesthetics
@@ -46,6 +53,13 @@ Preferred communication style: Simple, everyday language.
 - Comments and social interaction features
 - Picture-in-picture video player for floating stream viewing
 - Cookie consent banner (GDPR compliant)
+- **PWA Install Banner**:
+  - Modern gradient purple design with smooth animations
+  - Custom app icon (ULTRAGOL branded soccer ball with fire effects)
+  - "Instalar App" button triggers native browser installation
+  - Fully responsive for mobile and desktop
+  - Separate banners for main site and ULTRA platform
+  - localStorage-based dismissal tracking
 - **Settings/Configuration System** (Live Chat):
   - Professional settings modal with gray, white, and black color scheme
   - Typography customization: font family, size, and weight selection
