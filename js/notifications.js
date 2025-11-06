@@ -182,7 +182,8 @@ class NotificationManager {
 
     async getTeams() {
         try {
-            const response = await fetch('/api/ultragol/equipos');
+            // Llamar directamente a la API externa
+            const response = await fetch('https://ultragol-api3.onrender.com/Equipos');
             if (response.ok) {
                 return await response.json();
             }
@@ -192,7 +193,14 @@ class NotificationManager {
             return await fallbackResponse.json();
         } catch (error) {
             console.error('Error loading teams:', error);
-            return [];
+            // Try local fallback
+            try {
+                const fallbackResponse = await fetch('data/teams.json');
+                return await fallbackResponse.json();
+            } catch (fallbackError) {
+                console.error('Error loading fallback teams:', fallbackError);
+                return [];
+            }
         }
     }
 
@@ -225,13 +233,15 @@ class NotificationManager {
 
     async checkForNotifications() {
         try {
-            const response = await fetch('/api/ultragol/notificaciones');
+            // Llamar directamente a la API externa
+            const response = await fetch('https://ultragol-api3.onrender.com/notificaciones');
             if (!response.ok) {
                 console.error('Error fetching notifications:', response.status);
                 return;
             }
 
-            const notifications = await response.json();
+            const data = await response.json();
+            const notifications = data.notificaciones || [];
             
             // Filter notifications for selected team
             const teamNotifications = notifications.filter(notif => {

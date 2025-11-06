@@ -70,6 +70,18 @@ Preferred communication style: Simple, everyday language.
   - Real-time preview of all changes
   - Settings persistence using localStorage
   - Accessible via gear icon in chat toolbar
+- **Push Notification System**:
+  - Permission request modal appears 3 seconds after page load
+  - Team selector modal to choose favorite team
+  - Real-time notifications from https://ultragol-api3.onrender.com/notificaciones API
+  - Automatic polling every 60 seconds for new notifications
+  - Smart filtering: only shows notifications for user's selected team
+  - Browser notification API integration with custom icons and badges
+  - localStorage persistence for preferences and last notification ID
+  - Fully client-side implementation (works on static GitHub Pages)
+  - Available on both main site and ULTRA platform
+  - Toast messages for user feedback
+  - Welcome notification on first activation
 
 ### Backend Architecture
 
