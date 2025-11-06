@@ -1,0 +1,311 @@
+/* UltraGol Notifications Styles */
+
+.notification-permission-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.notification-modal-content {
+    position: relative;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.notification-modal-content.show {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.notification-modal-header {
+    text-align: center;
+    padding: 30px 30px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.notification-icon {
+    font-size: 48px;
+    color: #ff6b35;
+    margin-bottom: 15px;
+    animation: bellRing 2s ease-in-out infinite;
+}
+
+@keyframes bellRing {
+    0%, 100% { transform: rotate(0deg); }
+    10%, 30%, 50%, 70%, 90% { transform: rotate(10deg); }
+    20%, 40%, 60%, 80% { transform: rotate(-10deg); }
+}
+
+.notification-modal-header h2 {
+    color: #fff;
+    font-size: 24px;
+    margin: 0;
+    font-weight: 700;
+}
+
+.notification-modal-body {
+    padding: 30px;
+}
+
+.notification-modal-body p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.notification-modal-body ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.notification-modal-body ul li {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 15px;
+    padding: 12px 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.notification-modal-body ul li i {
+    color: #ff6b35;
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+.notification-privacy {
+    background: rgba(255, 107, 53, 0.1);
+    border-left: 3px solid #ff6b35;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 20px;
+}
+
+.notification-modal-footer {
+    padding: 20px 30px 30px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.notification-modal-footer button {
+    flex: 1;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+/* Team Selector Styles */
+.team-selector .notification-modal-body {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.team-option {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.team-option:hover {
+    background: rgba(255, 107, 53, 0.1);
+    border-color: #ff6b35;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
+}
+
+.team-option img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.team-option span {
+    display: block;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* Toast Notifications */
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 10001;
+    transform: translateX(400px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.notification-toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.notification-toast.success {
+    border-left: 4px solid #28a745;
+}
+
+.notification-toast.info {
+    border-left: 4px solid #17a2b8;
+}
+
+.notification-toast i {
+    font-size: 20px;
+}
+
+.notification-toast.success i {
+    color: #28a745;
+}
+
+.notification-toast.info i {
+    color: #17a2b8;
+}
+
+/* Scrollbar Styles */
+.team-selector .notification-modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.team-selector .notification-modal-body::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.team-selector .notification-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 107, 53, 0.5);
+    border-radius: 4px;
+}
+
+.team-selector .notification-modal-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 107, 53, 0.7);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .notification-modal-content {
+        max-width: 95%;
+    }
+    
+    .notification-modal-header h2 {
+        font-size: 20px;
+    }
+    
+    .notification-icon {
+        font-size: 40px;
+    }
+    
+    .teams-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+    }
+    
+    .team-option img {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .team-option span {
+        font-size: 11px;
+    }
+    
+    .notification-modal-footer {
+        flex-direction: column;
+    }
+    
+    .notification-toast {
+        right: 10px;
+        left: 10px;
+        top: 10px;
+    }
+}
+
+/* Animation for modal entrance */
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
