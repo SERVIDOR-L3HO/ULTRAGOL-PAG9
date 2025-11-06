@@ -1,0 +1,32 @@
+{
+  "name": "UltraGol - Plataforma Deportiva",
+  "short_name": "UltraGol",
+  "description": "La plataforma más avanzada para seguir la Liga MX. Estadísticas en tiempo real, análisis profesional y la mejor experiencia de usuario.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#0f3460",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "favicon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["sports", "entertainment"],
+  "screenshots": [
+    {
+      "src": "favicon.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ]
+}

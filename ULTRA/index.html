@@ -7,6 +7,14 @@
     <title>ULTRAGOL - Live Streaming</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="pwa-install-banner.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e94560">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="UltraGol LIVE">
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3612607805789879"
@@ -401,5 +409,30 @@
     </div>
 
     <script src="app.js"></script>
+    
+    <!-- PWA Install Banner -->
+    <div id="pwa-install-banner" class="pwa-install-banner">
+        <div class="pwa-banner-content">
+            <div class="pwa-banner-icon">
+                <img src="favicon.png" alt="UltraGol LIVE">
+            </div>
+            <div class="pwa-banner-text">
+                <h3 class="pwa-banner-title">Instalar UltraGol LIVE</h3>
+                <p class="pwa-banner-description">Accede más rápido a tus partidos en vivo</p>
+            </div>
+        </div>
+        <div class="pwa-banner-actions">
+            <button class="pwa-install-btn" onclick="installPWA()">
+                <i class="fas fa-download"></i>
+                Instalar App
+            </button>
+            <button class="pwa-close-btn" onclick="closePWABanner()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- PWA Install Script -->
+    <script src="pwa-install.js"></script>
 </body>
 </html>
