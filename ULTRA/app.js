@@ -844,17 +844,18 @@ async function performSearch(query) {
         clearBtn.style.display = query.length > 0 ? 'block' : 'none';
     }
     
-    resultsContainer.innerHTML = '<div class="search-loading"><div class="spinner"></div><p>Buscando...</p></div>';
+    resultsContainer.innerHTML = '<div class="search-loading"><div class="spinner"></div><p>Buscando en todo UltraGol...</p></div>';
     
     const searchTerm = query.toLowerCase().trim();
     const results = {
         matches: [],
         teams: [],
         leagues: [],
-        news: []
+        importantMatches: [],
+        liveMatches: []
     };
     
-    // Buscar en partidos
+    // Buscar en partidos de marcadores
     if (marcadoresData && marcadoresData.partidos) {
         results.matches = marcadoresData.partidos.filter(partido => {
             const localName = partido.local?.nombreCorto?.toLowerCase() || '';
@@ -867,6 +868,23 @@ async function performSearch(query) {
                    localFullName.includes(searchTerm) ||
                    visitanteFullName.includes(searchTerm);
         });
+        
+        // Separar partidos en vivo
+        results.liveMatches = results.matches.filter(p => p.estado?.enVivo);
+    }
+    
+    // Buscar en partidos importantes (transmisiones)
+    if (transmisionesData && transmisionesData.transmisiones) {
+        results.importantMatches = transmisionesData.transmisiones.filter(transmision => {
+            const titulo = transmision.titulo?.toLowerCase() || '';
+            const liga = transmision.liga?.toLowerCase() || '';
+            const estado = transmision.estado?.toLowerCase() || '';
+            
+            return titulo.includes(searchTerm) || 
+                   liga.includes(searchTerm) ||
+                   (searchTerm === 'vivo' && (estado.includes('vivo') || estado.includes('live'))) ||
+                   (searchTerm === 'en vivo' && (estado.includes('vivo') || estado.includes('live')));
+        }).slice(0, 10);
     }
     
     // Buscar equipos únicos
@@ -891,11 +909,11 @@ async function performSearch(query) {
                 }));
             }
         });
-        results.teams = Array.from(teamsSet).map(t => JSON.parse(t)).slice(0, 5);
+        results.teams = Array.from(teamsSet).map(t => JSON.parse(t)).slice(0, 6);
     }
     
     // Buscar ligas
-    const leagues = ['Liga MX', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1'];
+    const leagues = ['Liga MX', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Champions League', 'Copa Libertadores'];
     results.leagues = leagues.filter(league => league.toLowerCase().includes(searchTerm));
     
     // Mostrar resultados
@@ -906,7 +924,7 @@ function displaySearchResults(results, query) {
     const resultsContainer = document.getElementById('searchResults');
     let html = '';
     
-    const totalResults = results.matches.length + results.teams.length + results.leagues.length;
+    const totalResults = results.matches.length + results.teams.length + results.leagues.length + results.importantMatches.length;
     
     if (totalResults === 0) {
         resultsContainer.innerHTML = `
@@ -927,6 +945,9 @@ function displaySearchResults(results, query) {
                     <span class="search-tag" onclick="quickSearch('Chivas')">
                         <i class="fas fa-shield-alt"></i> Chivas
                     </span>
+                    <span class="search-tag" onclick="quickSearch('en vivo')">
+                        <i class="fas fa-circle"></i> En Vivo
+                    </span>
                 </div>
             </div>
         `;
@@ -934,15 +955,102 @@ function displaySearchResults(results, query) {
     }
     
     html += `<div class="search-results-header">
-        <i class="fas fa-check-circle"></i> ${totalResults} resultado${totalResults !== 1 ? 's' : ''} encontrado${totalResults !== 1 ? 's' : ''}
+        <div class="search-results-icon">
+            <i class="fas fa-trophy"></i>
+        </div>
+        <div class="search-results-text">
+            <div class="search-results-title">${totalResults} Resultado${totalResults !== 1 ? 's' : ''} Encontrado${totalResults !== 1 ? 's' : ''}</div>
+            <div class="search-results-subtitle">Búsqueda: "${query}"</div>
+        </div>
     </div>`;
+    
+    // Mostrar partidos en vivo primero (destacados)
+    if (results.liveMatches && results.liveMatches.length > 0) {
+        html += `<div class="search-section search-section-featured">
+            <div class="search-section-title">
+                <div class="search-section-icon live-pulse">
+                    <i class="fas fa-circle"></i>
+                </div>
+                <span>EN VIVO AHORA</span>
+                <span class="search-section-badge">${results.liveMatches.length}</span>
+            </div>`;
+        
+        results.liveMatches.forEach(partido => {
+            const hora = formatearHora(partido.fecha);
+            html += `
+                <div class="search-match-card search-match-live" onclick="selectMatchFromSearch('${partido.id}')">
+                    <div class="search-match-live-indicator">
+                        <span class="live-dot-pulse"></span>
+                        <span>EN VIVO</span>
+                    </div>
+                    <div class="search-match-teams">
+                        <div class="search-match-team">
+                            <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" onerror="this.src='https://via.placeholder.com/40'">
+                            <span>${partido.local.nombreCorto}</span>
+                        </div>
+                        <div class="search-match-score-big">
+                            <span class="score-num">${partido.local.marcador}</span>
+                            <span class="score-sep">-</span>
+                            <span class="score-num">${partido.visitante.marcador}</span>
+                        </div>
+                        <div class="search-match-team">
+                            <span>${partido.visitante.nombreCorto}</span>
+                            <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" onerror="this.src='https://via.placeholder.com/40'">
+                        </div>
+                    </div>
+                    <div class="search-match-time">${partido.reloj || 'EN VIVO'}</div>
+                </div>`;
+        });
+        
+        html += `</div>`;
+    }
+    
+    // Mostrar partidos importantes/transmisiones
+    if (results.importantMatches.length > 0) {
+        html += `<div class="search-section">
+            <div class="search-section-title">
+                <div class="search-section-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <span>Partidos Importantes</span>
+                <span class="search-section-badge">${results.importantMatches.length}</span>
+            </div>`;
+        
+        results.importantMatches.forEach((transmision, index) => {
+            const isLive = transmision.estado?.toLowerCase().includes('vivo') || transmision.estado?.toLowerCase().includes('live');
+            const canalesCount = transmision.canales?.length || 0;
+            
+            html += `
+                <div class="search-important-card ${isLive ? 'is-live' : ''}" onclick="selectImportantMatch(${index})">
+                    <div class="search-important-header">
+                        <div class="search-important-title">${transmision.titulo}</div>
+                        ${isLive ? '<span class="search-status-badge live"><i class="fas fa-circle"></i> EN VIVO</span>' : ''}
+                    </div>
+                    <div class="search-important-meta">
+                        <span class="search-important-liga">
+                            <i class="fas fa-trophy"></i> ${transmision.liga || 'Liga MX'}
+                        </span>
+                        ${canalesCount > 0 ? `
+                            <span class="search-important-channels">
+                                <i class="fas fa-tv"></i> ${canalesCount} canal${canalesCount !== 1 ? 'es' : ''}
+                            </span>
+                        ` : '<span class="search-important-channels-none">Sin canales disponibles</span>'}
+                    </div>
+                </div>`;
+        });
+        
+        html += `</div>`;
+    }
     
     // Mostrar equipos
     if (results.teams.length > 0) {
         html += `<div class="search-section">
             <div class="search-section-title">
-                <i class="fas fa-shield-alt"></i>
-                <span>Equipos (${results.teams.length})</span>
+                <div class="search-section-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <span>Equipos</span>
+                <span class="search-section-badge">${results.teams.length}</span>
             </div>
             <div class="search-teams-grid">`;
         
@@ -1038,6 +1146,20 @@ function selectMatchFromSearch(matchId) {
         selectMatch(matchId);
     } else {
         showToast('Este partido aún no está disponible para transmisión');
+    }
+}
+
+function selectImportantMatch(index) {
+    closeSearchModal();
+    if (!transmisionesData || !transmisionesData.transmisiones) return;
+    
+    const transmision = transmisionesData.transmisiones[index];
+    if (!transmision) return;
+    
+    if (transmision.canales && transmision.canales.length > 0) {
+        showChannelSelector(transmision);
+    } else {
+        showToast('No hay canales disponibles para este partido');
     }
 }
 
