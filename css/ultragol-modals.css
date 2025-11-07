@@ -1,0 +1,678 @@
+/* ==================== ULTRAGOL MODALS STYLES ==================== */
+/* Estilos compartidos para modales en todo el sitio */
+
+:root {
+    --primary: #FF4500;
+    --secondary: #1a1a1a;
+    --dark: #0d0d0d;
+    --accent: #FF6B35;
+    --text: #ffffff;
+    --text-muted: #999;
+    --card-bg: rgba(26, 26, 26, 0.95);
+    --border: rgba(255, 255, 255, 0.1);
+}
+
+/* ==================== MODAL DE REPRODUCCIÓN ==================== */
+.ultragol-player-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+}
+
+.ultragol-player-modal.active {
+    display: flex;
+}
+
+.ultragol-modal-content {
+    width: 95%;
+    max-width: 900px;
+    background: var(--secondary);
+    border-radius: 20px;
+    overflow: hidden;
+    animation: modalIn 0.3s ease;
+}
+
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.ultragol-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13, 13, 13, 0.95);
+}
+
+.ultragol-modal-header h3 {
+    font-size: 18px;
+    color: var(--text);
+    margin: 0;
+}
+
+.ultragol-close-modal {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.3s ease;
+}
+
+.ultragol-close-modal:hover {
+    background: var(--primary);
+    transform: scale(1.1);
+}
+
+.ultragol-modal-body {
+    position: relative;
+    height: 500px;
+    background: black;
+}
+
+.ultragol-loading-spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    z-index: 1;
+}
+
+.ultragol-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.ultragol-modal-body iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.ultragol-modal-footer {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    background: rgba(13, 13, 13, 0.95);
+}
+
+.ultragol-modal-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 12px;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ultragol-modal-btn:hover {
+    background: var(--primary);
+    transform: scale(1.05);
+}
+
+/* ==================== MODAL DE SELECCIÓN DE CANALES ==================== */
+.ultragol-channel-selector-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+}
+
+.ultragol-channel-selector-modal.active {
+    display: flex;
+}
+
+.ultragol-channel-selector-content {
+    width: 95%;
+    max-width: 600px;
+    max-height: 80vh;
+    background: var(--secondary);
+    border-radius: 20px;
+    overflow: hidden;
+    animation: modalIn 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.ultragol-channel-selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(13, 13, 13, 0.95);
+}
+
+.ultragol-channel-selector-header h3 {
+    font-size: 18px;
+    color: var(--text);
+    margin: 0;
+}
+
+.ultragol-channel-selector-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.ultragol-channel-option {
+    background: rgba(26, 26, 26, 0.8);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+}
+
+.ultragol-channel-option:hover {
+    background: rgba(26, 26, 26, 0.95);
+    border-color: var(--primary);
+    transform: translateX(5px);
+}
+
+.ultragol-channel-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.ultragol-channel-number {
+    background: var(--primary);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.ultragol-channel-name {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.ultragol-stream-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ultragol-stream-option-btn {
+    background: rgba(255, 69, 0, 0.15);
+    border: 1px solid var(--primary);
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ultragol-stream-option-btn:hover {
+    background: var(--primary);
+    transform: scale(1.05);
+}
+
+/* ==================== MODAL PARTIDOS IMPORTANTES ==================== */
+.ultragol-important-matches-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.ultragol-important-matches-modal.active {
+    display: flex;
+}
+
+.ultragol-important-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.96);
+    backdrop-filter: blur(12px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.ultragol-important-modal-container {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 
+        0 24px 64px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(255, 69, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ultragol-important-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid rgba(255, 69, 0, 0.2);
+    background: linear-gradient(135deg, rgba(255, 69, 0, 0.1) 0%, rgba(255, 107, 53, 0.05) 100%);
+}
+
+.ultragol-important-modal-header-content {
+    flex: 1;
+}
+
+.ultragol-important-modal-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.ultragol-important-modal-title {
+    font-size: 20px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #FF4500 0%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+.ultragol-important-modal-subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
+}
+
+.ultragol-close-important-modal {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.3s ease;
+}
+
+.ultragol-close-important-modal:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    transform: scale(1.1);
+}
+
+.ultragol-important-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.ultragol-loading-matches {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 20px;
+}
+
+.ultragol-loading-matches p {
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Tarjetas de partidos importantes */
+.ultragol-important-match-card {
+    background: #1a1a1a;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ultragol-important-match-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(255, 69, 0, 0.4);
+    border-color: rgba(255, 69, 0, 0.5);
+}
+
+.ultragol-match-image-container {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+}
+
+.ultragol-match-bg-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ultragol-match-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 0%, rgba(26, 26, 26, 0.95) 100%);
+}
+
+.ultragol-match-info-container {
+    padding: 16px;
+}
+
+.ultragol-match-badges {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.ultragol-league-badge {
+    background: rgba(255, 69, 0, 0.2);
+    color: var(--primary);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.ultragol-status-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ultragol-status-badge.live {
+    background: var(--primary);
+    color: white;
+}
+
+.ultragol-status-badge.upcoming {
+    background: rgba(255, 165, 0, 0.2);
+    color: #FFA500;
+}
+
+.ultragol-status-badge .live-dot {
+    width: 6px;
+    height: 6px;
+    background: currentColor;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+.ultragol-match-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 12px 0;
+    line-height: 1.3;
+}
+
+.ultragol-match-date {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ultragol-match-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.ultragol-channel-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.ultragol-btn-ver {
+    background: var(--primary);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ultragol-btn-ver:hover {
+    background: var(--accent);
+    transform: scale(1.05);
+}
+
+.ultragol-no-channels-text {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-style: italic;
+}
+
+/* ==================== BOTÓN PARTIDOS IMPORTANTES ==================== */
+.ultragol-important-matches-btn-container {
+    padding: 15px;
+    margin-top: 10px;
+}
+
+.ultragol-important-matches-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #FF4500 0%, #FF6B35 50%, #FFD700 100%);
+    border: none;
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 
+        0 8px 24px rgba(255, 69, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.ultragol-important-matches-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(255, 255, 255, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    from { transform: rotate(45deg) translateY(-100%); }
+    to { transform: rotate(45deg) translateY(100%); }
+}
+
+.ultragol-important-matches-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 12px 32px rgba(255, 69, 0, 0.6),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.ultragol-important-matches-btn:active {
+    transform: translateY(-1px);
+}
+
+.ultragol-btn-icon-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 24px;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.ultragol-btn-icon-wrapper i:first-child {
+    color: #FFD700;
+    animation: starPulse 2s infinite;
+}
+
+@keyframes starPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+.ultragol-btn-text-wrapper {
+    flex: 1;
+    text-align: left;
+    position: relative;
+    z-index: 1;
+}
+
+.ultragol-btn-title {
+    display: block;
+    font-size: 15px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.ultragol-btn-subtitle {
+    display: block;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 4px;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.ultragol-btn-arrow {
+    font-size: 20px;
+    color: white;
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.ultragol-important-matches-btn:hover .ultragol-btn-arrow {
+    transform: translateX(5px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ultragol-modal-content {
+        width: 98%;
+        max-width: 100%;
+    }
+
+    .ultragol-modal-body {
+        height: 400px;
+    }
+
+    .ultragol-channel-selector-content {
+        width: 98%;
+    }
+
+    .ultragol-important-modal-container {
+        max-width: 100%;
+        border-radius: 20px;
+    }
+
+    .ultragol-match-image-container {
+        height: 150px;
+    }
+}
