@@ -1522,5 +1522,51 @@
     
     <!-- Notifications System -->
     <script src="js/notifications.js"></script>
+    
+    <!-- Service Worker Registration with Auto-Update -->
+    <script>
+    if ('serviceWorker' in navigator) {
+      // Registrar el Service Worker con versión
+      navigator.serviceWorker.register('/sw.js?v=1')
+        .then(registration => {
+          console.log('✅ Service Worker registrado:', registration.scope);
+          
+          // Verificar actualizaciones cada 60 segundos
+          setInterval(() => {
+            registration.update();
+          }, 60000);
+          
+          // Escuchar cuando hay un nuevo Service Worker esperando
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            console.log('🔄 Nueva versión del Service Worker encontrada');
+            
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('✨ Nueva versión lista. La página se recargará automáticamente...');
+                // Esperar 1 segundo antes de recargar para que el usuario vea el mensaje
+                setTimeout(() => {
+                  window.location.reload();
+                }, 1000);
+              }
+            });
+          });
+        })
+        .catch(err => console.error('❌ Error al registrar el SW:', err));
+
+      // Si hay nueva versión del Service Worker, recarga automáticamente
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        console.log('🔄 Service Worker actualizado. Recargando página...');
+        window.location.reload();
+      });
+      
+      // Escuchar mensajes del Service Worker
+      navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data && event.data.type === 'CACHE_UPDATED') {
+          console.log('📦 Caché actualizada a versión:', event.data.version);
+        }
+      });
+    }
+    </script>
 </body>
 </html>

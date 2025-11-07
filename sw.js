@@ -1,4 +1,6 @@
+// IMPORTANTE: Cambiar la versión cada vez que hagas actualizaciones
 const CACHE_NAME = 'ultragol-v1';
+
 const urlsToCache = [
   '/',
   '/index.html',
@@ -11,60 +13,82 @@ const urlsToCache = [
   '/css/gemini-chat.css',
   '/css/live-scoreboard.css',
   '/css/pwa-install-banner.css',
+  '/css/notifications.css',
   '/js/main.js',
   '/js/firebase-config.js',
   '/js/firebase-auth.js',
   '/js/gemini-chat.js',
   '/js/pwa-install.js',
-  '/favicon.png'
+  '/js/notifications.js',
+  '/favicon.png',
+  '/app-icon.png',
+  '/manifest.json'
 ];
 
-self.addEventListener('install', (event) => {
+// Instala y cachea los archivos
+self.addEventListener('install', event => {
+  console.log('[Service Worker] Instalando versión:', CACHE_NAME);
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(urlsToCache.map(url => new Request(url, {cache: 'reload'})))
-          .catch(err => {
-            console.log('Cache addAll error:', err);
-          });
+      .then(cache => {
+        console.log('[Service Worker] Cacheando archivos');
+        return cache.addAll(urlsToCache);
       })
-  );
-  self.skipWaiting();
-});
-
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request, { ignoreSearch: true })
-      .then((response) => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-          }
-          return networkResponse;
-        }).catch(() => {
-          return caches.match(event.request, { ignoreSearch: true });
-        });
+      .then(() => {
+        console.log('[Service Worker] Todos los archivos cacheados correctamente');
+        return self.skipWaiting(); // Activa el nuevo SW inmediatamente
+      })
+      .catch(err => {
+        console.error('[Service Worker] Error al cachear archivos:', err);
       })
   );
 });
 
-self.addEventListener('activate', (event) => {
+// Activa y elimina la caché vieja
+self.addEventListener('activate', event => {
+  console.log('[Service Worker] Activando nueva versión:', CACHE_NAME);
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
+    caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map((cacheName) => {
+        cacheNames.map(cacheName => {
           if (cacheName !== CACHE_NAME) {
+            console.log('[Service Worker] Eliminando caché antigua:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
+    }).then(() => {
+      console.log('[Service Worker] Caché actualizada correctamente');
+      return self.clients.claim(); // Toma control de todas las páginas inmediatamente
     })
   );
-  return self.clients.claim();
+});
+
+// Intercepta peticiones y sirve desde caché o red
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        if (response) {
+          // Devuelve desde caché
+          return response;
+        }
+        
+        // Si no está en caché, busca en la red
+        return fetch(event.request).then(networkResponse => {
+          // Si la respuesta es válida, la cachea
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+          }
+          return networkResponse;
+        }).catch(err => {
+          console.log('[Service Worker] Error de red:', err);
+          // Intenta devolver desde caché como fallback
+          return caches.match(event.request);
+        });
+      })
+  );
 });
