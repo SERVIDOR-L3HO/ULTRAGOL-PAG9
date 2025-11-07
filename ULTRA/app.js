@@ -1529,11 +1529,11 @@ function renderImportantMatches() {
         
         let statusBadge = '';
         if (isLive) {
-            statusBadge = `<span class="status-badge status-live">EN VIVO</span>`;
+            statusBadge = `<span class="status-badge status-live"><span class="live-dot"></span> EN VIVO</span>`;
         } else if (isFinished) {
-            statusBadge = `<span class="status-badge status-finished">Finalizado</span>`;
+            statusBadge = `<span class="status-badge status-finished"><i class="fas fa-check-circle"></i> Finalizado</span>`;
         } else {
-            statusBadge = `<span class="status-badge status-upcoming"><i class="far fa-clock"></i> PRÓXIMO</span>`;
+            statusBadge = `<span class="status-badge status-upcoming">⏰ PRÓXIMO</span>`;
         }
         
         const deporte = transmision.deporte || 'Fútbol';
@@ -1571,20 +1571,26 @@ function renderImportantMatches() {
                     
                     <h3 class="match-title">${transmision.evento}</h3>
                     
-                    ${fecha ? `<div class="match-date"><i class="far fa-clock"></i> ${fecha}</div>` : ''}
+                    ${fecha ? `
+                        <div class="match-date">
+                            <i class="far fa-clock"></i> ${fecha}
+                        </div>
+                    ` : ''}
+                    
+                    ${canalesCount > 0 ? `
+                        <div class="match-channel">
+                            <i class="fas fa-tv"></i> Canal ${transmision.canales[0]?.numero || transmision.canales[0]?.nombre || transmision.canales[0]?.nombre || ''}
+                        </div>
+                    ` : `
+                        <div class="match-channel no-channel">
+                            <i class="fas fa-exclamation-circle"></i> Sin canales disponibles
+                        </div>
+                    `}
                     
                     <div class="match-footer">
-                        ${canalesCount > 0 ? `
-                            <div class="channel-info">
-                                <i class="fas fa-tv"></i>
-                                <span>Canal ${transmision.canales[0]?.numero || transmision.canales[0]?.nombre || ''}</span>
-                            </div>
-                            <button class="btn-ver">
-                                <i class="fas fa-play"></i> Ver
-                            </button>
-                        ` : `
-                            <div class="no-channels-text">Sin canales disponibles</div>
-                        `}
+                        <button class="btn-ver ${canalesCount === 0 ? 'btn-disabled' : ''}" ${canalesCount === 0 ? 'disabled' : ''}>
+                            <i class="fas fa-play"></i> Ver
+                        </button>
                     </div>
                 </div>
             </div>

@@ -2825,8 +2825,9 @@ body.dark-mode .news-content p {
 .match-footer {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 12px;
+    margin-top: 12px;
 }
 
 .channel-info {
@@ -2873,6 +2874,69 @@ body.dark-mode .news-content p {
     font-style: italic;
     text-align: center;
     width: 100%;
+}
+
+/* Estilos para la información del canal */
+.match-channel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 4px;
+    padding: 8px 12px;
+    background: rgba(255, 69, 0, 0.15);
+    border-radius: 8px;
+    border-left: 3px solid var(--primary);
+}
+
+.match-channel i {
+    color: var(--primary);
+    font-size: 14px;
+}
+
+.match-channel.no-channel {
+    background: rgba(255, 255, 255, 0.05);
+    border-left-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.match-channel.no-channel i {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Botón Ver deshabilitado */
+.btn-ver.btn-disabled {
+    background: linear-gradient(135deg, #666, #888);
+    cursor: not-allowed;
+    opacity: 0.5;
+    box-shadow: none;
+}
+
+.btn-ver.btn-disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Punto animado para EN VIVO */
+.live-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.3;
+        transform: scale(0.8);
+    }
 }
 
 .important-match-header {
