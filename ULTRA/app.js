@@ -766,9 +766,300 @@ function navTo(section, element) {
     }
 }
 
+// ==================== FUNCIONES DE BÚSQUEDA ====================
+
 function showSearchModal() {
-    showToast('Función de búsqueda próximamente');
+    const modal = document.getElementById('searchModal');
+    if (modal) {
+        modal.classList.add('active');
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            setTimeout(() => searchInput.focus(), 300);
+        }
+    }
 }
+
+function closeSearchModal() {
+    const modal = document.getElementById('searchModal');
+    if (modal) {
+        modal.classList.remove('active');
+        clearSearch();
+    }
+}
+
+function clearSearch() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+        showSearchWelcome();
+        document.querySelector('.clear-search-btn').style.display = 'none';
+    }
+}
+
+function quickSearch(term) {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = term;
+        performSearch(term);
+    }
+}
+
+function showSearchWelcome() {
+    const resultsContainer = document.getElementById('searchResults');
+    resultsContainer.innerHTML = `
+        <div class="search-welcome">
+            <div class="search-welcome-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h3>Busca en UltraGol</h3>
+            <p>Encuentra ligas, equipos, partidos en vivo y mucho más</p>
+            <div class="search-suggestions">
+                <span class="search-tag" onclick="quickSearch('Liga MX')">
+                    <i class="fas fa-futbol"></i> Liga MX
+                </span>
+                <span class="search-tag" onclick="quickSearch('América')">
+                    <i class="fas fa-shield-alt"></i> América
+                </span>
+                <span class="search-tag" onclick="quickSearch('Chivas')">
+                    <i class="fas fa-shield-alt"></i> Chivas
+                </span>
+                <span class="search-tag" onclick="quickSearch('en vivo')">
+                    <i class="fas fa-circle"></i> En Vivo
+                </span>
+            </div>
+        </div>
+    `;
+}
+
+async function performSearch(query) {
+    if (!query || query.trim() === '') {
+        showSearchWelcome();
+        return;
+    }
+    
+    const resultsContainer = document.getElementById('searchResults');
+    const clearBtn = document.querySelector('.clear-search-btn');
+    
+    if (clearBtn) {
+        clearBtn.style.display = query.length > 0 ? 'block' : 'none';
+    }
+    
+    resultsContainer.innerHTML = '<div class="search-loading"><div class="spinner"></div><p>Buscando...</p></div>';
+    
+    const searchTerm = query.toLowerCase().trim();
+    const results = {
+        matches: [],
+        teams: [],
+        leagues: [],
+        news: []
+    };
+    
+    // Buscar en partidos
+    if (marcadoresData && marcadoresData.partidos) {
+        results.matches = marcadoresData.partidos.filter(partido => {
+            const localName = partido.local?.nombreCorto?.toLowerCase() || '';
+            const visitanteName = partido.visitante?.nombreCorto?.toLowerCase() || '';
+            const localFullName = partido.local?.nombre?.toLowerCase() || '';
+            const visitanteFullName = partido.visitante?.nombre?.toLowerCase() || '';
+            
+            return localName.includes(searchTerm) || 
+                   visitanteName.includes(searchTerm) ||
+                   localFullName.includes(searchTerm) ||
+                   visitanteFullName.includes(searchTerm);
+        });
+    }
+    
+    // Buscar equipos únicos
+    if (marcadoresData && marcadoresData.partidos) {
+        const teamsSet = new Set();
+        marcadoresData.partidos.forEach(partido => {
+            const localName = partido.local?.nombreCorto?.toLowerCase() || '';
+            const visitanteName = partido.visitante?.nombreCorto?.toLowerCase() || '';
+            
+            if (localName.includes(searchTerm)) {
+                teamsSet.add(JSON.stringify({
+                    nombre: partido.local.nombreCorto,
+                    nombreCompleto: partido.local.nombre,
+                    logo: partido.local.logo
+                }));
+            }
+            if (visitanteName.includes(searchTerm)) {
+                teamsSet.add(JSON.stringify({
+                    nombre: partido.visitante.nombreCorto,
+                    nombreCompleto: partido.visitante.nombre,
+                    logo: partido.visitante.logo
+                }));
+            }
+        });
+        results.teams = Array.from(teamsSet).map(t => JSON.parse(t)).slice(0, 5);
+    }
+    
+    // Buscar ligas
+    const leagues = ['Liga MX', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1'];
+    results.leagues = leagues.filter(league => league.toLowerCase().includes(searchTerm));
+    
+    // Mostrar resultados
+    displaySearchResults(results, searchTerm);
+}
+
+function displaySearchResults(results, query) {
+    const resultsContainer = document.getElementById('searchResults');
+    let html = '';
+    
+    const totalResults = results.matches.length + results.teams.length + results.leagues.length;
+    
+    if (totalResults === 0) {
+        resultsContainer.innerHTML = `
+            <div class="search-no-results">
+                <div class="no-results-icon">
+                    <i class="fas fa-search-minus"></i>
+                </div>
+                <h3>No se encontraron resultados</h3>
+                <p>No encontramos resultados para "<strong>${query}</strong>"</p>
+                <p class="no-results-suggestion">Intenta buscar:</p>
+                <div class="search-suggestions">
+                    <span class="search-tag" onclick="quickSearch('Liga MX')">
+                        <i class="fas fa-futbol"></i> Liga MX
+                    </span>
+                    <span class="search-tag" onclick="quickSearch('América')">
+                        <i class="fas fa-shield-alt"></i> América
+                    </span>
+                    <span class="search-tag" onclick="quickSearch('Chivas')">
+                        <i class="fas fa-shield-alt"></i> Chivas
+                    </span>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    html += `<div class="search-results-header">
+        <i class="fas fa-check-circle"></i> ${totalResults} resultado${totalResults !== 1 ? 's' : ''} encontrado${totalResults !== 1 ? 's' : ''}
+    </div>`;
+    
+    // Mostrar equipos
+    if (results.teams.length > 0) {
+        html += `<div class="search-section">
+            <div class="search-section-title">
+                <i class="fas fa-shield-alt"></i>
+                <span>Equipos (${results.teams.length})</span>
+            </div>
+            <div class="search-teams-grid">`;
+        
+        results.teams.forEach(team => {
+            html += `
+                <div class="search-team-card" onclick="closeSearchModal()">
+                    <div class="search-team-logo">
+                        <img src="${team.logo}" alt="${team.nombre}" onerror="this.src='https://via.placeholder.com/60'">
+                    </div>
+                    <div class="search-team-info">
+                        <div class="search-team-name">${team.nombre}</div>
+                        <div class="search-team-full">${team.nombreCompleto}</div>
+                    </div>
+                </div>`;
+        });
+        
+        html += `</div></div>`;
+    }
+    
+    // Mostrar partidos
+    if (results.matches.length > 0) {
+        html += `<div class="search-section">
+            <div class="search-section-title">
+                <i class="fas fa-futbol"></i>
+                <span>Partidos (${results.matches.length})</span>
+            </div>`;
+        
+        results.matches.forEach(partido => {
+            const hora = formatearHora(partido.fecha);
+            let statusBadge = '';
+            
+            if (partido.estado?.enVivo) {
+                statusBadge = '<span class="search-status-badge live"><i class="fas fa-circle"></i> EN VIVO</span>';
+            } else if (partido.estado?.programado) {
+                statusBadge = `<span class="search-status-badge scheduled"><i class="far fa-clock"></i> ${hora}</span>`;
+            } else if (partido.estado?.finalizado) {
+                statusBadge = '<span class="search-status-badge finished"><i class="fas fa-check"></i> FINALIZADO</span>';
+            }
+            
+            html += `
+                <div class="search-match-card" onclick="selectMatchFromSearch('${partido.id}')">
+                    <div class="search-match-teams">
+                        <div class="search-match-team">
+                            <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" onerror="this.src='https://via.placeholder.com/40'">
+                            <span>${partido.local.nombreCorto}</span>
+                        </div>
+                        <div class="search-match-score">${partido.local.marcador} - ${partido.visitante.marcador}</div>
+                        <div class="search-match-team">
+                            <span>${partido.visitante.nombreCorto}</span>
+                            <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" onerror="this.src='https://via.placeholder.com/40'">
+                        </div>
+                    </div>
+                    ${statusBadge}
+                </div>`;
+        });
+        
+        html += `</div>`;
+    }
+    
+    // Mostrar ligas
+    if (results.leagues.length > 0) {
+        html += `<div class="search-section">
+            <div class="search-section-title">
+                <i class="fas fa-trophy"></i>
+                <span>Ligas (${results.leagues.length})</span>
+            </div>`;
+        
+        results.leagues.forEach(league => {
+            const isLigaMX = league === 'Liga MX';
+            html += `
+                <div class="search-league-card" onclick="${isLigaMX ? 'selectLeague(\'Liga MX\'); closeSearchModal();' : 'showLockedLeagueMessage(\'' + league + '\'); closeSearchModal();'}">
+                    <div class="search-league-icon ${isLigaMX ? 'active' : 'locked'}">
+                        <i class="fas ${isLigaMX ? 'fa-futbol' : 'fa-lock'}"></i>
+                    </div>
+                    <div class="search-league-info">
+                        <div class="search-league-name">${league}</div>
+                        <div class="search-league-status">${isLigaMX ? 'Disponible' : 'Próximamente'}</div>
+                    </div>
+                    ${!isLigaMX ? '<i class="fas fa-crown search-league-premium"></i>' : ''}
+                </div>`;
+        });
+        
+        html += `</div>`;
+    }
+    
+    resultsContainer.innerHTML = html;
+}
+
+function selectMatchFromSearch(matchId) {
+    closeSearchModal();
+    const partido = marcadoresData?.partidos?.find(p => p.id === matchId);
+    if (partido && partido.estado?.enVivo) {
+        selectMatch(matchId);
+    } else {
+        showToast('Este partido aún no está disponible para transmisión');
+    }
+}
+
+// Event listener para búsqueda en tiempo real
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        let searchTimeout;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                performSearch(e.target.value);
+            }, 300);
+        });
+        
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                performSearch(e.target.value);
+            }
+        });
+    }
+});
 
 function showToast(message) {
     const toast = document.createElement('div');

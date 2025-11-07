@@ -409,6 +409,48 @@
         </div>
     </div>
 
+    <!-- Modal de Búsqueda -->
+    <div id="searchModal" class="search-modal">
+        <div class="search-modal-overlay" onclick="closeSearchModal()"></div>
+        <div class="search-modal-container">
+            <div class="search-modal-header">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar ligas, equipos, partidos..." autocomplete="off">
+                    <button class="clear-search-btn" onclick="clearSearch()" style="display: none;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <button class="close-search-modal" onclick="closeSearchModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="search-modal-body" id="searchResults">
+                <div class="search-welcome">
+                    <div class="search-welcome-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>Busca en UltraGol</h3>
+                    <p>Encuentra ligas, equipos, partidos en vivo y mucho más</p>
+                    <div class="search-suggestions">
+                        <span class="search-tag" onclick="quickSearch('Liga MX')">
+                            <i class="fas fa-futbol"></i> Liga MX
+                        </span>
+                        <span class="search-tag" onclick="quickSearch('América')">
+                            <i class="fas fa-shield-alt"></i> América
+                        </span>
+                        <span class="search-tag" onclick="quickSearch('Chivas')">
+                            <i class="fas fa-shield-alt"></i> Chivas
+                        </span>
+                        <span class="search-tag" onclick="quickSearch('en vivo')">
+                            <i class="fas fa-circle"></i> En Vivo
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js?v=20251107"></script>
     
     <!-- PWA Install Banner -->
