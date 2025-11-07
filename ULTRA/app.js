@@ -1523,6 +1523,17 @@ function renderImportantMatches() {
         const equipoVisitante = equipos[1]?.trim() || 'Equipo 2';
         const canalesCount = transmision.canales?.length || 0;
         
+        let totalLinks = 0;
+        if (transmision.canales && transmision.canales.length > 0) {
+            transmision.canales.forEach(canal => {
+                if (canal.links) {
+                    if (canal.links.hoca) totalLinks++;
+                    if (canal.links.caster) totalLinks++;
+                    if (canal.links.wigi) totalLinks++;
+                }
+            });
+        }
+        
         const isLive = transmision.estado?.toLowerCase().includes('vivo') || transmision.estado?.toLowerCase().includes('live');
         const isUpcoming = transmision.estado?.toLowerCase().includes('próximo') || transmision.estado?.toLowerCase().includes('programado');
         const isFinished = transmision.estado?.toLowerCase().includes('finalizado') || transmision.estado?.toLowerCase().includes('finished');
@@ -1557,7 +1568,7 @@ function renderImportantMatches() {
         const inicialVisitante = equipoVisitante.substring(0, 2).toUpperCase();
         
         return `
-            <div class="important-match-card-new" onclick='${canalesCount > 0 ? `selectImportantMatchByTransmision(${index})` : `showToast("No hay canales disponibles para este partido")`}'>
+            <div class="important-match-card-new" onclick='selectImportantMatchByTransmision(${index})'>
                 <div class="match-image-container">
                     <img src="${backgroundImage}" alt="${deporte}" class="match-bg-image">
                     <div class="match-image-overlay"></div>
@@ -1582,13 +1593,13 @@ function renderImportantMatches() {
                             <i class="fas fa-tv"></i> Canal ${transmision.canales[0]?.numero || transmision.canales[0]?.nombre || transmision.canales[0]?.nombre || ''}
                         </div>
                     ` : `
-                        <div class="match-channel no-channel">
-                            <i class="fas fa-exclamation-circle"></i> Sin canales disponibles
+                        <div class="match-channel">
+                            <i class="fas fa-list"></i> Opciones ${totalLinks > 0 ? `#${totalLinks} links` : 'disponibles'}
                         </div>
                     `}
                     
                     <div class="match-footer">
-                        <button class="btn-ver ${canalesCount === 0 ? 'btn-disabled' : ''}" ${canalesCount === 0 ? 'disabled' : ''}>
+                        <button class="btn-ver">
                             <i class="fas fa-play"></i> Ver
                         </button>
                     </div>
@@ -1646,9 +1657,13 @@ function selectImportantMatchByTransmision(transmisionIndex) {
     
     const transmision = transmisionesData.transmisiones[transmisionIndex];
     
-    if (!transmision || !transmision.canales || transmision.canales.length === 0) {
-        showToast('No hay canales disponibles para este partido');
+    if (!transmision) {
+        showToast('No se pudo encontrar la transmisión');
         return;
+    }
+    
+    if (!transmision.canales || transmision.canales.length === 0) {
+        transmision.canales = [];
     }
     
     closeImportantMatchesModal();
