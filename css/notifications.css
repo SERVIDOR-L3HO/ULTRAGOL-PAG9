@@ -1,4 +1,4 @@
-/* UltraGol Notifications Styles */
+/* UltraGol Notifications Styles - Premium Edition */
 
 .notification-permission-modal {
     position: fixed;
@@ -10,6 +10,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .notification-modal-overlay {
@@ -18,51 +24,96 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(5px);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
 }
 
 .notification-modal-content {
     position: relative;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-radius: 20px;
-    max-width: 500px;
-    width: 90%;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    transform: scale(0.9);
+    background: linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%);
+    border-radius: 24px;
+    max-width: 520px;
+    width: 92%;
+    box-shadow: 
+        0 25px 70px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(255, 107, 53, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transform: scale(0.85) translateY(30px);
     opacity: 0;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+}
+
+.notification-modal-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #FF4500, #FF6B35, #FF8C42, #FF6B35, #FF4500);
+    background-size: 200% 100%;
+    animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
 }
 
 .notification-modal-content.show {
-    transform: scale(1);
+    transform: scale(1) translateY(0);
     opacity: 1;
 }
 
 .notification-modal-header {
     text-align: center;
-    padding: 30px 30px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 40px 30px 25px;
+    position: relative;
+}
+
+.notification-modal-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #FF6B35, transparent);
+    border-radius: 2px;
 }
 
 .notification-icon {
-    font-size: 48px;
-    color: #ff6b35;
-    margin-bottom: 15px;
-    animation: bellRing 2s ease-in-out infinite;
+    font-size: 52px;
+    background: linear-gradient(135deg, #FF4500, #FF6B35);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 18px;
+    display: inline-block;
+    animation: bellRing 2.5s ease-in-out infinite, glow 2s ease-in-out infinite;
+    filter: drop-shadow(0 4px 12px rgba(255, 107, 53, 0.4));
 }
 
 @keyframes bellRing {
     0%, 100% { transform: rotate(0deg); }
-    10%, 30%, 50%, 70%, 90% { transform: rotate(10deg); }
-    20%, 40%, 60%, 80% { transform: rotate(-10deg); }
+    10%, 30%, 50%, 70%, 90% { transform: rotate(12deg); }
+    20%, 40%, 60%, 80% { transform: rotate(-12deg); }
+}
+
+@keyframes glow {
+    0%, 100% { filter: drop-shadow(0 4px 12px rgba(255, 107, 53, 0.4)); }
+    50% { filter: drop-shadow(0 4px 20px rgba(255, 107, 53, 0.7)); }
 }
 
 .notification-modal-header h2 {
     color: #fff;
-    font-size: 24px;
+    font-size: 26px;
     margin: 0;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .notification-modal-body {
@@ -70,86 +121,143 @@
 }
 
 .notification-modal-body p {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 16px;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 15px;
     margin-bottom: 20px;
-    line-height: 1.6;
+    line-height: 1.7;
+    text-align: center;
 }
 
 .notification-modal-body ul {
     list-style: none;
     padding: 0;
-    margin: 20px 0;
+    margin: 25px 0;
 }
 
 .notification-modal-body ul li {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.9);
     font-size: 15px;
-    padding: 12px 0;
+    padding: 14px 18px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.notification-modal-body ul li:hover {
+    background: rgba(255, 107, 53, 0.08);
+    border-color: rgba(255, 107, 53, 0.3);
+    transform: translateX(5px);
 }
 
 .notification-modal-body ul li i {
-    color: #ff6b35;
-    font-size: 18px;
-    width: 24px;
+    color: #FF6B35;
+    font-size: 20px;
+    width: 28px;
     text-align: center;
+    filter: drop-shadow(0 0 8px rgba(255, 107, 53, 0.5));
 }
 
 .notification-privacy {
-    background: rgba(255, 107, 53, 0.1);
-    border-left: 3px solid #ff6b35;
-    padding: 12px 15px;
-    border-radius: 8px;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.9);
+    background: linear-gradient(135deg, rgba(255, 69, 0, 0.12), rgba(255, 107, 53, 0.08));
+    border-left: 4px solid #FF6B35;
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.95);
     margin-top: 20px;
+    box-shadow: 0 4px 12px rgba(255, 107, 53, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-privacy::before {
+    content: '\f06a';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: #FF6B35;
+    font-size: 16px;
 }
 
 .notification-modal-footer {
-    padding: 20px 30px 30px;
+    padding: 20px 30px 32px;
     display: flex;
-    gap: 15px;
+    gap: 12px;
     justify-content: center;
 }
 
 .notification-modal-footer button {
     flex: 1;
-    padding: 14px 24px;
+    padding: 16px 28px;
     border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: 600;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    transition: all 0.3s ease;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+    overflow: hidden;
+}
+
+.notification-modal-footer button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.notification-modal-footer button:active::before {
+    width: 300px;
+    height: 300px;
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+    background: linear-gradient(135deg, #FF4500 0%, #FF6B35 100%);
     color: #fff;
-    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+    box-shadow: 
+        0 6px 20px rgba(255, 69, 0, 0.4),
+        0 0 0 1px rgba(255, 107, 53, 0.5);
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 
+        0 10px 30px rgba(255, 69, 0, 0.5),
+        0 0 0 1px rgba(255, 107, 53, 0.7);
+}
+
+.btn-primary:active {
+    transform: translateY(-1px) scale(0.98);
 }
 
 .btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
 }
 
 .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.1);
     color: #fff;
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
 }
 
 /* Team Selector Styles */
@@ -201,18 +309,21 @@
     position: fixed;
     top: 20px;
     right: 20px;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    background: linear-gradient(145deg, #0a0a0a, #1a1a1a);
     color: #fff;
-    padding: 16px 24px;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    padding: 18px 26px;
+    border-radius: 14px;
+    box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     z-index: 10001;
     transform: translateX(400px);
     opacity: 0;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    backdrop-filter: blur(10px);
 }
 
 .notification-toast.show {
@@ -221,7 +332,7 @@
 }
 
 .notification-toast.success {
-    border-left: 4px solid #28a745;
+    border-left: 4px solid #FF6B35;
 }
 
 .notification-toast.info {
@@ -229,11 +340,12 @@
 }
 
 .notification-toast i {
-    font-size: 20px;
+    font-size: 22px;
 }
 
 .notification-toast.success i {
-    color: #28a745;
+    color: #FF6B35;
+    filter: drop-shadow(0 0 8px rgba(255, 107, 53, 0.5));
 }
 
 .notification-toast.info i {
@@ -259,23 +371,67 @@
     background: rgba(255, 107, 53, 0.7);
 }
 
+/* Particle Background Effect */
+.notification-modal-content::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 107, 53, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 69, 0, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.notification-modal-header,
+.notification-modal-body,
+.notification-modal-footer {
+    position: relative;
+    z-index: 1;
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .notification-modal-content {
-        max-width: 95%;
+        max-width: 96%;
+        border-radius: 20px;
+    }
+    
+    .notification-modal-header {
+        padding: 32px 24px 20px;
     }
     
     .notification-modal-header h2 {
-        font-size: 20px;
+        font-size: 22px;
     }
     
     .notification-icon {
-        font-size: 40px;
+        font-size: 44px;
+    }
+    
+    .notification-modal-body {
+        padding: 24px;
+    }
+    
+    .notification-modal-body p {
+        font-size: 14px;
+    }
+    
+    .notification-modal-body ul li {
+        padding: 12px 14px;
+        font-size: 14px;
     }
     
     .teams-grid {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
         gap: 10px;
+    }
+    
+    .team-option {
+        padding: 12px;
     }
     
     .team-option img {
@@ -289,12 +445,19 @@
     
     .notification-modal-footer {
         flex-direction: column;
+        padding: 16px 24px 28px;
+    }
+    
+    .notification-modal-footer button {
+        padding: 14px 24px;
+        font-size: 14px;
     }
     
     .notification-toast {
         right: 10px;
         left: 10px;
         top: 10px;
+        padding: 14px 18px;
     }
 }
 

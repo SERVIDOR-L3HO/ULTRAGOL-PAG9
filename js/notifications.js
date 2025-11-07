@@ -40,14 +40,14 @@ class NotificationManager {
                         <li><i class="fas fa-newspaper"></i> Noticias importantes</li>
                         <li><i class="fas fa-calendar"></i> Próximos encuentros</li>
                     </ul>
-                    <p class="notification-privacy">Solo recibirás notificaciones del equipo que elijas</p>
+                    <div class="notification-privacy">Solo recibirás notificaciones del equipo que elijas</div>
                 </div>
                 <div class="notification-modal-footer">
                     <button class="btn-secondary" id="notificationDeny">
                         <i class="fas fa-times"></i> No, gracias
                     </button>
                     <button class="btn-primary" id="notificationAllow">
-                        <i class="fas fa-check"></i> Activar notificaciones
+                        <i class="fas fa-check"></i> Activar
                     </button>
                 </div>
             </div>
