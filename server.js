@@ -270,6 +270,17 @@ app.get('/api/ultragol/notificaciones', async (req, res) => {
     }
 });
 
+app.get('/api/ultragol/transmisiones3', async (req, res) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/transmisiones3`);
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error proxying transmisiones3:', error);
+        res.status(500).json({ error: 'Error al obtener transmisiones3' });
+    }
+});
+
 console.log('✅ UltraGol API proxy enabled');
 
 if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {

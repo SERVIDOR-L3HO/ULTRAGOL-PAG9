@@ -44,15 +44,34 @@ async function loadMarcadores() {
     }
 }
 
-// Función para cargar transmisiones desde la API
+// Función para cargar transmisiones desde ambas APIs
 async function loadTransmisiones() {
     try {
-        const response = await fetch('https://ultragol-api3.onrender.com/transmisiones');
-        const data = await response.json();
-        transmisionesData = data;
+        // Cargar ambas APIs en paralelo
+        const [response1, response2] = await Promise.all([
+            fetch('https://ultragol-api3.onrender.com/transmisiones'),
+            fetch('https://ultragol-api3.onrender.com/transmisiones3')
+        ]);
         
-        console.log('✅ Transmisiones cargadas:', data);
-        return data;
+        const data1 = await response1.json();
+        const data2 = await response2.json();
+        
+        // Combinar las transmisiones de ambas APIs
+        const transmisionesCombinadas = [
+            ...(data1.transmisiones || []),
+            ...(data2.transmisiones || [])
+        ];
+        
+        // Crear el objeto combinado
+        transmisionesData = {
+            transmisiones: transmisionesCombinadas
+        };
+        
+        console.log('✅ Transmisiones cargadas desde API 1:', data1.transmisiones?.length || 0);
+        console.log('✅ Transmisiones cargadas desde API 2 (transmisiones3):', data2.transmisiones?.length || 0);
+        console.log('✅ Total transmisiones combinadas:', transmisionesCombinadas.length);
+        
+        return transmisionesData;
     } catch (error) {
         console.error('❌ Error cargando transmisiones:', error);
         return null;
