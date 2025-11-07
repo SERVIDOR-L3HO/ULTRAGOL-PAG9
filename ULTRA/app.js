@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     startAutoUpdate();
     await loadStandings();
     await loadNews();
+    await loadLineups();
 });
 
 // Función principal para cargar marcadores desde la API
@@ -1679,4 +1680,247 @@ function showNoMatchesMessage() {
             <p>No hay partidos disponibles en este momento.<br>Por favor, intenta más tarde.</p>
         </div>
     `;
+}
+
+// ===========================
+// LINEUPS FUNCTIONALITY
+// ===========================
+
+let lineupsData = null;
+let selectedMatchIndex = 0;
+
+// Cargar alineaciones desde la API
+async function loadLineups() {
+    try {
+        const response = await fetch('https://ultragol-api3.onrender.com/alineaciones');
+        const data = await response.json();
+        lineupsData = data;
+        
+        console.log('✅ Alineaciones cargadas:', data);
+        
+        renderMatchSelector();
+        
+        if (data.partidos && data.partidos.length > 0) {
+            renderLineup(0);
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('❌ Error cargando alineaciones:', error);
+        const selectorContainer = document.getElementById('lineupsMatchSelector');
+        const lineupsContainer = document.getElementById('lineupsContainer');
+        
+        if (selectorContainer) {
+            selectorContainer.innerHTML = '<div class="standings-loading">Error al cargar partidos</div>';
+        }
+        if (lineupsContainer) {
+            lineupsContainer.innerHTML = '<div class="lineups-loading">Error al cargar alineaciones</div>';
+        }
+        return null;
+    }
+}
+
+// Renderizar selector de partidos
+function renderMatchSelector() {
+    const container = document.getElementById('lineupsMatchSelector');
+    if (!container || !lineupsData || !lineupsData.partidos || lineupsData.partidos.length === 0) {
+        if (container) {
+            container.innerHTML = '<div class="standings-loading">No hay partidos disponibles</div>';
+        }
+        return;
+    }
+    
+    const tabsHTML = lineupsData.partidos.map((partido, index) => {
+        const isActive = index === selectedMatchIndex ? 'active' : '';
+        const isPending = !partido.alineacionDisponible ? 'pending' : '';
+        const badgeClass = partido.alineacionDisponible ? 'available' : 'pending';
+        const badgeText = partido.alineacionDisponible ? 'Disponible' : 'Pendiente';
+        
+        return `
+            <div class="lineup-match-tab ${isActive} ${isPending}" onclick="selectLineupMatch(${index})">
+                <div class="lineup-match-tab-teams">
+                    <img src="${partido.local.equipo.logo}" alt="${partido.local.equipo.nombreCorto}" onerror="this.src='https://via.placeholder.com/24'">
+                    <span>${partido.local.equipo.nombreCorto} vs ${partido.visitante.equipo.nombreCorto}</span>
+                    <img src="${partido.visitante.equipo.logo}" alt="${partido.visitante.equipo.nombreCorto}" onerror="this.src='https://via.placeholder.com/24'">
+                </div>
+                <div class="lineup-match-tab-info">
+                    <i class="far fa-clock"></i>
+                    <span>${partido.partido.hora}</span>
+                </div>
+                <span class="lineup-match-tab-badge ${badgeClass}">${badgeText}</span>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = `<div class="lineups-match-tabs">${tabsHTML}</div>`;
+}
+
+// Seleccionar un partido
+function selectLineupMatch(index) {
+    selectedMatchIndex = index;
+    renderMatchSelector();
+    renderLineup(index);
+}
+
+// Renderizar alineación del partido seleccionado
+function renderLineup(index) {
+    const container = document.getElementById('lineupsContainer');
+    if (!container || !lineupsData || !lineupsData.partidos || !lineupsData.partidos[index]) {
+        return;
+    }
+    
+    const partido = lineupsData.partidos[index];
+    
+    if (!partido.alineacionDisponible) {
+        container.innerHTML = `
+            <div class="lineup-not-available">
+                <i class="fas fa-clock"></i>
+                <h4>Alineación no disponible</h4>
+                <p>${partido.mensaje || 'La alineación se publicará aproximadamente 1 hora antes del partido.'}</p>
+                <div class="lineup-match-meta" style="margin-top: 20px;">
+                    <div class="lineup-match-meta-item">
+                        <i class="far fa-calendar"></i>
+                        <span>${partido.partido.hora}</span>
+                    </div>
+                    <div class="lineup-match-meta-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>${partido.partido.estadio || 'Estadio por confirmar'}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+    
+    // Renderizar alineaciones disponibles
+    const headerHTML = `
+        <div class="lineup-match-header">
+            <h3 class="lineup-match-title">${partido.partido.nombre}</h3>
+            <div class="lineup-match-meta">
+                <div class="lineup-match-meta-item">
+                    <i class="far fa-calendar"></i>
+                    <span>${partido.partido.hora}</span>
+                </div>
+                <div class="lineup-match-meta-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${partido.partido.estadio}</span>
+                </div>
+                <div class="lineup-match-meta-item">
+                    <i class="fas fa-info-circle"></i>
+                    <span>${partido.partido.estado}</span>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const localLineupHTML = renderTeamLineup(partido.local, 'local');
+    const visitanteLineupHTML = renderTeamLineup(partido.visitante, 'visitante');
+    
+    container.innerHTML = `
+        ${headerHTML}
+        <div class="lineups-display">
+            ${localLineupHTML}
+            ${visitanteLineupHTML}
+        </div>
+    `;
+}
+
+// Renderizar alineación de un equipo
+function renderTeamLineup(teamData, side) {
+    if (!teamData.alineacion || !teamData.alineacion.titulares) {
+        return `
+            <div class="lineup-team">
+                <div class="lineup-team-header">
+                    <img src="${teamData.equipo.logo}" alt="${teamData.equipo.nombre}" class="lineup-team-logo" onerror="this.src='https://via.placeholder.com/48'">
+                    <div class="lineup-team-name">${teamData.equipo.nombre}</div>
+                </div>
+                <div class="lineup-not-available">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p>Alineación no disponible</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    const formacion = teamData.alineacion.formacion || '4-4-2';
+    const titulares = teamData.alineacion.titulares || [];
+    
+    return `
+        <div class="lineup-team">
+            <div class="lineup-team-header">
+                <img src="${teamData.equipo.logo}" alt="${teamData.equipo.nombre}" class="lineup-team-logo" onerror="this.src='https://via.placeholder.com/48'">
+                <div class="lineup-team-name">${teamData.equipo.nombre}</div>
+                <div class="lineup-team-formation">${formacion}</div>
+            </div>
+            ${renderFootballField(titulares, formacion, side)}
+        </div>
+    `;
+}
+
+// Renderizar campo de fútbol con jugadores
+function renderFootballField(jugadores, formacion, side) {
+    const formacionArray = parseFormacion(formacion);
+    const jugadoresPorLinea = distribuirJugadores(jugadores, formacionArray);
+    
+    const lineasHTML = jugadoresPorLinea.map((linea, lineaIndex) => {
+        const jugadoresHTML = linea.map(jugador => {
+            const isGoalkeeper = lineaIndex === 0;
+            const numero = jugador.numero || jugador.dorsal || '?';
+            const nombre = jugador.nombre || jugador.apellido || 'Jugador';
+            const nombreCorto = nombre.split(' ').slice(-1)[0]; // Último apellido
+            
+            return `
+                <div class="player-marker ${isGoalkeeper ? 'goalkeeper' : ''}">
+                    <div class="player-avatar">${numero}</div>
+                    <div class="player-name">${nombreCorto}</div>
+                </div>
+            `;
+        }).join('');
+        
+        return `<div class="field-row">${jugadoresHTML}</div>`;
+    }).join('');
+    
+    const formacionClass = formacion.replace(/[^0-9-]/g, '');
+    
+    return `
+        <div class="football-field formation-${formacionClass}">
+            <div class="field-players">
+                ${lineasHTML}
+            </div>
+        </div>
+    `;
+}
+
+// Parsear formación (ejemplo: "4-4-2" -> [1, 4, 4, 2])
+function parseFormacion(formacion) {
+    if (!formacion) return [1, 4, 4, 2];
+    
+    const numeros = formacion.split('-').map(n => parseInt(n)).filter(n => !isNaN(n));
+    
+    // Agregar portero al inicio si no está
+    if (numeros.length > 0 && numeros.reduce((a, b) => a + b, 0) === 10) {
+        numeros.unshift(1);
+    }
+    
+    return numeros.length > 0 ? numeros : [1, 4, 4, 2];
+}
+
+// Distribuir jugadores en líneas según formación
+function distribuirJugadores(jugadores, formacionArray) {
+    const lineas = [];
+    let jugadorIndex = 0;
+    
+    for (let i = 0; i < formacionArray.length; i++) {
+        const jugadoresPorLinea = formacionArray[i];
+        const lineaJugadores = [];
+        
+        for (let j = 0; j < jugadoresPorLinea && jugadorIndex < jugadores.length; j++) {
+            lineaJugadores.push(jugadores[jugadorIndex]);
+            jugadorIndex++;
+        }
+        
+        lineas.push(lineaJugadores);
+    }
+    
+    return lineas;
 }
