@@ -1019,22 +1019,35 @@ function displaySearchResults(results, query) {
         results.importantMatches.forEach((transmision, index) => {
             const isLive = transmision.estado?.toLowerCase().includes('vivo') || transmision.estado?.toLowerCase().includes('live');
             const canalesCount = transmision.canales?.length || 0;
+            const liga = transmision.liga || 'Liga MX';
+            const hasChannels = canalesCount > 0;
+            
+            // Obtener el primer canal para mostrar
+            const firstChannel = hasChannels ? transmision.canales[0].nombre : '';
             
             html += `
-                <div class="search-important-card ${isLive ? 'is-live' : ''}" onclick="selectImportantMatch(${index})">
-                    <div class="search-important-header">
-                        <div class="search-important-title">${transmision.titulo}</div>
-                        ${isLive ? '<span class="search-status-badge live"><i class="fas fa-circle"></i> EN VIVO</span>' : ''}
-                    </div>
-                    <div class="search-important-meta">
-                        <span class="search-important-liga">
-                            <i class="fas fa-trophy"></i> ${transmision.liga || 'Liga MX'}
-                        </span>
-                        ${canalesCount > 0 ? `
-                            <span class="search-important-channels">
-                                <i class="fas fa-tv"></i> ${canalesCount} canal${canalesCount !== 1 ? 'es' : ''}
-                            </span>
-                        ` : '<span class="search-important-channels-none">Sin canales disponibles</span>'}
+                <div class="search-match-important-card">
+                    <div class="search-match-bg"></div>
+                    <div class="search-match-content">
+                        <div class="search-match-badges">
+                            <span class="search-badge-liga">${liga}</span>
+                            ${isLive ? '<span class="search-badge-live"><i class="fas fa-circle"></i> EN VIVO</span>' : '<span class="search-badge-scheduled"><i class="far fa-clock"></i> PRÓXIMO</span>'}
+                        </div>
+                        <div class="search-match-title">${transmision.titulo}</div>
+                        ${hasChannels ? `
+                            <div class="search-match-info">
+                                <div class="search-match-channel">
+                                    <i class="fas fa-tv"></i> ${firstChannel}${canalesCount > 1 ? ` +${canalesCount - 1}` : ''}
+                                </div>
+                                <button class="search-match-btn" onclick="event.stopPropagation(); selectImportantMatch(${index})">
+                                    <i class="fas fa-play"></i> Ver
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="search-match-no-channels">
+                                Sin canales disponibles
+                            </div>
+                        `}
                     </div>
                 </div>`;
         });
@@ -1080,30 +1093,55 @@ function displaySearchResults(results, query) {
         
         results.matches.forEach(partido => {
             const hora = formatearHora(partido.fecha);
-            let statusBadge = '';
+            const isLive = partido.estado?.enVivo;
+            const isProgramado = partido.estado?.programado;
+            const isFinalizado = partido.estado?.finalizado;
+            const matchTitle = `${partido.local.nombreCorto} vs ${partido.visitante.nombreCorto}`;
             
-            if (partido.estado?.enVivo) {
-                statusBadge = '<span class="search-status-badge live"><i class="fas fa-circle"></i> EN VIVO</span>';
-            } else if (partido.estado?.programado) {
-                statusBadge = `<span class="search-status-badge scheduled"><i class="far fa-clock"></i> ${hora}</span>`;
-            } else if (partido.estado?.finalizado) {
-                statusBadge = '<span class="search-status-badge finished"><i class="fas fa-check"></i> FINALIZADO</span>';
+            let statusBadge = '';
+            if (isLive) {
+                statusBadge = '<span class="search-badge-live"><i class="fas fa-circle"></i> EN VIVO</span>';
+            } else if (isProgramado) {
+                statusBadge = `<span class="search-badge-scheduled"><i class="far fa-clock"></i> PRÓXIMO</span>`;
+            } else if (isFinalizado) {
+                statusBadge = '<span class="search-badge-finished"><i class="fas fa-check"></i> FINALIZADO</span>';
             }
             
             html += `
-                <div class="search-match-card" onclick="selectMatchFromSearch('${partido.id}')">
-                    <div class="search-match-teams">
-                        <div class="search-match-team">
-                            <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" onerror="this.src='https://via.placeholder.com/40'">
-                            <span>${partido.local.nombreCorto}</span>
+                <div class="search-match-important-card">
+                    <div class="search-match-bg"></div>
+                    <div class="search-match-content">
+                        <div class="search-match-badges">
+                            <span class="search-badge-liga">Liga MX</span>
+                            ${statusBadge}
                         </div>
-                        <div class="search-match-score">${partido.local.marcador} - ${partido.visitante.marcador}</div>
-                        <div class="search-match-team">
-                            <span>${partido.visitante.nombreCorto}</span>
-                            <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" onerror="this.src='https://via.placeholder.com/40'">
-                        </div>
+                        <div class="search-match-title">${matchTitle}</div>
+                        ${isLive ? `
+                            <div class="search-match-info">
+                                <div class="search-match-score-display">
+                                    <span class="score-number">${partido.local.marcador}</span>
+                                    <span class="score-separator">-</span>
+                                    <span class="score-number">${partido.visitante.marcador}</span>
+                                </div>
+                                <button class="search-match-btn" onclick="event.stopPropagation(); selectMatchFromSearch('${partido.id}')">
+                                    <i class="fas fa-play"></i> Ver
+                                </button>
+                            </div>
+                        ` : isProgramado ? `
+                            <div class="search-match-info">
+                                <div class="search-match-time-display">
+                                    <i class="far fa-clock"></i> ${hora}
+                                </div>
+                                <button class="search-match-btn disabled" onclick="event.stopPropagation(); showToast('Este partido aún no está disponible')">
+                                    <i class="fas fa-lock"></i> Próximo
+                                </button>
+                            </div>
+                        ` : `
+                            <div class="search-match-no-channels">
+                                Finalizado: ${partido.local.marcador} - ${partido.visitante.marcador}
+                            </div>
+                        `}
                     </div>
-                    ${statusBadge}
                 </div>`;
         });
         
@@ -1157,7 +1195,7 @@ function selectImportantMatch(index) {
     if (!transmision) return;
     
     if (transmision.canales && transmision.canales.length > 0) {
-        showChannelSelector(transmision);
+        showChannelSelector(transmision, transmision.titulo);
     } else {
         showToast('No hay canales disponibles para este partido');
     }
