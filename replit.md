@@ -49,6 +49,14 @@ Preferred communication style: Simple, everyday language.
   - Preserves user's selected match during automatic data refreshes
   - Shows live match clock, scores, team logos, and match status
   - Displays goal information (player names and minutes) when available
+- **Important Matches Modal** (ULTRA Platform):
+  - Uniform card design for all matches regardless of channel availability
+  - Status badges with animated indicators (live dot for "EN VIVO", clock for "PRÓXIMO", check for "Finalizado")
+  - Consistent layout: status badge, match title, date/time, channel info, and action button
+  - Channel information displayed in highlighted box with orange accent border
+  - "Sin canales disponibles" message shown when no channels exist
+  - Persistent "Ver" button on all cards (disabled state when no channels available)
+  - Professional disabled button styling with reduced opacity and no hover effects
 - User authentication UI with registration, login, and profile management
 - Comments and social interaction features
 - Picture-in-picture video player for floating stream viewing
