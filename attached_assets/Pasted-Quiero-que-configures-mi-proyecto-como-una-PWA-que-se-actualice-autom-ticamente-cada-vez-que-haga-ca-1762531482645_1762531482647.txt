@@ -1,0 +1,78 @@
+Quiero que configures mi proyecto como una PWA que se actualice automáticamente cada vez que haga cambios. 
+Necesito que hagas lo siguiente paso a paso:
+
+1. Crea o actualiza el archivo `service-worker.js` en la raíz del proyecto con este código:
+
+------------------------------------------------
+const CACHE_NAME = 'mi-pwa-v1'; // cambia la versión cuando haya actualizaciones
+
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/style.css',
+  '/script.js',
+];
+
+// Instala y cachea los archivos
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+      .then(() => self.skipWaiting())
+  );
+});
+
+// Activa y elimina la caché vieja
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.map(key => {
+        if (key !== CACHE_NAME) {
+          return caches.delete(key);
+        }
+      }))
+    )
+  );
+  return self.clients.claim();
+});
+
+// Intercepta peticiones y sirve desde caché o red
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => response || fetch(event.request))
+  );
+});
+------------------------------------------------
+
+2. En el archivo `index.html`, antes de la etiqueta `</body>`, agrega este script:
+
+------------------------------------------------
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/service-worker.js?v=1')
+    .then(() => console.log('Service Worker registrado correctamente'))
+    .catch(err => console.error('Error al registrar el SW:', err));
+
+  // Si hay nueva versión del Service Worker, recarga automáticamente
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
+}
+</script>
+------------------------------------------------
+
+3. Asegúrate de que tu proyecto tenga los siguientes archivos para que funcione como PWA:
+   - `manifest.json` con los datos del ícono y nombre de la app.
+   - Ícono (por ejemplo `icon-512.png`).
+   - El `service-worker.js` en la raíz.
+   - Que tu `index.html` tenga el siguiente link dentro del `<head>`:
+     <link rel="manifest" href="/manifest.json">
+
+4. Cada vez que suba nuevos cambios, Replit debe:
+   - Cambiar el número de versión en `CACHE_NAME` (por ejemplo `mi-pwa-v2`).
+   - Cambiar el número en `serviceWorker.register('/service-worker.js?v=2')`.
+
+5. Quiero que todo esto quede automatizado para que la PWA se actualice sola sin tener que borrar caché ni nada manualmente.
+
+Cuando termines, verifica que el Service Worker esté funcionando correctamente y que, al volver a cargar la página, los cambios se vean inmediatamente.
