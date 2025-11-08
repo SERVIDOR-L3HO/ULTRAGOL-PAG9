@@ -212,8 +212,8 @@ class NotificationManager {
         if (this.notificationPermission === 'granted') {
             new Notification('¡Bienvenido a UltraGol!', {
                 body: 'Recibirás notificaciones de tu equipo favorito',
-                icon: '/assets/logo.png',
-                badge: '/assets/badge.png',
+                icon: '/app-icon.png',
+                badge: '/favicon.png',
                 tag: 'welcome'
             });
         }
@@ -221,10 +221,15 @@ class NotificationManager {
 
     async startNotificationPolling() {
         if (!this.favoriteTeam || this.notificationPermission !== 'granted') {
+            console.log('⚠️ Notificaciones no habilitadas:', {
+                favoriteTeam: this.favoriteTeam,
+                permission: this.notificationPermission
+            });
             return;
         }
 
         console.log(`🔔 Starting notifications for team: ${this.favoriteTeam}`);
+        console.log('📡 Polling API: https://ultragol-api3.onrender.com/notificaciones/ligamx');
         
         // Check immediately
         this.checkForNotifications();
@@ -241,38 +246,51 @@ class NotificationManager {
             // Endpoints disponibles: ligamx, premier, laliga, series, bundesliga, ligue1
             const apiUrl = 'https://ultragol-api3.onrender.com/notificaciones/ligamx';
             
+            console.log('📡 Checking notifications...', new Date().toLocaleTimeString());
             const response = await fetch(apiUrl);
+            
             if (!response.ok) {
-                console.error('Error fetching notifications:', response.status);
+                console.error('❌ Error fetching notifications:', response.status);
                 // Fallback a todas las notificaciones si falla
                 const fallbackResponse = await fetch('https://ultragol-api3.onrender.com/notificaciones');
                 if (!fallbackResponse.ok) return;
                 const fallbackData = await fallbackResponse.json();
+                console.log('✅ Fallback data loaded:', fallbackData.total, 'notifications');
                 this.processNotifications(fallbackData.notificaciones || []);
                 return;
             }
 
             const data = await response.json();
             const notifications = data.notificaciones || [];
+            console.log('✅ Notifications loaded:', data.total, 'total,', notifications.length, 'available');
             this.processNotifications(notifications);
 
         } catch (error) {
-            console.error('Error checking notifications:', error);
+            console.error('❌ Error checking notifications:', error);
         }
     }
 
     processNotifications(notifications) {
+        console.log('🔍 Processing notifications for team:', this.favoriteTeam);
+        console.log('📋 Total notifications to process:', notifications.length);
+        
         // Filter notifications for selected team
         const teamNotifications = notifications.filter(notif => {
             return this.isRelevantNotification(notif);
         });
 
+        console.log('✅ Relevant notifications for your team:', teamNotifications.length);
+        
         // Show new notifications
         teamNotifications.forEach(notif => {
+            console.log('🔔 Notification:', notif.titulo, 'ID:', notif.id);
             if (notif.id && notif.id !== this.lastNotificationId) {
+                console.log('✨ Showing NEW notification:', notif.titulo);
                 this.showNotification(notif);
                 this.lastNotificationId = notif.id;
                 localStorage.setItem('lastNotificationId', notif.id);
+            } else {
+                console.log('⏭️ Skipping notification (already shown):', notif.id);
             }
         });
     }
@@ -302,13 +320,14 @@ class NotificationManager {
 
     showNotification(notificationData) {
         if (this.notificationPermission !== 'granted') {
+            console.log('⚠️ Cannot show notification, permission not granted');
             return;
         }
 
         const options = {
             body: notificationData.mensaje || notificationData.body || 'Nueva actualización de tu equipo',
-            icon: notificationData.icon || '/assets/logo.png',
-            badge: '/assets/badge.png',
+            icon: notificationData.icono || notificationData.icon || '/app-icon.png',
+            badge: '/favicon.png',
             tag: notificationData.id || `notif-${Date.now()}`,
             data: {
                 url: notificationData.url || '/',
@@ -326,13 +345,15 @@ class NotificationManager {
         notification.onclick = (event) => {
             event.preventDefault();
             window.focus();
-            if (notificationData.url) {
+            if (notificationData.accion && notificationData.accion.url) {
+                window.location.href = notificationData.accion.url;
+            } else if (notificationData.url) {
                 window.location.href = notificationData.url;
             }
             notification.close();
         };
 
-        console.log('🔔 Notification shown:', notificationData.titulo);
+        console.log('✅ Notification shown:', notificationData.titulo);
     }
 
     showMessage(message, type = 'info') {
