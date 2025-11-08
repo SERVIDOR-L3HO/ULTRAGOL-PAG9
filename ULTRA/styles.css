@@ -290,6 +290,40 @@ body {
     font-size: 14px;
 }
 
+.play-badge-icon {
+    background: rgba(255, 30, 30, 0.9) !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    animation: playPulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 15px rgba(255, 30, 30, 0.6);
+}
+
+.play-badge-icon:hover {
+    background: rgba(255, 50, 50, 1) !important;
+    transform: scale(1.15);
+    box-shadow: 0 0 25px rgba(255, 30, 30, 0.9);
+}
+
+.play-badge-icon:active {
+    transform: scale(0.95);
+}
+
+.play-badge-icon i {
+    font-size: 12px;
+    margin-left: 2px;
+}
+
+@keyframes playPulse {
+    0%, 100% { 
+        box-shadow: 0 0 15px rgba(255, 30, 30, 0.6);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 25px rgba(255, 30, 30, 0.9);
+        transform: scale(1.05);
+    }
+}
+
 .live-badge {
     position: absolute;
     top: 20px;

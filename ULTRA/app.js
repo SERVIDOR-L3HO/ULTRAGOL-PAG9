@@ -199,7 +199,7 @@ function updateFeaturedMatch(data) {
                     <h2 class="match-title">${partido.local.nombreCorto} vs. ${partido.visitante.nombreCorto}</h2>
                     <div class="match-badges">
                         <span class="badge-icon" title="Marcador"><i class="fas fa-circle"></i></span>
-                        <span class="badge-icon" title="Estadio: ${partido.estadio || 'TBD'}"><i class="fas fa-users"></i></span>
+                        <span class="badge-icon play-badge-icon" title="Ver partido en vivo" onclick="watchMatch('${partido.id}')"><i class="fas fa-play"></i></span>
                         <span class="badge-icon" title="Transmisión"><i class="fas fa-wifi"></i></span>
                     </div>
                 </div>
