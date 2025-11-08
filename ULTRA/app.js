@@ -909,18 +909,66 @@ async function performSearch(query) {
         results.liveMatches = results.matches.filter(p => p.estado?.enVivo);
     }
     
-    // Buscar en partidos importantes (transmisiones)
+    // Buscar en partidos importantes (transmisiones) y combinar canales de ambas APIs
     if (transmisionesData && transmisionesData.transmisiones) {
-        results.importantMatches = transmisionesData.transmisiones.filter(transmision => {
+        const matchedTransmisiones = transmisionesData.transmisiones.filter(transmision => {
             const titulo = transmision.titulo?.toLowerCase() || '';
             const liga = transmision.liga?.toLowerCase() || '';
             const estado = transmision.estado?.toLowerCase() || '';
+            const evento = transmision.evento?.toLowerCase() || '';
             
             return titulo.includes(searchTerm) || 
+                   evento.includes(searchTerm) ||
                    liga.includes(searchTerm) ||
                    (searchTerm === 'vivo' && (estado.includes('vivo') || estado.includes('live'))) ||
                    (searchTerm === 'en vivo' && (estado.includes('vivo') || estado.includes('live')));
-        }).slice(0, 10);
+        });
+        
+        // Combinar canales de ambas APIs para cada transmisión encontrada
+        const transmisionesConCanalesCombinados = matchedTransmisiones.map(transmision => {
+            const eventoNombre = (transmision.evento || transmision.titulo || '').toLowerCase();
+            let canalesCombinados = [];
+            
+            // Buscar en API 1
+            if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
+                const transAPI1 = transmisionesAPI1.transmisiones.find(t => {
+                    const evento = (t.evento || t.titulo || '').toLowerCase();
+                    return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+                });
+                
+                if (transAPI1 && transAPI1.canales) {
+                    const canalesAPI1 = transAPI1.canales.map(canal => ({
+                        ...canal,
+                        fuente: 'golazolvhd'
+                    }));
+                    canalesCombinados = [...canalesCombinados, ...canalesAPI1];
+                }
+            }
+            
+            // Buscar en API 2
+            if (transmisionesAPI2 && transmisionesAPI2.transmisiones) {
+                const transAPI2 = transmisionesAPI2.transmisiones.find(t => {
+                    const evento = (t.evento || t.titulo || '').toLowerCase();
+                    return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+                });
+                
+                if (transAPI2 && transAPI2.canales) {
+                    const canalesAPI2 = transAPI2.canales.map(canal => ({
+                        ...canal,
+                        fuente: 'ellink'
+                    }));
+                    canalesCombinados = [...canalesCombinados, ...canalesAPI2];
+                }
+            }
+            
+            // Retornar transmisión con canales combinados
+            return {
+                ...transmision,
+                canales: canalesCombinados
+            };
+        });
+        
+        results.importantMatches = transmisionesConCanalesCombinados.slice(0, 10);
     }
     
     // Buscar equipos únicos
