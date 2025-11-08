@@ -23,6 +23,10 @@ class NotificationManager {
     }
 
     showPermissionModal() {
+        // Marcar como mostrado inmediatamente para que no aparezca en otras páginas
+        localStorage.setItem('notificationModalShown', 'true');
+        this.modalShown = true;
+        
         const modal = document.createElement('div');
         modal.className = 'notification-permission-modal';
         modal.innerHTML = `
