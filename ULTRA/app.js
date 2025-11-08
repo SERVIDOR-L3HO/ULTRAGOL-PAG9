@@ -59,14 +59,35 @@ async function loadTransmisiones() {
         const data1 = await response1.json();
         const data2 = await response2.json();
         
-        // Guardar datos separados de cada API
+        // Normalizar API 2 (transmisiones3 - e1link) que usa "enlaces" array
+        const transmisionesNormalizadasAPI2 = (data2.transmisiones || []).map(t => {
+            const canalesNormalizados = (t.enlaces || []).map((enlace, index) => ({
+                numero: `${index + 1}`,
+                nombre: t.canal || `Canal ${index + 1}`,
+                links: {
+                    hoca: enlace,
+                    caster: enlace,
+                    wigi: enlace
+                }
+            }));
+            
+            return {
+                ...t,
+                canales: canalesNormalizados
+            };
+        });
+        
+        // Guardar datos separados de cada API (API1 ya tiene el formato correcto)
         transmisionesAPI1 = data1;
-        transmisionesAPI2 = data2;
+        transmisionesAPI2 = {
+            ...data2,
+            transmisiones: transmisionesNormalizadasAPI2
+        };
         
         // Combinar las transmisiones de ambas APIs para compatibilidad
         const transmisionesCombinadas = [
             ...(data1.transmisiones || []),
-            ...(data2.transmisiones || [])
+            ...transmisionesNormalizadasAPI2
         ];
         
         // Crear el objeto combinado
@@ -74,8 +95,8 @@ async function loadTransmisiones() {
             transmisiones: transmisionesCombinadas
         };
         
-        console.log('✅ Transmisiones cargadas desde API 1 (golazolvhd):', data1.transmisiones?.length || 0);
-        console.log('✅ Transmisiones cargadas desde API 2 (ellink):', data2.transmisiones?.length || 0);
+        console.log('✅ Transmisiones cargadas desde API 1 (rereyano):', data1.transmisiones?.length || 0);
+        console.log('✅ Transmisiones cargadas desde API 2 (e1link):', data2.transmisiones?.length || 0);
         console.log('✅ Total transmisiones combinadas:', transmisionesCombinadas.length);
         
         return transmisionesData;
@@ -637,31 +658,62 @@ function showChannelSelector(transmision, partidoNombre) {
     
     title.textContent = `${partidoNombre} - Seleccionar Canal`;
     
+    if (!transmision.canales || transmision.canales.length === 0) {
+        body.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">
+                <i class="fas fa-info-circle" style="font-size: 48px; margin-bottom: 16px;"></i>
+                <p>No hay canales disponibles para este partido</p>
+            </div>
+        `;
+        modal.classList.add('active');
+        return;
+    }
+    
     body.innerHTML = transmision.canales.map((canal, index) => {
         const streamTypes = [];
-        if (canal.links?.hoca) streamTypes.push({ name: 'Hoca', url: canal.links.hoca });
-        if (canal.links?.caster) streamTypes.push({ name: 'Caster', url: canal.links.caster });
-        if (canal.links?.wigi) streamTypes.push({ name: 'Wigi', url: canal.links.wigi });
         
-        const fuenteBadge = canal.fuente ? `<span class="fuente-badge" style="background: ${canal.fuente === 'golazolvhd' ? '#ff6b35' : '#4ecdc4'}; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px;">${canal.fuente === 'golazolvhd' ? 'API 1' : 'API 2'}</span>` : '';
+        if (canal.links?.hoca) {
+            streamTypes.push({ name: 'Opción 1', url: canal.links.hoca, icon: 'play-circle' });
+        }
+        if (canal.links?.caster && canal.links.caster !== canal.links?.hoca) {
+            streamTypes.push({ name: 'Opción 2', url: canal.links.caster, icon: 'play-circle' });
+        }
+        if (canal.links?.wigi && canal.links.wigi !== canal.links?.hoca && canal.links.wigi !== canal.links?.caster) {
+            streamTypes.push({ name: 'Opción 3', url: canal.links.wigi, icon: 'play-circle' });
+        }
+        
+        if (streamTypes.length === 0) {
+            return '';
+        }
+        
+        const fuenteBadge = canal.fuente ? `<span class="fuente-badge" style="background: ${canal.fuente === 'golazolvhd' ? '#4ecdc4' : '#ff6b35'}; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; color: white;">${canal.fuente === 'golazolvhd' ? 'rereyano' : 'e1link'}</span>` : '';
         
         return `
             <div class="channel-option">
                 <div class="channel-info">
-                    <div class="channel-number">${canal.numero}</div>
-                    <div class="channel-name">${canal.nombre}${fuenteBadge}</div>
+                    <div class="channel-number">${canal.numero || (index + 1)}</div>
+                    <div class="channel-name">${canal.nombre || `Canal ${index + 1}`}${fuenteBadge}</div>
                 </div>
                 <div class="stream-options">
                     ${streamTypes.map(type => `
-                        <button class="stream-option-btn" onclick='selectStream("${type.url}", "${partidoNombre} - ${canal.nombre} (${type.name})")'>
-                            <i class="fas fa-play-circle"></i>
+                        <button class="stream-option-btn" onclick='selectStream("${type.url.replace(/'/g, "\\'")}", "${(partidoNombre + ' - ' + (canal.nombre || `Canal ${index + 1}`)).replace(/'/g, "\\'")}")'>
+                            <i class="fas fa-${type.icon}"></i>
                             ${type.name}
                         </button>
                     `).join('')}
                 </div>
             </div>
         `;
-    }).join('');
+    }).filter(html => html !== '').join('');
+    
+    if (body.innerHTML.trim() === '') {
+        body.innerHTML = `
+            <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">
+                <i class="fas fa-info-circle" style="font-size: 48px; margin-bottom: 16px;"></i>
+                <p>No hay enlaces válidos disponibles</p>
+            </div>
+        `;
+    }
     
     modal.classList.add('active');
 }
