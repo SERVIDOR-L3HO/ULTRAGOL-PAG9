@@ -1,4 +1,5 @@
 let currentStreamUrl = '';
+let currentStreamTitle = '';
 let activeTab = 'live';
 let currentLeague = 'Liga MX';
 let marcadoresData = null;
@@ -19,6 +20,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadStandings();
     await loadNews();
     await loadLineups();
+    
+    // Detectar si hay un link compartido y abrir la transmisión automáticamente
+    checkSharedStream();
 });
 
 // Función principal para cargar marcadores desde la API
@@ -769,6 +773,7 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     }
     
     currentStreamUrl = embedUrl;
+    currentStreamTitle = title;
     modalTitle.textContent = title;
     modal.classList.add('active');
     loader.style.display = 'flex';
@@ -2300,4 +2305,137 @@ function distribuirJugadores(jugadores, formacionArray) {
     }
     
     return lineas;
+}
+
+// Función para compartir la transmisión actual
+async function shareStream() {
+    if (!currentStreamUrl || !currentStreamTitle) {
+        showToast('No hay transmisión activa para compartir');
+        return;
+    }
+    
+    // Codificar los parámetros en base64 para una URL más limpia
+    const shareData = {
+        url: currentStreamUrl,
+        title: currentStreamTitle
+    };
+    
+    const encodedData = btoa(JSON.stringify(shareData));
+    const shareUrl = `${window.location.origin}${window.location.pathname}?stream=${encodedData}`;
+    
+    // Intentar usar la API nativa de compartir si está disponible
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: `UltraGol - ${currentStreamTitle}`,
+                text: `¡Mira este partido en vivo!`,
+                url: shareUrl
+            });
+            showToast('¡Link compartido exitosamente! 🎉');
+        } catch (error) {
+            // Si el usuario cancela, solo copiar al portapapeles
+            if (error.name !== 'AbortError') {
+                copyToClipboard(shareUrl);
+            }
+        }
+    } else {
+        // Fallback: copiar al portapapeles
+        copyToClipboard(shareUrl);
+    }
+}
+
+// Función auxiliar para copiar al portapapeles
+function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('¡Link copiado al portapapeles! 📋');
+        }).catch(() => {
+            fallbackCopyToClipboard(text);
+        });
+    } else {
+        fallbackCopyToClipboard(text);
+    }
+}
+
+// Fallback para navegadores que no soportan clipboard API
+function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        showToast('¡Link copiado al portapapeles! 📋');
+    } catch (err) {
+        showToast('No se pudo copiar el link');
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+// Función para detectar y abrir transmisión compartida
+function checkSharedStream() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const streamParam = urlParams.get('stream');
+    
+    if (streamParam) {
+        try {
+            // Decodificar los datos del link compartido
+            const shareData = JSON.parse(atob(streamParam));
+            
+            if (shareData.url && shareData.title) {
+                // Esperar un momento para que la página cargue completamente
+                setTimeout(() => {
+                    playStreamInModal(shareData.url, shareData.title, false);
+                    showToast('Abriendo transmisión compartida... 📺');
+                    
+                    // Limpiar la URL sin recargar la página
+                    const cleanUrl = window.location.origin + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }, 1000);
+            }
+        } catch (error) {
+            console.error('Error al procesar link compartido:', error);
+        }
+    }
+}
+
+// Función auxiliar para mostrar notificaciones
+function showToast(message) {
+    // Crear elemento de toast si no existe
+    let toast = document.getElementById('toast-notification');
+    
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'toast-notification';
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            z-index: 10000;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        `;
+        document.body.appendChild(toast);
+    }
+    
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    
+    setTimeout(() => {
+        toast.style.opacity = '0';
+    }, 3000);
 }

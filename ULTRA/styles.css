@@ -870,6 +870,35 @@ body {
     background: var(--primary);
 }
 
+.modal-share-btn {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-share-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.modal-share-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.modal-share-btn:hover {
+    background: linear-gradient(135deg, #ee5a6f, #ff6b6b) !important;
+    transform: scale(1.05);
+}
+
 .settings-panel {
     position: fixed;
     top: 0;
