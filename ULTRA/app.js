@@ -1146,7 +1146,7 @@ function displaySearchResults(results, query) {
                                 <div class="search-match-channel">
                                     <i class="fas fa-tv"></i> ${firstChannel}${canalesCount > 1 ? ` +${canalesCount - 1}` : ''}
                                 </div>
-                                <button class="search-match-btn" onclick="event.stopPropagation(); selectImportantMatch(${index})">
+                                <button class="search-match-btn" onclick='event.stopPropagation(); selectImportantMatchByName("${(transmision.evento || transmision.titulo || '').replace(/"/g, '&quot;')}")'>
                                     <i class="fas fa-play"></i> Ver
                                 </button>
                             </div>
