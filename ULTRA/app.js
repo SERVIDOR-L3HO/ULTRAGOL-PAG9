@@ -1140,7 +1140,9 @@ function displaySearchResults(results, query) {
             </div>`;
         
         results.importantMatches.forEach((transmision, index) => {
-            const isLive = transmision.estado?.toLowerCase().includes('vivo') || transmision.estado?.toLowerCase().includes('live');
+            const estadoAPI = (transmision.estado || '').toLowerCase().trim();
+            const isLive = estadoAPI.includes('vivo') || estadoAPI.includes('live') || estadoAPI === 'en vivo';
+            const isUpcoming = estadoAPI.includes('próximo') || estadoAPI.includes('programado') || estadoAPI.includes('upcoming');
             const canalesCount = transmision.canales?.length || 0;
             const liga = transmision.liga || 'Liga MX';
             const hasChannels = canalesCount > 0;
@@ -1148,13 +1150,22 @@ function displaySearchResults(results, query) {
             // Obtener el primer canal para mostrar
             const firstChannel = hasChannels ? transmision.canales[0].nombre : '';
             
+            let statusBadgeSearch = '';
+            if (isLive) {
+                statusBadgeSearch = '<span class="search-badge-live"><i class="fas fa-circle"></i> EN VIVO</span>';
+            } else if (isUpcoming) {
+                statusBadgeSearch = '<span class="search-badge-scheduled"><i class="far fa-clock"></i> PRÓXIMO</span>';
+            } else {
+                statusBadgeSearch = '<span class="search-badge-scheduled"><i class="far fa-clock"></i> PRÓXIMO</span>';
+            }
+            
             html += `
                 <div class="search-match-important-card">
                     <div class="search-match-bg"></div>
                     <div class="search-match-content">
                         <div class="search-match-badges">
                             <span class="search-badge-liga">${liga}</span>
-                            ${isLive ? '<span class="search-badge-live"><i class="fas fa-circle"></i> EN VIVO</span>' : '<span class="search-badge-scheduled"><i class="far fa-clock"></i> PRÓXIMO</span>'}
+                            ${statusBadgeSearch}
                         </div>
                         <div class="search-match-title">${transmision.titulo}</div>
                         ${hasChannels ? `
@@ -1707,15 +1718,18 @@ function renderImportantMatches() {
             });
         }
         
-        const isLive = transmision.estado?.toLowerCase().includes('vivo') || transmision.estado?.toLowerCase().includes('live');
-        const isUpcoming = transmision.estado?.toLowerCase().includes('próximo') || transmision.estado?.toLowerCase().includes('programado');
-        const isFinished = transmision.estado?.toLowerCase().includes('finalizado') || transmision.estado?.toLowerCase().includes('finished');
+        const estadoAPI = (transmision.estado || '').toLowerCase().trim();
+        const isLive = estadoAPI.includes('vivo') || estadoAPI.includes('live') || estadoAPI === 'en vivo';
+        const isUpcoming = estadoAPI.includes('próximo') || estadoAPI.includes('programado') || estadoAPI.includes('upcoming');
+        const isFinished = estadoAPI.includes('finalizado') || estadoAPI.includes('finished');
         
         let statusBadge = '';
         if (isLive) {
             statusBadge = `<span class="status-badge status-live"><span class="live-dot"></span> EN VIVO</span>`;
         } else if (isFinished) {
             statusBadge = `<span class="status-badge status-finished"><i class="fas fa-check-circle"></i> Finalizado</span>`;
+        } else if (isUpcoming) {
+            statusBadge = `<span class="status-badge status-upcoming">⏰ PRÓXIMO</span>`;
         } else {
             statusBadge = `<span class="status-badge status-upcoming">⏰ PRÓXIMO</span>`;
         }
@@ -1835,13 +1849,60 @@ function selectImportantMatchByTransmision(transmisionIndex) {
         return;
     }
     
-    if (!transmision.canales || transmision.canales.length === 0) {
-        transmision.canales = [];
+    const eventoNombre = (transmision.evento || transmision.titulo || '').toLowerCase();
+    
+    let canalesCombinados = [];
+    let tituloMostrar = transmision.titulo || transmision.evento;
+    
+    if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
+        const transAPI1 = transmisionesAPI1.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
+        if (transAPI1 && transAPI1.canales) {
+            const canalesAPI1 = transAPI1.canales.map(canal => ({
+                ...canal,
+                fuente: 'golazolvhd'
+            }));
+            canalesCombinados = [...canalesCombinados, ...canalesAPI1];
+            console.log(`✅ Encontrados ${canalesAPI1.length} canales en API 1 (golazolvhd)`);
+        }
     }
     
-    closeImportantMatchesModal();
+    if (transmisionesAPI2 && transmisionesAPI2.transmisiones) {
+        const transAPI2 = transmisionesAPI2.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
+        if (transAPI2 && transAPI2.canales) {
+            const canalesAPI2 = transAPI2.canales.map(canal => ({
+                ...canal,
+                fuente: 'ellink'
+            }));
+            canalesCombinados = [...canalesCombinados, ...canalesAPI2];
+            console.log(`✅ Encontrados ${canalesAPI2.length} canales en API 2 (ellink)`);
+        }
+    }
     
-    showChannelSelector(transmision, transmision.evento);
+    if (canalesCombinados.length > 0) {
+        const transmisionCombinada = {
+            evento: tituloMostrar,
+            titulo: tituloMostrar,
+            canales: canalesCombinados
+        };
+        
+        closeImportantMatchesModal();
+        showChannelSelector(transmisionCombinada, tituloMostrar);
+    } else {
+        if (transmision.canales && transmision.canales.length > 0) {
+            closeImportantMatchesModal();
+            showChannelSelector(transmision, tituloMostrar);
+        } else {
+            showToast('No hay canales disponibles para este partido');
+        }
+    }
 }
 
 function showNoMatchesMessage() {
