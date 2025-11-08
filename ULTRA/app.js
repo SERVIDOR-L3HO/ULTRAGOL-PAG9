@@ -3,6 +3,8 @@ let activeTab = 'live';
 let currentLeague = 'Liga MX';
 let marcadoresData = null;
 let transmisionesData = null;
+let transmisionesAPI1 = null;
+let transmisionesAPI2 = null;
 let updateInterval = null;
 let currentFeaturedIndex = 0;
 let featuredMatches = [];
@@ -57,7 +59,11 @@ async function loadTransmisiones() {
         const data1 = await response1.json();
         const data2 = await response2.json();
         
-        // Combinar las transmisiones de ambas APIs
+        // Guardar datos separados de cada API
+        transmisionesAPI1 = data1;
+        transmisionesAPI2 = data2;
+        
+        // Combinar las transmisiones de ambas APIs para compatibilidad
         const transmisionesCombinadas = [
             ...(data1.transmisiones || []),
             ...(data2.transmisiones || [])
@@ -68,8 +74,8 @@ async function loadTransmisiones() {
             transmisiones: transmisionesCombinadas
         };
         
-        console.log('✅ Transmisiones cargadas desde API 1:', data1.transmisiones?.length || 0);
-        console.log('✅ Transmisiones cargadas desde API 2 (transmisiones3):', data2.transmisiones?.length || 0);
+        console.log('✅ Transmisiones cargadas desde API 1 (golazolvhd):', data1.transmisiones?.length || 0);
+        console.log('✅ Transmisiones cargadas desde API 2 (ellink):', data2.transmisiones?.length || 0);
         console.log('✅ Total transmisiones combinadas:', transmisionesCombinadas.length);
         
         return transmisionesData;
@@ -518,11 +524,6 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         return;
     }
     
-    if (!transmisionesData || !transmisionesData.transmisiones) {
-        showToast('No hay transmisiones disponibles');
-        return;
-    }
-    
     const nombreLocal = partido.local.nombre.toLowerCase();
     const nombreVisitante = partido.visitante.nombre.toLowerCase();
     const nombreCortoLocal = partido.local.nombreCorto.toLowerCase();
@@ -530,7 +531,6 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     
     // Función auxiliar para extraer palabras clave del nombre
     const extraerPalabrasClaves = (nombre) => {
-        // Remover todos los prefijos comunes en un solo paso
         return nombre
             .replace(/^(fc|cf|cd|club|atletico|atlético|deportivo|sporting|de|del|la|los|las)\s+/gi, '')
             .replace(/^(fc|cf|cd|club|atletico|atlético|deportivo|sporting|de|del|la|los|las)\s+/gi, '')
@@ -545,40 +545,73 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     console.log(`   Local: "${nombreLocal}" → palabras clave: "${palabrasLocal}"`);
     console.log(`   Visitante: "${nombreVisitante}" → palabras clave: "${palabrasVisitante}"`);
     
-    const transmision = transmisionesData.transmisiones.find(t => {
-        const evento = t.evento.toLowerCase();
+    // Función para buscar transmisión en una lista
+    const buscarTransmision = (transmisiones) => {
+        if (!transmisiones || transmisiones.length === 0) return null;
         
-        // Buscar coincidencias usando múltiples estrategias
-        const tieneLocal = 
-            evento.includes(nombreLocal) || 
-            evento.includes(nombreCortoLocal) ||
-            evento.includes(palabrasLocal);
+        return transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
             
-        const tieneVisitante = 
-            evento.includes(nombreVisitante) || 
-            evento.includes(nombreCortoVisitante) ||
-            evento.includes(palabrasVisitante);
-        
-        return tieneLocal && tieneVisitante;
-    });
+            const tieneLocal = 
+                evento.includes(nombreLocal) || 
+                evento.includes(nombreCortoLocal) ||
+                evento.includes(palabrasLocal);
+                
+            const tieneVisitante = 
+                evento.includes(nombreVisitante) || 
+                evento.includes(nombreCortoVisitante) ||
+                evento.includes(palabrasVisitante);
+            
+            return tieneLocal && tieneVisitante;
+        });
+    };
     
-    if (!transmision) {
+    // Buscar en ambas APIs
+    const transmisionAPI1 = transmisionesAPI1 ? buscarTransmision(transmisionesAPI1.transmisiones) : null;
+    const transmisionAPI2 = transmisionesAPI2 ? buscarTransmision(transmisionesAPI2.transmisiones) : null;
+    
+    // Combinar canales de ambas APIs
+    let canalesCombinados = [];
+    let eventoNombre = '';
+    
+    if (transmisionAPI1) {
+        eventoNombre = transmisionAPI1.evento || transmisionAPI1.titulo;
+        const canalesAPI1 = (transmisionAPI1.canales || []).map(canal => ({
+            ...canal,
+            fuente: 'golazolvhd'
+        }));
+        canalesCombinados = [...canalesCombinados, ...canalesAPI1];
+        console.log(`✅ Encontrados ${canalesAPI1.length} canales en API 1 (golazolvhd)`);
+    }
+    
+    if (transmisionAPI2) {
+        if (!eventoNombre) eventoNombre = transmisionAPI2.evento || transmisionAPI2.titulo;
+        const canalesAPI2 = (transmisionAPI2.canales || []).map(canal => ({
+            ...canal,
+            fuente: 'ellink'
+        }));
+        canalesCombinados = [...canalesCombinados, ...canalesAPI2];
+        console.log(`✅ Encontrados ${canalesAPI2.length} canales en API 2 (ellink)`);
+    }
+    
+    if (canalesCombinados.length === 0) {
         showToast('No hay transmisión disponible para este partido');
         console.log(`❌ No se encontró transmisión para: ${partido.local.nombre} vs ${partido.visitante.nombre}`);
         return;
     }
     
-    console.log(`✅ Transmisión encontrada: ${transmision.evento}`);
-    console.log(`📺 Total canales: ${transmision.canales?.length || 0}`);
-    
-    if (!transmision.canales || transmision.canales.length === 0) {
-        showToast('No hay canales disponibles para esta transmisión');
-        return;
-    }
+    console.log(`📺 Total canales combinados: ${canalesCombinados.length}`);
     
     const partidoNombre = `${partido.local.nombreCorto} vs ${partido.visitante.nombreCorto}`;
     
-    showChannelSelector(transmision, partidoNombre);
+    // Crear transmisión combinada
+    const transmisionCombinada = {
+        evento: eventoNombre,
+        titulo: eventoNombre,
+        canales: canalesCombinados
+    };
+    
+    showChannelSelector(transmisionCombinada, partidoNombre);
 }
 
 function showChannelSelector(transmision, partidoNombre) {
@@ -590,15 +623,17 @@ function showChannelSelector(transmision, partidoNombre) {
     
     body.innerHTML = transmision.canales.map((canal, index) => {
         const streamTypes = [];
-        if (canal.links.hoca) streamTypes.push({ name: 'Hoca', url: canal.links.hoca });
-        if (canal.links.caster) streamTypes.push({ name: 'Caster', url: canal.links.caster });
-        if (canal.links.wigi) streamTypes.push({ name: 'Wigi', url: canal.links.wigi });
+        if (canal.links?.hoca) streamTypes.push({ name: 'Hoca', url: canal.links.hoca });
+        if (canal.links?.caster) streamTypes.push({ name: 'Caster', url: canal.links.caster });
+        if (canal.links?.wigi) streamTypes.push({ name: 'Wigi', url: canal.links.wigi });
+        
+        const fuenteBadge = canal.fuente ? `<span class="fuente-badge" style="background: ${canal.fuente === 'golazolvhd' ? '#ff6b35' : '#4ecdc4'}; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px;">${canal.fuente === 'golazolvhd' ? 'API 1' : 'API 2'}</span>` : '';
         
         return `
             <div class="channel-option">
                 <div class="channel-info">
                     <div class="channel-number">${canal.numero}</div>
-                    <div class="channel-name">${canal.nombre}</div>
+                    <div class="channel-name">${canal.nombre}${fuenteBadge}</div>
                 </div>
                 <div class="stream-options">
                     ${streamTypes.map(type => `
@@ -1195,11 +1230,61 @@ function selectImportantMatch(index) {
     const transmision = transmisionesData.transmisiones[index];
     if (!transmision) return;
     
-    if (transmision.canales && transmision.canales.length > 0) {
-        showChannelSelector(transmision, transmision.titulo);
-    } else {
-        showToast('No hay canales disponibles para este partido');
+    // Buscar esta transmisión en ambas APIs para combinar canales
+    const eventoNombre = (transmision.evento || transmision.titulo || '').toLowerCase();
+    
+    let canalesCombinados = [];
+    let tituloMostrar = transmision.titulo || transmision.evento;
+    
+    // Buscar en API 1
+    if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
+        const transAPI1 = transmisionesAPI1.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
+        if (transAPI1 && transAPI1.canales) {
+            const canalesAPI1 = transAPI1.canales.map(canal => ({
+                ...canal,
+                fuente: 'golazolvhd'
+            }));
+            canalesCombinados = [...canalesCombinados, ...canalesAPI1];
+            console.log(`✅ Encontrados ${canalesAPI1.length} canales en API 1 (golazolvhd)`);
+        }
     }
+    
+    // Buscar en API 2
+    if (transmisionesAPI2 && transmisionesAPI2.transmisiones) {
+        const transAPI2 = transmisionesAPI2.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
+        if (transAPI2 && transAPI2.canales) {
+            const canalesAPI2 = transAPI2.canales.map(canal => ({
+                ...canal,
+                fuente: 'ellink'
+            }));
+            canalesCombinados = [...canalesCombinados, ...canalesAPI2];
+            console.log(`✅ Encontrados ${canalesAPI2.length} canales en API 2 (ellink)`);
+        }
+    }
+    
+    if (canalesCombinados.length === 0) {
+        showToast('No hay canales disponibles para este partido');
+        return;
+    }
+    
+    console.log(`📺 Total canales combinados: ${canalesCombinados.length}`);
+    
+    // Crear transmisión combinada
+    const transmisionCombinada = {
+        evento: tituloMostrar,
+        titulo: tituloMostrar,
+        canales: canalesCombinados
+    };
+    
+    showChannelSelector(transmisionCombinada, tituloMostrar);
 }
 
 // Event listener para búsqueda en tiempo real
