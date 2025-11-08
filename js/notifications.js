@@ -237,33 +237,44 @@ class NotificationManager {
 
     async checkForNotifications() {
         try {
-            // Llamar directamente a la API externa
-            const response = await fetch('https://ultragol-api3.onrender.com/notificaciones');
+            // Usar el endpoint específico de Liga MX (más eficiente)
+            // Endpoints disponibles: ligamx, premier, laliga, series, bundesliga, ligue1
+            const apiUrl = 'https://ultragol-api3.onrender.com/notificaciones/ligamx';
+            
+            const response = await fetch(apiUrl);
             if (!response.ok) {
                 console.error('Error fetching notifications:', response.status);
+                // Fallback a todas las notificaciones si falla
+                const fallbackResponse = await fetch('https://ultragol-api3.onrender.com/notificaciones');
+                if (!fallbackResponse.ok) return;
+                const fallbackData = await fallbackResponse.json();
+                this.processNotifications(fallbackData.notificaciones || []);
                 return;
             }
 
             const data = await response.json();
             const notifications = data.notificaciones || [];
-            
-            // Filter notifications for selected team
-            const teamNotifications = notifications.filter(notif => {
-                return this.isRelevantNotification(notif);
-            });
-
-            // Show new notifications
-            teamNotifications.forEach(notif => {
-                if (notif.id && notif.id !== this.lastNotificationId) {
-                    this.showNotification(notif);
-                    this.lastNotificationId = notif.id;
-                    localStorage.setItem('lastNotificationId', notif.id);
-                }
-            });
+            this.processNotifications(notifications);
 
         } catch (error) {
             console.error('Error checking notifications:', error);
         }
+    }
+
+    processNotifications(notifications) {
+        // Filter notifications for selected team
+        const teamNotifications = notifications.filter(notif => {
+            return this.isRelevantNotification(notif);
+        });
+
+        // Show new notifications
+        teamNotifications.forEach(notif => {
+            if (notif.id && notif.id !== this.lastNotificationId) {
+                this.showNotification(notif);
+                this.lastNotificationId = notif.id;
+                localStorage.setItem('lastNotificationId', notif.id);
+            }
+        });
     }
 
     isRelevantNotification(notification) {
