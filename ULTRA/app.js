@@ -560,12 +560,53 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         return;
     }
     
+    // Diccionario de aliases para equipos de Liga MX
+    const aliasesEquipos = {
+        'uanl': ['tigres', 'tigres uanl', 'uanl'],
+        'tigres': ['tigres', 'tigres uanl', 'uanl'],
+        'america': ['america', 'club america', 'las aguilas'],
+        'chivas': ['chivas', 'guadalajara', 'cd guadalajara'],
+        'guadalajara': ['chivas', 'guadalajara', 'cd guadalajara'],
+        'cruz azul': ['cruz azul', 'la maquina'],
+        'pumas': ['pumas', 'pumas unam', 'unam'],
+        'monterrey': ['monterrey', 'rayados', 'cf monterrey'],
+        'santos': ['santos', 'santos laguna'],
+        'toluca': ['toluca', 'diablos rojos'],
+        'leon': ['leon', 'club leon', 'la fiera'],
+        'atlas': ['atlas', 'fc atlas'],
+        'pachuca': ['pachuca', 'tuzos'],
+        'tijuana': ['tijuana', 'xolos', 'club tijuana'],
+        'puebla': ['puebla', 'club puebla', 'la franja'],
+        'queretaro': ['queretaro', 'gallos blancos'],
+        'necaxa': ['necaxa', 'rayos'],
+        'mazatlan': ['mazatlan', 'mazatlan fc'],
+        'juarez': ['juarez', 'fc juarez', 'bravos'],
+        'san luis': ['san luis', 'atletico de san luis', 'atl san luis', 'atl. san luis', 'asl'],
+        'asl': ['san luis', 'atletico de san luis', 'atl san luis', 'atl. san luis', 'asl'],
+        'gdl': ['chivas', 'guadalajara', 'cd guadalajara'],
+        'mty': ['monterrey', 'rayados', 'cf monterrey']
+    };
+    
     // Función auxiliar para normalizar nombres de equipos
     const normalizarNombre = (nombre) => {
         return nombre
             .toLowerCase()
             .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Quitar acentos
             .trim();
+    };
+    
+    // Función para obtener aliases de un equipo
+    const obtenerAliases = (nombre) => {
+        const normalizado = normalizarNombre(nombre);
+        
+        // Buscar en el diccionario
+        for (const [clave, aliases] of Object.entries(aliasesEquipos)) {
+            if (normalizado.includes(clave) || aliases.some(alias => normalizado.includes(alias))) {
+                return aliases;
+            }
+        }
+        
+        return [normalizado];
     };
     
     // Función auxiliar para extraer palabras clave del nombre
@@ -584,33 +625,39 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     const palabrasLocal = extraerPalabrasClaves(partido.local.nombre);
     const palabrasVisitante = extraerPalabrasClaves(partido.visitante.nombre);
     
+    // Obtener aliases para búsqueda más flexible
+    const aliasesLocal = obtenerAliases(partido.local.nombreCorto);
+    const aliasesVisitante = obtenerAliases(partido.visitante.nombreCorto);
+    
     console.log(`🔍 Buscando transmisión para:`);
-    console.log(`   Local: "${nombreLocal}" → palabras: "${palabrasLocal}"`);
-    console.log(`   Visitante: "${nombreVisitante}" → palabras: "${palabrasVisitante}"`);
+    console.log(`   Local: "${nombreLocal}" → aliases: [${aliasesLocal.join(', ')}]`);
+    console.log(`   Visitante: "${nombreVisitante}" → aliases: [${aliasesVisitante.join(', ')}]`);
     
     // Función para buscar transmisión en una lista con búsqueda mejorada
     const buscarTransmision = (transmisiones) => {
         if (!transmisiones || transmisiones.length === 0) return null;
         
-        // Primer intento: búsqueda estricta (ambos equipos)
+        // Primer intento: búsqueda estricta con aliases
         let resultado = transmisiones.find(t => {
             const evento = normalizarNombre(t.evento || t.titulo || '');
             
-            // Buscar coincidencias con múltiples variaciones
+            // Buscar coincidencias con aliases
             const tieneLocal = 
                 evento.includes(nombreLocal) || 
                 evento.includes(nombreCortoLocal) ||
                 evento.includes(palabrasLocal) ||
+                aliasesLocal.some(alias => evento.includes(alias)) ||
                 (palabrasLocal.length > 3 && evento.includes(palabrasLocal.split(' ')[0]));
                 
             const tieneVisitante = 
                 evento.includes(nombreVisitante) || 
                 evento.includes(nombreCortoVisitante) ||
                 evento.includes(palabrasVisitante) ||
+                aliasesVisitante.some(alias => evento.includes(alias)) ||
                 (palabrasVisitante.length > 3 && evento.includes(palabrasVisitante.split(' ')[0]));
             
             if (tieneLocal && tieneVisitante) {
-                console.log(`  ✅ Match encontrado (estricto): "${evento}"`);
+                console.log(`  ✅ Match encontrado (con aliases): "${evento}"`);
                 return true;
             }
             
