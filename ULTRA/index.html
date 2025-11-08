@@ -467,7 +467,13 @@
         </div>
     </div>
 
-    <script src="app.js?v=20251107"></script>
+    <script>
+        // Forzar siempre la versión más reciente del app.js
+        const timestamp = new Date().getTime();
+        const script = document.createElement('script');
+        script.src = `app.js?v=${timestamp}`;
+        document.head.appendChild(script);
+    </script>
     
     <!-- PWA Install Banner -->
     <div id="pwa-install-banner" class="pwa-install-banner">

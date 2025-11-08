@@ -1,14 +1,20 @@
-const CACHE_NAME = 'ultragol-live-v1';
+const CACHE_NAME = 'ultragol-live-v2';
 const urlsToCache = [
   '/ULTRA/',
-  '/ULTRA/index.html',
   '/ULTRA/styles.css',
   '/ULTRA/trending-box.css',
   '/ULTRA/pwa-install-banner.css',
-  '/ULTRA/app.js',
-  '/ULTRA/pwa-install.js',
   '/ULTRA/favicon.png',
   '/ULTRA/ultragol-logo.png'
+];
+
+// URLs que NUNCA deben cachearse (siempre actualización en tiempo real)
+const NO_CACHE_URLS = [
+  '/ULTRA/app.js',
+  '/ULTRA/index.html',
+  'marcadores',
+  'transmisiones',
+  'ultragol-api'
 ];
 
 self.addEventListener('install', (event) => {
@@ -25,6 +31,18 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  const url = event.request.url;
+  
+  // Si es una URL que NO debe cachearse, siempre ir a la red
+  if (NO_CACHE_URLS.some(noCache => url.includes(noCache))) {
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+  
+  // Para el resto, usar estrategia de cache primero
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true })
       .then((response) => {
