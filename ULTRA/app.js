@@ -2321,26 +2321,54 @@ async function shareStream() {
     };
     
     const encodedData = btoa(JSON.stringify(shareData));
-    const shareUrl = `${window.location.origin}${window.location.pathname}?stream=${encodedData}`;
+    // Usar 's' en lugar de 'stream' para acortar la URL
+    const shareUrl = `${window.location.origin}${window.location.pathname}?s=${encodedData}`;
+    
+    // Crear mensajes creativos según el tipo de partido
+    const mensajesCreativos = [
+        `⚽🔥 ${currentStreamTitle} | ¡No te lo pierdas EN VIVO!`,
+        `🎯 ${currentStreamTitle} | ¡Transmisión en directo!`,
+        `⚡ ${currentStreamTitle} | ¡Vívelo con nosotros!`,
+        `🏆 ${currentStreamTitle} | ¡EN VIVO AHORA!`
+    ];
+    
+    // Seleccionar mensaje aleatorio
+    const mensajeAleatorio = mensajesCreativos[Math.floor(Math.random() * mensajesCreativos.length)];
+    
+    // Mensaje completo con emojis y el link
+    const mensajeCompleto = `${mensajeAleatorio}\n\n${shareUrl}`;
     
     // Intentar usar la API nativa de compartir si está disponible
     if (navigator.share) {
         try {
             await navigator.share({
-                title: `UltraGol - ${currentStreamTitle}`,
-                text: `¡Mira este partido en vivo!`,
+                title: `⚽ UltraGol - ${currentStreamTitle}`,
+                text: mensajeCompleto,
                 url: shareUrl
             });
             showToast('¡Link compartido exitosamente! 🎉');
         } catch (error) {
             // Si el usuario cancela, solo copiar al portapapeles
             if (error.name !== 'AbortError') {
-                copyToClipboard(shareUrl);
+                copyToClipboardWithMessage(mensajeCompleto);
             }
         }
     } else {
         // Fallback: copiar al portapapeles
-        copyToClipboard(shareUrl);
+        copyToClipboardWithMessage(mensajeCompleto);
+    }
+}
+
+// Función auxiliar para copiar mensaje completo al portapapeles
+function copyToClipboardWithMessage(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('¡Mensaje copiado al portapapeles! 📋');
+        }).catch(() => {
+            fallbackCopyToClipboard(text);
+        });
+    } else {
+        fallbackCopyToClipboard(text);
     }
 }
 
@@ -2379,7 +2407,8 @@ function fallbackCopyToClipboard(text) {
 // Función para detectar y abrir transmisión compartida
 function checkSharedStream() {
     const urlParams = new URLSearchParams(window.location.search);
-    const streamParam = urlParams.get('stream');
+    // Soportar tanto 's' (nuevo) como 'stream' (viejo) para compatibilidad
+    const streamParam = urlParams.get('s') || urlParams.get('stream');
     
     if (streamParam) {
         try {
