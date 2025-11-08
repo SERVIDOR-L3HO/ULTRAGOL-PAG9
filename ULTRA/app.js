@@ -59,34 +59,45 @@ async function loadTransmisiones() {
         const data1 = await response1.json();
         const data2 = await response2.json();
         
-        // Normalizar API 2 (transmisiones3 - e1link) que usa "enlaces" array
+        // Convertir API 2 (transmisiones3 - e1link) que usa "enlaces" a "canales" pero manteniendo la estructura de array
         const transmisionesNormalizadasAPI2 = (data2.transmisiones || []).map(t => {
-            const canalesNormalizados = (t.enlaces || []).map((enlace, index) => ({
-                numero: `${index + 1}`,
-                nombre: t.canal || `Canal ${index + 1}`,
-                links: {
-                    hoca: enlace,
-                    caster: enlace,
-                    wigi: enlace
-                }
-            }));
+            const canalesNormalizados = [{
+                numero: '',
+                nombre: t.canal || 'Canal',
+                enlaces: t.enlaces || [],
+                tipoAPI: 'e1link'
+            }];
             
             return {
                 ...t,
-                canales: canalesNormalizados
+                canales: canalesNormalizados,
+                tipoAPI: 'e1link'
             };
         });
         
-        // Guardar datos separados de cada API (API1 ya tiene el formato correcto)
-        transmisionesAPI1 = data1;
+        // Marcar transmisiones API 1 con su tipo
+        const transmisionesAPI1Marcadas = (data1.transmisiones || []).map(t => ({
+            ...t,
+            tipoAPI: 'rereyano',
+            canales: (t.canales || []).map(c => ({
+                ...c,
+                tipoAPI: 'rereyano'
+            }))
+        }));
+        
+        // Guardar datos separados de cada API
+        transmisionesAPI1 = {
+            ...data1,
+            transmisiones: transmisionesAPI1Marcadas
+        };
         transmisionesAPI2 = {
             ...data2,
             transmisiones: transmisionesNormalizadasAPI2
         };
         
-        // Combinar las transmisiones de ambas APIs para compatibilidad
+        // Combinar las transmisiones de ambas APIs (partidos pueden repetirse)
         const transmisionesCombinadas = [
-            ...(data1.transmisiones || []),
+            ...transmisionesAPI1Marcadas,
             ...transmisionesNormalizadasAPI2
         ];
         
@@ -672,21 +683,35 @@ function showChannelSelector(transmision, partidoNombre) {
     body.innerHTML = transmision.canales.map((canal, index) => {
         const streamTypes = [];
         
-        if (canal.links?.hoca) {
-            streamTypes.push({ name: 'Opción 1', url: canal.links.hoca, icon: 'play-circle' });
-        }
-        if (canal.links?.caster && canal.links.caster !== canal.links?.hoca) {
-            streamTypes.push({ name: 'Opción 2', url: canal.links.caster, icon: 'play-circle' });
-        }
-        if (canal.links?.wigi && canal.links.wigi !== canal.links?.hoca && canal.links.wigi !== canal.links?.caster) {
-            streamTypes.push({ name: 'Opción 3', url: canal.links.wigi, icon: 'play-circle' });
+        // Detectar el tipo de API y mostrar enlaces apropiadamente
+        if (canal.tipoAPI === 'e1link' && canal.enlaces) {
+            // API 2 (e1link): Mostrar como "URL 1", "URL 2", etc.
+            canal.enlaces.forEach((url, idx) => {
+                streamTypes.push({ 
+                    name: `URL ${idx + 1}`, 
+                    url: url, 
+                    icon: 'play-circle' 
+                });
+            });
+        } else if (canal.tipoAPI === 'rereyano' && canal.links) {
+            // API 1 (rereyano): Mostrar como "hoca", "caster", "wigi"
+            if (canal.links.hoca) {
+                streamTypes.push({ name: 'hoca', url: canal.links.hoca, icon: 'play-circle' });
+            }
+            if (canal.links.caster) {
+                streamTypes.push({ name: 'caster', url: canal.links.caster, icon: 'play-circle' });
+            }
+            if (canal.links.wigi) {
+                streamTypes.push({ name: 'wigi', url: canal.links.wigi, icon: 'play-circle' });
+            }
         }
         
         if (streamTypes.length === 0) {
             return '';
         }
         
-        const fuenteBadge = canal.fuente ? `<span class="fuente-badge" style="background: ${canal.fuente === 'golazolvhd' ? '#4ecdc4' : '#ff6b35'}; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; color: white;">${canal.fuente === 'golazolvhd' ? 'rereyano' : 'e1link'}</span>` : '';
+        // Badge de fuente con colores diferentes
+        const fuenteBadge = canal.tipoAPI ? `<span class="fuente-badge" style="background: ${canal.tipoAPI === 'rereyano' ? '#4ecdc4' : '#ff6b35'}; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; color: white;">${canal.tipoAPI === 'rereyano' ? 'rereyano' : 'e1link'}</span>` : '';
         
         return `
             <div class="channel-option">
@@ -1394,12 +1419,8 @@ function selectImportantMatch(index) {
         });
         
         if (transAPI1 && transAPI1.canales) {
-            const canalesAPI1 = transAPI1.canales.map(canal => ({
-                ...canal,
-                fuente: 'golazolvhd'
-            }));
-            canalesCombinados = [...canalesCombinados, ...canalesAPI1];
-            console.log(`✅ Encontrados ${canalesAPI1.length} canales en API 1 (golazolvhd)`);
+            canalesCombinados = [...canalesCombinados, ...transAPI1.canales];
+            console.log(`✅ Encontrados ${transAPI1.canales.length} canales en API 1 (rereyano)`);
         }
     }
     
@@ -1411,12 +1432,8 @@ function selectImportantMatch(index) {
         });
         
         if (transAPI2 && transAPI2.canales) {
-            const canalesAPI2 = transAPI2.canales.map(canal => ({
-                ...canal,
-                fuente: 'ellink'
-            }));
-            canalesCombinados = [...canalesCombinados, ...canalesAPI2];
-            console.log(`✅ Encontrados ${canalesAPI2.length} canales en API 2 (ellink)`);
+            canalesCombinados = [...canalesCombinados, ...transAPI2.canales];
+            console.log(`✅ Encontrados ${transAPI2.canales.length} canales en API 2 (e1link)`);
         }
     }
     
@@ -1467,12 +1484,8 @@ function selectImportantMatchByName(eventoNombre) {
         });
         
         if (transAPI1 && transAPI1.canales) {
-            const canalesAPI1 = transAPI1.canales.map(canal => ({
-                ...canal,
-                fuente: 'golazolvhd'
-            }));
-            canalesCombinados = [...canalesCombinados, ...canalesAPI1];
-            console.log(`✅ Encontrados ${canalesAPI1.length} canales en API 1 (golazolvhd)`);
+            canalesCombinados = [...canalesCombinados, ...transAPI1.canales];
+            console.log(`✅ Encontrados ${transAPI1.canales.length} canales en API 1 (rereyano)`);
         }
     }
     
@@ -1483,12 +1496,8 @@ function selectImportantMatchByName(eventoNombre) {
         });
         
         if (transAPI2 && transAPI2.canales) {
-            const canalesAPI2 = transAPI2.canales.map(canal => ({
-                ...canal,
-                fuente: 'ellink'
-            }));
-            canalesCombinados = [...canalesCombinados, ...canalesAPI2];
-            console.log(`✅ Encontrados ${canalesAPI2.length} canales en API 2 (ellink)`);
+            canalesCombinados = [...canalesCombinados, ...transAPI2.canales];
+            console.log(`✅ Encontrados ${transAPI2.canales.length} canales en API 2 (e1link)`);
         }
     }
     
