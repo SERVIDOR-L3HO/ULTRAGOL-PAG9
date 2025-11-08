@@ -1523,10 +1523,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) {
         let searchTimeout;
+        
         searchInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            const clearBtn = document.querySelector('.clear-search-btn');
+            if (clearBtn) {
+                clearBtn.style.display = value.length > 0 ? 'flex' : 'none';
+            }
+            
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
-                performSearch(e.target.value);
+                performSearch(value);
             }, 300);
         });
         
@@ -1534,6 +1541,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Enter') {
                 performSearch(e.target.value);
             }
+        });
+        
+        searchInput.addEventListener('keydown', (e) => {
+            e.stopPropagation();
         });
     }
 });

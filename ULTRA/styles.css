@@ -3272,6 +3272,9 @@ body.dark-mode .news-content p {
     font-size: 16px;
     outline: none;
     font-family: 'Poppins', -apple-system, sans-serif;
+    -webkit-user-select: text;
+    user-select: text;
+    pointer-events: auto;
 }
 
 .search-input::placeholder {
