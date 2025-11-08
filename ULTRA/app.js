@@ -1385,6 +1385,78 @@ function selectImportantMatch(index) {
     showChannelSelector(transmisionCombinada, tituloMostrar);
 }
 
+function selectImportantMatchByName(eventoNombre) {
+    closeSearchModal();
+    
+    if (!transmisionesData || !transmisionesData.transmisiones) {
+        showToast('No hay transmisiones disponibles');
+        return;
+    }
+    
+    const nombreBuscar = eventoNombre.toLowerCase().trim();
+    
+    const transmision = transmisionesData.transmisiones.find(t => {
+        const eventoActual = (t.evento || t.titulo || '').toLowerCase().trim();
+        return eventoActual === nombreBuscar || eventoActual.includes(nombreBuscar) || nombreBuscar.includes(eventoActual);
+    });
+    
+    if (!transmision) {
+        showToast('No se encontró la transmisión');
+        return;
+    }
+    
+    let canalesCombinados = [];
+    let tituloMostrar = transmision.titulo || transmision.evento;
+    
+    if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
+        const transAPI1 = transmisionesAPI1.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
+        });
+        
+        if (transAPI1 && transAPI1.canales) {
+            const canalesAPI1 = transAPI1.canales.map(canal => ({
+                ...canal,
+                fuente: 'golazolvhd'
+            }));
+            canalesCombinados = [...canalesCombinados, ...canalesAPI1];
+            console.log(`✅ Encontrados ${canalesAPI1.length} canales en API 1 (golazolvhd)`);
+        }
+    }
+    
+    if (transmisionesAPI2 && transmisionesAPI2.transmisiones) {
+        const transAPI2 = transmisionesAPI2.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
+        });
+        
+        if (transAPI2 && transAPI2.canales) {
+            const canalesAPI2 = transAPI2.canales.map(canal => ({
+                ...canal,
+                fuente: 'ellink'
+            }));
+            canalesCombinados = [...canalesCombinados, ...canalesAPI2];
+            console.log(`✅ Encontrados ${canalesAPI2.length} canales en API 2 (ellink)`);
+        }
+    }
+    
+    if (canalesCombinados.length > 0) {
+        const transmisionCombinada = {
+            evento: tituloMostrar,
+            titulo: tituloMostrar,
+            canales: canalesCombinados
+        };
+        
+        showChannelSelector(transmisionCombinada, tituloMostrar);
+    } else {
+        if (transmision.canales && transmision.canales.length > 0) {
+            showChannelSelector(transmision, tituloMostrar);
+        } else {
+            showToast('No hay canales disponibles para este partido');
+        }
+    }
+}
+
 // Event listener para búsqueda en tiempo real
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchInput');
