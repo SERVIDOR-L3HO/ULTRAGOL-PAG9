@@ -1887,8 +1887,10 @@ function renderImportantMatches() {
         const inicialLocal = equipoLocal.substring(0, 2).toUpperCase();
         const inicialVisitante = equipoVisitante.substring(0, 2).toUpperCase();
         
+        const eventoEscapado = (transmision.evento || transmision.titulo || '').replace(/'/g, "\\'");
+        
         return `
-            <div class="important-match-card-new" onclick='selectImportantMatchByTransmision(${index})'>
+            <div class="important-match-card-new" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
                 <div class="match-image-container">
                     <img src="${backgroundImage}" alt="${deporte}" class="match-bg-image">
                     <div class="match-image-overlay"></div>
@@ -1969,53 +1971,51 @@ function findTransmisionForMatch(partido) {
     return transmision;
 }
 
-function selectImportantMatchByTransmision(transmisionIndex) {
+function selectImportantMatchByTransmision(eventoNombre) {
     if (!transmisionesData || !transmisionesData.transmisiones) {
         showToast('No se pudo encontrar la transmisión');
         return;
     }
     
-    const transmision = transmisionesData.transmisiones[transmisionIndex];
+    const nombreBuscar = eventoNombre.toLowerCase().trim();
+    
+    // Buscar la transmisión por nombre del evento
+    const transmision = transmisionesData.transmisiones.find(t => {
+        const evento = (t.evento || t.titulo || '').toLowerCase().trim();
+        return evento === nombreBuscar;
+    });
     
     if (!transmision) {
-        showToast('No se pudo encontrar la transmisión');
+        showToast('No se encontró el partido');
         return;
     }
-    
-    const eventoNombre = (transmision.evento || transmision.titulo || '').toLowerCase();
     
     let canalesCombinados = [];
     let tituloMostrar = transmision.titulo || transmision.evento;
     
+    // Buscar en API 1 (rereyano)
     if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
         const transAPI1 = transmisionesAPI1.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+            const evento = (t.evento || t.titulo || '').toLowerCase().trim();
+            return evento === nombreBuscar;
         });
         
         if (transAPI1 && transAPI1.canales) {
-            const canalesAPI1 = transAPI1.canales.map(canal => ({
-                ...canal,
-                fuente: 'golazolvhd'
-            }));
-            canalesCombinados = [...canalesCombinados, ...canalesAPI1];
-            console.log(`✅ Encontrados ${canalesAPI1.length} canales en API 1 (golazolvhd)`);
+            canalesCombinados = [...canalesCombinados, ...transAPI1.canales];
+            console.log(`✅ Encontrados ${transAPI1.canales.length} canales en API 1 (rereyano) para "${tituloMostrar}"`);
         }
     }
     
+    // Buscar en API 2 (e1link)
     if (transmisionesAPI2 && transmisionesAPI2.transmisiones) {
         const transAPI2 = transmisionesAPI2.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+            const evento = (t.evento || t.titulo || '').toLowerCase().trim();
+            return evento === nombreBuscar;
         });
         
         if (transAPI2 && transAPI2.canales) {
-            const canalesAPI2 = transAPI2.canales.map(canal => ({
-                ...canal,
-                fuente: 'ellink'
-            }));
-            canalesCombinados = [...canalesCombinados, ...canalesAPI2];
-            console.log(`✅ Encontrados ${canalesAPI2.length} canales en API 2 (ellink)`);
+            canalesCombinados = [...canalesCombinados, ...transAPI2.canales];
+            console.log(`✅ Encontrados ${transAPI2.canales.length} canales en API 2 (e1link) para "${tituloMostrar}"`);
         }
     }
     
