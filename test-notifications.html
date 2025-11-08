@@ -128,7 +128,8 @@
         <button class="btn" onclick="requestPermission()">1. Solicitar Permiso de Notificaciones</button>
         <button class="btn btn-secondary" onclick="testNotification()">2. Enviar Notificación de Prueba</button>
         <button class="btn btn-success" onclick="testAPINotifications()">3. Obtener Notificaciones de la API</button>
-        <button class="btn btn-success" onclick="clearStorage()">Limpiar LocalStorage</button>
+        <button class="btn" onclick="showTeamSelectorManually()">4. Mostrar Selector de Equipos</button>
+        <button class="btn btn-success" onclick="clearStorage()">🗑️ Limpiar LocalStorage y Reiniciar</button>
 
         <div class="log" id="log"></div>
     </div>
@@ -239,7 +240,20 @@
             localStorage.removeItem('lastNotificationId');
             localStorage.removeItem('notificationModalShown');
             addLog('🗑️ LocalStorage limpiado');
+            addLog('🔄 Recargando página en 2 segundos...');
             updateStatus();
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        }
+
+        function showTeamSelectorManually() {
+            addLog('👥 Intentando mostrar selector de equipos...');
+            if (window.notificationManager) {
+                window.notificationManager.showTeamSelector();
+            } else {
+                addLog('❌ NotificationManager no está disponible. Carga la página principal primero.');
+            }
         }
 
         updateStatus();

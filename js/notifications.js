@@ -80,13 +80,21 @@ class NotificationManager {
         }
 
         try {
+            console.log('📱 Requesting notification permission...');
             const permission = await Notification.requestPermission();
+            console.log('📱 Permission result:', permission);
             
             if (permission === 'granted') {
                 this.notificationPermission = 'granted';
                 localStorage.setItem('notificationPermission', 'granted');
+                console.log('✅ Permission granted, closing modal and showing team selector...');
                 this.closeModal(modal);
-                this.showTeamSelector();
+                
+                // Wait for modal to close before showing team selector
+                setTimeout(() => {
+                    console.log('👥 Opening team selector...');
+                    this.showTeamSelector();
+                }, 400);
             } else {
                 this.notificationPermission = 'denied';
                 localStorage.setItem('notificationPermission', 'denied');
@@ -95,7 +103,7 @@ class NotificationManager {
                 this.showMessage('Notificaciones desactivadas', 'info');
             }
         } catch (error) {
-            console.error('Error requesting notification permission:', error);
+            console.error('❌ Error requesting notification permission:', error);
             this.closeModal(modal);
         }
     }
@@ -116,56 +124,75 @@ class NotificationManager {
     }
 
     async showTeamSelector() {
-        const modal = document.createElement('div');
-        modal.className = 'notification-permission-modal';
+        console.log('👥 showTeamSelector() called');
         
-        const teams = await this.getTeams();
-        
-        const teamOptions = teams.map(team => `
-            <div class="team-option" data-team-id="${team.id}">
-                <img src="${team.logo}" alt="${team.name}" onerror="this.style.display='none'">
-                <span>${team.name}</span>
-            </div>
-        `).join('');
-
-        modal.innerHTML = `
-            <div class="notification-modal-overlay"></div>
-            <div class="notification-modal-content team-selector">
-                <div class="notification-modal-header">
-                    <i class="fas fa-heart notification-icon"></i>
-                    <h2>Elige tu equipo favorito</h2>
+        try {
+            console.log('📡 Loading teams...');
+            const teams = await this.getTeams();
+            console.log('✅ Teams loaded:', teams.length, 'teams');
+            
+            if (!teams || teams.length === 0) {
+                console.error('❌ No teams available');
+                this.showMessage('Error al cargar equipos. Por favor, intenta más tarde.', 'error');
+                return;
+            }
+            
+            const modal = document.createElement('div');
+            modal.className = 'notification-permission-modal';
+            
+            const teamOptions = teams.map(team => `
+                <div class="team-option" data-team-id="${team.id}">
+                    <img src="${team.logo}" alt="${team.name}" onerror="this.style.display='none'">
+                    <span>${team.name}</span>
                 </div>
-                <div class="notification-modal-body">
-                    <p>Selecciona el equipo del cual quieres recibir notificaciones:</p>
-                    <div class="teams-grid">
-                        ${teamOptions}
+            `).join('');
+
+            modal.innerHTML = `
+                <div class="notification-modal-overlay"></div>
+                <div class="notification-modal-content team-selector">
+                    <div class="notification-modal-header">
+                        <i class="fas fa-heart notification-icon"></i>
+                        <h2>Elige tu equipo favorito</h2>
+                    </div>
+                    <div class="notification-modal-body">
+                        <p>Selecciona el equipo del cual quieres recibir notificaciones:</p>
+                        <div class="teams-grid">
+                            ${teamOptions}
+                        </div>
+                    </div>
+                    <div class="notification-modal-footer">
+                        <button class="btn-secondary" id="teamSelectorCancel">
+                            Cancelar
+                        </button>
                     </div>
                 </div>
-                <div class="notification-modal-footer">
-                    <button class="btn-secondary" id="teamSelectorCancel">
-                        Cancelar
-                    </button>
-                </div>
-            </div>
-        `;
+            `;
 
-        document.body.appendChild(modal);
+            console.log('📋 Appending team selector modal to body');
+            document.body.appendChild(modal);
 
-        setTimeout(() => {
-            modal.querySelector('.notification-modal-content').classList.add('show');
-        }, 100);
+            setTimeout(() => {
+                console.log('✨ Showing team selector modal');
+                modal.querySelector('.notification-modal-content').classList.add('show');
+            }, 100);
 
-        modal.querySelectorAll('.team-option').forEach(option => {
-            option.addEventListener('click', () => {
-                const teamId = option.dataset.teamId;
-                this.selectTeam(teamId, modal);
+            modal.querySelectorAll('.team-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const teamId = option.dataset.teamId;
+                    console.log('🎯 Team selected:', teamId);
+                    this.selectTeam(teamId, modal);
+                });
             });
-        });
 
-        document.getElementById('teamSelectorCancel').addEventListener('click', () => {
-            this.closeModal(modal);
-            localStorage.setItem('notificationModalShown', 'true');
-        });
+            document.getElementById('teamSelectorCancel').addEventListener('click', () => {
+                console.log('❌ Team selector cancelled');
+                this.closeModal(modal);
+                localStorage.setItem('notificationModalShown', 'true');
+            });
+        } catch (error) {
+            console.error('❌ Error showing team selector:', error);
+            this.showMessage('Error al mostrar selector de equipos', 'error');
+        }
     }
 
     selectTeam(teamId, modal) {
@@ -186,23 +213,31 @@ class NotificationManager {
 
     async getTeams() {
         try {
+            console.log('📡 Fetching teams from API...');
             // Llamar directamente a la API externa
             const response = await fetch('https://ultragol-api3.onrender.com/Equipos');
             if (response.ok) {
-                return await response.json();
+                const teams = await response.json();
+                console.log('✅ Teams fetched from API:', teams.length);
+                return teams;
             }
             
+            console.log('⚠️ API failed, trying fallback...');
             // Fallback to local data
             const fallbackResponse = await fetch('data/teams.json');
-            return await fallbackResponse.json();
+            const teams = await fallbackResponse.json();
+            console.log('✅ Teams loaded from fallback:', teams.length);
+            return teams;
         } catch (error) {
-            console.error('Error loading teams:', error);
+            console.error('❌ Error loading teams:', error);
             // Try local fallback
             try {
                 const fallbackResponse = await fetch('data/teams.json');
-                return await fallbackResponse.json();
+                const teams = await fallbackResponse.json();
+                console.log('✅ Teams loaded from fallback (2nd try):', teams.length);
+                return teams;
             } catch (fallbackError) {
-                console.error('Error loading fallback teams:', fallbackError);
+                console.error('❌ Error loading fallback teams:', fallbackError);
                 return [];
             }
         }
@@ -408,13 +443,49 @@ class NotificationManager {
 if (typeof window !== 'undefined') {
     window.notificationManager = new NotificationManager();
     
+    // Helper functions for manual testing/activation
+    window.activarNotificaciones = function() {
+        console.log('🔔 Activando sistema de notificaciones manualmente...');
+        window.notificationManager.showPermissionModal();
+    };
+    
+    window.elegirEquipo = function() {
+        console.log('👥 Abriendo selector de equipos...');
+        window.notificationManager.showTeamSelector();
+    };
+    
+    window.limpiarNotificaciones = function() {
+        console.log('🗑️ Limpiando configuración de notificaciones...');
+        localStorage.removeItem('selectedTeam');
+        localStorage.removeItem('notificationPermission');
+        localStorage.removeItem('lastNotificationId');
+        localStorage.removeItem('notificationModalShown');
+        console.log('✅ Limpiado. Recarga la página para reiniciar el sistema.');
+    };
+    
+    window.estadoNotificaciones = function() {
+        console.log('📊 Estado del sistema de notificaciones:');
+        console.log('  - Permiso del navegador:', Notification.permission);
+        console.log('  - Permiso guardado:', localStorage.getItem('notificationPermission'));
+        console.log('  - Equipo favorito:', localStorage.getItem('selectedTeam') || 'No seleccionado');
+        console.log('  - Modal mostrado:', localStorage.getItem('notificationModalShown'));
+        console.log('  - Última notificación:', localStorage.getItem('lastNotificationId') || 'Ninguna');
+        console.log('\n💡 Funciones disponibles:');
+        console.log('  - activarNotificaciones() - Muestra el modal de permisos');
+        console.log('  - elegirEquipo() - Muestra el selector de equipos');
+        console.log('  - limpiarNotificaciones() - Limpia toda la configuración');
+        console.log('  - estadoNotificaciones() - Muestra este mensaje');
+    };
+    
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
             window.notificationManager.init();
+            console.log('\n💡 Sistema de notificaciones cargado. Escribe estadoNotificaciones() para ver el estado.');
         });
     } else {
         window.notificationManager.init();
+        console.log('\n💡 Sistema de notificaciones cargado. Escribe estadoNotificaciones() para ver el estado.');
     }
 }
 
