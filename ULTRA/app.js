@@ -588,14 +588,13 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     console.log(`   Local: "${nombreLocal}" → palabras: "${palabrasLocal}"`);
     console.log(`   Visitante: "${nombreVisitante}" → palabras: "${palabrasVisitante}"`);
     
-    // Función para buscar transmisión en una lista
+    // Función para buscar transmisión en una lista con búsqueda mejorada
     const buscarTransmision = (transmisiones) => {
         if (!transmisiones || transmisiones.length === 0) return null;
         
-        return transmisiones.find(t => {
+        // Primer intento: búsqueda estricta (ambos equipos)
+        let resultado = transmisiones.find(t => {
             const evento = normalizarNombre(t.evento || t.titulo || '');
-            
-            console.log(`  Comparando con: "${evento}"`);
             
             // Buscar coincidencias con múltiples variaciones
             const tieneLocal = 
@@ -611,11 +610,53 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
                 (palabrasVisitante.length > 3 && evento.includes(palabrasVisitante.split(' ')[0]));
             
             if (tieneLocal && tieneVisitante) {
-                console.log(`  ✅ Match encontrado: "${evento}"`);
+                console.log(`  ✅ Match encontrado (estricto): "${evento}"`);
+                return true;
             }
             
-            return tieneLocal && tieneVisitante;
+            return false;
         });
+        
+        // Segundo intento: búsqueda flexible (al menos 3 caracteres coinciden)
+        if (!resultado) {
+            resultado = transmisiones.find(t => {
+                const evento = normalizarNombre(t.evento || t.titulo || '');
+                
+                // Extraer palabras del evento
+                const palabrasEvento = evento.split(/\s+vs?\s+|\s+-\s+/i);
+                
+                if (palabrasEvento.length >= 2) {
+                    const equipo1Evento = palabrasEvento[0].trim();
+                    const equipo2Evento = palabrasEvento[1].split(/\s*[-|]\s*/)[0].trim();
+                    
+                    // Verificar si alguna parte del nombre coincide
+                    const coincideLocal = 
+                        equipo1Evento.includes(nombreCortoLocal.substring(0, 3)) ||
+                        equipo2Evento.includes(nombreCortoLocal.substring(0, 3)) ||
+                        nombreCortoLocal.includes(equipo1Evento.substring(0, 3)) ||
+                        nombreCortoLocal.includes(equipo2Evento.substring(0, 3));
+                        
+                    const coincideVisitante = 
+                        equipo1Evento.includes(nombreCortoVisitante.substring(0, 3)) ||
+                        equipo2Evento.includes(nombreCortoVisitante.substring(0, 3)) ||
+                        nombreCortoVisitante.includes(equipo1Evento.substring(0, 3)) ||
+                        nombreCortoVisitante.includes(equipo2Evento.substring(0, 3));
+                    
+                    if (coincideLocal && coincideVisitante) {
+                        console.log(`  ✅ Match encontrado (flexible): "${evento}"`);
+                        return true;
+                    }
+                }
+                
+                return false;
+            });
+        }
+        
+        if (!resultado) {
+            console.log(`  ❌ No se encontró coincidencia en ${transmisiones.length} transmisiones`);
+        }
+        
+        return resultado;
     };
     
     // Buscar en ambas APIs
