@@ -928,6 +928,7 @@ async function performSearch(query) {
         const transmisionesConCanalesCombinados = matchedTransmisiones.map(transmision => {
             const eventoNombre = (transmision.evento || transmision.titulo || '').toLowerCase();
             let canalesCombinados = [];
+            let tituloDisplay = transmision.titulo || transmision.evento || 'Partido';
             
             // Buscar en API 1
             if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
@@ -936,12 +937,22 @@ async function performSearch(query) {
                     return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
                 });
                 
-                if (transAPI1 && transAPI1.canales) {
-                    const canalesAPI1 = transAPI1.canales.map(canal => ({
-                        ...canal,
-                        fuente: 'golazolvhd'
-                    }));
-                    canalesCombinados = [...canalesCombinados, ...canalesAPI1];
+                if (transAPI1) {
+                    // Actualizar título si es mejor que el actual
+                    if (transAPI1.titulo && !tituloDisplay) {
+                        tituloDisplay = transAPI1.titulo;
+                    }
+                    if (transAPI1.evento && !tituloDisplay) {
+                        tituloDisplay = transAPI1.evento;
+                    }
+                    
+                    if (transAPI1.canales) {
+                        const canalesAPI1 = transAPI1.canales.map(canal => ({
+                            ...canal,
+                            fuente: 'golazolvhd'
+                        }));
+                        canalesCombinados = [...canalesCombinados, ...canalesAPI1];
+                    }
                 }
             }
             
@@ -952,18 +963,30 @@ async function performSearch(query) {
                     return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
                 });
                 
-                if (transAPI2 && transAPI2.canales) {
-                    const canalesAPI2 = transAPI2.canales.map(canal => ({
-                        ...canal,
-                        fuente: 'ellink'
-                    }));
-                    canalesCombinados = [...canalesCombinados, ...canalesAPI2];
+                if (transAPI2) {
+                    // Actualizar título si es mejor que el actual
+                    if (transAPI2.titulo && !tituloDisplay) {
+                        tituloDisplay = transAPI2.titulo;
+                    }
+                    if (transAPI2.evento && !tituloDisplay) {
+                        tituloDisplay = transAPI2.evento;
+                    }
+                    
+                    if (transAPI2.canales) {
+                        const canalesAPI2 = transAPI2.canales.map(canal => ({
+                            ...canal,
+                            fuente: 'ellink'
+                        }));
+                        canalesCombinados = [...canalesCombinados, ...canalesAPI2];
+                    }
                 }
             }
             
-            // Retornar transmisión con canales combinados
+            // Retornar transmisión con canales combinados y título garantizado
             return {
                 ...transmision,
+                titulo: tituloDisplay,
+                evento: tituloDisplay,
                 canales: canalesCombinados
             };
         });
