@@ -1543,21 +1543,16 @@
             
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('✨ Nueva versión lista. La página se recargará automáticamente...');
-                // Esperar 1 segundo antes de recargar para que el usuario vea el mensaje
-                setTimeout(() => {
-                  window.location.reload();
-                }, 1000);
+                console.log('✨ Nueva versión disponible. Recarga la página para actualizar.');
               }
             });
           });
         })
         .catch(err => console.error('❌ Error al registrar el SW:', err));
 
-      // Si hay nueva versión del Service Worker, recarga automáticamente
+      // Service Worker actualizado (sin recarga automática)
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        console.log('🔄 Service Worker actualizado. Recargando página...');
-        window.location.reload();
+        console.log('🔄 Service Worker actualizado.');
       });
       
       // Escuchar mensajes del Service Worker
