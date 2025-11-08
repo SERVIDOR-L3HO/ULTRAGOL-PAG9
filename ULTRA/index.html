@@ -467,12 +467,16 @@
         </div>
     </div>
 
+    <script src="app.js"></script>
     <script>
-        // Forzar siempre la versión más reciente del app.js
-        const timestamp = new Date().getTime();
-        const script = document.createElement('script');
-        script.src = `app.js?v=${timestamp}`;
-        document.head.appendChild(script);
+        // Forzar recarga si hay nueva versión
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.update();
+                }
+            });
+        }
     </script>
     
     <!-- PWA Install Banner -->
