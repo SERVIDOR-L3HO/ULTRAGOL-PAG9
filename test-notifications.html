@@ -161,10 +161,21 @@
         // Helper function to show notifications (compatible with Service Workers)
         async function showNotification(title, options) {
             try {
-                // Check if Service Worker is available and active
+                // IMPORTANTE: Si hay un Service Worker registrado, SIEMPRE debemos usarlo
+                // Los navegadores modernos no permiten new Notification() cuando hay SW
+                
                 if ('serviceWorker' in navigator) {
-                    const registration = await navigator.serviceWorker.getRegistration();
-                    if (registration && registration.active) {
+                    addLog('🔍 Verificando Service Worker...');
+                    
+                    // Wait for Service Worker to be ready (with timeout)
+                    const registration = await Promise.race([
+                        navigator.serviceWorker.ready,
+                        new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Service Worker timeout')), 3000)
+                        )
+                    ]);
+                    
+                    if (registration) {
                         addLog('📱 Usando Service Worker para mostrar notificación');
                         
                         // Clean options - remove non-cloneable data (functions)
@@ -188,8 +199,8 @@
                     }
                 }
                 
-                // Fallback to regular Notification API
-                addLog('🔔 Usando Notification API estándar');
+                // Solo usar Notification API directa si NO hay Service Worker
+                addLog('🔔 No hay Service Worker, usando Notification API estándar');
                 const notification = new Notification(title, options);
                 
                 if (options.onclick) {

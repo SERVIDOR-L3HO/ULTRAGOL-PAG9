@@ -439,10 +439,24 @@ class NotificationManager {
 
     async showNotificationSafe(title, options) {
         try {
-            // Check if Service Worker is available and active
+            // IMPORTANTE: Si hay un Service Worker registrado, SIEMPRE debemos usarlo
+            // Los navegadores modernos no permiten new Notification() cuando hay SW registrado
+            
             if ('serviceWorker' in navigator) {
-                const registration = await navigator.serviceWorker.getRegistration();
-                if (registration && registration.active) {
+                console.log('🔍 Checking for Service Worker...');
+                
+                // Wait for Service Worker to be ready (with timeout to prevent hanging)
+                const registration = await Promise.race([
+                    navigator.serviceWorker.ready,
+                    new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Service Worker timeout')), 3000)
+                    )
+                ]).catch(err => {
+                    console.warn('⚠️ Service Worker not ready:', err.message);
+                    return null;
+                });
+                
+                if (registration) {
                     console.log('📱 Using Service Worker to show notification');
                     
                     // Clean options - remove non-cloneable data (functions, etc)
@@ -462,8 +476,8 @@ class NotificationManager {
                 }
             }
             
-            // Fallback to regular Notification API
-            console.log('🔔 Using standard Notification API');
+            // Solo usar Notification API directa si NO hay Service Worker
+            console.log('🔔 No Service Worker available, using standard Notification API');
             const notification = new Notification(title, options);
             
             // Handle onclick if provided in options
