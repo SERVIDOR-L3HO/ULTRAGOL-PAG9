@@ -247,12 +247,49 @@
             }, 2000);
         }
 
-        function showTeamSelectorManually() {
+        async function showTeamSelectorManually() {
             addLog('👥 Intentando mostrar selector de equipos...');
-            if (window.notificationManager) {
-                window.notificationManager.showTeamSelector();
+            
+            // Load notifications.js if not already loaded
+            if (!window.NotificationManager) {
+                addLog('📦 Cargando NotificationManager...');
+                try {
+                    const script = document.createElement('script');
+                    script.src = '/js/notifications.js';
+                    script.onload = () => {
+                        addLog('✅ NotificationManager cargado');
+                        setTimeout(() => {
+                            if (window.notificationManager) {
+                                addLog('🎯 Mostrando selector de equipos...');
+                                window.notificationManager.showTeamSelector();
+                            } else {
+                                addLog('❌ Error: NotificationManager no se inicializó');
+                            }
+                        }, 500);
+                    };
+                    script.onerror = () => {
+                        addLog('❌ Error cargando notifications.js');
+                    };
+                    document.head.appendChild(script);
+                    
+                    // Also load CSS
+                    const cssLink = document.createElement('link');
+                    cssLink.rel = 'stylesheet';
+                    cssLink.href = '/css/notifications.css';
+                    document.head.appendChild(cssLink);
+                } catch (error) {
+                    addLog(`❌ Error: ${error.message}`);
+                }
+            } else if (window.notificationManager) {
+                addLog('🎯 Mostrando selector de equipos...');
+                try {
+                    await window.notificationManager.showTeamSelector();
+                    addLog('✅ Selector mostrado');
+                } catch (error) {
+                    addLog(`❌ Error mostrando selector: ${error.message}`);
+                }
             } else {
-                addLog('❌ NotificationManager no está disponible. Carga la página principal primero.');
+                addLog('❌ NotificationManager no está disponible');
             }
         }
 
@@ -262,6 +299,7 @@
         addLog('   1. Solicita permiso de notificaciones');
         addLog('   2. Envía una notificación de prueba');
         addLog('   3. Obtén notificaciones reales de la API');
+        addLog('   4. Prueba el selector de equipos');
     </script>
 </body>
 </html>

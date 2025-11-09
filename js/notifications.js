@@ -129,7 +129,7 @@ class NotificationManager {
         try {
             console.log('📡 Loading teams...');
             const teams = await this.getTeams();
-            console.log('✅ Teams loaded:', teams.length, 'teams');
+            console.log('✅ Teams loaded:', teams ? teams.length : 0, 'teams');
             
             if (!teams || teams.length === 0) {
                 console.error('❌ No teams available');
@@ -137,21 +137,38 @@ class NotificationManager {
                 return;
             }
             
+            // Validate that we have body element
+            if (!document.body) {
+                console.error('❌ document.body not available');
+                setTimeout(() => this.showTeamSelector(), 100);
+                return;
+            }
+            
             const modal = document.createElement('div');
             modal.className = 'notification-permission-modal';
             
-            const teamOptions = teams.map(team => `
-                <div class="team-option" data-team-id="${team.id}">
-                    <img src="${team.logo}" alt="${team.name}" onerror="this.style.display='none'">
-                    <span>${team.name}</span>
-                </div>
-            `).join('');
+            // Generate team options with error handling
+            const teamOptions = teams.map(team => {
+                const teamId = team.id || '';
+                const teamName = team.name || team.shortName || 'Sin nombre';
+                const teamLogo = team.logo || '';
+                
+                return `
+                    <div class="team-option" data-team-id="${teamId}">
+                        <img src="${teamLogo}" alt="${teamName}" onerror="this.style.display='none'" loading="lazy">
+                        <span>${teamName}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Use simpler icon if Font Awesome not available
+            const heartIcon = '<i class="fas fa-heart notification-icon"></i>';
 
             modal.innerHTML = `
                 <div class="notification-modal-overlay"></div>
                 <div class="notification-modal-content team-selector">
                     <div class="notification-modal-header">
-                        <i class="fas fa-heart notification-icon"></i>
+                        ${heartIcon}
                         <h2>Elige tu equipo favorito</h2>
                     </div>
                     <div class="notification-modal-body">
@@ -169,28 +186,54 @@ class NotificationManager {
             `;
 
             console.log('📋 Appending team selector modal to body');
-            document.body.appendChild(modal);
+            
+            try {
+                document.body.appendChild(modal);
+            } catch (appendError) {
+                console.error('❌ Error appending modal:', appendError);
+                this.showMessage('Error al mostrar selector de equipos', 'error');
+                return;
+            }
 
             setTimeout(() => {
-                console.log('✨ Showing team selector modal');
-                modal.querySelector('.notification-modal-content').classList.add('show');
+                try {
+                    console.log('✨ Showing team selector modal');
+                    const modalContent = modal.querySelector('.notification-modal-content');
+                    if (modalContent) {
+                        modalContent.classList.add('show');
+                    }
+                } catch (showError) {
+                    console.error('❌ Error showing modal:', showError);
+                }
             }, 100);
 
-            modal.querySelectorAll('.team-option').forEach(option => {
+            // Add event listeners with error handling
+            const teamOptionElements = modal.querySelectorAll('.team-option');
+            console.log('🎯 Found', teamOptionElements.length, 'team options');
+            
+            teamOptionElements.forEach(option => {
                 option.addEventListener('click', () => {
-                    const teamId = option.dataset.teamId;
-                    console.log('🎯 Team selected:', teamId);
-                    this.selectTeam(teamId, modal);
+                    try {
+                        const teamId = option.dataset.teamId;
+                        console.log('🎯 Team selected:', teamId);
+                        this.selectTeam(teamId, modal);
+                    } catch (selectError) {
+                        console.error('❌ Error selecting team:', selectError);
+                    }
                 });
             });
 
-            document.getElementById('teamSelectorCancel').addEventListener('click', () => {
-                console.log('❌ Team selector cancelled');
-                this.closeModal(modal);
-                localStorage.setItem('notificationModalShown', 'true');
-            });
+            const cancelButton = document.getElementById('teamSelectorCancel');
+            if (cancelButton) {
+                cancelButton.addEventListener('click', () => {
+                    console.log('❌ Team selector cancelled');
+                    this.closeModal(modal);
+                    localStorage.setItem('notificationModalShown', 'true');
+                });
+            }
         } catch (error) {
             console.error('❌ Error showing team selector:', error);
+            console.error('Error details:', error.message, error.stack);
             this.showMessage('Error al mostrar selector de equipos', 'error');
         }
     }
@@ -212,34 +255,75 @@ class NotificationManager {
     }
 
     async getTeams() {
+        // Helper function to fetch with timeout
+        const fetchWithTimeout = (url, timeout = 5000) => {
+            return Promise.race([
+                fetch(url),
+                new Promise((_, reject) =>
+                    setTimeout(() => reject(new Error('Request timeout')), timeout)
+                )
+            ]);
+        };
+
         try {
             console.log('📡 Fetching teams from API...');
-            // Llamar directamente a la API externa
-            const response = await fetch('https://ultragol-api3.onrender.com/Equipos');
-            if (response.ok) {
-                const teams = await response.json();
-                console.log('✅ Teams fetched from API:', teams.length);
-                return teams;
+            
+            // Try API first with timeout
+            try {
+                const response = await fetchWithTimeout('https://ultragol-api3.onrender.com/Equipos', 5000);
+                if (response.ok) {
+                    const teams = await response.json();
+                    console.log('✅ Teams fetched from API:', teams.length);
+                    
+                    // Validate teams structure
+                    if (Array.isArray(teams) && teams.length > 0 && teams[0].id) {
+                        return teams;
+                    } else {
+                        console.warn('⚠️ API response invalid, using fallback');
+                    }
+                }
+            } catch (apiError) {
+                console.log('⚠️ API failed:', apiError.message, '- trying fallback...');
             }
             
-            console.log('⚠️ API failed, trying fallback...');
             // Fallback to local data
-            const fallbackResponse = await fetch('data/teams.json');
+            console.log('📂 Loading teams from local file...');
+            const fallbackResponse = await fetch('/data/teams.json');
+            
+            if (!fallbackResponse.ok) {
+                throw new Error('Fallback file not found');
+            }
+            
             const teams = await fallbackResponse.json();
             console.log('✅ Teams loaded from fallback:', teams.length);
-            return teams;
-        } catch (error) {
-            console.error('❌ Error loading teams:', error);
-            // Try local fallback
-            try {
-                const fallbackResponse = await fetch('data/teams.json');
-                const teams = await fallbackResponse.json();
-                console.log('✅ Teams loaded from fallback (2nd try):', teams.length);
+            
+            // Validate fallback teams structure
+            if (Array.isArray(teams) && teams.length > 0) {
                 return teams;
-            } catch (fallbackError) {
-                console.error('❌ Error loading fallback teams:', fallbackError);
+            } else {
+                console.error('❌ Invalid teams data structure');
                 return [];
             }
+        } catch (error) {
+            console.error('❌ Error loading teams:', error);
+            console.error('Error details:', error.message);
+            
+            // Last resort: try one more time with local data
+            try {
+                console.log('🔄 Last attempt: loading local teams...');
+                const response = await fetch('./data/teams.json');
+                if (response.ok) {
+                    const teams = await response.json();
+                    if (Array.isArray(teams) && teams.length > 0) {
+                        console.log('✅ Teams loaded (final attempt):', teams.length);
+                        return teams;
+                    }
+                }
+            } catch (finalError) {
+                console.error('❌ Final attempt failed:', finalError.message);
+            }
+            
+            return [];
         }
     }
 
@@ -392,21 +476,56 @@ class NotificationManager {
     }
 
     showMessage(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `notification-toast ${type}`;
-        toast.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-            <span>${message}</span>
-        `;
-        
-        document.body.appendChild(toast);
-        
-        setTimeout(() => toast.classList.add('show'), 100);
-        
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
+        try {
+            // Validate that body is available
+            if (!document.body) {
+                console.error('❌ Cannot show message: document.body not available');
+                return;
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `notification-toast ${type}`;
+            
+            // Use emoji fallback if Font Awesome not available
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+            const iconHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>`;
+            
+            toast.innerHTML = `
+                ${iconHTML}
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                try {
+                    toast.classList.add('show');
+                } catch (e) {
+                    console.error('❌ Error showing toast:', e);
+                }
+            }, 100);
+            
+            setTimeout(() => {
+                try {
+                    toast.classList.remove('show');
+                    setTimeout(() => {
+                        try {
+                            if (toast.parentNode) {
+                                toast.remove();
+                            }
+                        } catch (e) {
+                            console.error('❌ Error removing toast:', e);
+                        }
+                    }, 300);
+                } catch (e) {
+                    console.error('❌ Error hiding toast:', e);
+                }
+            }, 3000);
+        } catch (error) {
+            console.error('❌ Error showing message:', error);
+            // Fallback to alert if toast fails
+            alert(message);
+        }
     }
 
     stopNotificationPolling() {
