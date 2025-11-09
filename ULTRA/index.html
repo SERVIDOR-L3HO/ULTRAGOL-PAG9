@@ -318,7 +318,7 @@
                     <span>Regresar</span>
                 </button>
                 <h3 id="modalTitle">Transmisión en Vivo</h3>
-                <button class="close-modal" onclick="closeModal()">
+                <button class="close-modal" onclick="closeAllModals()" title="Cerrar">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -401,8 +401,12 @@
     <div id="channelSelectorModal" class="channel-selector-modal">
         <div class="channel-selector-content">
             <div class="channel-selector-header">
+                <button class="back-modal-btn" onclick="navigateBack()" title="Regresar">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Regresar</span>
+                </button>
                 <h3 id="channelSelectorTitle">Seleccionar Canal de Transmisión</h3>
-                <button class="close-channel-selector" onclick="closeChannelSelector()">
+                <button class="close-channel-selector" onclick="closeAllModals()" title="Cerrar">
                     <i class="fas fa-times"></i>
                 </button>
             </div>

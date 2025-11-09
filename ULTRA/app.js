@@ -12,6 +12,40 @@ let featuredMatches = [];
 let touchStartX = 0;
 let touchEndX = 0;
 
+// Sistema de navegación con historial de modales
+let modalHistory = [];
+
+// Utilidades de navegación de modales
+const modalNavigation = {
+    resetHistory() {
+        modalHistory = [];
+        console.log('📋 Historial de modales reseteado');
+    },
+    
+    pushModal(modalId, data = {}) {
+        modalHistory.push({ id: modalId, data: data });
+        console.log(`📌 Modal añadido al historial: ${modalId}`, modalHistory);
+    },
+    
+    popModal() {
+        const popped = modalHistory.pop();
+        console.log(`📤 Modal removido del historial: ${popped?.id}`, modalHistory);
+        return popped;
+    },
+    
+    getCurrent() {
+        return modalHistory[modalHistory.length - 1];
+    },
+    
+    getPrevious() {
+        return modalHistory[modalHistory.length - 2];
+    },
+    
+    getLength() {
+        return modalHistory.length;
+    }
+};
+
 // Inicializar cuando se carga la página
 document.addEventListener('DOMContentLoaded', async () => {
     await loadMarcadores();
@@ -759,6 +793,9 @@ function showChannelSelector(transmision, partidoNombre) {
     const body = document.getElementById('channelSelectorBody');
     const title = document.getElementById('channelSelectorTitle');
     
+    // Guardar en historial antes de abrir
+    modalNavigation.pushModal('channelSelector', { transmision, partidoNombre });
+    
     title.textContent = `${partidoNombre} - Seleccionar Canal`;
     
     if (!transmision.canales || transmision.canales.length === 0) {
@@ -841,6 +878,11 @@ function showChannelSelector(transmision, partidoNombre) {
 function closeChannelSelector() {
     const modal = document.getElementById('channelSelectorModal');
     modal.classList.remove('active');
+    
+    // Si cerramos el selector de canales, resetear historial solo si no hay más modales
+    if (modalNavigation.getLength() > 0 && modalNavigation.getCurrent()?.id === 'channelSelector') {
+        modalNavigation.popModal();
+    }
 }
 
 function selectStream(streamUrl, streamTitle) {
@@ -853,6 +895,9 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     const modalBody = modal.querySelector('.modal-body');
     const modalTitle = document.getElementById('modalTitle');
     const loader = document.getElementById('modalLoader');
+    
+    // Guardar en historial antes de abrir
+    modalNavigation.pushModal('player', { streamUrl, title, isYouTube });
     
     let embedUrl = streamUrl;
     
@@ -910,7 +955,57 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     };
 }
 
-function closeModal() {
+// Función de navegación hacia atrás con historial
+function navigateBack() {
+    const currentModal = modalNavigation.getCurrent();
+    
+    if (!currentModal) {
+        // No hay historial, cerrar todo
+        closeAllModals();
+        return;
+    }
+    
+    console.log(`⬅️ Navegando hacia atrás desde: ${currentModal.id}`);
+    
+    // Remover el modal actual del historial
+    modalNavigation.popModal();
+    
+    // Cerrar el modal actual
+    if (currentModal.id === 'player') {
+        closePlayerModalOnly();
+    } else if (currentModal.id === 'channelSelector') {
+        closeChannelSelectorOnly();
+    } else if (currentModal.id === 'importantMatches') {
+        closeImportantMatchesModalOnly();
+    }
+    
+    // Obtener el modal anterior
+    const previousModal = modalNavigation.getCurrent();
+    
+    if (!previousModal) {
+        // No hay modal anterior, cerrar todo
+        console.log('✅ No hay modal anterior, todo cerrado');
+        return;
+    }
+    
+    // Restaurar el modal anterior
+    console.log(`🔄 Restaurando modal anterior: ${previousModal.id}`);
+    
+    if (previousModal.id === 'channelSelector') {
+        // Restaurar el selector de canales con los datos guardados
+        const { transmision, partidoNombre } = previousModal.data;
+        // Remover del historial temporalmente porque showChannelSelector lo volverá a agregar
+        modalNavigation.popModal();
+        showChannelSelector(transmision, partidoNombre);
+    } else if (previousModal.id === 'importantMatches') {
+        // Restaurar el modal de partidos importantes
+        const modal = document.getElementById('importantMatchesModal');
+        modal.classList.add('active');
+    }
+}
+
+// Cerrar solo el modal del reproductor sin afectar el historial
+function closePlayerModalOnly() {
     const modal = document.getElementById('playerModal');
     const modalBody = modal.querySelector('.modal-body');
     
@@ -931,6 +1026,32 @@ function closeModal() {
             <iframe id="modalIframe" frameborder="0" allowfullscreen></iframe>
         `;
     }, 300);
+}
+
+// Cerrar solo el selector de canales sin afectar el historial
+function closeChannelSelectorOnly() {
+    const modal = document.getElementById('channelSelectorModal');
+    modal.classList.remove('active');
+}
+
+// Cerrar solo el modal de partidos importantes sin afectar el historial
+function closeImportantMatchesModalOnly() {
+    const modal = document.getElementById('importantMatchesModal');
+    modal.classList.remove('active');
+}
+
+// Cerrar todos los modales y resetear historial
+function closeAllModals() {
+    closePlayerModalOnly();
+    closeChannelSelectorOnly();
+    closeImportantMatchesModalOnly();
+    modalNavigation.resetHistory();
+    console.log('🚪 Todos los modales cerrados');
+}
+
+// Función legacy - mantener por compatibilidad
+function closeModal() {
+    navigateBack();
 }
 
 function refreshStream() {
@@ -1924,6 +2045,10 @@ function openImportantMatchesModal() {
     const modal = document.getElementById('importantMatchesModal');
     const body = document.getElementById('importantMatchesBody');
     
+    // Resetear historial al abrir el modal de partidos importantes (es el punto de inicio)
+    modalNavigation.resetHistory();
+    modalNavigation.pushModal('importantMatches', {});
+    
     modal.classList.add('active');
     
     body.innerHTML = `
@@ -1937,8 +2062,8 @@ function openImportantMatchesModal() {
 }
 
 function closeImportantMatchesModal() {
-    const modal = document.getElementById('importantMatchesModal');
-    modal.classList.remove('active');
+    // Cerrar todos los modales y resetear historial cuando se cierra con la X
+    closeAllModals();
 }
 
 async function loadImportantMatches() {
