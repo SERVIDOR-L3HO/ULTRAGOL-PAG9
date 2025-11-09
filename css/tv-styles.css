@@ -38,11 +38,11 @@
 }
 
 body.tv-mode {
-    cursor: none;
+    /* cursor: none; */ /* Deshabilitado para mantener cursor visible en TV */
 }
 
 body.tv-mode * {
-    cursor: none !important;
+    /* cursor: none !important; */ /* Deshabilitado para mantener cursor visible en TV */
 }
 
 body.tv-mode :focus {
