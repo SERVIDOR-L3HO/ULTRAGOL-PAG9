@@ -880,7 +880,6 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; microphone; camera" 
             allowfullscreen 
             scrolling="no"
-            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-presentation allow-popups-to-escape-sandbox allow-modals allow-top-navigation-by-user-activation"
             style="width: 100%; height: 100%; border: none;">
         </iframe>
     `;
