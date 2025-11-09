@@ -59,16 +59,21 @@ El navegador ve `?v=20251109` como una URL diferente y descarga el archivo nuevo
 
 ## 📁 Archivos que se Actualizan Automáticamente
 
-El script actualiza estos archivos HTML:
-- index.html
-- standings.html
-- teams.html
-- calendario.html
-- estadisticas.html
-- donaciones.html
-- noticias.html
-- partido-live.html
-- team-profile.html
+El script actualiza **TODOS** los archivos HTML en tu proyecto:
+
+**Archivos en la raíz:**
+- index.html, standings.html, teams.html
+- calendario.html, estadisticas.html, donaciones.html
+- noticias.html, partido-live.html, team-profile.html
+- Y todos los demás archivos .html en la raíz
+
+**Archivos en carpetas:**
+- ULTRA/index.html
+- ULTRACANALES/index.html, ULTRACANALES/canales.html
+- live-chat/index.html, live-chat/auth.html
+- Y cualquier otro archivo .html en subcarpetas
+
+El script busca TODOS los archivos HTML automáticamente, no importa dónde estén.
 
 ## ⚡ Método Manual (Si Prefieres)
 
