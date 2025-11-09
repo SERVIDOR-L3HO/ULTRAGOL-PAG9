@@ -6,13 +6,25 @@ He corregido el error "Error al mostrar selector de equipos" y mejorado todo el 
 
 ## ✅ Mejoras Implementadas
 
-### 1. **Mejor Manejo de Errores**
+### 1. **Compatibilidad con Service Workers (CRÍTICO - Móviles)**
+- **Detección automática**: El sistema detecta si hay un Service Worker activo
+- **Método correcto según plataforma**:
+  - Con Service Worker (móviles): Usa `registration.showNotification()`
+  - Sin Service Worker (desktop): Usa `new Notification()`
+- **Limpieza de datos**: Las funciones se separan de los datos clonables antes de enviar al SW
+- **Clicks funcionan**: El Service Worker maneja los clicks correctamente:
+  - Enfoca ventana existente si está abierta
+  - Navega a la URL correcta
+  - Abre nueva ventana si es necesario
+- **Normalización de URLs**: Convierte URLs relativas a absolutas para comparación correcta
+
+### 2. **Mejor Manejo de Errores**
 - Validación del DOM antes de crear modales
 - Try-catch anidados para prevenir fallos
 - Mensajes de error claros para el usuario
 - Fallback a alertas si los toasts fallan
 
-### 2. **Carga de Equipos Robusta**
+### 3. **Carga de Equipos Robusta**
 - Timeout de 5 segundos para la API
 - Múltiples intentos de fallback:
   1. API externa (`https://ultragol-api3.onrender.com/Equipos`)
@@ -20,8 +32,9 @@ He corregido el error "Error al mostrar selector de equipos" y mejorado todo el 
   3. Archivo local alternativo (`./data/teams.json`)
 - Validación de estructura de datos
 
-### 3. **Test de Notificaciones Mejorado**
+### 4. **Test de Notificaciones Mejorado**
 - La página `test-notifications.html` ahora carga dinámicamente el NotificationManager
+- Compatible con Service Workers
 - Mejores diagnósticos y logs
 - Fácil de usar para pruebas
 
