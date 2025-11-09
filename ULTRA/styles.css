@@ -67,7 +67,7 @@ body {
 }
 
 .app-logo {
-    height: 35px;
+    height: 50px;
     width: auto;
     object-fit: contain;
     filter: drop-shadow(0 2px 4px rgba(255, 69, 0, 0.3));
@@ -226,11 +226,11 @@ body {
 }
 
 .team-logo {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
     background: transparent;
     border-radius: 50%;
-    padding: 3px;
+    padding: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -5070,7 +5070,7 @@ body.dark-mode .news-content p {
     }
     
     .app-logo {
-        height: 28px;
+        height: 42px;
     }
     
     .score-badge {
@@ -5089,8 +5089,8 @@ body.dark-mode .news-content p {
     }
     
     .team-logo {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
     }
     
     .score-display {
@@ -5203,7 +5203,7 @@ body.dark-mode .news-content p {
     }
     
     .app-logo {
-        height: 40px;
+        height: 55px;
     }
     
     .score-badge {
@@ -5226,8 +5226,8 @@ body.dark-mode .news-content p {
     }
     
     .team-logo {
-        width: 65px;
-        height: 65px;
+        width: 85px;
+        height: 85px;
     }
     
     .score-display {
@@ -5404,7 +5404,7 @@ body.dark-mode .news-content p {
     }
     
     .app-logo {
-        height: 45px;
+        height: 60px;
     }
     
     .featured-carousel {
@@ -5412,8 +5412,8 @@ body.dark-mode .news-content p {
     }
     
     .team-logo {
-        width: 70px;
-        height: 70px;
+        width: 90px;
+        height: 90px;
     }
     
     .score {
@@ -5481,7 +5481,7 @@ body.dark-mode .news-content p {
     }
     
     .app-logo {
-        height: 50px;
+        height: 65px;
     }
     
     .score-badge {
@@ -5499,8 +5499,8 @@ body.dark-mode .news-content p {
     }
     
     .team-logo {
-        width: 80px;
-        height: 80px;
+        width: 100px;
+        height: 100px;
         padding: 10px;
     }
     
@@ -5728,8 +5728,8 @@ body.dark-mode .news-content p {
     }
     
     .team-logo {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
     }
     
     .score {
