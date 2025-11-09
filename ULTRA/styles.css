@@ -788,12 +788,74 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
+    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .modal-header h3 {
-    font-size: 18px;
+    font-size: 16px;
+    font-weight: 600;
+    flex: 1;
+    text-align: center;
+    margin: 0 10px;
+}
+
+.back-modal-btn {
+    background: linear-gradient(135deg, rgba(255, 69, 0, 0.15), rgba(255, 107, 53, 0.15));
+    border: 1px solid rgba(255, 69, 0, 0.3);
+    padding: 8px 16px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.back-modal-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.back-modal-btn:hover::before {
+    left: 100%;
+}
+
+.back-modal-btn:hover {
+    background: linear-gradient(135deg, rgba(255, 69, 0, 0.3), rgba(255, 107, 53, 0.3));
+    border-color: var(--primary);
+    transform: translateX(-3px);
+    box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
+}
+
+.back-modal-btn:active {
+    transform: translateX(0);
+}
+
+.back-modal-btn i {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+
+.back-modal-btn:hover i {
+    transform: translateX(-2px);
+}
+
+.back-modal-btn span {
+    position: relative;
+    z-index: 1;
 }
 
 .close-modal {
@@ -812,6 +874,7 @@ body {
 
 .close-modal:hover {
     background: var(--primary);
+    transform: rotate(90deg);
 }
 
 .modal-body {
