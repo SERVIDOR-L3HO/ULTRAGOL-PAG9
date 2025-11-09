@@ -813,9 +813,12 @@ function showChannelSelector(transmision, partidoNombre) {
                 </div>
                 <div class="stream-options">
                     ${streamTypes.map(type => `
-                        <button class="stream-option-btn" onclick='selectStream("${type.url.replace(/'/g, "\\'")}", "${(partidoNombre + ' - ' + (canal.nombre || `Canal ${index + 1}`)).replace(/'/g, "\\'")}")'>
+                        <button class="stream-option-btn" onclick='selectStream("${type.url.replace(/'/g, "\\'")}", "${(partidoNombre + ' - ' + (canal.nombre || `Canal ${index + 1}`)).replace(/'/g, "\\'")}")' title="Ver aquí">
                             <i class="fas fa-${type.icon}"></i>
                             ${type.name}
+                        </button>
+                        <button class="stream-option-btn" onclick='window.open("${type.url.replace(/'/g, "\\'")}", "_blank")' style="background: rgba(76, 175, 80, 0.2); margin-left: 4px;" title="Abrir en ventana nueva">
+                            <i class="fas fa-external-link-alt"></i>
                         </button>
                     `).join('')}
                 </div>
@@ -856,7 +859,7 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     if (isYouTube && streamUrl.includes('youtube.com/watch')) {
         const videoId = streamUrl.split('v=')[1]?.split('&')[0];
         if (videoId) {
-            embedUrl = `https://www.youtube.com/embed/${videoId}`;
+            embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0`;
         }
     }
     
@@ -870,15 +873,42 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
         <div class="loading-spinner" id="modalLoader" style="display: flex;">
             <div class="spinner"></div>
         </div>
-        <iframe id="modalIframe" src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width: 100%; height: 100%;"></iframe>
+        <iframe 
+            id="modalIframe" 
+            src="${embedUrl}" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
+            allowfullscreen 
+            scrolling="no"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-presentation"
+            referrerpolicy="no-referrer"
+            style="width: 100%; height: 100%; border: none;">
+        </iframe>
     `;
     
     const iframe = document.getElementById('modalIframe');
+    
     iframe.onload = () => {
         setTimeout(() => {
             const loaderEl = document.getElementById('modalLoader');
             if (loaderEl) loaderEl.style.display = 'none';
-        }, 500);
+        }, 800);
+    };
+    
+    iframe.onerror = () => {
+        console.error('Error cargando stream:', embedUrl);
+        const loaderEl = document.getElementById('modalLoader');
+        if (loaderEl) {
+            loaderEl.innerHTML = `
+                <div style="text-align: center; color: white;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px;"></i>
+                    <p>Error al cargar la transmisión</p>
+                    <button onclick="refreshStream()" style="margin-top: 16px; padding: 12px 24px; background: #ff6b35; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        <i class="fas fa-redo"></i> Reintentar
+                    </button>
+                </div>
+            `;
+        }
     };
 }
 
