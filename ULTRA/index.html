@@ -325,14 +325,18 @@
                 <iframe id="modalIframe" frameborder="0" allowfullscreen></iframe>
             </div>
             <div class="modal-footer">
-                <button class="modal-btn" onclick="refreshStream()">
+                <button class="modal-btn" onclick="refreshStream()" title="Recargar">
                     <i class="fas fa-sync-alt"></i>
                 </button>
                 <button class="modal-btn modal-share-btn" onclick="shareStream()" title="Compartir transmisión">
                     <i class="fas fa-share-alt"></i>
                 </button>
-                <button class="modal-btn" onclick="fullscreenStream()">
+                <button class="modal-btn" onclick="fullscreenStream()" title="Pantalla completa">
                     <i class="fas fa-expand"></i>
+                </button>
+                <button class="modal-btn modal-btn-primary" onclick="openStreamInNewWindow()" title="Abrir en ventana nueva (Recomendado si se traba)" style="background: linear-gradient(135deg, #00ff41 0%, #00b32d 100%); flex: 1; margin-left: 12px; font-weight: 600;">
+                    <i class="fas fa-external-link-alt"></i>
+                    <span style="margin-left: 6px;">Abrir en Ventana Nueva</span>
                 </button>
             </div>
         </div>

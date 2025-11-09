@@ -961,6 +961,15 @@ function fullscreenStream() {
     }
 }
 
+function openStreamInNewWindow() {
+    if (currentStreamUrl) {
+        window.open(currentStreamUrl, '_blank', 'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no');
+        showToast('Transmisión abierta en nueva ventana');
+    } else {
+        showToast('No hay transmisión activa');
+    }
+}
+
 function openStream(url) {
     currentStreamUrl = url;
     const modal = document.getElementById('playerModal');
