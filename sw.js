@@ -1,5 +1,5 @@
 // IMPORTANTE: Cambiar la versión cada vez que hagas actualizaciones
-const CACHE_NAME = 'ultragol-v1';
+const CACHE_NAME = 'ultragol-v3-notifications-fixed';
 
 const urlsToCache = [
   '/',
@@ -90,5 +90,54 @@ self.addEventListener('fetch', event => {
           return caches.match(event.request);
         });
       })
+  );
+});
+
+// Maneja clicks en notificaciones
+self.addEventListener('notificationclick', event => {
+  console.log('[Service Worker] Notification click received:', event.notification.tag);
+  
+  event.notification.close();
+  
+  // Obtiene la URL del data de la notificación
+  const relativeUrl = event.notification.data?.url || '/';
+  
+  // Normaliza a URL absoluta para comparación
+  const absoluteUrl = new URL(relativeUrl, self.location.origin).href;
+  
+  console.log('[Service Worker] Opening URL:', absoluteUrl);
+  
+  event.waitUntil(
+    clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true
+    }).then(clientList => {
+      // Si ya hay una ventana abierta con esta URL, enfócala
+      for (let i = 0; i < clientList.length; i++) {
+        const client = clientList[i];
+        console.log('[Service Worker] Checking client:', client.url);
+        if (client.url === absoluteUrl && 'focus' in client) {
+          console.log('[Service Worker] Focusing existing window');
+          return client.focus();
+        }
+      }
+      
+      // Si hay alguna ventana del sitio abierta, enfócala y navégala
+      if (clientList.length > 0 && 'focus' in clientList[0]) {
+        console.log('[Service Worker] Focusing existing window and navigating');
+        return clientList[0].focus().then(client => {
+          if ('navigate' in client) {
+            return client.navigate(absoluteUrl);
+          }
+          return client;
+        });
+      }
+      
+      // Si no hay ventana abierta, abre una nueva
+      if (clients.openWindow) {
+        console.log('[Service Worker] Opening new window');
+        return clients.openWindow(absoluteUrl);
+      }
+    })
   );
 });

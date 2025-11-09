@@ -327,9 +327,9 @@ class NotificationManager {
         }
     }
 
-    sendWelcomeNotification() {
+    async sendWelcomeNotification() {
         if (this.notificationPermission === 'granted') {
-            new Notification('¡Bienvenido a UltraGol!', {
+            await this.showNotificationSafe('¡Bienvenido a UltraGol!', {
                 body: 'Recibirás notificaciones de tu equipo favorito',
                 icon: '/app-icon.png',
                 badge: '/favicon.png',
@@ -437,7 +437,54 @@ class NotificationManager {
             .replace(/[^a-z0-9-]/g, '');
     }
 
-    showNotification(notificationData) {
+    async showNotificationSafe(title, options) {
+        try {
+            // Check if Service Worker is available and active
+            if ('serviceWorker' in navigator) {
+                const registration = await navigator.serviceWorker.getRegistration();
+                if (registration && registration.active) {
+                    console.log('📱 Using Service Worker to show notification');
+                    
+                    // Clean options - remove non-cloneable data (functions, etc)
+                    const swOptions = {
+                        body: options.body,
+                        icon: options.icon,
+                        badge: options.badge,
+                        tag: options.tag,
+                        vibrate: options.vibrate,
+                        requireInteraction: options.requireInteraction,
+                        data: options.data || {}  // Only cloneable data
+                    };
+                    
+                    await registration.showNotification(title, swOptions);
+                    console.log('✅ Notification sent via Service Worker');
+                    return true;
+                }
+            }
+            
+            // Fallback to regular Notification API
+            console.log('🔔 Using standard Notification API');
+            const notification = new Notification(title, options);
+            
+            // Handle onclick if provided in options
+            if (options.data && options.data.url) {
+                notification.onclick = (event) => {
+                    event.preventDefault();
+                    window.focus();
+                    window.location.href = options.data.url;
+                    notification.close();
+                };
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Error showing notification:', error);
+            console.error('Error details:', error.message, error.stack);
+            return false;
+        }
+    }
+
+    async showNotification(notificationData) {
         if (this.notificationPermission !== 'granted') {
             console.log('⚠️ Cannot show notification, permission not granted');
             return;
@@ -456,23 +503,16 @@ class NotificationManager {
             vibrate: [200, 100, 200]
         };
 
-        const notification = new Notification(
+        const success = await this.showNotificationSafe(
             notificationData.titulo || 'UltraGol',
             options
         );
 
-        notification.onclick = (event) => {
-            event.preventDefault();
-            window.focus();
-            if (notificationData.accion && notificationData.accion.url) {
-                window.location.href = notificationData.accion.url;
-            } else if (notificationData.url) {
-                window.location.href = notificationData.url;
-            }
-            notification.close();
-        };
-
-        console.log('✅ Notification shown:', notificationData.titulo);
+        if (success) {
+            console.log('✅ Notification shown:', notificationData.titulo);
+        } else {
+            console.error('❌ Failed to show notification:', notificationData.titulo);
+        }
     }
 
     showMessage(message, type = 'info') {
