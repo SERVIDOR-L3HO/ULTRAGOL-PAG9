@@ -1,7 +1,7 @@
 // Live Scoreboard Module
 class LiveScoreboard {
     constructor() {
-        this.apiUrl = 'https://ultragol-api3.onrender.com/marcadores';
+        this.apiUrl = 'https://ultragol-api3.onrender.com/transmisiones3';
         this.currentFilter = 'live'; // live, upcoming, all
         this.matches = [];
         this.lastUpdated = null;
@@ -20,13 +20,14 @@ class LiveScoreboard {
             if (!response.ok) throw new Error('Error al obtener los datos');
             
             const data = await response.json();
-            this.matches = data.partidos || [];
+            console.log('✅ Transmisiones cargadas:', data);
+            this.matches = data.transmisiones || [];
             this.lastUpdated = data.actualizado || new Date().toLocaleString('es-MX');
             
             this.renderMatches();
             this.updateLastUpdatedTime();
         } catch (error) {
-            console.error('Error fetching matches:', error);
+            console.error('Error fetching transmisiones:', error);
             this.showError();
         }
     }
@@ -55,9 +56,15 @@ class LiveScoreboard {
     getFilteredMatches() {
         switch (this.currentFilter) {
             case 'live':
-                return this.matches.filter(match => match.estado.enVivo);
+                return this.matches.filter(match => {
+                    const estado = (match.estado || '').toLowerCase();
+                    return estado === 'en vivo' || estado === 'live';
+                });
             case 'upcoming':
-                return this.matches.filter(match => match.estado.programado && !match.estado.enVivo);
+                return this.matches.filter(match => {
+                    const estado = (match.estado || '').toLowerCase();
+                    return estado === 'próximo' || estado === 'proximo' || estado === 'upcoming';
+                });
             case 'all':
             default:
                 return this.matches;
@@ -79,72 +86,66 @@ class LiveScoreboard {
     }
 
     renderMatchCard(match) {
-        const isLive = match.estado.enVivo;
-        const isFinished = match.estado.finalizado;
-        const localWinner = match.local.ganador;
-        const visitanteWinner = match.visitante.ganador;
-
+        const isLive = (match.estado || '').toLowerCase().includes('vivo') || (match.estado || '').toLowerCase() === 'live';
+        const isUpcoming = (match.estado || '').toLowerCase().includes('próximo') || (match.estado || '').toLowerCase().includes('proximo');
+        
+        // Extraer equipos del campo 'equipo' (formato: "Team1 vs Team2")
+        const equipos = (match.equipo || 'Partido').split(' vs ');
+        const team1 = equipos[0] || 'Equipo 1';
+        const team2 = equipos[1] || 'Equipo 2';
+        
         return `
-            <div class="match-card ${isLive ? 'live' : ''}" data-match-id="${match.id}">
+            <div class="match-card ${isLive ? 'live' : ''}" data-match-id="${match.id || ''}">
                 <div class="match-header">
                     <div class="match-date">
-                        <i class="far fa-calendar"></i> ${this.formatDate(match.fecha)}
+                        <i class="fas fa-trophy"></i> ${match.liga || 'Liga'}
                     </div>
                     <div class="match-status">
                         ${isLive ? `
-                            <span class="status-badge live">LIVE</span>
-                            <span class="match-clock">${match.reloj}</span>
-                        ` : isFinished ? `
-                            <span class="status-badge finished">Finalizado</span>
+                            <span class="status-badge live">EN VIVO</span>
+                        ` : isUpcoming ? `
+                            <span class="status-badge scheduled">${match.hora || 'Próximamente'}</span>
                         ` : `
-                            <span class="status-badge scheduled">${this.formatTime(match.fecha)}</span>
+                            <span class="status-badge">${match.estado || 'Programado'}</span>
                         `}
                     </div>
                 </div>
 
                 <div class="match-content">
                     <div class="teams-container">
-                        <!-- Local Team -->
-                        <div class="team ${localWinner ? 'winner' : ''}">
+                        <!-- Team 1 -->
+                        <div class="team">
                             <div class="team-logo-container">
-                                <img src="${match.local.logo}" alt="${match.local.nombre}" class="team-logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%%22 y=%2250%%22 font-size=%2240%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22>?</text></svg>'">
+                                <i class="fas fa-shield-alt" style="font-size: 2rem; color: var(--primary);"></i>
                             </div>
-                            <div class="team-name">${match.local.nombreCorto || match.local.nombre}</div>
+                            <div class="team-name">${team1}</div>
                         </div>
 
-                        <!-- Score Section -->
+                        <!-- VS Section -->
                         <div class="score-section">
-                            ${isLive || isFinished ? `
-                                <div class="score-display">
-                                    <span class="score">${match.local.marcador}</span>
-                                    <span class="score-separator">-</span>
-                                    <span class="score">${match.visitante.marcador}</span>
-                                </div>
-                            ` : `
-                                <div class="vs-text">VS</div>
-                            `}
+                            <div class="vs-text">VS</div>
                         </div>
 
-                        <!-- Visitante Team -->
-                        <div class="team ${visitanteWinner ? 'winner' : ''}">
+                        <!-- Team 2 -->
+                        <div class="team">
                             <div class="team-logo-container">
-                                <img src="${match.visitante.logo}" alt="${match.visitante.nombre}" class="team-logo" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23333%22 width=%22100%22 height=%22100%22/><text x=%2250%%22 y=%2250%%22 font-size=%2240%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22>?</text></svg>'">
+                                <i class="fas fa-shield-alt" style="font-size: 2rem; color: var(--primary);"></i>
                             </div>
-                            <div class="team-name">${match.visitante.nombreCorto || match.visitante.nombre}</div>
+                            <div class="team-name">${team2}</div>
                         </div>
                     </div>
                 </div>
 
-                ${match.detalles ? `
+                ${match.hora ? `
                     <div class="match-details">
                         <div class="match-venue">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span>${match.detalles.estadio || 'Estadio por confirmar'}</span>
+                            <i class="far fa-clock"></i>
+                            <span>${match.hora}</span>
                         </div>
-                        ${match.detalles.ciudad ? `
+                        ${match.deporte ? `
                             <div class="match-venue">
-                                <i class="fas fa-city"></i>
-                                <span>${match.detalles.ciudad}</span>
+                                <i class="fas fa-futbol"></i>
+                                <span>${match.deporte}</span>
                             </div>
                         ` : ''}
                     </div>
