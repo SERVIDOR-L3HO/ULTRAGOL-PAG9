@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ultragol-live-v2';
+const CACHE_NAME = 'ultragol-live-v3';
 const urlsToCache = [
   '/ULTRA/',
   '/ULTRA/styles.css',
@@ -12,6 +12,8 @@ const urlsToCache = [
 const NO_CACHE_URLS = [
   '/ULTRA/app.js',
   '/ULTRA/index.html',
+  '/ULTRA/goleadores.html',
+  '/ULTRA/noticias.html',
   'marcadores',
   'transmisiones',
   'ultragol-api'

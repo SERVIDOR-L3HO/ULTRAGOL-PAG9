@@ -43,52 +43,60 @@
         }
 
         .league-selector {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding: 10px 0 20px;
-            margin: 0 -15px;
-            padding-left: 15px;
-            padding-right: 15px;
-        }
-
-        .league-selector::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .league-selector::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 2px;
-        }
-
-        .league-selector::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 2px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
         }
 
         .league-btn {
             background: var(--card-bg);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             color: var(--text);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
+            padding: 20px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
-            white-space: nowrap;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            min-height: 100px;
+        }
+
+        .league-btn .league-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
             transition: all 0.3s ease;
         }
 
         .league-btn.active {
-            background: var(--primary);
             border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(255, 69, 0, 0.4);
+            box-shadow: 0 0 20px rgba(255, 69, 0, 0.3);
+        }
+
+        .league-btn.active .league-icon {
+            transform: scale(1.1);
         }
 
         .league-btn:hover {
-            background: var(--accent);
-            border-color: var(--accent);
+            transform: translateY(-2px);
+            border-color: var(--primary);
         }
+
+        .league-icon.liga-mx { background: linear-gradient(135deg, #006847, #CE1126); }
+        .league-icon.premier { background: linear-gradient(135deg, #3d195b, #00ff87); }
+        .league-icon.laliga { background: linear-gradient(135deg, #FF6B00, #FFD700); }
+        .league-icon.serie-a { background: linear-gradient(135deg, #024494, #00B4D8); }
+        .league-icon.bundesliga { background: linear-gradient(135deg, #D3010C, #000000); }
+        .league-icon.ligue1 { background: linear-gradient(135deg, #0055A4, #EF4135); }
 
         .goleadores-list {
             display: flex;
@@ -99,7 +107,7 @@
         .goleador-card {
             background: var(--card-bg);
             border-radius: 15px;
-            padding: 15px;
+            padding: 18px;
             display: flex;
             align-items: center;
             gap: 15px;
@@ -107,6 +115,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            min-height: 85px;
         }
 
         .goleador-card::before {
@@ -154,13 +163,11 @@
         }
 
         .player-name {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
             color: var(--text);
-            overflow: visible;
-            white-space: normal;
-            word-break: break-word;
+            line-height: 1.3;
         }
 
         .team-name {
@@ -297,22 +304,40 @@
 
             <div class="league-selector" id="leagueSelector">
                 <button class="league-btn active" onclick="selectLeagueGoleadores('Liga MX', this)">
-                    Liga MX
+                    <div class="league-icon liga-mx">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>Liga MX</span>
                 </button>
                 <button class="league-btn" onclick="selectLeagueGoleadores('Premier League', this)">
-                    Premier League
+                    <div class="league-icon premier">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>Premier League</span>
                 </button>
                 <button class="league-btn" onclick="selectLeagueGoleadores('La Liga', this)">
-                    La Liga
+                    <div class="league-icon laliga">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>La Liga</span>
                 </button>
                 <button class="league-btn" onclick="selectLeagueGoleadores('Serie A', this)">
-                    Serie A
+                    <div class="league-icon serie-a">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>Serie A</span>
                 </button>
                 <button class="league-btn" onclick="selectLeagueGoleadores('Bundesliga', this)">
-                    Bundesliga
+                    <div class="league-icon bundesliga">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>Bundesliga</span>
                 </button>
                 <button class="league-btn" onclick="selectLeagueGoleadores('Ligue 1', this)">
-                    Ligue 1
+                    <div class="league-icon ligue1">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>Ligue 1</span>
                 </button>
             </div>
 
