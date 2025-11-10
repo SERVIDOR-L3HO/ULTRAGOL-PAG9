@@ -2188,7 +2188,6 @@ function selectLeague(leagueName, element) {
     }
     
     loadStandings();
-    loadNews();
     loadMarcadores();
     loadLineups();
     

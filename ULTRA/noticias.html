@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Noticias - ULTRAGOL</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20251110">
+    <link rel="stylesheet" href="noticias-styles.css?v=20251110">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e94560">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="UltraGol LIVE">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <button class="icon-btn back-btn" onclick="window.location.href='index.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="score-badge">9:4</div>
+            </div>
+
+            <div class="header-center">
+                <img src="ultragol-logo.png" alt="ULTRAGOL" class="app-logo">
+            </div>
+
+            <div class="header-right">
+                <button class="icon-btn share-btn" onclick="shareApp()">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+                <button class="icon-btn settings-btn">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </header>
+
+        <section class="leagues-selector">
+            <h2>PRINCIPALES LIGAS</h2>
+            <div class="leagues-grid">
+                <button class="league-btn active" onclick="selectLeague('Liga MX', this)">
+                    <div class="league-icon ligamx">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>Liga MX</span>
+                </button>
+                <button class="league-btn" onclick="selectLeague('Premier League', this)">
+                    <div class="league-icon premier">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>Premier League</span>
+                </button>
+                <button class="league-btn" onclick="selectLeague('La Liga', this)">
+                    <div class="league-icon laliga">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>La Liga</span>
+                </button>
+                <button class="league-btn" onclick="selectLeague('Serie A', this)">
+                    <div class="league-icon serie-a">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>Serie A</span>
+                </button>
+                <button class="league-btn" onclick="selectLeague('Bundesliga', this)">
+                    <div class="league-icon bundesliga">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>Bundesliga</span>
+                </button>
+                <button class="league-btn" onclick="selectLeague('Ligue 1', this)">
+                    <div class="league-icon ligue1">
+                        <i class="fas fa-futbol"></i>
+                    </div>
+                    <span>Ligue 1</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="news-section">
+            <div class="section-header">
+                <h3 id="newsLeagueName">NOTICIAS Y RESÚMENES - Liga MX</h3>
+                <button class="crown-btn">
+                    <i class="fas fa-crown"></i>
+                </button>
+            </div>
+            <div class="news-grid" id="newsGrid">
+                <div class="news-loading">Cargando noticias...</div>
+            </div>
+        </section>
+
+        <div class="bottom-nav">
+            <button class="nav-btn" onclick="window.location.href='index.html'">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='#'">
+                <i class="fas fa-search"></i>
+                <span>Buscar</span>
+            </button>
+            <button class="nav-btn active">
+                <i class="fas fa-newspaper"></i>
+                <span>Noticias</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='#'">
+                <i class="fas fa-calendar"></i>
+                <span>Calendario</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="newsModal" class="news-modal">
+        <div class="news-modal-content">
+            <div class="news-modal-header">
+                <h3 id="newsModalTitle">Noticia</h3>
+                <button class="close-news-modal" onclick="closeNewsModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="news-modal-body">
+                <img id="newsModalImage" src="" alt="Noticia">
+                <div id="newsModalText" class="news-modal-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="noticias.js"></script>
+</body>
+</html>
