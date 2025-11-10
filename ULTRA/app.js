@@ -2178,9 +2178,19 @@ function selectLeague(leagueName, element) {
         standingsTitle.textContent = `TABLA DE POSICIONES - ${leagueName}`;
     }
     
+    const infoMessage = document.getElementById('standingsInfoMessage');
+    if (infoMessage) {
+        if (leagueName === 'Liga MX') {
+            infoMessage.style.display = 'flex';
+        } else {
+            infoMessage.style.display = 'none';
+        }
+    }
+    
     loadStandings();
     loadNews();
     loadMarcadores();
+    loadLineups();
     
     showToast(`Mostrando datos de ${leagueName}`);
 }
