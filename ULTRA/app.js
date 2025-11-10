@@ -860,6 +860,15 @@ function showChannelSelector(transmision, partidoNombre) {
                     icon: 'play-circle' 
                 });
             });
+        } else if (canal.tipoAPI === 'voodc' && canal.enlaces) {
+            // API 3 (voodc): Mostrar enlaces igual que e1link
+            canal.enlaces.forEach((enlace, idx) => {
+                streamTypes.push({ 
+                    name: enlace.calidad || `HD ${idx + 1}`, 
+                    url: enlace.url, 
+                    icon: 'play-circle' 
+                });
+            });
         } else if (canal.tipoAPI === 'rereyano' && canal.links) {
             // API 1 (rereyano): Mostrar como "hoca", "caster", "wigi"
             if (canal.links.hoca) {
@@ -878,7 +887,19 @@ function showChannelSelector(transmision, partidoNombre) {
         }
         
         // Badge de fuente con colores diferentes
-        const fuenteBadge = canal.tipoAPI ? `<span class="fuente-badge" style="background: ${canal.tipoAPI === 'rereyano' ? '#4ecdc4' : '#ff6b35'}; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; color: white;">${canal.tipoAPI === 'rereyano' ? 'rereyano' : 'e1link'}</span>` : '';
+        let badgeColor = '#ff6b35'; // default
+        let badgeText = canal.tipoAPI || '';
+        if (canal.tipoAPI === 'rereyano') {
+            badgeColor = '#4ecdc4';
+            badgeText = 'rereyano';
+        } else if (canal.tipoAPI === 'e1link') {
+            badgeColor = '#ff6b35';
+            badgeText = 'e1link';
+        } else if (canal.tipoAPI === 'voodc') {
+            badgeColor = '#9b59b6';
+            badgeText = 'voodc';
+        }
+        const fuenteBadge = canal.tipoAPI ? `<span class="fuente-badge" style="background: ${badgeColor}; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; color: white;">${badgeText}</span>` : '';
         
         return `
             <div class="channel-option">
