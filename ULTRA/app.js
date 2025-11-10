@@ -13,6 +13,63 @@ let featuredMatches = [];
 let touchStartX = 0;
 let touchEndX = 0;
 
+const leaguesConfig = {
+    'Liga MX': {
+        apiPath: '',
+        tabla: '/tabla',
+        noticias: '/Noticias',
+        goleadores: '/goleadores',
+        calendario: '/calendario',
+        marcadores: '/marcadores',
+        alineaciones: '/alineaciones'
+    },
+    'Premier League': {
+        apiPath: '/premier',
+        tabla: '/premier/tabla',
+        noticias: '/premier/noticias',
+        goleadores: '/premier/goleadores',
+        calendario: '/premier/calendario',
+        marcadores: '/premier/marcadores',
+        alineaciones: '/premier/alineaciones'
+    },
+    'La Liga': {
+        apiPath: '/laliga',
+        tabla: '/laliga/tabla',
+        noticias: '/laliga/noticias',
+        goleadores: '/laliga/goleadores',
+        calendario: '/laliga/calendario',
+        marcadores: '/laliga/marcadores',
+        alineaciones: '/laliga/alineaciones'
+    },
+    'Serie A': {
+        apiPath: '/seriea',
+        tabla: '/seriea/tabla',
+        noticias: '/seriea/noticias',
+        goleadores: '/seriea/goleadores',
+        calendario: '/seriea/calendario',
+        marcadores: '/seriea/marcadores',
+        alineaciones: '/seriea/alineaciones'
+    },
+    'Bundesliga': {
+        apiPath: '/bundesliga',
+        tabla: '/bundesliga/tabla',
+        noticias: '/bundesliga/noticias',
+        goleadores: '/bundesliga/goleadores',
+        calendario: '/bundesliga/calendario',
+        marcadores: '/bundesliga/marcadores',
+        alineaciones: '/bundesliga/alineaciones'
+    },
+    'Ligue 1': {
+        apiPath: '/ligue1',
+        tabla: '/ligue1/tabla',
+        noticias: '/ligue1/noticias',
+        goleadores: '/ligue1/goleadores',
+        calendario: '/ligue1/calendario',
+        marcadores: '/ligue1/marcadores',
+        alineaciones: '/ligue1/alineaciones'
+    }
+};
+
 // Sistema de navegación con historial de modales
 let modalHistory = [];
 
@@ -63,7 +120,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Función principal para cargar marcadores desde la API
 async function loadMarcadores() {
     try {
-        const response = await fetch('https://ultragol-api3.onrender.com/marcadores');
+        const leagueConfig = leaguesConfig[currentLeague];
+        const endpoint = leagueConfig ? leagueConfig.marcadores : '/marcadores';
+        const response = await fetch(`https://ultragol-api3.onrender.com${endpoint}`);
         const data = await response.json();
         marcadoresData = data;
         
@@ -1692,17 +1751,16 @@ function displaySearchResults(results, query) {
             </div>`;
         
         results.leagues.forEach(league => {
-            const isLigaMX = league === 'Liga MX';
+            const isCurrentLeague = league === currentLeague;
             html += `
-                <div class="search-league-card" onclick="${isLigaMX ? 'selectLeague(\'Liga MX\'); closeSearchModal();' : 'showLockedLeagueMessage(\'' + league + '\'); closeSearchModal();'}">
-                    <div class="search-league-icon ${isLigaMX ? 'active' : 'locked'}">
-                        <i class="fas ${isLigaMX ? 'fa-futbol' : 'fa-lock'}"></i>
+                <div class="search-league-card" onclick="selectLeague('${league}'); closeSearchModal();">
+                    <div class="search-league-icon ${isCurrentLeague ? 'active' : ''}">
+                        <i class="fas fa-futbol"></i>
                     </div>
                     <div class="search-league-info">
                         <div class="search-league-name">${league}</div>
-                        <div class="search-league-status">${isLigaMX ? 'Disponible' : 'Próximamente'}</div>
+                        <div class="search-league-status">Disponible</div>
                     </div>
-                    ${!isLigaMX ? '<i class="fas fa-crown search-league-premium"></i>' : ''}
                 </div>`;
         });
         
@@ -1984,7 +2042,9 @@ async function loadReplays() {
 
 async function loadStandings() {
     try {
-        const response = await fetch('https://ultragol-api3.onrender.com/tabla');
+        const leagueConfig = leaguesConfig[currentLeague];
+        const endpoint = leagueConfig ? leagueConfig.tabla : '/tabla';
+        const response = await fetch(`https://ultragol-api3.onrender.com${endpoint}`);
         const data = await response.json();
         
         const standingsTable = document.getElementById('standingsTable');
@@ -2037,7 +2097,9 @@ async function loadStandings() {
 
 async function loadNews() {
     try {
-        const response = await fetch('https://ultragol-api3.onrender.com/Noticias');
+        const leagueConfig = leaguesConfig[currentLeague];
+        const endpoint = leagueConfig ? leagueConfig.noticias : '/noticias';
+        const response = await fetch(`https://ultragol-api3.onrender.com${endpoint}`);
         const data = await response.json();
         
         const newsGrid = document.getElementById('newsGrid');
@@ -2095,14 +2157,32 @@ function closeNewsModal() {
 }
 
 function selectLeague(leagueName, element) {
-    if (leagueName !== 'Liga MX') {
-        showLockedLeagueMessage(leagueName);
-        return;
+    document.querySelectorAll('.league-btn').forEach(btn => btn.classList.remove('active'));
+    
+    if (element) {
+        element.classList.add('active');
+    } else {
+        const leagueButtons = document.querySelectorAll('.league-btn');
+        leagueButtons.forEach(btn => {
+            const btnText = btn.querySelector('span')?.textContent || '';
+            if (btnText === leagueName) {
+                btn.classList.add('active');
+            }
+        });
     }
     
-    document.querySelectorAll('.league-btn').forEach(btn => btn.classList.remove('active'));
-    element.classList.add('active');
     currentLeague = leagueName;
+    
+    const standingsTitle = document.getElementById('standingsLeagueName');
+    if (standingsTitle) {
+        standingsTitle.textContent = `TABLA DE POSICIONES - ${leagueName}`;
+    }
+    
+    loadStandings();
+    loadNews();
+    loadMarcadores();
+    
+    showToast(`Mostrando datos de ${leagueName}`);
 }
 
 function showLockedLeagueMessage(leagueName) {
@@ -2435,7 +2515,9 @@ let selectedMatchIndex = 0;
 // Cargar alineaciones desde la API
 async function loadLineups() {
     try {
-        const response = await fetch('https://ultragol-api3.onrender.com/alineaciones');
+        const leagueConfig = leaguesConfig[currentLeague];
+        const endpoint = leagueConfig ? leagueConfig.alineaciones : '/alineaciones';
+        const response = await fetch(`https://ultragol-api3.onrender.com${endpoint}`);
         const data = await response.json();
         lineupsData = data;
         
