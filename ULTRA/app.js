@@ -6,6 +6,7 @@ let marcadoresData = null;
 let transmisionesData = null;
 let transmisionesAPI1 = null;
 let transmisionesAPI2 = null;
+let transmisionesAPI3 = null;
 let updateInterval = null;
 let currentFeaturedIndex = 0;
 let featuredMatches = [];
@@ -85,17 +86,19 @@ async function loadMarcadores() {
     }
 }
 
-// Función para cargar transmisiones desde ambas APIs
+// Función para cargar transmisiones desde las 3 APIs
 async function loadTransmisiones() {
     try {
-        // Cargar ambas APIs en paralelo
-        const [response1, response2] = await Promise.all([
+        // Cargar las 3 APIs en paralelo
+        const [response1, response2, response3] = await Promise.all([
             fetch('https://ultragol-api3.onrender.com/transmisiones'),
-            fetch('https://ultragol-api3.onrender.com/transmisiones3')
+            fetch('https://ultragol-api3.onrender.com/transmisiones3'),
+            fetch('https://17c7b72a-6b57-4fcd-9f84-2321c89b0a72-00-3ub6gwf825rzc.spock.replit.dev/transmisiones2')
         ]);
         
         const data1 = await response1.json();
         const data2 = await response2.json();
+        const data3 = await response3.json();
         
         // Convertir API 2 (transmisiones3 - e1link) que usa "enlaces" a "canales" pero manteniendo la estructura de array
         const transmisionesNormalizadasAPI2 = (data2.transmisiones || []).map(t => {
@@ -110,6 +113,24 @@ async function loadTransmisiones() {
                 ...t,
                 canales: canalesNormalizados,
                 tipoAPI: 'e1link'
+            };
+        });
+        
+        // Convertir API 3 (transmisiones2 - voodc) que usa "url" directamente a "canales"
+        const transmisionesNormalizadasAPI3 = (data3.transmisiones || []).map(t => {
+            const canalesNormalizados = [{
+                numero: '',
+                nombre: t.deporte || 'Canal',
+                enlaces: t.url ? [{ url: t.url, calidad: 'HD' }] : [],
+                tipoAPI: 'voodc'
+            }];
+            
+            return {
+                ...t,
+                evento: t.evento || t.titulo,
+                titulo: t.titulo || t.evento,
+                canales: canalesNormalizados,
+                tipoAPI: 'voodc'
             };
         });
         
@@ -132,11 +153,16 @@ async function loadTransmisiones() {
             ...data2,
             transmisiones: transmisionesNormalizadasAPI2
         };
+        transmisionesAPI3 = {
+            ...data3,
+            transmisiones: transmisionesNormalizadasAPI3
+        };
         
-        // Combinar las transmisiones de ambas APIs (partidos pueden repetirse)
+        // Combinar las transmisiones de las 3 APIs (partidos pueden repetirse)
         const transmisionesCombinadas = [
             ...transmisionesAPI1Marcadas,
-            ...transmisionesNormalizadasAPI2
+            ...transmisionesNormalizadasAPI2,
+            ...transmisionesNormalizadasAPI3
         ];
         
         // Crear el objeto combinado
@@ -146,6 +172,7 @@ async function loadTransmisiones() {
         
         console.log('✅ Transmisiones cargadas desde API 1 (rereyano):', data1.transmisiones?.length || 0);
         console.log('✅ Transmisiones cargadas desde API 2 (e1link):', data2.transmisiones?.length || 0);
+        console.log('✅ Transmisiones cargadas desde API 3 (voodc):', data3.transmisiones?.length || 0);
         console.log('✅ Total transmisiones combinadas:', transmisionesCombinadas.length);
         
         return transmisionesData;
@@ -740,11 +767,12 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         return resultado;
     };
     
-    // Buscar en ambas APIs
+    // Buscar en las 3 APIs
     const transmisionAPI1 = transmisionesAPI1 ? buscarTransmision(transmisionesAPI1.transmisiones) : null;
     const transmisionAPI2 = transmisionesAPI2 ? buscarTransmision(transmisionesAPI2.transmisiones) : null;
+    const transmisionAPI3 = transmisionesAPI3 ? buscarTransmision(transmisionesAPI3.transmisiones) : null;
     
-    // Combinar canales de ambas APIs
+    // Combinar canales de las 3 APIs
     let canalesCombinados = [];
     let eventoNombre = '';
     
@@ -766,6 +794,16 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         }));
         canalesCombinados = [...canalesCombinados, ...canalesAPI2];
         console.log(`✅ Encontrados ${canalesAPI2.length} canales en API 2 (ellink)`);
+    }
+    
+    if (transmisionAPI3) {
+        if (!eventoNombre) eventoNombre = transmisionAPI3.evento || transmisionAPI3.titulo;
+        const canalesAPI3 = (transmisionAPI3.canales || []).map(canal => ({
+            ...canal,
+            fuente: 'voodc'
+        }));
+        canalesCombinados = [...canalesCombinados, ...canalesAPI3];
+        console.log(`✅ Encontrados ${canalesAPI3.length} canales en API 3 (voodc)`);
     }
     
     if (canalesCombinados.length === 0) {
@@ -1256,7 +1294,7 @@ async function performSearch(query) {
                    (searchTerm === 'en vivo' && (estado.includes('vivo') || estado.includes('live')));
         });
         
-        // Combinar canales de ambas APIs para cada transmisión encontrada
+        // Combinar canales de las 3 APIs para cada transmisión encontrada
         const transmisionesConCanalesCombinados = matchedTransmisiones.map(transmision => {
             const eventoNombre = (transmision.evento || transmision.titulo || '').toLowerCase();
             let canalesCombinados = [];
@@ -1310,6 +1348,32 @@ async function performSearch(query) {
                             fuente: 'ellink'
                         }));
                         canalesCombinados = [...canalesCombinados, ...canalesAPI2];
+                    }
+                }
+            }
+            
+            // Buscar en API 3
+            if (transmisionesAPI3 && transmisionesAPI3.transmisiones) {
+                const transAPI3 = transmisionesAPI3.transmisiones.find(t => {
+                    const evento = (t.evento || t.titulo || '').toLowerCase();
+                    return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+                });
+                
+                if (transAPI3) {
+                    // Actualizar título si es mejor que el actual
+                    if (transAPI3.titulo && !tituloDisplay) {
+                        tituloDisplay = transAPI3.titulo;
+                    }
+                    if (transAPI3.evento && !tituloDisplay) {
+                        tituloDisplay = transAPI3.evento;
+                    }
+                    
+                    if (transAPI3.canales) {
+                        const canalesAPI3 = transAPI3.canales.map(canal => ({
+                            ...canal,
+                            fuente: 'voodc'
+                        }));
+                        canalesCombinados = [...canalesCombinados, ...canalesAPI3];
                     }
                 }
             }
@@ -1644,7 +1708,7 @@ function selectImportantMatch(index) {
     const transmision = transmisionesData.transmisiones[index];
     if (!transmision) return;
     
-    // Buscar esta transmisión en ambas APIs para combinar canales
+    // Buscar esta transmisión en las 3 APIs para combinar canales
     const eventoNombre = (transmision.evento || transmision.titulo || '').toLowerCase();
     
     let canalesCombinados = [];
@@ -1673,6 +1737,19 @@ function selectImportantMatch(index) {
         if (transAPI2 && transAPI2.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI2.canales];
             console.log(`✅ Encontrados ${transAPI2.canales.length} canales en API 2 (e1link)`);
+        }
+    }
+    
+    // Buscar en API 3
+    if (transmisionesAPI3 && transmisionesAPI3.transmisiones) {
+        const transAPI3 = transmisionesAPI3.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
+        if (transAPI3 && transAPI3.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI3.canales];
+            console.log(`✅ Encontrados ${transAPI3.canales.length} canales en API 3 (voodc)`);
         }
     }
     
@@ -1737,6 +1814,18 @@ function selectImportantMatchByName(eventoNombre) {
         if (transAPI2 && transAPI2.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI2.canales];
             console.log(`✅ Encontrados ${transAPI2.canales.length} canales en API 2 (e1link)`);
+        }
+    }
+    
+    if (transmisionesAPI3 && transmisionesAPI3.transmisiones) {
+        const transAPI3 = transmisionesAPI3.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
+        });
+        
+        if (transAPI3 && transAPI3.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI3.canales];
+            console.log(`✅ Encontrados ${transAPI3.canales.length} canales en API 3 (voodc)`);
         }
     }
     
@@ -2270,6 +2359,19 @@ function selectImportantMatchByTransmision(eventoNombre) {
         if (transAPI2 && transAPI2.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI2.canales];
             console.log(`✅ Encontrados ${transAPI2.canales.length} canales en API 2 (e1link) para "${tituloMostrar}"`);
+        }
+    }
+    
+    // Buscar en API 3 (voodc)
+    if (transmisionesAPI3 && transmisionesAPI3.transmisiones) {
+        const transAPI3 = transmisionesAPI3.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase().trim();
+            return evento === nombreBuscar;
+        });
+        
+        if (transAPI3 && transAPI3.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI3.canales];
+            console.log(`✅ Encontrados ${transAPI3.canales.length} canales en API 3 (voodc) para "${tituloMostrar}"`);
         }
     }
     
