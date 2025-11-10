@@ -2051,6 +2051,14 @@ async function loadStandings() {
         if (!standingsTable) return;
         
         if (!data.equipos || data.equipos.length === 0) {
+            const infoMessage = document.getElementById('standingsInfoMessage');
+            const infoText = document.getElementById('standingsInfoText');
+            
+            if (currentLeague !== 'Liga MX') {
+                if (infoMessage) infoMessage.style.display = 'flex';
+                if (infoText) infoText.textContent = 'Esta página fue diseñada especialmente para la Liga MX. Los datos de otras ligas estarán disponibles próximamente.';
+            }
+            
             standingsTable.innerHTML = '<div class="standings-loading">No hay datos de tabla disponibles</div>';
             return;
         }
@@ -2179,12 +2187,14 @@ function selectLeague(leagueName, element) {
     }
     
     const infoMessage = document.getElementById('standingsInfoMessage');
+    const infoText = document.getElementById('standingsInfoText');
+    
     if (infoMessage) {
-        if (leagueName === 'Liga MX') {
-            infoMessage.style.display = 'flex';
-        } else {
-            infoMessage.style.display = 'none';
-        }
+        infoMessage.style.display = 'none';
+    }
+    
+    if (leagueName === 'Liga MX' && infoText) {
+        infoText.textContent = 'Esta página fue diseñada especialmente para la Liga MX. Puedes encontrar más información de Liga MX en las páginas anteriores.';
     }
     
     loadStandings();
