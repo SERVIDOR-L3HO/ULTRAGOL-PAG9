@@ -357,24 +357,45 @@
         let currentLeague = 'Liga MX';
         const API_BASE = 'https://ultragol-api3.onrender.com';
 
-        async function loadGoleadores() {
+        const leagueEndpoints = {
+            'Liga MX': '/goleadores',
+            'Premier League': '/premier/goleadores',
+            'La Liga': '/laliga/goleadores',
+            'Serie A': '/seriea/goleadores',
+            'Bundesliga': '/bundesliga/goleadores'
+        };
+
+        async function loadGoleadores(league = 'Liga MX') {
             const content = document.getElementById('goleadoresContent');
             const updatedInfo = document.getElementById('updatedInfo');
             const statsSummary = document.getElementById('statsSummary');
+
+            const endpoint = leagueEndpoints[league];
+            if (!endpoint) {
+                content.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>${league}</h3>
+                        <p>Datos de goleadores próximamente disponibles</p>
+                    </div>
+                `;
+                return;
+            }
 
             try {
                 content.innerHTML = `
                     <div class="loading-spinner">
                         <div class="spinner"></div>
-                        <div style="color: var(--text-muted);">Cargando goleadores...</div>
+                        <div style="color: var(--text-muted);">Cargando goleadores de ${league}...</div>
                     </div>
                 `;
 
-                const response = await fetch(`${API_BASE}/goleadores`);
+                const response = await fetch(`${API_BASE}${endpoint}`);
                 const data = await response.json();
 
                 if (data.goleadores && data.goleadores.length > 0) {
-                    updatedInfo.innerHTML = `<i class="fas fa-clock"></i> Actualizado: ${data.actualizado}`;
+                    const leagueName = data.liga || league;
+                    updatedInfo.innerHTML = `<i class="fas fa-clock"></i> ${leagueName} - Actualizado: ${data.actualizado}`;
                     
                     const totalGoals = data.goleadores.reduce((sum, g) => sum + g.goles, 0);
                     document.getElementById('totalPlayers').textContent = data.total;
@@ -413,7 +434,7 @@
                 content.innerHTML = `
                     <div class="error-message">
                         <i class="fas fa-exclamation-circle"></i>
-                        <h3>Error al cargar goleadores</h3>
+                        <h3>Error al cargar goleadores de ${league}</h3>
                         <p>Por favor, intenta de nuevo más tarde</p>
                     </div>
                 `;
@@ -426,18 +447,7 @@
             document.querySelectorAll('.league-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            if (league === 'Liga MX') {
-                loadGoleadores();
-            } else {
-                const content = document.getElementById('goleadoresContent');
-                content.innerHTML = `
-                    <div class="error-message">
-                        <i class="fas fa-info-circle"></i>
-                        <h3>${league}</h3>
-                        <p>Datos de goleadores próximamente disponibles</p>
-                    </div>
-                `;
-            }
+            loadGoleadores(league);
         }
 
         function shareGoleadores() {
