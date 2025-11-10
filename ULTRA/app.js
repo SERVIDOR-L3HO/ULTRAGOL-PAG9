@@ -854,9 +854,6 @@ function showChannelSelector(transmision, partidoNombre) {
                             <i class="fas fa-${type.icon}"></i>
                             ${type.name}
                         </button>
-                        <button class="stream-option-btn" onclick='window.open("${type.url.replace(/'/g, "\\'")}", "_blank")' style="background: rgba(76, 175, 80, 0.2); margin-left: 4px;" title="Abrir en ventana nueva">
-                            <i class="fas fa-external-link-alt"></i>
-                        </button>
                     `).join('')}
                 </div>
             </div>
@@ -1077,15 +1074,6 @@ function fullscreenStream() {
         iframe.webkitRequestFullscreen();
     } else if (iframe.mozRequestFullScreen) {
         iframe.mozRequestFullScreen();
-    }
-}
-
-function openStreamInNewWindow() {
-    if (currentStreamUrl) {
-        window.open(currentStreamUrl, '_blank', 'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no');
-        showToast('Transmisión abierta en nueva ventana');
-    } else {
-        showToast('No hay transmisión activa');
     }
 }
 
