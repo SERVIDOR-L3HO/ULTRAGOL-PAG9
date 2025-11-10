@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Goleadores - ULTRAGOL</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20251110">
+    <style>
+        .goleadores-container {
+            padding: 20px 15px 100px;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .goleadores-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .goleadores-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .goleadores-header h1 i {
+            font-size: 32px;
+        }
+
+        .updated-info {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .league-selector {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 10px 0 20px;
+            margin: 0 -15px;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .league-selector::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        .league-selector::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+        }
+
+        .league-selector::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .league-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .league-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(255, 69, 0, 0.4);
+        }
+
+        .league-btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .goleadores-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .goleador-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .goleador-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 69, 0, 0.05) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .goleador-card:hover::before {
+            opacity: 1;
+        }
+
+        .goleador-card:hover {
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .position-badge {
+            min-width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 4px 10px rgba(255, 69, 0, 0.3);
+        }
+
+        .position-badge.top-3 {
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .goleador-info {
+            flex: 1;
+        }
+
+        .player-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+
+        .team-name {
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .team-name i {
+            font-size: 11px;
+        }
+
+        .goals-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            background: rgba(255, 69, 0, 0.1);
+            padding: 8px 12px;
+            border-radius: 10px;
+            min-width: 60px;
+        }
+
+        .goals-count {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .goals-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .error-message i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <button class="icon-btn back-btn" onclick="window.location.href='index.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="score-badge">9:4</div>
+            </div>
+
+            <div class="header-center">
+                <img src="ultragol-logo.png" alt="ULTRAGOL" class="app-logo">
+            </div>
+
+            <div class="header-right">
+                <button class="icon-btn share-btn" onclick="shareGoleadores()">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="goleadores-container">
+            <div class="goleadores-header">
+                <h1>
+                    <i class="fas fa-futbol"></i>
+                    Goleadores
+                </h1>
+                <div class="updated-info" id="updatedInfo">
+                    <i class="fas fa-clock"></i> Cargando...
+                </div>
+            </div>
+
+            <div class="league-selector" id="leagueSelector">
+                <button class="league-btn active" onclick="selectLeagueGoleadores('Liga MX', this)">
+                    Liga MX
+                </button>
+                <button class="league-btn" onclick="selectLeagueGoleadores('Premier League', this)">
+                    Premier League
+                </button>
+                <button class="league-btn" onclick="selectLeagueGoleadores('La Liga', this)">
+                    La Liga
+                </button>
+                <button class="league-btn" onclick="selectLeagueGoleadores('Serie A', this)">
+                    Serie A
+                </button>
+                <button class="league-btn" onclick="selectLeagueGoleadores('Bundesliga', this)">
+                    Bundesliga
+                </button>
+            </div>
+
+            <div class="stats-summary" id="statsSummary" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPlayers">0</div>
+                    <div class="stat-label">Jugadores</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalGoals">0</div>
+                    <div class="stat-label">Goles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="topScorer">-</div>
+                    <div class="stat-label">Líder</div>
+                </div>
+            </div>
+
+            <div id="goleadoresContent">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <div style="color: var(--text-muted);">Cargando goleadores...</div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <button class="nav-btn" onclick="window.location.href='index.html'">
+                <i class="fas fa-home"></i>
+                <span class="nav-label">Inicio</span>
+            </button>
+            <button class="nav-btn" onclick="alert('Búsqueda próximamente')">
+                <i class="fas fa-search"></i>
+                <span class="nav-label">Buscar</span>
+            </button>
+            <button class="nav-btn" onclick="window.location.href='noticias.html'">
+                <i class="fas fa-newspaper"></i>
+                <span class="nav-label">Noticias</span>
+            </button>
+            <button class="nav-btn active" onclick="window.location.href='goleadores.html'">
+                <i class="fas fa-trophy"></i>
+                <span class="nav-label">Goleadores</span>
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        let currentLeague = 'Liga MX';
+        const API_BASE = 'https://ultragol-api3.onrender.com';
+
+        async function loadGoleadores() {
+            const content = document.getElementById('goleadoresContent');
+            const updatedInfo = document.getElementById('updatedInfo');
+            const statsSummary = document.getElementById('statsSummary');
+
+            try {
+                content.innerHTML = `
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <div style="color: var(--text-muted);">Cargando goleadores...</div>
+                    </div>
+                `;
+
+                const response = await fetch(`${API_BASE}/goleadores`);
+                const data = await response.json();
+
+                if (data.goleadores && data.goleadores.length > 0) {
+                    updatedInfo.innerHTML = `<i class="fas fa-clock"></i> Actualizado: ${data.actualizado}`;
+                    
+                    const totalGoals = data.goleadores.reduce((sum, g) => sum + g.goles, 0);
+                    document.getElementById('totalPlayers').textContent = data.total;
+                    document.getElementById('totalGoals').textContent = totalGoals;
+                    document.getElementById('topScorer').textContent = data.goleadores[0].goles;
+                    statsSummary.style.display = 'grid';
+
+                    const html = data.goleadores.map(goleador => {
+                        const isTopThree = goleador.posicion <= 3;
+                        return `
+                            <div class="goleador-card">
+                                <div class="position-badge ${isTopThree ? 'top-3' : ''}">
+                                    ${goleador.posicion}
+                                </div>
+                                <div class="goleador-info">
+                                    <div class="player-name">${goleador.jugador}</div>
+                                    <div class="team-name">
+                                        <i class="fas fa-shield-alt"></i>
+                                        ${goleador.equipo}
+                                    </div>
+                                </div>
+                                <div class="goals-badge">
+                                    <div class="goals-count">${goleador.goles}</div>
+                                    <div class="goals-label">Goles</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    content.innerHTML = `<div class="goleadores-list">${html}</div>`;
+                } else {
+                    throw new Error('No hay datos disponibles');
+                }
+            } catch (error) {
+                console.error('Error cargando goleadores:', error);
+                content.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <h3>Error al cargar goleadores</h3>
+                        <p>Por favor, intenta de nuevo más tarde</p>
+                    </div>
+                `;
+            }
+        }
+
+        function selectLeagueGoleadores(league, btn) {
+            currentLeague = league;
+            
+            document.querySelectorAll('.league-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if (league === 'Liga MX') {
+                loadGoleadores();
+            } else {
+                const content = document.getElementById('goleadoresContent');
+                content.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-info-circle"></i>
+                        <h3>${league}</h3>
+                        <p>Datos de goleadores próximamente disponibles</p>
+                    </div>
+                `;
+            }
+        }
+
+        function shareGoleadores() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Tabla de Goleadores - ULTRAGOL',
+                    text: `Mira la tabla de goleadores de ${currentLeague} en ULTRAGOL`,
+                    url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                alert('Compartir no está disponible en este navegador');
+            }
+        }
+
+        loadGoleadores();
+    </script>
+</body>
+</html>
