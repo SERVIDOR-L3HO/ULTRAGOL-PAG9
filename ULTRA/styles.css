@@ -1163,7 +1163,7 @@ input:checked + .slider:before {
 }
 
 .standings-table {
-    background: var(--card-bg);
+    background: transparent;
     border-radius: 12px;
     overflow: hidden;
     margin-top: 15px;
@@ -1175,29 +1175,162 @@ input:checked + .slider:before {
     color: var(--text-muted);
 }
 
-.standings-row {
-    display: grid;
-    grid-template-columns: 40px 1fr 40px 40px 40px 50px;
-    gap: 10px;
-    padding: 12px 15px;
-    align-items: center;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.2s;
-}
-
-.standings-row:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.standings-row:last-child {
-    border-bottom: none;
-}
-
 .standings-header {
-    background: rgba(255, 69, 0, 0.1);
+    background: rgba(139, 69, 19, 0.3);
     font-weight: 600;
     font-size: 12px;
     color: var(--text-muted);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.standings-header .standings-row {
+    border-bottom: none;
+}
+
+.standings-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.standings-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 4px 50px 1fr 40px 40px 40px 40px 60px;
+    gap: 8px;
+    padding: 12px 15px 12px 0;
+    align-items: center;
+    background: rgba(30, 30, 30, 0.8);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.standings-row:hover {
+    background: rgba(40, 40, 40, 0.9);
+    transform: translateX(5px);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.standings-header.standings-row {
+    background: rgba(139, 69, 19, 0.3);
+    border: none;
+}
+
+.position-indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: 10px 0 0 10px;
+}
+
+.zona-calificacion-directa .position-indicator {
+    background: linear-gradient(180deg, #00d9b3 0%, #00b894 100%);
+}
+
+.zona-calificacion .position-indicator {
+    background: linear-gradient(180deg, #00b894 0%, #00a085 100%);
+}
+
+.zona-repechaje .position-indicator {
+    background: linear-gradient(180deg, #ff9500 0%, #ff8000 100%);
+}
+
+.zona-media .position-indicator {
+    background: linear-gradient(180deg, #6b7280 0%, #4b5563 100%);
+}
+
+.zona-descenso .position-indicator {
+    background: linear-gradient(180deg, #ff4757 0%, #e84118 100%);
+}
+
+.pos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 8px;
+}
+
+.pos-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: white;
+}
+
+.zona-calificacion-directa .pos-number {
+    background: linear-gradient(135deg, #00d9b3 0%, #00b894 100%);
+    box-shadow: 0 4px 12px rgba(0, 217, 179, 0.4);
+}
+
+.zona-calificacion .pos-number {
+    background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+    box-shadow: 0 4px 12px rgba(0, 184, 148, 0.4);
+}
+
+.zona-repechaje .pos-number {
+    background: linear-gradient(135deg, #ff9500 0%, #ff8000 100%);
+    box-shadow: 0 4px 12px rgba(255, 149, 0, 0.4);
+}
+
+.zona-media .pos-number {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+}
+
+.zona-descenso .pos-number {
+    background: linear-gradient(135deg, #ff4757 0%, #e84118 100%);
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.4);
+}
+
+.team-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.team-logo-small {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.team-name-standings {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.stat {
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+}
+
+.stat.points {
+    font-weight: 700;
+    font-size: 15px;
+    color: #ff4757;
+    background: rgba(255, 71, 87, 0.15);
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 71, 87, 0.3);
 }
 
 .standings-pos {

@@ -2070,9 +2070,26 @@ async function loadStandings() {
                 </div>
             </div>
             <div class="standings-body">
-                ${equipos.map((equipo, index) => `
-                    <div class="standings-row ${index < 4 ? 'playoff-zone' : index >= equipos.length - 4 ? 'relegation-zone' : ''}">
-                        <div class="pos">${equipo.posicion}</div>
+                ${equipos.map((equipo, index) => {
+                    let zoneClass = '';
+                    if (index < 4) {
+                        zoneClass = 'zona-calificacion-directa';
+                    } else if (index < 6) {
+                        zoneClass = 'zona-calificacion';
+                    } else if (index < 10) {
+                        zoneClass = 'zona-repechaje';
+                    } else if (index < equipos.length - 3) {
+                        zoneClass = 'zona-media';
+                    } else {
+                        zoneClass = 'zona-descenso';
+                    }
+                    
+                    return `
+                    <div class="standings-row ${zoneClass}" data-position="${index + 1}">
+                        <div class="position-indicator"></div>
+                        <div class="pos">
+                            <span class="pos-number">${equipo.posicion}</span>
+                        </div>
                         <div class="team-cell">
                             <img src="${equipo.logo || 'https://via.placeholder.com/30'}" alt="${equipo.equipo}" class="team-logo-small" onerror="this.src='https://via.placeholder.com/30'">
                             <span class="team-name-standings">${equipo.equipo}</span>
@@ -2083,7 +2100,8 @@ async function loadStandings() {
                         <div class="stat">${equipo.estadisticas?.pp || 0}</div>
                         <div class="stat points">${equipo.estadisticas?.pts || 0}</div>
                     </div>
-                `).join('')}
+                    `;
+                }).join('')}
             </div>
         `;
     } catch (error) {
