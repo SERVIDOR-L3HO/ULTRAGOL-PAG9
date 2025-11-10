@@ -158,6 +158,9 @@
             font-weight: 600;
             margin-bottom: 4px;
             color: var(--text);
+            overflow: visible;
+            white-space: normal;
+            word-break: break-word;
         }
 
         .team-name {
@@ -308,6 +311,9 @@
                 <button class="league-btn" onclick="selectLeagueGoleadores('Bundesliga', this)">
                     Bundesliga
                 </button>
+                <button class="league-btn" onclick="selectLeagueGoleadores('Ligue 1', this)">
+                    Ligue 1
+                </button>
             </div>
 
             <div class="stats-summary" id="statsSummary" style="display: none;">
@@ -362,7 +368,8 @@
             'Premier League': '/premier/goleadores',
             'La Liga': '/laliga/goleadores',
             'Serie A': '/seriea/goleadores',
-            'Bundesliga': '/bundesliga/goleadores'
+            'Bundesliga': '/bundesliga/goleadores',
+            'Ligue 1': '/ligue1/goleadores'
         };
 
         async function loadGoleadores(league = 'Liga MX') {
