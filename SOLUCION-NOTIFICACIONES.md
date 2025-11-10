@@ -38,16 +38,22 @@ if (registration && registration.active) {
 }
 ```
 
-**Después (código correcto):**
+**Después (código correcto con fallback mejorado):**
 ```javascript
-// Esperar a que el Service Worker esté listo (con timeout)
+// Esperar a que el Service Worker esté listo (con timeout de 10s para GitHub Pages)
 const registration = await Promise.race([
     navigator.serviceWorker.ready,  // ✅ Espera hasta que esté listo
     new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Service Worker timeout')), 3000)
+        setTimeout(() => reject(new Error('Service Worker timeout')), 10000)
     )
-]).catch(err => {
-    console.warn('⚠️ Service Worker not ready:', err.message);
+]).catch(async (err) => {
+    console.warn('⚠️ Service Worker not ready via .ready:', err.message);
+    // ✅ NUEVO: Intentar obtener registro existente como fallback
+    const existingReg = await navigator.serviceWorker.getRegistration();
+    if (existingReg) {
+        console.log('✅ Found existing Service Worker registration');
+        return existingReg;
+    }
     return null;
 });
 
@@ -70,18 +76,32 @@ Cambiamos la versión del caché para forzar una actualización:
 
 ```javascript
 // sw.js
-const CACHE_NAME = 'ultragol-v4-notifications-sw-fixed-20251109';
+const CACHE_NAME = 'ultragol-v5-sw-timeout-fix-20251109';
 ```
+
+### 4. Timeout Aumentado
+
+GitHub Pages puede ser más lento que localhost, por lo que aumentamos el timeout:
+- **Antes**: 3 segundos
+- **Ahora**: 10 segundos
+
+### 5. Fallback Mejorado
+
+Si `navigator.serviceWorker.ready` no se resuelve en 10 segundos, ahora intentamos obtener el registro existente como plan B
 
 ## 🚀 Cambios Clave
 
 1. **`navigator.serviceWorker.ready`**: Espera a que el Service Worker esté completamente listo antes de mostrar notificaciones
 
-2. **Timeout de 3 segundos**: Previene que la aplicación se cuelgue si el Service Worker nunca se activa
+2. **Timeout de 10 segundos**: Aumentado de 3s a 10s para GitHub Pages (más lento que localhost)
 
-3. **Manejo de errores mejorado**: Si el Service Worker falla, se captura el error y se maneja apropiadamente
+3. **Fallback mejorado**: Si `.ready` falla, intenta obtener el registro existente con `getRegistration()`
 
-4. **Consistencia**: Tanto `notifications.js` como `test-notifications.html` usan la misma lógica
+4. **Manejo de errores mejorado**: Si el Service Worker falla, se captura el error y se maneja apropiadamente
+
+5. **Logging detallado**: Muestra el estado del Service Worker (active/not active) para debugging
+
+6. **Consistencia**: Tanto `notifications.js` como `test-notifications.html` usan la misma lógica
 
 ## 📋 Para Subir a GitHub Pages
 
@@ -107,7 +127,7 @@ Espera 2-3 minutos para que GitHub Pages actualice.
 | **Método usado** | `getRegistration()` + fallback | `ready` + timeout |
 | **Manejo de SW** | Verifica si está activo | Espera a que esté listo |
 | **Fallback** | Intenta `new Notification()` aunque haya SW | Solo usa `new Notification()` si NO hay SW |
-| **Timeout** | ❌ No tenía | ✅ 3 segundos |
+| **Timeout** | ❌ No tenía | ✅ 10 segundos + fallback |
 | **Errores** | Se colgaba o fallaba silenciosamente | Manejo explícito de errores |
 
 ## 📚 Documentación Útil
@@ -126,6 +146,21 @@ Espera 2-3 minutos para que GitHub Pages actualice.
 
 ---
 
-**Corrección aplicada:** 9 de noviembre, 2025  
-**Versión:** v20251109b  
-**Service Worker:** ultragol-v4-notifications-sw-fixed-20251109
+## 🔄 Historial de Correcciones
+
+### v20251109c (Última versión)
+- ✅ Timeout aumentado de 3s a 10s para GitHub Pages
+- ✅ Fallback mejorado: intenta `getRegistration()` si `.ready` falla
+- ✅ Logging detallado del estado del Service Worker
+- ✅ Service Worker: `ultragol-v5-sw-timeout-fix-20251109`
+
+### v20251109b
+- ✅ Primera corrección: cambio de `getRegistration()` a `.ready`
+- ✅ Timeout de 3 segundos agregado
+- ✅ Service Worker: `ultragol-v4-notifications-sw-fixed-20251109`
+
+---
+
+**Última actualización:** 9 de noviembre, 2025  
+**Versión actual:** v20251109c  
+**Service Worker actual:** ultragol-v5-sw-timeout-fix-20251109

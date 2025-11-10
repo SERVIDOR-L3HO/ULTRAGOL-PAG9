@@ -445,19 +445,27 @@ class NotificationManager {
             if ('serviceWorker' in navigator) {
                 console.log('🔍 Checking for Service Worker...');
                 
-                // Wait for Service Worker to be ready (with timeout to prevent hanging)
+                // Wait for Service Worker to be ready (with longer timeout for GitHub Pages)
                 const registration = await Promise.race([
                     navigator.serviceWorker.ready,
                     new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Service Worker timeout')), 3000)
+                        setTimeout(() => reject(new Error('Service Worker timeout after 10s')), 10000)
                     )
-                ]).catch(err => {
-                    console.warn('⚠️ Service Worker not ready:', err.message);
+                ]).catch(async (err) => {
+                    console.warn('⚠️ Service Worker not ready via .ready:', err.message);
+                    // Try to get existing registration as fallback
+                    const existingReg = await navigator.serviceWorker.getRegistration();
+                    if (existingReg) {
+                        console.log('✅ Found existing Service Worker registration');
+                        return existingReg;
+                    }
+                    console.warn('⚠️ No Service Worker registration found');
                     return null;
                 });
                 
                 if (registration) {
                     console.log('📱 Using Service Worker to show notification');
+                    console.log('SW state:', registration.active ? 'active' : 'not active');
                     
                     // Clean options - remove non-cloneable data (functions, etc)
                     const swOptions = {

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script para actualizar versiones de cache busting en TODOS los archivos HTML
-VERSION="20251109b"
+VERSION="20251109c"
 
 echo "🔄 Actualizando versiones a v=$VERSION..."
 echo ""

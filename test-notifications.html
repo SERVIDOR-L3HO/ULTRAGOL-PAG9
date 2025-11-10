@@ -167,16 +167,27 @@
                 if ('serviceWorker' in navigator) {
                     addLog('🔍 Verificando Service Worker...');
                     
-                    // Wait for Service Worker to be ready (with timeout)
+                    // Wait for Service Worker to be ready (with longer timeout for GitHub Pages)
                     const registration = await Promise.race([
                         navigator.serviceWorker.ready,
                         new Promise((_, reject) => 
-                            setTimeout(() => reject(new Error('Service Worker timeout')), 3000)
+                            setTimeout(() => reject(new Error('Service Worker timeout after 10s')), 10000)
                         )
-                    ]);
+                    ]).catch(async (err) => {
+                        addLog(`⚠️ SW not ready via .ready: ${err.message}`);
+                        // Try to get existing registration as fallback
+                        const existingReg = await navigator.serviceWorker.getRegistration();
+                        if (existingReg) {
+                            addLog('✅ Found existing Service Worker registration');
+                            return existingReg;
+                        }
+                        addLog('⚠️ No Service Worker registration found');
+                        return null;
+                    });
                     
                     if (registration) {
                         addLog('📱 Usando Service Worker para mostrar notificación');
+                        addLog(`SW state: ${registration.active ? 'active' : 'not active'}`);
                         
                         // Clean options - remove non-cloneable data (functions)
                         const swOptions = {

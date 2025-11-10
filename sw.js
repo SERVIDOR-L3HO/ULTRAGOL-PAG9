@@ -1,5 +1,5 @@
 // IMPORTANTE: Cambiar la versión cada vez que hagas actualizaciones
-const CACHE_NAME = 'ultragol-v4-notifications-sw-fixed-20251109';
+const CACHE_NAME = 'ultragol-v5-sw-timeout-fix-20251109';
 
 const urlsToCache = [
   '/',
