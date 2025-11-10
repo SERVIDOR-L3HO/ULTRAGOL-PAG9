@@ -2050,20 +2050,12 @@ async function loadStandings() {
         const standingsTable = document.getElementById('standingsTable');
         if (!standingsTable) return;
         
-        if (!data.equipos || data.equipos.length === 0) {
-            const infoMessage = document.getElementById('standingsInfoMessage');
-            const infoText = document.getElementById('standingsInfoText');
-            
-            if (currentLeague !== 'Liga MX') {
-                if (infoMessage) infoMessage.style.display = 'flex';
-                if (infoText) infoText.textContent = 'Esta página fue diseñada especialmente para la Liga MX. Los datos de otras ligas estarán disponibles próximamente.';
-            }
-            
+        if (!data.tabla || data.tabla.length === 0) {
             standingsTable.innerHTML = '<div class="standings-loading">No hay datos de tabla disponibles</div>';
             return;
         }
         
-        const equipos = data.equipos.sort((a, b) => a.posicion - b.posicion);
+        const equipos = data.tabla.sort((a, b) => a.posicion - b.posicion);
         
         standingsTable.innerHTML = `
             <div class="standings-header">
@@ -2082,14 +2074,14 @@ async function loadStandings() {
                     <div class="standings-row ${index < 4 ? 'playoff-zone' : index >= equipos.length - 4 ? 'relegation-zone' : ''}">
                         <div class="pos">${equipo.posicion}</div>
                         <div class="team-cell">
-                            <img src="${equipo.logo}" alt="${equipo.nombre}" class="team-logo-small" onerror="this.src='https://via.placeholder.com/30'">
-                            <span class="team-name-standings">${equipo.nombreCorto || equipo.nombre}</span>
+                            <img src="${equipo.logo || 'https://via.placeholder.com/30'}" alt="${equipo.equipo}" class="team-logo-small" onerror="this.src='https://via.placeholder.com/30'">
+                            <span class="team-name-standings">${equipo.equipo}</span>
                         </div>
-                        <div class="stat">${equipo.partidosJugados || 0}</div>
-                        <div class="stat">${equipo.ganados || 0}</div>
-                        <div class="stat">${equipo.empatados || 0}</div>
-                        <div class="stat">${equipo.perdidos || 0}</div>
-                        <div class="stat points">${equipo.puntos || 0}</div>
+                        <div class="stat">${equipo.estadisticas?.pj || 0}</div>
+                        <div class="stat">${equipo.estadisticas?.pg || 0}</div>
+                        <div class="stat">${equipo.estadisticas?.pe || 0}</div>
+                        <div class="stat">${equipo.estadisticas?.pp || 0}</div>
+                        <div class="stat points">${equipo.estadisticas?.pts || 0}</div>
                     </div>
                 `).join('')}
             </div>
@@ -2184,17 +2176,6 @@ function selectLeague(leagueName, element) {
     const standingsTitle = document.getElementById('standingsLeagueName');
     if (standingsTitle) {
         standingsTitle.textContent = `TABLA DE POSICIONES - ${leagueName}`;
-    }
-    
-    const infoMessage = document.getElementById('standingsInfoMessage');
-    const infoText = document.getElementById('standingsInfoText');
-    
-    if (infoMessage) {
-        infoMessage.style.display = 'none';
-    }
-    
-    if (leagueName === 'Liga MX' && infoText) {
-        infoText.textContent = 'Esta página fue diseñada especialmente para la Liga MX. Puedes encontrar más información de Liga MX en las páginas anteriores.';
     }
     
     loadStandings();
