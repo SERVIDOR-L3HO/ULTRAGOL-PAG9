@@ -24,6 +24,12 @@ class LiveScoreboard {
             this.matches = data.transmisiones || [];
             this.lastUpdated = data.actualizado || new Date().toLocaleString('es-MX');
             
+            console.log('📡 Total de transmisiones:', this.matches.length);
+            if (this.matches.length > 0) {
+                console.log('📋 Primera transmisión:', this.matches[0]);
+                console.log('🔍 Estados encontrados:', this.matches.map(m => m.estado));
+            }
+            
             this.renderMatches();
             this.updateLastUpdatedTime();
         } catch (error) {
@@ -54,43 +60,67 @@ class LiveScoreboard {
     }
 
     getFilteredMatches() {
+        let filtered;
         switch (this.currentFilter) {
             case 'live':
-                return this.matches.filter(match => {
+                filtered = this.matches.filter(match => {
                     const estado = (match.estado || '').toLowerCase();
                     return estado === 'en vivo' || estado === 'live';
                 });
+                console.log(`🔴 Filtro EN VIVO: ${filtered.length} de ${this.matches.length} transmisiones`);
+                return filtered;
             case 'upcoming':
-                return this.matches.filter(match => {
+                filtered = this.matches.filter(match => {
                     const estado = (match.estado || '').toLowerCase();
                     return estado === 'próximo' || estado === 'proximo' || estado === 'upcoming';
                 });
+                console.log(`⏰ Filtro PRÓXIMOS: ${filtered.length} de ${this.matches.length} transmisiones`);
+                return filtered;
             case 'all':
             default:
+                console.log(`📋 Filtro TODOS: ${this.matches.length} transmisiones`);
                 return this.matches;
         }
     }
 
     renderMatches() {
         const container = document.getElementById('scoreboard-grid');
-        if (!container) return;
+        console.log('🎬 renderMatches() llamado, container:', container);
+        
+        if (!container) {
+            console.error('❌ Container #scoreboard-grid no encontrado');
+            return;
+        }
 
         const filteredMatches = this.getFilteredMatches();
+        console.log('📝 Partidos filtrados:', filteredMatches.length);
 
         if (filteredMatches.length === 0) {
+            console.log('⚠️ No hay partidos para mostrar');
             container.innerHTML = this.renderEmptyState();
             return;
         }
 
-        container.innerHTML = filteredMatches.map(match => this.renderMatchCard(match)).join('');
+        try {
+            const html = filteredMatches.map((match, index) => {
+                console.log(`🏗️ Generando tarjeta ${index + 1} de ${filteredMatches.length}`);
+                return this.renderMatchCard(match);
+            }).join('');
+            console.log(`✨ HTML generado, longitud: ${html.length} caracteres`);
+            container.innerHTML = html;
+            console.log('✅ Tarjetas renderizadas exitosamente');
+        } catch (error) {
+            console.error('❌ Error al renderizar tarjetas:', error);
+        }
     }
 
     renderMatchCard(match) {
         const isLive = (match.estado || '').toLowerCase().includes('vivo') || (match.estado || '').toLowerCase() === 'live';
         const isUpcoming = (match.estado || '').toLowerCase().includes('próximo') || (match.estado || '').toLowerCase().includes('proximo');
         
-        // Extraer equipos del campo 'equipo' (formato: "Team1 vs Team2")
-        const equipos = (match.equipo || 'Partido').split(' vs ');
+        // Extraer equipos del campo 'evento' o 'titulo' (formato: "Team1 vs Team2")
+        const partidoNombre = match.evento || match.titulo || match.equipo || 'Partido';
+        const equipos = partidoNombre.split(' vs ');
         const team1 = equipos[0] || 'Equipo 1';
         const team2 = equipos[1] || 'Equipo 2';
         
@@ -236,8 +266,20 @@ class LiveScoreboard {
 }
 
 // Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('scoreboard-grid')) {
+function initLiveScoreboard() {
+    const container = document.getElementById('scoreboard-grid');
+    if (container) {
+        console.log('🎬 Inicializando LiveScoreboard...');
         new LiveScoreboard();
+    } else {
+        console.log('⏳ Esperando a que el DOM esté listo...');
     }
-});
+}
+
+// Try to initialize immediately or wait for DOM
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLiveScoreboard);
+} else {
+    // DOM already loaded
+    initLiveScoreboard();
+}
