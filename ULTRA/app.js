@@ -152,7 +152,7 @@ async function loadTransmisiones() {
         const [response1, response2, response3] = await Promise.all([
             fetch('https://ultragol-api3.onrender.com/transmisiones'),
             fetch('https://ultragol-api3.onrender.com/transmisiones3'),
-            fetch('https://17c7b72a-6b57-4fcd-9f84-2321c89b0a72-00-3ub6gwf825rzc.spock.replit.dev/transmisiones2')
+            fetch('https://9fa7ec8e-6960-4b03-a65e-79d58e7b8ab8-00-1lvbttqhuwaz0.kirk.replit.dev/transmisiones2')
         ]);
         
         const data1 = await response1.json();
