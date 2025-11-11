@@ -148,16 +148,27 @@ async function loadMarcadores() {
 // Función para cargar transmisiones desde las 3 APIs
 async function loadTransmisiones() {
     try {
-        // Cargar las 3 APIs en paralelo
-        const [response1, response2, response3] = await Promise.all([
-            fetch('https://ultragol-api3.onrender.com/transmisiones'),
-            fetch('https://ultragol-api3.onrender.com/transmisiones3'),
+        // Cargar las 3 APIs en paralelo con manejo individual de errores
+        const [data1, data2, data3] = await Promise.all([
+            fetch('https://ultragol-api3.onrender.com/transmisiones')
+                .then(res => res.json())
+                .catch(err => {
+                    console.warn('⚠️ Error cargando API 1 (rereyano):', err);
+                    return { transmisiones: [] };
+                }),
+            fetch('https://ultragol-api3.onrender.com/transmisiones3')
+                .then(res => res.json())
+                .catch(err => {
+                    console.warn('⚠️ Error cargando API 2 (e1link):', err);
+                    return { transmisiones: [] };
+                }),
             fetch('https://9fa7ec8e-6960-4b03-a65e-79d58e7b8ab8-00-1lvbttqhuwaz0.kirk.replit.dev/transmisiones2')
+                .then(res => res.json())
+                .catch(err => {
+                    console.warn('⚠️ Error cargando API 3 (voodc):', err);
+                    return { transmisiones: [] };
+                })
         ]);
-        
-        const data1 = await response1.json();
-        const data2 = await response2.json();
-        const data3 = await response3.json();
         
         // Convertir API 2 (transmisiones3 - e1link) que usa "enlaces" a "canales" pero manteniendo la estructura de array
         const transmisionesNormalizadasAPI2 = (data2.transmisiones || []).map(t => {
@@ -237,7 +248,9 @@ async function loadTransmisiones() {
         return transmisionesData;
     } catch (error) {
         console.error('❌ Error cargando transmisiones:', error);
-        return null;
+        // Retornar objeto vacío en lugar de null para evitar errores
+        transmisionesData = { transmisiones: [] };
+        return transmisionesData;
     }
 }
 
