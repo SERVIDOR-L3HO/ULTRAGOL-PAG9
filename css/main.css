@@ -1288,11 +1288,14 @@ body {
     letter-spacing: 1px;
 }
 
-.team-name {
-    font-size: 1.5rem;
-    font-weight: 600;
+.team-preview-card .team-name {
+    font-size: 1.8rem;
+    font-weight: 700;
     margin-bottom: 1rem;
-    color: #333;
+    color: #1a1a1a !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .team-points {
