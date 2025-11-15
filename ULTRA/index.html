@@ -409,42 +409,119 @@
         </div>
     </div>
 
-    <!-- Modal de Búsqueda -->
+    <!-- Modal de Búsqueda Profesional -->
     <div id="searchModal" class="search-modal">
         <div class="search-modal-overlay" onclick="closeSearchModal()"></div>
         <div class="search-modal-container">
             <div class="search-modal-header">
-                <div class="search-input-wrapper">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="search" id="searchInput" class="search-input" placeholder="Buscar ligas, equipos, partidos..." autocomplete="off" inputmode="text">
-                    <button class="clear-search-btn" onclick="clearSearch()" style="display: none;">
+                <div class="search-header-top">
+                    <h2 class="search-modal-title">
+                        <i class="fas fa-compass"></i>
+                        Explora UltraGol
+                    </h2>
+                    <button class="close-search-modal" onclick="closeSearchModal()">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <button class="close-search-modal" onclick="closeSearchModal()">
-                    <i class="fas fa-times"></i>
-                </button>
+                <div class="search-input-wrapper">
+                    <div class="search-input-icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <input type="search" id="searchInput" class="search-input" placeholder="Busca equipos, ligas, partidos, deportes..." autocomplete="off" inputmode="text">
+                    <button class="clear-search-btn" onclick="clearSearch()" style="display: none;">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                </div>
+                <div class="search-filters" id="searchFilters">
+                    <button class="filter-chip active" data-filter="all" onclick="filterSearch('all', this)">
+                        <i class="fas fa-th"></i> Todo
+                    </button>
+                    <button class="filter-chip" data-filter="live" onclick="filterSearch('live', this)">
+                        <i class="fas fa-circle"></i> En Vivo
+                    </button>
+                    <button class="filter-chip" data-filter="football" onclick="filterSearch('football', this)">
+                        <i class="fas fa-futbol"></i> Fútbol
+                    </button>
+                    <button class="filter-chip" data-filter="other" onclick="filterSearch('other', this)">
+                        <i class="fas fa-trophy"></i> Otros Deportes
+                    </button>
+                </div>
             </div>
             <div class="search-modal-body" id="searchResults">
                 <div class="search-welcome">
-                    <div class="search-welcome-icon">
-                        <i class="fas fa-search"></i>
+                    <div class="search-welcome-animation">
+                        <div class="search-icon-animated">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <div class="search-waves">
+                            <span class="wave"></span>
+                            <span class="wave"></span>
+                            <span class="wave"></span>
+                        </div>
                     </div>
-                    <h3>Busca en UltraGol</h3>
-                    <p>Encuentra ligas, equipos, partidos en vivo y mucho más</p>
-                    <div class="search-suggestions">
-                        <span class="search-tag" onclick="quickSearch('Liga MX')">
-                            <i class="fas fa-futbol"></i> Liga MX
-                        </span>
-                        <span class="search-tag" onclick="quickSearch('América')">
-                            <i class="fas fa-shield-alt"></i> América
-                        </span>
-                        <span class="search-tag" onclick="quickSearch('Chivas')">
-                            <i class="fas fa-shield-alt"></i> Chivas
-                        </span>
-                        <span class="search-tag" onclick="quickSearch('en vivo')">
-                            <i class="fas fa-circle"></i> En Vivo
-                        </span>
+                    <h3 class="search-welcome-title">Descubre el Mundo del Deporte</h3>
+                    <p class="search-welcome-subtitle">Busca entre cientos de partidos en vivo y próximos eventos</p>
+                    
+                    <div class="search-categories">
+                        <div class="search-category-section">
+                            <h4><i class="fas fa-fire"></i> Populares</h4>
+                            <div class="search-tags-grid">
+                                <span class="search-tag-pro" onclick="quickSearch('en vivo')">
+                                    <i class="fas fa-circle live-dot-search"></i> En Vivo
+                                </span>
+                                <span class="search-tag-pro" onclick="quickSearch('Liga MX')">
+                                    <i class="fas fa-futbol"></i> Liga MX
+                                </span>
+                                <span class="search-tag-pro" onclick="quickSearch('Premier League')">
+                                    <i class="fas fa-crown"></i> Premier
+                                </span>
+                                <span class="search-tag-pro" onclick="quickSearch('Champions')">
+                                    <i class="fas fa-star"></i> Champions
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="search-category-section">
+                            <h4><i class="fas fa-shield-alt"></i> Equipos Destacados</h4>
+                            <div class="search-tags-grid">
+                                <span class="search-tag-pro" onclick="quickSearch('América')">
+                                    <i class="fas fa-eagle"></i> América
+                                </span>
+                                <span class="search-tag-pro" onclick="quickSearch('Chivas')">
+                                    <i class="fas fa-heart"></i> Chivas
+                                </span>
+                                <span class="search-tag-pro" onclick="quickSearch('Tigres')">
+                                    <i class="fas fa-paw"></i> Tigres
+                                </span>
+                                <span class="search-tag-pro" onclick="quickSearch('Pumas')">
+                                    <i class="fas fa-cat"></i> Pumas
+                                </span>
+                                <span class="search-tag-pro" onclick="quickSearch('Cruz Azul')">
+                                    <i class="fas fa-bolt"></i> Cruz Azul
+                                </span>
+                                <span class="search-tag-pro" onclick="quickSearch('Monterrey')">
+                                    <i class="fas fa-mountain"></i> Monterrey
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="search-category-section">
+                            <h4><i class="fas fa-trophy"></i> Otros Deportes</h4>
+                            <div class="search-tags-grid">
+                                <span class="search-tag-pro" onclick="quickSearch('UFC')">
+                                    <i class="fas fa-fist-raised"></i> UFC
+                                </span>
+                                <span class="search-tag-pro" onclick="quickSearch('NBA')">
+                                    <i class="fas fa-basketball-ball"></i> NBA
+                                </span>
+                                <span class="search-tag-pro" onclick="quickSearch('NFL')">
+                                    <i class="fas fa-football-ball"></i> NFL
+                                </span>
+                                <span class="search-tag-pro" onclick="quickSearch('Boxing')">
+                                    <i class="fas fa-hand-rock"></i> Box
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

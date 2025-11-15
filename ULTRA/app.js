@@ -1355,27 +1355,102 @@ function showSearchWelcome() {
     const resultsContainer = document.getElementById('searchResults');
     resultsContainer.innerHTML = `
         <div class="search-welcome">
-            <div class="search-welcome-icon">
-                <i class="fas fa-search"></i>
+            <div class="search-welcome-animation">
+                <div class="search-icon-animated">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="search-waves">
+                    <span class="wave"></span>
+                    <span class="wave"></span>
+                    <span class="wave"></span>
+                </div>
             </div>
-            <h3>Busca en UltraGol</h3>
-            <p>Encuentra ligas, equipos, partidos en vivo y mucho más</p>
-            <div class="search-suggestions">
-                <span class="search-tag" onclick="quickSearch('Liga MX')">
-                    <i class="fas fa-futbol"></i> Liga MX
-                </span>
-                <span class="search-tag" onclick="quickSearch('América')">
-                    <i class="fas fa-shield-alt"></i> América
-                </span>
-                <span class="search-tag" onclick="quickSearch('Chivas')">
-                    <i class="fas fa-shield-alt"></i> Chivas
-                </span>
-                <span class="search-tag" onclick="quickSearch('en vivo')">
-                    <i class="fas fa-circle"></i> En Vivo
-                </span>
+            <h3 class="search-welcome-title">Descubre el Mundo del Deporte</h3>
+            <p class="search-welcome-subtitle">Busca entre cientos de partidos en vivo y próximos eventos</p>
+            
+            <div class="search-categories">
+                <div class="search-category-section">
+                    <h4><i class="fas fa-fire"></i> Populares</h4>
+                    <div class="search-tags-grid">
+                        <span class="search-tag-pro" onclick="quickSearch('en vivo')">
+                            <i class="fas fa-circle live-dot-search"></i> En Vivo
+                        </span>
+                        <span class="search-tag-pro" onclick="quickSearch('Liga MX')">
+                            <i class="fas fa-futbol"></i> Liga MX
+                        </span>
+                        <span class="search-tag-pro" onclick="quickSearch('Premier League')">
+                            <i class="fas fa-crown"></i> Premier
+                        </span>
+                        <span class="search-tag-pro" onclick="quickSearch('Champions')">
+                            <i class="fas fa-star"></i> Champions
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="search-category-section">
+                    <h4><i class="fas fa-shield-alt"></i> Equipos Destacados</h4>
+                    <div class="search-tags-grid">
+                        <span class="search-tag-pro" onclick="quickSearch('América')">
+                            <i class="fas fa-eagle"></i> América
+                        </span>
+                        <span class="search-tag-pro" onclick="quickSearch('Chivas')">
+                            <i class="fas fa-heart"></i> Chivas
+                        </span>
+                        <span class="search-tag-pro" onclick="quickSearch('Tigres')">
+                            <i class="fas fa-paw"></i> Tigres
+                        </span>
+                        <span class="search-tag-pro" onclick="quickSearch('Pumas')">
+                            <i class="fas fa-cat"></i> Pumas
+                        </span>
+                        <span class="search-tag-pro" onclick="quickSearch('Cruz Azul')">
+                            <i class="fas fa-bolt"></i> Cruz Azul
+                        </span>
+                        <span class="search-tag-pro" onclick="quickSearch('Monterrey')">
+                            <i class="fas fa-mountain"></i> Monterrey
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="search-category-section">
+                    <h4><i class="fas fa-trophy"></i> Otros Deportes</h4>
+                    <div class="search-tags-grid">
+                        <span class="search-tag-pro" onclick="quickSearch('UFC')">
+                            <i class="fas fa-fist-raised"></i> UFC
+                        </span>
+                        <span class="search-tag-pro" onclick="quickSearch('NBA')">
+                            <i class="fas fa-basketball-ball"></i> NBA
+                        </span>
+                        <span class="search-tag-pro" onclick="quickSearch('NFL')">
+                            <i class="fas fa-football-ball"></i> NFL
+                        </span>
+                        <span class="search-tag-pro" onclick="quickSearch('Boxing')">
+                            <i class="fas fa-hand-rock"></i> Box
+                        </span>
+                    </div>
+                </div>
             </div>
         </div>
     `;
+}
+
+// Variable global para guardar el filtro actual
+let currentSearchFilter = 'all';
+
+// Función para manejar el cambio de filtros
+function filterSearch(filterType, element) {
+    // Actualizar el filtro actual
+    currentSearchFilter = filterType;
+    
+    // Actualizar estilos de los chips
+    const allChips = document.querySelectorAll('.filter-chip');
+    allChips.forEach(chip => chip.classList.remove('active'));
+    element.classList.add('active');
+    
+    // Si hay texto en el buscador, volver a buscar con el nuevo filtro
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput && searchInput.value.trim() !== '') {
+        performSearch(searchInput.value);
+    }
 }
 
 async function performSearch(query) {
