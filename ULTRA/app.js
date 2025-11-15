@@ -70,6 +70,54 @@ const leaguesConfig = {
     }
 };
 
+// Diccionario de aliases para equipos de Liga MX (compartido)
+const aliasesEquipos = {
+    'uanl': ['tigres', 'tigres uanl', 'uanl', 'tigs'],
+    'tigres': ['tigres', 'tigres uanl', 'uanl', 'tigs'],
+    'america': ['america', 'club america', 'las aguilas', 'ame', 'ca'],
+    'chivas': ['chivas', 'guadalajara', 'cd guadalajara', 'gdl', 'rebaño'],
+    'guadalajara': ['chivas', 'guadalajara', 'cd guadalajara', 'gdl', 'rebaño'],
+    'cruz azul': ['cruz azul', 'la maquina', 'azul', 'ca'],
+    'pumas': ['pumas', 'pumas unam', 'unam', 'felinos'],
+    'monterrey': ['monterrey', 'rayados', 'cf monterrey', 'mty', 'rayos'],
+    'santos': ['santos', 'santos laguna', 'guerreros'],
+    'toluca': ['toluca', 'diablos rojos', 'diablos', 'tol'],
+    'leon': ['leon', 'club leon', 'la fiera', 'esmeraldas'],
+    'atlas': ['atlas', 'fc atlas', 'rojinegros'],
+    'pachuca': ['pachuca', 'tuzos', 'pach'],
+    'tijuana': ['tijuana', 'xolos', 'club tijuana', 'tj'],
+    'puebla': ['puebla', 'club puebla', 'la franja', 'pue'],
+    'queretaro': ['queretaro', 'gallos blancos', 'gallos', 'qro'],
+    'necaxa': ['necaxa', 'rayos', 'nec'],
+    'mazatlan': ['mazatlan', 'mazatlan fc', 'mzt'],
+    'juarez': ['juarez', 'fc juarez', 'bravos', 'jua'],
+    'san luis': ['san luis', 'atletico de san luis', 'atl san luis', 'atl. san luis', 'asl', 'tuneros'],
+    'asl': ['san luis', 'atletico de san luis', 'atl san luis', 'atl. san luis', 'asl', 'tuneros'],
+    'gdl': ['chivas', 'guadalajara', 'cd guadalajara', 'rebaño'],
+    'mty': ['monterrey', 'rayados', 'cf monterrey']
+};
+
+// Función auxiliar para normalizar nombres de equipos (uso compartido)
+const normalizarNombre = (nombre) => {
+    return nombre
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .trim();
+};
+
+// Función para obtener aliases de un equipo (uso compartido)
+const obtenerAliases = (nombre) => {
+    const normalizado = normalizarNombre(nombre);
+    
+    for (const [clave, aliases] of Object.entries(aliasesEquipos)) {
+        if (normalizado.includes(clave) || aliases.some(alias => normalizado.includes(alias))) {
+            return aliases;
+        }
+    }
+    
+    return [normalizado];
+};
+
 // Sistema de navegación con historial de modales
 let modalHistory = [];
 
@@ -1345,7 +1393,7 @@ async function performSearch(query) {
     
     resultsContainer.innerHTML = '<div class="search-loading"><div class="spinner"></div><p>Buscando en todo UltraGol...</p></div>';
     
-    const searchTerm = query.toLowerCase().trim();
+    const searchTerm = normalizarNombre(query);
     const results = {
         matches: [],
         teams: [],
@@ -1354,18 +1402,35 @@ async function performSearch(query) {
         liveMatches: []
     };
     
-    // Buscar en partidos de marcadores
+    // Obtener aliases del término de búsqueda
+    const searchAliases = obtenerAliases(searchTerm);
+    console.log(`🔍 Buscando: "${searchTerm}" → aliases: [${searchAliases.join(', ')}]`);
+    
+    // Función para verificar si un nombre coincide con la búsqueda (con abreviaciones)
+    const coincideConBusqueda = (nombre) => {
+        if (!nombre) return false;
+        const nombreNormalizado = normalizarNombre(nombre);
+        const aliasesNombre = obtenerAliases(nombreNormalizado);
+        
+        // Verificar coincidencia directa
+        if (nombreNormalizado.includes(searchTerm)) return true;
+        
+        // Verificar coincidencia con aliases de la búsqueda
+        if (searchAliases.some(alias => nombreNormalizado.includes(alias))) return true;
+        
+        // Verificar coincidencia con aliases del nombre
+        if (aliasesNombre.some(alias => searchTerm.includes(alias) || alias.includes(searchTerm))) return true;
+        
+        return false;
+    };
+    
+    // Buscar en partidos de marcadores (con abreviaciones mejoradas)
     if (marcadoresData && marcadoresData.partidos) {
         results.matches = marcadoresData.partidos.filter(partido => {
-            const localName = partido.local?.nombreCorto?.toLowerCase() || '';
-            const visitanteName = partido.visitante?.nombreCorto?.toLowerCase() || '';
-            const localFullName = partido.local?.nombre?.toLowerCase() || '';
-            const visitanteFullName = partido.visitante?.nombre?.toLowerCase() || '';
-            
-            return localName.includes(searchTerm) || 
-                   visitanteName.includes(searchTerm) ||
-                   localFullName.includes(searchTerm) ||
-                   visitanteFullName.includes(searchTerm);
+            return coincideConBusqueda(partido.local?.nombreCorto) ||
+                   coincideConBusqueda(partido.visitante?.nombreCorto) ||
+                   coincideConBusqueda(partido.local?.nombre) ||
+                   coincideConBusqueda(partido.visitante?.nombre);
         });
         
         // Separar partidos en vivo
@@ -1375,16 +1440,31 @@ async function performSearch(query) {
     // Buscar en partidos importantes (transmisiones) y combinar canales de ambas APIs
     if (transmisionesData && transmisionesData.transmisiones) {
         const matchedTransmisiones = transmisionesData.transmisiones.filter(transmision => {
-            const titulo = transmision.titulo?.toLowerCase() || '';
-            const liga = transmision.liga?.toLowerCase() || '';
-            const estado = transmision.estado?.toLowerCase() || '';
-            const evento = transmision.evento?.toLowerCase() || '';
+            const titulo = normalizarNombre(transmision.titulo || '');
+            const liga = normalizarNombre(transmision.liga || '');
+            const estado = normalizarNombre(transmision.estado || '');
+            const evento = normalizarNombre(transmision.evento || '');
             
-            return titulo.includes(searchTerm) || 
-                   evento.includes(searchTerm) ||
-                   liga.includes(searchTerm) ||
-                   (searchTerm === 'vivo' && (estado.includes('vivo') || estado.includes('live'))) ||
-                   (searchTerm === 'en vivo' && (estado.includes('vivo') || estado.includes('live')));
+            // Búsqueda directa
+            if (titulo.includes(searchTerm) || evento.includes(searchTerm) || liga.includes(searchTerm)) {
+                return true;
+            }
+            
+            // Búsqueda especial para "vivo" o "en vivo"
+            if ((searchTerm === 'vivo' || searchTerm === 'en vivo') && 
+                (estado.includes('vivo') || estado.includes('live'))) {
+                return true;
+            }
+            
+            // Búsqueda con abreviaciones en el título/evento
+            const palabrasTitulo = (titulo + ' ' + evento).split(/\s+vs?\s+|\s+-\s+/i);
+            for (const palabra of palabrasTitulo) {
+                if (coincideConBusqueda(palabra)) {
+                    return true;
+                }
+            }
+            
+            return false;
         });
         
         // Combinar canales de las 3 APIs para cada transmisión encontrada
@@ -1483,21 +1563,18 @@ async function performSearch(query) {
         results.importantMatches = transmisionesConCanalesCombinados.slice(0, 10);
     }
     
-    // Buscar equipos únicos
+    // Buscar equipos únicos (con abreviaciones)
     if (marcadoresData && marcadoresData.partidos) {
         const teamsSet = new Set();
         marcadoresData.partidos.forEach(partido => {
-            const localName = partido.local?.nombreCorto?.toLowerCase() || '';
-            const visitanteName = partido.visitante?.nombreCorto?.toLowerCase() || '';
-            
-            if (localName.includes(searchTerm)) {
+            if (coincideConBusqueda(partido.local?.nombreCorto) || coincideConBusqueda(partido.local?.nombre)) {
                 teamsSet.add(JSON.stringify({
                     nombre: partido.local.nombreCorto,
                     nombreCompleto: partido.local.nombre,
                     logo: partido.local.logo
                 }));
             }
-            if (visitanteName.includes(searchTerm)) {
+            if (coincideConBusqueda(partido.visitante?.nombreCorto) || coincideConBusqueda(partido.visitante?.nombre)) {
                 teamsSet.add(JSON.stringify({
                     nombre: partido.visitante.nombreCorto,
                     nombreCompleto: partido.visitante.nombre,
@@ -1530,7 +1607,16 @@ function displaySearchResults(results, query) {
                 </div>
                 <h3>No se encontraron resultados</h3>
                 <p>No encontramos resultados para "<strong>${query}</strong>"</p>
-                <p class="no-results-suggestion">Intenta buscar:</p>
+                <div class="no-results-suggestion-box">
+                    <p class="no-results-suggestion">💡 <strong>Sugerencias de búsqueda:</strong></p>
+                    <ul class="search-tips">
+                        <li>Prueba usar abreviaciones: <strong>Ame</strong> (América), <strong>Tigs</strong> (Tigres), <strong>GDL</strong> (Chivas)</li>
+                        <li>Busca por apodos: <strong>Rayados</strong>, <strong>Tuzos</strong>, <strong>Xolos</strong></li>
+                        <li>Usa nombres completos: <strong>Club América</strong>, <strong>Monterrey</strong></li>
+                        <li>Busca por estado: <strong>en vivo</strong>, <strong>upcoming</strong></li>
+                    </ul>
+                </div>
+                <p class="no-results-suggestion">Búsquedas populares:</p>
                 <div class="search-suggestions">
                     <span class="search-tag" onclick="quickSearch('Liga MX')">
                         <i class="fas fa-futbol"></i> Liga MX
@@ -1543,6 +1629,12 @@ function displaySearchResults(results, query) {
                     </span>
                     <span class="search-tag" onclick="quickSearch('en vivo')">
                         <i class="fas fa-circle"></i> En Vivo
+                    </span>
+                    <span class="search-tag" onclick="quickSearch('Tigres')">
+                        <i class="fas fa-shield-alt"></i> Tigres
+                    </span>
+                    <span class="search-tag" onclick="quickSearch('Pumas')">
+                        <i class="fas fa-shield-alt"></i> Pumas
                     </span>
                 </div>
             </div>
