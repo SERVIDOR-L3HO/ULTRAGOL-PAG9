@@ -2955,15 +2955,25 @@ async function shareStream() {
         return;
     }
     
-    // Codificar los parámetros en base64 para una URL más limpia
+    // Crear datos para compartir (versión compacta)
     const shareData = {
-        url: currentStreamUrl,
-        title: currentStreamTitle
+        u: currentStreamUrl,    // 'u' en lugar de 'url' para ahorrar espacio
+        t: currentStreamTitle   // 't' en lugar de 'title' para ahorrar espacio
     };
     
-    const encodedData = btoa(JSON.stringify(shareData));
-    // Usar 's' en lugar de 'stream' para acortar la URL
-    const shareUrl = `${window.location.origin}${window.location.pathname}?s=${encodedData}`;
+    // Convertir a JSON y comprimir con LZ-String
+    const jsonData = JSON.stringify(shareData);
+    const compressed = LZString.compressToEncodedURIComponent(jsonData);
+    
+    // URL corta usando compresión
+    const shareUrl = `${window.location.origin}${window.location.pathname}?s=${compressed}`;
+    
+    // Calcular reducción de tamaño
+    const oldSize = btoa(JSON.stringify({url: currentStreamUrl, title: currentStreamTitle})).length;
+    const newSize = compressed.length;
+    const reduction = Math.round(((oldSize - newSize) / oldSize) * 100);
+    
+    console.log(`🔗 URL comprimida: ${oldSize} → ${newSize} caracteres (${reduction}% más corta)`);
     
     // Crear mensajes creativos según el tipo de partido
     const mensajesCreativos = [
@@ -2987,7 +2997,7 @@ async function shareStream() {
                 text: mensajeCompleto,
                 url: shareUrl
             });
-            showToast('¡Link compartido exitosamente! 🎉');
+            showToast(`¡Link compartido! (${reduction}% más corto) 🎉`);
         } catch (error) {
             // Si el usuario cancela, solo copiar al portapapeles
             if (error.name !== 'AbortError') {
@@ -3048,18 +3058,33 @@ function fallbackCopyToClipboard(text) {
 // Función para detectar y abrir transmisión compartida
 function checkSharedStream() {
     const urlParams = new URLSearchParams(window.location.search);
-    // Soportar tanto 's' (nuevo) como 'stream' (viejo) para compatibilidad
     const streamParam = urlParams.get('s') || urlParams.get('stream');
     
     if (streamParam) {
         try {
-            // Decodificar los datos del link compartido
-            const shareData = JSON.parse(atob(streamParam));
+            let shareData;
             
-            if (shareData.url && shareData.title) {
+            // Intentar descomprimir primero (nuevo formato comprimido)
+            try {
+                const decompressed = LZString.decompressFromEncodedURIComponent(streamParam);
+                if (decompressed) {
+                    shareData = JSON.parse(decompressed);
+                    console.log('✅ URL comprimida decodificada exitosamente');
+                }
+            } catch (e) {
+                // Si falla, intentar el formato antiguo base64 (compatibilidad)
+                console.log('⚠️ Intentando formato antiguo base64...');
+                shareData = JSON.parse(atob(streamParam));
+            }
+            
+            // Soportar tanto formato nuevo {u, t} como formato viejo {url, title}
+            const url = shareData.u || shareData.url;
+            const title = shareData.t || shareData.title;
+            
+            if (url && title) {
                 // Esperar un momento para que la página cargue completamente
                 setTimeout(() => {
-                    playStreamInModal(shareData.url, shareData.title, false);
+                    playStreamInModal(url, title, false);
                     showToast('Abriendo transmisión compartida... 📺');
                     
                     // Limpiar la URL sin recargar la página
@@ -3068,7 +3093,8 @@ function checkSharedStream() {
                 }, 1000);
             }
         } catch (error) {
-            console.error('Error al procesar link compartido:', error);
+            console.error('❌ Error al procesar link compartido:', error);
+            showToast('Error: Link inválido o corrupto');
         }
     }
 }
