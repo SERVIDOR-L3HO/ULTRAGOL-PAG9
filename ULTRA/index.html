@@ -14,6 +14,9 @@
     <!-- LZ-String para comprimir URLs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
     
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e94560">
@@ -378,11 +381,40 @@
                     <span>Regresar</span>
                 </button>
                 <h3 id="channelSelectorTitle">Seleccionar Canal de Transmisión</h3>
-                <button class="close-channel-selector" onclick="closeAllModals()" title="Cerrar">
+                <div class="header-actions">
+                    <button class="qr-modal-btn" onclick="openQRModal()" title="Generar QR">
+                        <i class="fas fa-qrcode"></i>
+                    </button>
+                    <button class="close-channel-selector" onclick="closeAllModals()" title="Cerrar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="channel-selector-body" id="channelSelectorBody">
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de QR Code -->
+    <div id="qrModal" class="qr-modal">
+        <div class="qr-modal-content">
+            <div class="qr-modal-header">
+                <h3>Código QR del Canal</h3>
+                <button class="close-qr-modal" onclick="closeQRModal()" title="Cerrar">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="channel-selector-body" id="channelSelectorBody">
+            <div class="qr-modal-body">
+                <div class="qr-container">
+                    <div id="qrCodeContainer"></div>
+                </div>
+                <p class="qr-info" id="qrChannelInfo">Escanea este código para ver el canal en tu dispositivo</p>
+            </div>
+            <div class="qr-modal-footer">
+                <button class="download-qr-btn" onclick="downloadQRCode()">
+                    <i class="fas fa-download"></i>
+                    <span>Descargar QR</span>
+                </button>
             </div>
         </div>
     </div>

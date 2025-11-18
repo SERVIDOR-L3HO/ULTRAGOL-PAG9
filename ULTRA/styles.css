@@ -2628,6 +2628,220 @@ input:checked + .slider:before {
     }
 }
 
+/* ==================== QR CODE MODAL ==================== */
+.channel-selector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.qr-modal-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.3s ease;
+    font-size: 18px;
+}
+
+.qr-modal-btn:hover {
+    background: var(--primary);
+    transform: scale(1.1);
+}
+
+.qr-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-modal.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.qr-modal-content {
+    background: var(--secondary);
+    border-radius: 20px;
+    width: 90%;
+    max-width: 400px;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+}
+
+.qr-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.qr-modal-header h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+}
+
+.close-qr-modal {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.3s ease;
+}
+
+.close-qr-modal:hover {
+    background: var(--primary);
+    transform: rotate(90deg);
+}
+
+.qr-modal-body {
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.qr-container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#qrCodeContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#qrCodeContainer img,
+#qrCodeContainer canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.qr-info {
+    text-align: center;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0 10px;
+}
+
+.qr-modal-footer {
+    padding: 20px;
+    border-top: 1px solid var(--border);
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.download-qr-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border: none;
+    padding: 14px 20px;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.download-qr-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(255, 69, 0, 0.5);
+}
+
+.download-qr-btn:active {
+    transform: translateY(0);
+}
+
+.download-qr-btn i {
+    font-size: 16px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 480px) {
+    .qr-modal-content {
+        width: 95%;
+        max-width: none;
+    }
+    
+    .qr-modal-header h3 {
+        font-size: 16px;
+    }
+    
+    .qr-container {
+        padding: 15px;
+    }
+    
+    .qr-info {
+        font-size: 13px;
+    }
+}
+
 /* ==================== MODO OSCURO ==================== */
 body.dark-mode {
     --bg: #0a0a0a;

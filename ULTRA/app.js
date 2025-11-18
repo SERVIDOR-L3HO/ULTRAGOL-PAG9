@@ -3135,3 +3135,144 @@ function showToast(message) {
         toast.style.opacity = '0';
     }, 3000);
 }
+
+// Variables globales para el QR modal
+let currentQRUrl = '';
+let currentQRTitle = '';
+let qrCodeInstance = null;
+
+// Función para abrir el modal de QR
+function openQRModal() {
+    const modal = document.getElementById('qrModal');
+    const qrContainer = document.getElementById('qrCodeContainer');
+    const qrInfo = document.getElementById('qrChannelInfo');
+    
+    // Limpiar el contenedor anterior
+    qrContainer.innerHTML = '';
+    
+    // Obtener la URL actual del stream o del canal seleccionado
+    let urlToShare = currentStreamUrl || window.location.href;
+    let titleToShare = currentStreamTitle || 'UltraGol - Transmisión en vivo';
+    
+    // Si hay un stream activo, crear un link compartible
+    if (currentStreamUrl) {
+        try {
+            const shareData = {
+                u: currentStreamUrl,
+                t: currentStreamTitle
+            };
+            const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(shareData));
+            urlToShare = `${window.location.origin}${window.location.pathname}?s=${compressed}`;
+        } catch (error) {
+            console.error('Error al crear link compartible:', error);
+        }
+    }
+    
+    // Guardar la información actual para descarga
+    currentQRUrl = urlToShare;
+    currentQRTitle = titleToShare;
+    
+    // Generar el código QR
+    qrCodeInstance = new QRCode(qrContainer, {
+        text: urlToShare,
+        width: 256,
+        height: 256,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+    
+    // Actualizar el texto informativo
+    qrInfo.textContent = `${titleToShare}`;
+    
+    // Mostrar el modal con animación
+    modal.classList.add('active');
+    
+    console.log('✅ QR Code generado:', urlToShare);
+    showToast('Código QR generado correctamente');
+}
+
+// Función para cerrar el modal de QR
+function closeQRModal() {
+    const modal = document.getElementById('qrModal');
+    modal.classList.remove('active');
+    
+    // Limpiar el QR después de cerrar
+    setTimeout(() => {
+        const qrContainer = document.getElementById('qrCodeContainer');
+        qrContainer.innerHTML = '';
+        qrCodeInstance = null;
+    }, 300);
+}
+
+// Función para descargar el código QR
+function downloadQRCode() {
+    try {
+        const qrContainer = document.getElementById('qrCodeContainer');
+        const canvas = qrContainer.querySelector('canvas');
+        
+        if (!canvas) {
+            showToast('Error: No se encontró el código QR');
+            return;
+        }
+        
+        // Crear un canvas más grande con padding y texto
+        const finalCanvas = document.createElement('canvas');
+        const ctx = finalCanvas.getContext('2d');
+        const padding = 40;
+        const textHeight = 60;
+        
+        finalCanvas.width = canvas.width + (padding * 2);
+        finalCanvas.height = canvas.height + (padding * 2) + textHeight;
+        
+        // Fondo blanco
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+        
+        // Dibujar el QR en el centro
+        ctx.drawImage(canvas, padding, padding);
+        
+        // Agregar texto en la parte inferior
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        
+        // Título del canal (truncado si es muy largo)
+        let title = currentQRTitle || 'UltraGol';
+        if (title.length > 35) {
+            title = title.substring(0, 32) + '...';
+        }
+        
+        ctx.fillText(title, finalCanvas.width / 2, finalCanvas.height - 30);
+        
+        // Logo/marca
+        ctx.font = '12px Arial';
+        ctx.fillText('UltraGol Live Streaming', finalCanvas.width / 2, finalCanvas.height - 10);
+        
+        // Convertir a imagen y descargar
+        finalCanvas.toBlob((blob) => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            // Crear nombre de archivo seguro
+            const safeName = (currentQRTitle || 'ultragol-qr')
+                .replace(/[^a-z0-9]/gi, '-')
+                .toLowerCase()
+                .substring(0, 50);
+            
+            link.download = `${safeName}-qr-code.png`;
+            link.href = url;
+            link.click();
+            
+            // Limpiar
+            URL.revokeObjectURL(url);
+            
+            showToast('Código QR descargado exitosamente');
+            console.log('✅ QR Code descargado:', link.download);
+        }, 'image/png');
+        
+    } catch (error) {
+        console.error('Error al descargar QR:', error);
+        showToast('Error al descargar el código QR');
+    }
+}
