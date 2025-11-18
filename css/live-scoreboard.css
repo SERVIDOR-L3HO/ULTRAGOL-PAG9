@@ -102,17 +102,17 @@
 /* Match Card */
 .match-card {
     background: linear-gradient(145deg, 
-        #1a237e 0%,
-        #0d47a1 50%,
-        #01579b 100%);
+        #0a0a0a 0%,
+        #1a1a1a 50%,
+        #0f0f0f 100%);
     border-radius: 20px;
     padding: 0;
-    border: 2px solid rgba(100, 181, 246, 0.3);
+    border: 2px solid rgba(255, 145, 0, 0.3);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     position: relative;
     overflow: hidden;
     cursor: pointer;
-    box-shadow: 0 10px 30px rgba(13, 71, 161, 0.4);
+    box-shadow: 0 10px 30px rgba(255, 111, 0, 0.2);
 }
 
 .match-card::before {
@@ -124,14 +124,15 @@
     height: 100%;
     background: linear-gradient(90deg, 
         transparent 0%,
-        rgba(100, 181, 246, 0.2) 50%,
+        rgba(255, 193, 7, 0.15) 50%,
         transparent 100%);
     transition: left 0.5s ease;
 }
 
 .match-card:hover {
     transform: translateY(-8px);
-    box-shadow: 0 15px 40px rgba(100, 181, 246, 0.5);
+    box-shadow: 0 15px 40px rgba(255, 145, 0, 0.4);
+    border-color: rgba(255, 193, 7, 0.5);
 }
 
 .match-card:hover::before {
@@ -141,15 +142,16 @@
 /* Live Match Card */
 .match-card.live {
     background: linear-gradient(145deg, 
-        #1b5e20 0%,
-        #2e7d32 50%,
-        #388e3c 100%);
-    border: 2px solid rgba(129, 199, 132, 0.5);
-    box-shadow: 0 10px 30px rgba(46, 125, 50, 0.5);
+        #0a0a0a 0%,
+        #1a1a1a 50%,
+        #0f0f0f 100%);
+    border: 2px solid rgba(255, 214, 0, 0.6);
+    box-shadow: 0 10px 30px rgba(255, 214, 0, 0.3);
 }
 
 .match-card.live:hover {
-    box-shadow: 0 15px 40px rgba(76, 175, 80, 0.6);
+    box-shadow: 0 15px 40px rgba(255, 214, 0, 0.5);
+    border-color: rgba(255, 235, 59, 0.8);
 }
 
 .live-indicator {
@@ -157,11 +159,12 @@
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 4px;
     background: linear-gradient(90deg, 
-        #00e676 0%,
-        #69f0ae 50%,
-        #00e676 100%);
+        #ffd600 0%,
+        #ffea00 50%,
+        #ffd600 100%);
+    box-shadow: 0 0 10px rgba(255, 214, 0, 0.6);
 }
 
 /* Match Header */
@@ -199,7 +202,7 @@
 
 .match-league span {
     font-size: 0.85rem;
-    color: #e3f2fd;
+    color: #ffd54f;
     font-weight: 600;
     letter-spacing: 0.5px;
 }
@@ -239,10 +242,10 @@
 }
 
 .status-badge.scheduled {
-    background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+    background: linear-gradient(135deg, #ff6f00 0%, #ff9100 100%);
     color: #fff;
-    border: 1px solid #ce93d8;
-    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.4);
+    border: 1px solid #ffb74d;
+    box-shadow: 0 4px 12px rgba(255, 111, 0, 0.4);
 }
 
 .status-badge.scheduled i {
@@ -250,10 +253,11 @@
 }
 
 .status-badge.finished {
-    background: linear-gradient(135deg, #00c853 0%, #00e676 100%);
-    color: #fff;
-    border: 1px solid #69f0ae;
-    box-shadow: 0 4px 12px rgba(0, 200, 83, 0.4);
+    background: linear-gradient(135deg, #ffd600 0%, #ffea00 100%);
+    color: #000;
+    font-weight: 800;
+    border: 1px solid #ffeb3b;
+    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.5);
 }
 
 /* Match Content */
@@ -304,8 +308,8 @@
 }
 
 .match-card.live .team-logo-bg {
-    background: linear-gradient(135deg, #00e676 0%, #69f0ae 50%, #b9f6ca 100%);
-    border-color: #a7ffeb;
+    background: linear-gradient(135deg, #ffd600 0%, #ffea00 50%, #ffeb3b 100%);
+    border-color: #fff59d;
 }
 
 .team-shield {
@@ -343,8 +347,8 @@
 .vs-container {
     position: relative;
     padding: 1rem;
-    background: linear-gradient(135deg, #7c4dff 0%, #651fff 100%);
-    border: 2px solid #b388ff;
+    background: linear-gradient(135deg, #ff6f00 0%, #ff9100 100%);
+    border: 2px solid #ffb74d;
     border-radius: 50%;
     width: 65px;
     height: 65px;
@@ -352,7 +356,7 @@
     align-items: center;
     justify-content: center;
     transition: transform 0.3s ease;
-    box-shadow: 0 4px 12px rgba(124, 77, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(255, 111, 0, 0.5);
 }
 
 .match-card:hover .vs-container {
@@ -361,8 +365,8 @@
 
 .match-card.live .vs-container {
     background: linear-gradient(135deg, #ffd600 0%, #ffea00 100%);
-    border-color: #ffff00;
-    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.5);
+    border-color: #fff59d;
+    box-shadow: 0 4px 12px rgba(255, 214, 0, 0.6);
 }
 
 .vs-text {
@@ -400,7 +404,7 @@
 }
 
 .match-card.live .match-info i {
-    color: #a7ffeb;
+    color: #ffd54f;
 }
 
 /* Empty State */
