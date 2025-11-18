@@ -989,6 +989,17 @@ body {
     box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
 }
 
+.modal-chat-btn {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.15), rgba(126, 34, 206, 0.15));
+    border-color: rgba(147, 51, 234, 0.3);
+}
+
+.modal-chat-btn:hover {
+    background: linear-gradient(135deg, rgba(147, 51, 234, 0.3), rgba(126, 34, 206, 0.3));
+    border-color: #9333ea;
+    box-shadow: 0 4px 12px rgba(147, 51, 234, 0.5);
+}
+
 .modal-primary-btn {
     background: linear-gradient(135deg, #00ff41 0%, #00b32d 100%);
     border: none;

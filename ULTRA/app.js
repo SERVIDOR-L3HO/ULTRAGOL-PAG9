@@ -1256,6 +1256,21 @@ function fullscreenStream() {
     }
 }
 
+function openLiveChat() {
+    const chatUrl = '../live-chat/index.html';
+    const chatWindow = window.open(
+        chatUrl,
+        'UltraGolChat',
+        'width=400,height=700,left=100,top=100,resizable=yes,scrollbars=yes'
+    );
+    
+    if (chatWindow) {
+        chatWindow.focus();
+    } else {
+        showToast('Por favor permite las ventanas emergentes para abrir el chat');
+    }
+}
+
 function openStream(url) {
     currentStreamUrl = url;
     const modal = document.getElementById('playerModal');
