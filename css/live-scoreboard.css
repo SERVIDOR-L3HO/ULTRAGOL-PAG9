@@ -101,14 +101,19 @@
 
 /* Match Card */
 .match-card {
-    background: linear-gradient(145deg, rgba(30, 30, 30, 0.8) 0%, rgba(20, 20, 20, 0.9) 100%);
-    border-radius: 20px;
-    padding: 1.5rem;
-    border: 2px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(145deg, 
+        rgba(25, 35, 45, 0.95) 0%, 
+        rgba(15, 25, 35, 0.98) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
     cursor: pointer;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .match-card::before {
@@ -118,44 +123,92 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 153, 51, 0.05) 0%, rgba(255, 68, 68, 0.05) 100%);
+    background: linear-gradient(135deg, 
+        rgba(255, 153, 51, 0.03) 0%, 
+        rgba(255, 68, 68, 0.03) 50%,
+        rgba(138, 43, 226, 0.03) 100%);
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.5s ease;
+    z-index: 0;
+}
+
+.match-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
 }
 
 .match-card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(255, 153, 51, 0.4);
-    box-shadow: 0 15px 40px rgba(255, 153, 51, 0.2);
+    transform: translateY(-12px) scale(1.02);
+    border-color: rgba(255, 153, 51, 0.3);
+    box-shadow: 0 20px 60px rgba(255, 153, 51, 0.25),
+                0 0 0 1px rgba(255, 153, 51, 0.1);
 }
 
 .match-card:hover::before {
     opacity: 1;
 }
 
+.match-card:hover::after {
+    opacity: 0.5;
+}
+
 /* Live Match Card */
 .match-card.live {
     background: linear-gradient(145deg, 
-        rgba(46, 125, 50, 0.15) 0%, 
-        rgba(27, 94, 32, 0.15) 100%),
-        url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23116530" width="100" height="100"/><path d="M0 0 L50 50 L0 100 Z M50 0 L100 50 L50 100 Z" fill="%23145c2e" opacity="0.3"/></svg>');
-    background-size: cover, 50px 50px;
-    border-color: rgba(76, 175, 80, 0.4);
-    animation: liveCardGlow 2s ease-in-out infinite;
+        rgba(20, 90, 50, 0.3) 0%, 
+        rgba(15, 60, 40, 0.4) 100%),
+        linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(10, 30, 20, 0.7) 100%);
+    border: 1px solid rgba(76, 175, 80, 0.4);
+    animation: liveCardGlow 3s ease-in-out infinite;
+    box-shadow: 0 8px 32px rgba(76, 175, 80, 0.3),
+                0 0 60px rgba(76, 175, 80, 0.15);
 }
 
 @keyframes liveCardGlow {
     0%, 100% {
-        box-shadow: 0 5px 20px rgba(76, 175, 80, 0.3);
+        box-shadow: 0 8px 32px rgba(76, 175, 80, 0.3),
+                    0 0 60px rgba(76, 175, 80, 0.15);
+        border-color: rgba(76, 175, 80, 0.4);
     }
     50% {
-        box-shadow: 0 8px 30px rgba(76, 175, 80, 0.5);
+        box-shadow: 0 12px 40px rgba(76, 175, 80, 0.5),
+                    0 0 80px rgba(76, 175, 80, 0.25);
+        border-color: rgba(76, 175, 80, 0.6);
     }
 }
 
 .match-card.live::before {
-    background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(46, 125, 50, 0.1) 100%);
+    background: linear-gradient(135deg, 
+        rgba(76, 175, 80, 0.08) 0%, 
+        rgba(46, 125, 50, 0.08) 100%);
     opacity: 1;
+}
+
+.live-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        rgba(76, 175, 80, 0) 0%,
+        rgba(76, 175, 80, 1) 50%,
+        rgba(76, 175, 80, 0) 100%);
+    background-size: 200% 100%;
+    animation: liveIndicatorMove 2s linear infinite;
+}
+
+@keyframes liveIndicatorMove {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
 }
 
 /* Match Header */
@@ -163,13 +216,39 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    z-index: 1;
 }
 
-.match-date {
+.match-league {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.league-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255, 153, 51, 0.15) 0%, rgba(255, 68, 68, 0.15) 100%);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 153, 51, 0.2);
+}
+
+.league-icon i {
+    color: #ff9933;
+    font-size: 0.9rem;
+}
+
+.match-league span {
     font-size: 0.85rem;
-    color: #999;
-    font-weight: 500;
+    color: #aaa;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
 .match-status {
@@ -179,114 +258,159 @@
 }
 
 .status-badge {
-    padding: 0.4rem 0.9rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 1.2px;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.3s ease;
 }
 
 .status-badge.live {
-    background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+    background: linear-gradient(135deg, #ff1744 0%, #d50000 100%);
     color: #fff;
-    animation: livePulse 1.5s ease-in-out infinite;
-    box-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
-}
-
-@keyframes livePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-.status-badge.live::before {
-    content: '●';
-    margin-right: 0.3rem;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
-.status-badge.scheduled {
-    background: rgba(255, 255, 255, 0.1);
-    color: #999;
+    animation: livePulse 2s ease-in-out infinite;
+    box-shadow: 0 0 25px rgba(255, 23, 68, 0.6),
+                0 0 50px rgba(255, 23, 68, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.status-badge.finished {
-    background: rgba(76, 175, 80, 0.2);
-    color: #4caf50;
-    border: 1px solid rgba(76, 175, 80, 0.3);
+@keyframes livePulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 25px rgba(255, 23, 68, 0.6),
+                    0 0 50px rgba(255, 23, 68, 0.3);
+    }
+    50% { 
+        transform: scale(1.05);
+        box-shadow: 0 0 35px rgba(255, 23, 68, 0.8),
+                    0 0 70px rgba(255, 23, 68, 0.4);
+    }
 }
 
-.match-clock {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: #4caf50;
-    padding: 0.3rem 0.7rem;
+.live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    animation: liveDotPulse 1.5s ease-in-out infinite;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes liveDotPulse {
+    0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.5;
+        transform: scale(0.8);
+    }
+}
+
+.status-badge.scheduled {
+    background: rgba(255, 255, 255, 0.08);
+    color: #aaa;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-badge.scheduled i {
+    font-size: 0.7rem;
+}
+
+.status-badge.finished {
     background: rgba(76, 175, 80, 0.15);
-    border-radius: 12px;
+    color: #4caf50;
+    border: 1px solid rgba(76, 175, 80, 0.25);
 }
 
 /* Match Content */
 .match-content {
     position: relative;
+    padding: 2rem 1.5rem;
+    z-index: 1;
 }
 
 .teams-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .team {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.8rem;
+    gap: 1rem;
     flex: 1;
 }
 
 .team-logo-container {
     position: relative;
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.team-logo {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transition: transform 0.3s ease;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+.team-logo-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 153, 51, 0.1) 0%, rgba(255, 68, 68, 0.1) 100%);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s ease;
 }
 
-.match-card:hover .team-logo {
+.match-card:hover .team-logo-bg {
+    background: linear-gradient(135deg, rgba(255, 153, 51, 0.2) 0%, rgba(255, 68, 68, 0.2) 100%);
+    border-color: rgba(255, 153, 51, 0.3);
+    box-shadow: 0 0 30px rgba(255, 153, 51, 0.3);
     transform: scale(1.1);
 }
 
-.team.winner .team-logo-container::before {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    right: -5px;
-    bottom: -5px;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.3) 0%, rgba(255, 153, 51, 0.3) 100%);
-    border-radius: 50%;
-    animation: winnerGlow 1.5s ease-in-out infinite;
+.match-card.live .team-logo-bg {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.15) 0%, rgba(46, 125, 50, 0.15) 100%);
+    border-color: rgba(76, 175, 80, 0.3);
 }
 
-@keyframes winnerGlow {
-    0%, 100% { opacity: 0.5; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.1); }
+.match-card.live:hover .team-logo-bg {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.25) 0%, rgba(46, 125, 50, 0.25) 100%);
+    box-shadow: 0 0 35px rgba(76, 175, 80, 0.4);
+}
+
+.team-shield {
+    position: relative;
+    z-index: 1;
+    font-size: 2.5rem;
+    color: #ff9933;
+    transition: all 0.4s ease;
+    filter: drop-shadow(0 4px 12px rgba(255, 153, 51, 0.4));
+}
+
+.match-card:hover .team-shield {
+    transform: scale(1.1) rotateY(10deg);
+    color: #ffaa55;
+    filter: drop-shadow(0 6px 16px rgba(255, 153, 51, 0.6));
+}
+
+.match-card.live .team-shield {
+    color: #4caf50;
+    filter: drop-shadow(0 4px 12px rgba(76, 175, 80, 0.4));
+}
+
+.match-card.live:hover .team-shield {
+    color: #66bb6a;
+    filter: drop-shadow(0 6px 16px rgba(76, 175, 80, 0.6));
 }
 
 .team-name {
@@ -294,11 +418,18 @@
     font-weight: 600;
     color: #fff;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.3;
+    max-width: 120px;
+    transition: all 0.3s ease;
 }
 
-.team.winner .team-name {
-    color: #ffd700;
+.match-card:hover .team-name {
+    color: #ff9933;
+    transform: scale(1.05);
+}
+
+.match-card.live:hover .team-name {
+    color: #4caf50;
 }
 
 /* Score Section */
@@ -307,93 +438,99 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    min-width: 100px;
+    min-width: 80px;
 }
 
-.score-display {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.3);
-    padding: 0.8rem 1.5rem;
-    border-radius: 15px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.match-card.live .score-display {
-    background: rgba(46, 125, 50, 0.2);
-    border-color: rgba(76, 175, 80, 0.3);
-}
-
-.score {
-    min-width: 40px;
-    text-align: center;
-}
-
-.score-separator {
-    font-size: 1.8rem;
-    color: #666;
-    font-weight: 400;
-}
-
-.vs-text {
-    font-size: 0.9rem;
-    color: #666;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-/* Match Details */
-.match-details {
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.match-venue {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.85rem;
-    color: #999;
-    margin-bottom: 0.5rem;
-}
-
-.match-venue i {
-    color: #ff9933;
-}
-
-.match-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.action-btn {
-    flex: 1;
-    padding: 0.7rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    color: #fff;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.vs-container {
+    position: relative;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    transition: all 0.4s ease;
 }
 
-.action-btn:hover {
+.match-card:hover .vs-container {
     background: rgba(255, 153, 51, 0.1);
     border-color: rgba(255, 153, 51, 0.3);
+    box-shadow: 0 0 25px rgba(255, 153, 51, 0.3);
+    transform: rotate(180deg) scale(1.1);
+}
+
+.match-card.live .vs-container {
+    background: rgba(76, 175, 80, 0.08);
+    border-color: rgba(76, 175, 80, 0.2);
+}
+
+.match-card.live:hover .vs-container {
+    background: rgba(76, 175, 80, 0.15);
+    border-color: rgba(76, 175, 80, 0.4);
+    box-shadow: 0 0 30px rgba(76, 175, 80, 0.4);
+}
+
+.vs-text {
+    font-size: 0.95rem;
+    color: #999;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s ease;
+}
+
+.match-card:hover .vs-text {
     color: #ff9933;
+}
+
+.match-card.live:hover .vs-text {
+    color: #4caf50;
+}
+
+/* Match Footer */
+.match-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.match-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #999;
+    transition: all 0.3s ease;
+}
+
+.match-info i {
+    color: #ff9933;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+}
+
+.match-card:hover .match-info {
+    color: #bbb;
+}
+
+.match-card:hover .match-info i {
+    color: #ffaa55;
+    transform: scale(1.1);
+}
+
+.match-card.live .match-info i {
+    color: #4caf50;
+}
+
+.match-card.live:hover .match-info i {
+    color: #66bb6a;
 }
 
 /* Empty State */

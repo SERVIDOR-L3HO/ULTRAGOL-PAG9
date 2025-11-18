@@ -118,7 +118,6 @@ class LiveScoreboard {
         const isLive = (match.estado || '').toLowerCase().includes('vivo') || (match.estado || '').toLowerCase() === 'live';
         const isUpcoming = (match.estado || '').toLowerCase().includes('próximo') || (match.estado || '').toLowerCase().includes('proximo');
         
-        // Extraer equipos del campo 'evento' o 'titulo' (formato: "Team1 vs Team2")
         const partidoNombre = match.evento || match.titulo || match.equipo || 'Partido';
         const equipos = partidoNombre.split(' vs ');
         const team1 = equipos[0] || 'Equipo 1';
@@ -126,15 +125,26 @@ class LiveScoreboard {
         
         return `
             <div class="match-card ${isLive ? 'live' : ''}" data-match-id="${match.id || ''}">
+                ${isLive ? '<div class="live-indicator"></div>' : ''}
+                
                 <div class="match-header">
-                    <div class="match-date">
-                        <i class="fas fa-trophy"></i> ${match.liga || 'Liga'}
+                    <div class="match-league">
+                        <div class="league-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <span>${match.liga || 'Liga'}</span>
                     </div>
                     <div class="match-status">
                         ${isLive ? `
-                            <span class="status-badge live">EN VIVO</span>
+                            <span class="status-badge live">
+                                <span class="live-dot"></span>
+                                EN VIVO
+                            </span>
                         ` : isUpcoming ? `
-                            <span class="status-badge scheduled">${match.hora || 'Próximamente'}</span>
+                            <span class="status-badge scheduled">
+                                <i class="far fa-clock"></i>
+                                ${match.hora || 'Próximamente'}
+                            </span>
                         ` : `
                             <span class="status-badge">${match.estado || 'Programado'}</span>
                         `}
@@ -143,43 +153,48 @@ class LiveScoreboard {
 
                 <div class="match-content">
                     <div class="teams-container">
-                        <!-- Team 1 -->
                         <div class="team">
                             <div class="team-logo-container">
-                                <i class="fas fa-shield-alt" style="font-size: 2rem; color: var(--primary);"></i>
+                                <div class="team-logo-bg"></div>
+                                <div class="team-shield">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
                             </div>
                             <div class="team-name">${team1}</div>
                         </div>
 
-                        <!-- VS Section -->
                         <div class="score-section">
-                            <div class="vs-text">VS</div>
+                            <div class="vs-container">
+                                <span class="vs-text">VS</span>
+                            </div>
                         </div>
 
-                        <!-- Team 2 -->
                         <div class="team">
                             <div class="team-logo-container">
-                                <i class="fas fa-shield-alt" style="font-size: 2rem; color: var(--primary);"></i>
+                                <div class="team-logo-bg"></div>
+                                <div class="team-shield">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
                             </div>
                             <div class="team-name">${team2}</div>
                         </div>
                     </div>
                 </div>
 
-                ${match.hora ? `
-                    <div class="match-details">
-                        <div class="match-venue">
+                <div class="match-footer">
+                    ${match.hora ? `
+                        <div class="match-info">
                             <i class="far fa-clock"></i>
                             <span>${match.hora}</span>
                         </div>
-                        ${match.deporte ? `
-                            <div class="match-venue">
-                                <i class="fas fa-futbol"></i>
-                                <span>${match.deporte}</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                ` : ''}
+                    ` : ''}
+                    ${match.deporte ? `
+                        <div class="match-info">
+                            <i class="fas fa-futbol"></i>
+                            <span>${match.deporte}</span>
+                        </div>
+                    ` : ''}
+                </div>
             </div>
         `;
     }
