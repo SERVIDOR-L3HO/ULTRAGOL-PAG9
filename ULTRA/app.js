@@ -2740,6 +2740,19 @@ function selectImportantMatchByTransmision(eventoNombre) {
         }
     }
     
+    // Buscar en API 4 (transmisiones4 - ftvhd)
+    if (transmisionesAPI4 && transmisionesAPI4.transmisiones) {
+        const transAPI4 = transmisionesAPI4.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase().trim();
+            return evento === nombreBuscar;
+        });
+        
+        if (transAPI4 && transAPI4.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI4.canales];
+            console.log(`✅ Encontrados ${transAPI4.canales.length} canales en API 4 (ftvhd) para "${tituloMostrar}"`);
+        }
+    }
+    
     if (canalesCombinados.length > 0) {
         const transmisionCombinada = {
             evento: tituloMostrar,
