@@ -259,15 +259,15 @@ async function loadTransmisiones() {
             };
         });
         
-        // Convertir API 4 (transmisiones4) - normalizar según su estructura
+        // Convertir API 4 (transmisiones4 - ftvhd) que ya tiene "canales" con "url" directo
         const transmisionesNormalizadasAPI4 = (data4.transmisiones || []).map(t => {
-            // Si la API 4 usa estructura similar a e1link con "enlaces"
-            const canalesNormalizados = [{
+            // La API 4 ya tiene canales[], pero con url directo, necesitamos convertir a enlaces[]
+            const canalesNormalizados = (t.canales || []).map(canal => ({
                 numero: '',
-                nombre: t.canal || 'Canal',
-                enlaces: t.enlaces || [],
+                nombre: canal.nombre || 'Canal',
+                enlaces: canal.url ? [{ url: canal.url, calidad: 'HD' }] : [],
                 tipoAPI: 'transmisiones4'
-            }];
+            }));
             
             return {
                 ...t,
