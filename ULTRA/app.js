@@ -7,6 +7,7 @@ let transmisionesData = null;
 let transmisionesAPI1 = null;
 let transmisionesAPI2 = null;
 let transmisionesAPI3 = null;
+let transmisionesAPI4 = null;
 let updateInterval = null;
 let currentFeaturedIndex = 0;
 let featuredMatches = [];
@@ -193,11 +194,11 @@ async function loadMarcadores() {
     }
 }
 
-// Función para cargar transmisiones desde las 3 APIs
+// Función para cargar transmisiones desde las 4 APIs
 async function loadTransmisiones() {
     try {
-        // Cargar las 3 APIs en paralelo con manejo individual de errores
-        const [data1, data2, data3] = await Promise.all([
+        // Cargar las 4 APIs en paralelo con manejo individual de errores
+        const [data1, data2, data3, data4] = await Promise.all([
             fetch('https://ultragol-api3.onrender.com/transmisiones')
                 .then(res => res.json())
                 .catch(err => {
@@ -214,6 +215,12 @@ async function loadTransmisiones() {
                 .then(res => res.json())
                 .catch(err => {
                     console.warn('⚠️ Error cargando API 3 (voodc):', err);
+                    return { transmisiones: [] };
+                }),
+            fetch('https://ultragol-api3.onrender.com/transmisiones4')
+                .then(res => res.json())
+                .catch(err => {
+                    console.warn('⚠️ Error cargando API 4 (transmisiones4):', err);
                     return { transmisiones: [] };
                 })
         ]);
@@ -252,6 +259,23 @@ async function loadTransmisiones() {
             };
         });
         
+        // Convertir API 4 (transmisiones4) - normalizar según su estructura
+        const transmisionesNormalizadasAPI4 = (data4.transmisiones || []).map(t => {
+            // Si la API 4 usa estructura similar a e1link con "enlaces"
+            const canalesNormalizados = [{
+                numero: '',
+                nombre: t.canal || 'Canal',
+                enlaces: t.enlaces || [],
+                tipoAPI: 'transmisiones4'
+            }];
+            
+            return {
+                ...t,
+                canales: canalesNormalizados,
+                tipoAPI: 'transmisiones4'
+            };
+        });
+        
         // Marcar transmisiones API 1 con su tipo
         const transmisionesAPI1Marcadas = (data1.transmisiones || []).map(t => ({
             ...t,
@@ -275,12 +299,17 @@ async function loadTransmisiones() {
             ...data3,
             transmisiones: transmisionesNormalizadasAPI3
         };
+        transmisionesAPI4 = {
+            ...data4,
+            transmisiones: transmisionesNormalizadasAPI4
+        };
         
-        // Combinar las transmisiones de las 3 APIs (partidos pueden repetirse)
+        // Combinar las transmisiones de las 4 APIs (partidos pueden repetirse)
         const transmisionesCombinadas = [
             ...transmisionesAPI1Marcadas,
             ...transmisionesNormalizadasAPI2,
-            ...transmisionesNormalizadasAPI3
+            ...transmisionesNormalizadasAPI3,
+            ...transmisionesNormalizadasAPI4
         ];
         
         // Crear el objeto combinado
@@ -291,6 +320,7 @@ async function loadTransmisiones() {
         console.log('✅ Transmisiones cargadas desde API 1 (rereyano):', data1.transmisiones?.length || 0);
         console.log('✅ Transmisiones cargadas desde API 2 (e1link):', data2.transmisiones?.length || 0);
         console.log('✅ Transmisiones cargadas desde API 3 (voodc):', data3.transmisiones?.length || 0);
+        console.log('✅ Transmisiones cargadas desde API 4 (transmisiones4):', data4.transmisiones?.length || 0);
         console.log('✅ Total transmisiones combinadas:', transmisionesCombinadas.length);
         
         return transmisionesData;
