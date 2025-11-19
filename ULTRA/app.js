@@ -1688,6 +1688,32 @@ async function performSearch(query) {
                 }
             }
             
+            // Buscar en API 4 (transmisiones4 - ftvhd)
+            if (transmisionesAPI4 && transmisionesAPI4.transmisiones) {
+                const transAPI4 = transmisionesAPI4.transmisiones.find(t => {
+                    const evento = (t.evento || t.titulo || '').toLowerCase();
+                    return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+                });
+                
+                if (transAPI4) {
+                    // Actualizar título si es mejor que el actual
+                    if (transAPI4.titulo && !tituloDisplay) {
+                        tituloDisplay = transAPI4.titulo;
+                    }
+                    if (transAPI4.evento && !tituloDisplay) {
+                        tituloDisplay = transAPI4.evento;
+                    }
+                    
+                    if (transAPI4.canales) {
+                        const canalesAPI4 = transAPI4.canales.map(canal => ({
+                            ...canal,
+                            fuente: 'ftvhd'
+                        }));
+                        canalesCombinados = [...canalesCombinados, ...canalesAPI4];
+                    }
+                }
+            }
+            
             // Retornar transmisión con canales combinados y título garantizado
             return {
                 ...transmision,
