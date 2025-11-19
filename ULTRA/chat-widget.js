@@ -1,5 +1,5 @@
 // Chat Widget Estilo Messenger - UltraGol
-// Sistema de chat flotante con funcionalidad drag & drop
+// Sistema de chat flotante con funcionalidad drag & drop y resize optimizado
 
 const chatBubble = document.getElementById('chatBubble');
 const chatModal = document.getElementById('chatModal');
@@ -10,12 +10,19 @@ const chatBadge = document.getElementById('chatBadge');
 
 let isDraggingBubble = false;
 let isDraggingModal = false;
+let isResizing = false;
 let currentX;
 let currentY;
 let initialX;
 let initialY;
 let xOffset = 0;
 let yOffset = 0;
+
+// Variables para resize
+let startWidth;
+let startHeight;
+let startX;
+let startY;
 
 // Toggle del modal de chat
 function toggleChat() {
@@ -92,47 +99,78 @@ function dragStartModal(e) {
     isDraggingModal = true;
 }
 
-document.addEventListener('mousemove', drag);
-document.addEventListener('touchmove', drag);
+// Optimizado con requestAnimationFrame para mejor rendimiento
+let rafId = null;
+
+document.addEventListener('mousemove', drag, { passive: false });
+document.addEventListener('touchmove', drag, { passive: false });
 
 function drag(e) {
-    if (isDraggingBubble) {
-        e.preventDefault();
+    if (!isDraggingBubble && !isDraggingModal && !isResizing) return;
 
-        if (e.type === 'touchmove') {
-            currentX = e.touches[0].clientX - initialX;
-            currentY = e.touches[0].clientY - initialY;
-        } else {
-            currentX = e.clientX - initialX;
-            currentY = e.clientY - initialY;
-        }
-
-        xOffset = currentX;
-        yOffset = currentY;
-
-        setTranslate(currentX, currentY, chatBubble);
+    if (rafId) {
+        cancelAnimationFrame(rafId);
     }
 
-    if (isDraggingModal) {
-        e.preventDefault();
+    rafId = requestAnimationFrame(() => {
+        if (isDraggingBubble) {
+            e.preventDefault();
 
-        if (e.type === 'touchmove') {
-            currentX = e.touches[0].clientX - initialX;
-            currentY = e.touches[0].clientY - initialY;
-        } else {
-            currentX = e.clientX - initialX;
-            currentY = e.clientY - initialY;
+            if (e.type === 'touchmove') {
+                currentX = e.touches[0].clientX - initialX;
+                currentY = e.touches[0].clientY - initialY;
+            } else {
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+            }
+
+            xOffset = currentX;
+            yOffset = currentY;
+
+            setTranslate(currentX, currentY, chatBubble);
         }
 
-        xOffset = currentX;
-        yOffset = currentY;
+        if (isDraggingModal) {
+            e.preventDefault();
 
-        setTranslate(currentX, currentY, chatModal);
-    }
+            if (e.type === 'touchmove') {
+                currentX = e.touches[0].clientX - initialX;
+                currentY = e.touches[0].clientY - initialY;
+            } else {
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+            }
+
+            xOffset = currentX;
+            yOffset = currentY;
+
+            setTranslate(currentX, currentY, chatModal);
+        }
+
+        if (isResizing) {
+            e.preventDefault();
+            
+            const clientX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type === 'touchmove' ? e.touches[0].clientY : e.clientY;
+            
+            const width = startWidth + (clientX - startX);
+            const height = startHeight + (clientY - startY);
+            
+            // Límites mínimos y máximos
+            const minWidth = 320;
+            const maxWidth = window.innerWidth - 40;
+            const minHeight = 400;
+            const maxHeight = window.innerHeight - 120;
+            
+            chatModal.style.width = Math.min(Math.max(width, minWidth), maxWidth) + 'px';
+            chatModal.style.height = Math.min(Math.max(height, minHeight), maxHeight) + 'px';
+        }
+    });
 }
 
 function setTranslate(xPos, yPos, el) {
     el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+    el.style.willChange = 'transform';
 }
 
 document.addEventListener('mouseup', dragEnd);
@@ -149,9 +187,47 @@ function dragEnd(e) {
     initialX = currentX;
     initialY = currentY;
 
+    // Limpiar willChange para mejor rendimiento
+    if (chatBubble.style.willChange) {
+        chatBubble.style.willChange = 'auto';
+    }
+    if (chatModal.style.willChange) {
+        chatModal.style.willChange = 'auto';
+    }
+
     isDraggingBubble = false;
     isDraggingModal = false;
+    isResizing = false;
+    
+    if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+    }
 }
+
+// Funcionalidad de resize
+function initResize() {
+    const resizeHandle = document.createElement('div');
+    resizeHandle.className = 'chat-resize-handle';
+    resizeHandle.innerHTML = '<i class="fas fa-grip-lines-vertical"></i>';
+    chatModal.appendChild(resizeHandle);
+    
+    resizeHandle.addEventListener('mousedown', startResize);
+    resizeHandle.addEventListener('touchstart', startResize);
+}
+
+function startResize(e) {
+    e.stopPropagation();
+    isResizing = true;
+    
+    startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+    startY = e.type === 'touchstart' ? e.touches[0].clientY : e.clientY;
+    startWidth = chatModal.offsetWidth;
+    startHeight = chatModal.offsetHeight;
+}
+
+// Inicializar resize cuando se carga
+setTimeout(initResize, 100);
 
 // Event listeners para botones
 closeChatBtn.addEventListener('click', closeChat);
