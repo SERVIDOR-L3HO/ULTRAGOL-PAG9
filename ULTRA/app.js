@@ -2525,9 +2525,13 @@ function renderImportantMatches() {
         if (transmision.canales && transmision.canales.length > 0) {
             transmision.canales.forEach(canal => {
                 if (canal.links) {
+                    // API 1 (rereyano) - links con hoca, caster, wigi
                     if (canal.links.hoca) totalLinks++;
                     if (canal.links.caster) totalLinks++;
                     if (canal.links.wigi) totalLinks++;
+                } else if (canal.enlaces && canal.enlaces.length > 0) {
+                    // API 2, 3, 4 - enlaces como array
+                    totalLinks += canal.enlaces.length;
                 }
             });
         }
