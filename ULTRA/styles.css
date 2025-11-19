@@ -579,22 +579,15 @@ body {
     font-size: 22px;
     transition: all 0.3s ease;
     overflow: hidden;
-    background: #fff;
+    background: #fff !important;
 }
 
 .league-icon img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    padding: 8px;
+    padding: 4px;
 }
-
-.liga-mx { background: linear-gradient(135deg, #FF4500, #FF6347); }
-.premier { background: linear-gradient(135deg, #3C1053, #AD1457); }
-.laliga { background: linear-gradient(135deg, #FF4500, #FFD700); }
-.serie-a { background: linear-gradient(135deg, #0082CA, #00A0E3); }
-.bundesliga { background: linear-gradient(135deg, #D20515, #000000); }
-.ligue1 { background: linear-gradient(135deg, #0055A5, #FF6B35); }
 
 .league-btn.active .league-icon {
     box-shadow: 0 0 20px rgba(255, 69, 0, 0.6);
