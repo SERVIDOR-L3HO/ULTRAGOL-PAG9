@@ -1257,17 +1257,11 @@ function fullscreenStream() {
 }
 
 function openLiveChat() {
-    const chatUrl = '../live-chat/index.html';
-    const chatWindow = window.open(
-        chatUrl,
-        'UltraGolChat',
-        'width=400,height=700,left=100,top=100,resizable=yes,scrollbars=yes'
-    );
-    
-    if (chatWindow) {
-        chatWindow.focus();
+    // Usar el chat widget flotante
+    if (window.chatWidget) {
+        window.chatWidget.open();
     } else {
-        showToast('Por favor permite las ventanas emergentes para abrir el chat');
+        showToast('Chat no disponible');
     }
 }
 

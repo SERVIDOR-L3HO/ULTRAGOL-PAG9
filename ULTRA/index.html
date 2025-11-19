@@ -608,5 +608,32 @@
     
     <!-- TV Remote Navigation -->
     <script src="../js/tv-remote-navigation.js?v=20251109c?v=20251109c"></script>
+
+    <!-- Chat Flotante Estilo Messenger -->
+    <div id="chatBubble" class="chat-bubble">
+        <i class="fas fa-comments"></i>
+        <span class="chat-badge" id="chatBadge">1</span>
+    </div>
+
+    <div id="chatModal" class="chat-modal">
+        <div class="chat-modal-header" id="chatModalHeader">
+            <div class="chat-modal-title">
+                <i class="fas fa-comments"></i>
+                <span>Chat en Vivo</span>
+            </div>
+            <button class="chat-modal-close" id="closeChatBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="chat-modal-body">
+            <iframe id="chatIframe" src="../live-chat/index.html" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <button id="closeBubbleBtn" class="close-bubble-btn" style="display: none;">
+        <i class="fas fa-times-circle"></i>
+    </button>
+
+    <script src="chat-widget.js"></script>
 </body>
 </html>
