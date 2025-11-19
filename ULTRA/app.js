@@ -917,12 +917,13 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         return resultado;
     };
     
-    // Buscar en las 3 APIs
+    // Buscar en las 4 APIs
     const transmisionAPI1 = transmisionesAPI1 ? buscarTransmision(transmisionesAPI1.transmisiones) : null;
     const transmisionAPI2 = transmisionesAPI2 ? buscarTransmision(transmisionesAPI2.transmisiones) : null;
     const transmisionAPI3 = transmisionesAPI3 ? buscarTransmision(transmisionesAPI3.transmisiones) : null;
+    const transmisionAPI4 = transmisionesAPI4 ? buscarTransmision(transmisionesAPI4.transmisiones) : null;
     
-    // Combinar canales de las 3 APIs
+    // Combinar canales de las 4 APIs
     let canalesCombinados = [];
     let eventoNombre = '';
     
@@ -954,6 +955,16 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         }));
         canalesCombinados = [...canalesCombinados, ...canalesAPI3];
         console.log(`✅ Encontrados ${canalesAPI3.length} canales en API 3 (voodc)`);
+    }
+    
+    if (transmisionAPI4) {
+        if (!eventoNombre) eventoNombre = transmisionAPI4.evento || transmisionAPI4.titulo;
+        const canalesAPI4 = (transmisionAPI4.canales || []).map(canal => ({
+            ...canal,
+            fuente: 'ftvhd'
+        }));
+        canalesCombinados = [...canalesCombinados, ...canalesAPI4];
+        console.log(`✅ Encontrados ${canalesAPI4.length} canales en API 4 (ftvhd)`);
     }
     
     if (canalesCombinados.length === 0) {
@@ -1002,10 +1013,10 @@ function showChannelSelector(transmision, partidoNombre) {
         
         // Detectar el tipo de API y mostrar enlaces apropiadamente
         if (canal.tipoAPI === 'e1link' && canal.enlaces) {
-            // API 2 (e1link): Mostrar como "URL 1", "URL 2", etc.
+            // API 2 (e1link): Mostrar como nombre del canal o "URL 1", "URL 2", etc.
             canal.enlaces.forEach((url, idx) => {
                 streamTypes.push({ 
-                    name: `URL ${idx + 1}`, 
+                    name: canal.nombre ? `${canal.nombre} ${idx > 0 ? idx + 1 : ''}`.trim() : `URL ${idx + 1}`, 
                     url: url, 
                     icon: 'play-circle' 
                 });
@@ -1015,6 +1026,15 @@ function showChannelSelector(transmision, partidoNombre) {
             canal.enlaces.forEach((enlace, idx) => {
                 streamTypes.push({ 
                     name: enlace.calidad || `HD ${idx + 1}`, 
+                    url: enlace.url, 
+                    icon: 'play-circle' 
+                });
+            });
+        } else if (canal.tipoAPI === 'transmisiones4' && canal.enlaces) {
+            // API 4 (transmisiones4 - ftvhd): Mostrar nombre del canal con enlaces
+            canal.enlaces.forEach((enlace, idx) => {
+                streamTypes.push({ 
+                    name: canal.nombre || enlace.calidad || `Canal ${idx + 1}`, 
                     url: enlace.url, 
                     icon: 'play-circle' 
                 });
@@ -1048,6 +1068,9 @@ function showChannelSelector(transmision, partidoNombre) {
         } else if (canal.tipoAPI === 'voodc') {
             badgeColor = '#9b59b6';
             badgeText = 'voodc';
+        } else if (canal.tipoAPI === 'transmisiones4') {
+            badgeColor = '#e74c3c';
+            badgeText = 'ftvhd';
         }
         const fuenteBadge = canal.tipoAPI ? `<span class="fuente-badge" style="background: ${badgeColor}; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; color: white;">${badgeText}</span>` : '';
         

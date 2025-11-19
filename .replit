@@ -15,27 +15,23 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Server"
+args = "ULTRA Server"
 
 [[workflows.workflow]]
-name = "Server"
+name = "ULTRA Server"
 author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd ULTRA && node server.js"
+waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node server.js"
-waitForPort = 5000
-
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 37535
-externalPort = 8000
 
 [[ports]]
 localPort = 38341
@@ -72,6 +68,10 @@ externalPort = 3003
 [[ports]]
 localPort = 42185
 externalPort = 9000
+
+[[ports]]
+localPort = 43791
+externalPort = 8000
 
 [[ports]]
 localPort = 44335

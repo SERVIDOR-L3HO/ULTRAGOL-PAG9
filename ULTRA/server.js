@@ -33,11 +33,6 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Manejo de rutas SPA
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 ULTRAGOL servidor iniciado en puerto ${PORT}`);
     console.log(`🌐 Servidor disponible en: http://0.0.0.0:${PORT}`);
