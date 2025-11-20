@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEMO API 5 - Cómo se ve en los modales</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #27ae60;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .stats {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .stats h2 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .match-card {
+            background: #1a1a1a;
+            border: 2px solid #27ae60;
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.2s;
+        }
+        .match-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(39, 174, 96, 0.3);
+        }
+        .match-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
+        }
+        .match-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #fff;
+        }
+        .league-badge {
+            background: #27ae60;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+        .match-info {
+            color: #999;
+            margin-bottom: 15px;
+        }
+        .channels-count {
+            background: #2c2c2c;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .channel {
+            background: #2a2a2a;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border-left: 4px solid #27ae60;
+        }
+        .channel-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .channel-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .badge {
+            background: #27ae60;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+        .quality-badge {
+            background: #3498db;
+        }
+        .url {
+            color: #3498db;
+            font-size: 0.85em;
+            word-break: break-all;
+            background: #1a1a1a;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.5em;
+            color: #27ae60;
+        }
+        .error {
+            background: #e74c3c;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 DEMO: API 5 en Modales de ULTRAGOL</h1>
+        
+        <div id="loading" class="loading">
+            ⏳ Cargando transmisiones de API 5 (donromans)...
+        </div>
+        
+        <div id="stats" style="display: none;"></div>
+        <div id="matches" class="grid"></div>
+    </div>
+
+    <script>
+        async function loadAPI5Demo() {
+            const loadingDiv = document.getElementById('loading');
+            const statsDiv = document.getElementById('stats');
+            const matchesDiv = document.getElementById('matches');
+            
+            try {
+                const response = await fetch('https://ultragol-api-3.vercel.app/transmisiones5');
+                const data = await response.json();
+                
+                loadingDiv.style.display = 'none';
+                
+                if (!data.matches || data.matches.length === 0) {
+                    matchesDiv.innerHTML = '<div class="error">❌ No hay partidos disponibles en este momento</div>';
+                    return;
+                }
+                
+                // Stats
+                let totalChannels = 0;
+                data.matches.forEach(match => {
+                    if (match.links) {
+                        match.links.forEach(linkGroup => {
+                            if (linkGroup.data) totalChannels += linkGroup.data.length;
+                        });
+                    }
+                });
+                
+                statsDiv.style.display = 'block';
+                statsDiv.className = 'stats';
+                statsDiv.innerHTML = `
+                    <h2>✅ ${data.matches.length} Partidos</h2>
+                    <p style="font-size: 1.2em;">con ${totalChannels} canales/enlaces disponibles desde API 5</p>
+                    <p style="margin-top: 10px; opacity: 0.8;">Así se ven en los modales de "Partidos Importantes" y "Búsqueda"</p>
+                `;
+                
+                // Matches
+                matchesDiv.innerHTML = data.matches.map((match, idx) => {
+                    let channelsHTML = '';
+                    let channelCount = 0;
+                    
+                    if (match.links && match.links.length > 0) {
+                        match.links.forEach(linkGroup => {
+                            if (linkGroup.type === 'urls_list' && linkGroup.data) {
+                                linkGroup.data.forEach(stream => {
+                                    channelCount++;
+                                    channelsHTML += `
+                                        <div class="channel">
+                                            <div class="channel-header">
+                                                <span class="channel-name">${stream.stream_source || 'Canal'}</span>
+                                                <span class="badge">donromans</span>
+                                                <span class="badge quality-badge">${stream.stream_quality || 'hd'}</span>
+                                                <span style="color: #999; font-size: 0.85em;">${stream.platform || ''}</span>
+                                            </div>
+                                            <div class="url">${stream.match_url}</div>
+                                        </div>
+                                    `;
+                                });
+                            }
+                        });
+                    }
+                    
+                    return `
+                        <div class="match-card">
+                            <div class="match-header">
+                                <div class="match-title">${match.title}</div>
+                                <div class="league-badge">${match.league}</div>
+                            </div>
+                            <div class="match-info">
+                                📅 ${match.hour}
+                                ${match.is_replay ? ' | 🔄 Repetición' : ''}
+                            </div>
+                            <div class="channels-count">
+                                📺 ${channelCount} ${channelCount === 1 ? 'Canal' : 'Canales'} Disponibles
+                            </div>
+                            ${channelsHTML || '<div class="error">Sin canales disponibles</div>'}
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                matchesDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error al cargar API 5</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        loadAPI5Demo();
+    </script>
+</body>
+</html>
