@@ -8,6 +8,7 @@ let transmisionesAPI1 = null;
 let transmisionesAPI2 = null;
 let transmisionesAPI3 = null;
 let transmisionesAPI4 = null;
+let transmisionesAPI5 = null;
 let updateInterval = null;
 let currentFeaturedIndex = 0;
 let featuredMatches = [];
@@ -194,11 +195,11 @@ async function loadMarcadores() {
     }
 }
 
-// Función para cargar transmisiones desde las 4 APIs
+// Función para cargar transmisiones desde las 5 APIs
 async function loadTransmisiones() {
     try {
-        // Cargar las 4 APIs en paralelo con manejo individual de errores
-        const [data1, data2, data3, data4] = await Promise.all([
+        // Cargar las 5 APIs en paralelo con manejo individual de errores
+        const [data1, data2, data3, data4, data5] = await Promise.all([
             fetch('https://ultragol-api3.onrender.com/transmisiones')
                 .then(res => res.json())
                 .catch(err => {
@@ -222,6 +223,12 @@ async function loadTransmisiones() {
                 .catch(err => {
                     console.warn('⚠️ Error cargando API 4 (transmisiones4):', err);
                     return { transmisiones: [] };
+                }),
+            fetch('https://ultragol-api-3.vercel.app/transmisiones5')
+                .then(res => res.json())
+                .catch(err => {
+                    console.warn('⚠️ Error cargando API 5 (donromans):', err);
+                    return { matches: [] };
                 })
         ]);
         
@@ -276,6 +283,43 @@ async function loadTransmisiones() {
             };
         });
         
+        // Convertir API 5 (transmisiones5 - donromans) que usa "matches" con "links"
+        const transmisionesNormalizadasAPI5 = (data5.matches || []).map(match => {
+            const canalesNormalizados = [];
+            
+            // Procesar cada link en el array de links
+            if (match.links && match.links.length > 0) {
+                match.links.forEach(linkGroup => {
+                    if (linkGroup.type === 'urls_list' && linkGroup.data && linkGroup.data.length > 0) {
+                        // Cada enlace en el grupo se convierte en un canal
+                        linkGroup.data.forEach(stream => {
+                            canalesNormalizados.push({
+                                numero: '',
+                                nombre: stream.stream_source || stream.platform || 'Canal',
+                                enlaces: [{
+                                    url: stream.match_url,
+                                    calidad: stream.stream_quality === 'hd' ? 'HD' : 'SD',
+                                    platform: stream.platform,
+                                    source: stream.stream_source
+                                }],
+                                tipoAPI: 'donromans'
+                            });
+                        });
+                    }
+                });
+            }
+            
+            return {
+                evento: match.title,
+                titulo: match.title,
+                liga: match.league,
+                fecha: match.hour,
+                estado: match.is_replay ? 'Repetición' : 'Programado',
+                canales: canalesNormalizados,
+                tipoAPI: 'donromans'
+            };
+        });
+        
         // Marcar transmisiones API 1 con su tipo
         const transmisionesAPI1Marcadas = (data1.transmisiones || []).map(t => ({
             ...t,
@@ -303,13 +347,18 @@ async function loadTransmisiones() {
             ...data4,
             transmisiones: transmisionesNormalizadasAPI4
         };
+        transmisionesAPI5 = {
+            matches: data5.matches || [],
+            transmisiones: transmisionesNormalizadasAPI5
+        };
         
-        // Combinar las transmisiones de las 4 APIs (partidos pueden repetirse)
+        // Combinar las transmisiones de las 5 APIs (partidos pueden repetirse)
         const transmisionesCombinadas = [
             ...transmisionesAPI1Marcadas,
             ...transmisionesNormalizadasAPI2,
             ...transmisionesNormalizadasAPI3,
-            ...transmisionesNormalizadasAPI4
+            ...transmisionesNormalizadasAPI4,
+            ...transmisionesNormalizadasAPI5
         ];
         
         // Crear el objeto combinado
@@ -321,6 +370,7 @@ async function loadTransmisiones() {
         console.log('✅ Transmisiones cargadas desde API 2 (e1link):', data2.transmisiones?.length || 0);
         console.log('✅ Transmisiones cargadas desde API 3 (voodc):', data3.transmisiones?.length || 0);
         console.log('✅ Transmisiones cargadas desde API 4 (transmisiones4):', data4.transmisiones?.length || 0);
+        console.log('✅ Transmisiones cargadas desde API 5 (donromans):', data5.matches?.length || 0);
         console.log('✅ Total transmisiones combinadas:', transmisionesCombinadas.length);
         
         return transmisionesData;
@@ -917,13 +967,14 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         return resultado;
     };
     
-    // Buscar en las 4 APIs
+    // Buscar en las 5 APIs
     const transmisionAPI1 = transmisionesAPI1 ? buscarTransmision(transmisionesAPI1.transmisiones) : null;
     const transmisionAPI2 = transmisionesAPI2 ? buscarTransmision(transmisionesAPI2.transmisiones) : null;
     const transmisionAPI3 = transmisionesAPI3 ? buscarTransmision(transmisionesAPI3.transmisiones) : null;
     const transmisionAPI4 = transmisionesAPI4 ? buscarTransmision(transmisionesAPI4.transmisiones) : null;
+    const transmisionAPI5 = transmisionesAPI5 ? buscarTransmision(transmisionesAPI5.transmisiones) : null;
     
-    // Combinar canales de las 4 APIs
+    // Combinar canales de las 5 APIs
     let canalesCombinados = [];
     let eventoNombre = '';
     
@@ -965,6 +1016,16 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         }));
         canalesCombinados = [...canalesCombinados, ...canalesAPI4];
         console.log(`✅ Encontrados ${canalesAPI4.length} canales en API 4 (ftvhd)`);
+    }
+    
+    if (transmisionAPI5) {
+        if (!eventoNombre) eventoNombre = transmisionAPI5.evento || transmisionAPI5.titulo;
+        const canalesAPI5 = (transmisionAPI5.canales || []).map(canal => ({
+            ...canal,
+            fuente: 'donromans'
+        }));
+        canalesCombinados = [...canalesCombinados, ...canalesAPI5];
+        console.log(`✅ Encontrados ${canalesAPI5.length} canales en API 5 (donromans)`);
     }
     
     if (canalesCombinados.length === 0) {
@@ -1039,6 +1100,16 @@ function showChannelSelector(transmision, partidoNombre) {
                     icon: 'play-circle' 
                 });
             });
+        } else if (canal.tipoAPI === 'donromans' && canal.enlaces) {
+            // API 5 (donromans): Mostrar nombre del canal con plataforma
+            canal.enlaces.forEach((enlace, idx) => {
+                const displayName = enlace.source || enlace.platform || canal.nombre || `Canal ${idx + 1}`;
+                streamTypes.push({ 
+                    name: displayName,
+                    url: enlace.url, 
+                    icon: 'play-circle' 
+                });
+            });
         } else if (canal.tipoAPI === 'rereyano' && canal.links) {
             // API 1 (rereyano): Mostrar como "hoca", "caster", "wigi"
             if (canal.links.hoca) {
@@ -1071,6 +1142,9 @@ function showChannelSelector(transmision, partidoNombre) {
         } else if (canal.tipoAPI === 'transmisiones4') {
             badgeColor = '#e74c3c';
             badgeText = 'ftvhd';
+        } else if (canal.tipoAPI === 'donromans') {
+            badgeColor = '#27ae60';
+            badgeText = 'donromans';
         }
         const fuenteBadge = canal.tipoAPI ? `<span class="fuente-badge" style="background: ${badgeColor}; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; color: white;">${badgeText}</span>` : '';
         
@@ -2100,6 +2174,32 @@ function selectImportantMatch(index) {
         }
     }
     
+    // Buscar en API 4
+    if (transmisionesAPI4 && transmisionesAPI4.transmisiones) {
+        const transAPI4 = transmisionesAPI4.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
+        if (transAPI4 && transAPI4.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI4.canales];
+            console.log(`✅ Encontrados ${transAPI4.canales.length} canales en API 4 (transmisiones4)`);
+        }
+    }
+    
+    // Buscar en API 5
+    if (transmisionesAPI5 && transmisionesAPI5.transmisiones) {
+        const transAPI5 = transmisionesAPI5.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
+        if (transAPI5 && transAPI5.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI5.canales];
+            console.log(`✅ Encontrados ${transAPI5.canales.length} canales en API 5 (donromans)`);
+        }
+    }
+    
     if (canalesCombinados.length === 0) {
         showToast('No hay canales disponibles para este partido');
         return;
@@ -2173,6 +2273,30 @@ function selectImportantMatchByName(eventoNombre) {
         if (transAPI3 && transAPI3.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI3.canales];
             console.log(`✅ Encontrados ${transAPI3.canales.length} canales en API 3 (voodc)`);
+        }
+    }
+    
+    if (transmisionesAPI4 && transmisionesAPI4.transmisiones) {
+        const transAPI4 = transmisionesAPI4.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
+        });
+        
+        if (transAPI4 && transAPI4.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI4.canales];
+            console.log(`✅ Encontrados ${transAPI4.canales.length} canales en API 4 (transmisiones4)`);
+        }
+    }
+    
+    if (transmisionesAPI5 && transmisionesAPI5.transmisiones) {
+        const transAPI5 = transmisionesAPI5.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
+        });
+        
+        if (transAPI5 && transAPI5.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI5.canales];
+            console.log(`✅ Encontrados ${transAPI5.canales.length} canales en API 5 (donromans)`);
         }
     }
     
