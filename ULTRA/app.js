@@ -668,7 +668,7 @@ function renderGolesInfo(partido) {
             html += `
                 <div class="gol-item">
                     <i class="fas fa-futbol"></i>
-                    <span class="gol-jugador">${gol.jugador || 'Jugador'}</span>
+                    <span class="gol-jugador">${gol.goleador || 'Jugador'}</span>
                     <span class="gol-minuto">${gol.minuto}'</span>
                 </div>
             `;
@@ -684,7 +684,7 @@ function renderGolesInfo(partido) {
             html += `
                 <div class="gol-item">
                     <i class="fas fa-futbol"></i>
-                    <span class="gol-jugador">${gol.jugador || 'Jugador'}</span>
+                    <span class="gol-jugador">${gol.goleador || 'Jugador'}</span>
                     <span class="gol-minuto">${gol.minuto}'</span>
                 </div>
             `;
