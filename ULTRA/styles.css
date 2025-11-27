@@ -1002,6 +1002,48 @@ body {
     box-shadow: 0 4px 12px rgba(147, 51, 234, 0.5);
 }
 
+.modal-radio-btn {
+    background: linear-gradient(135deg, rgba(233, 69, 96, 0.15), rgba(255, 107, 107, 0.15));
+    border-color: rgba(233, 69, 96, 0.3);
+    transition: all 0.3s ease;
+}
+
+.modal-radio-btn:hover {
+    background: linear-gradient(135deg, rgba(233, 69, 96, 0.3), rgba(255, 107, 107, 0.3));
+    border-color: #e94560;
+    box-shadow: 0 4px 12px rgba(233, 69, 96, 0.5);
+}
+
+.modal-radio-btn.active {
+    background: linear-gradient(135deg, #e94560 0%, #ff6b6b 100%) !important;
+    border-color: #ff6b6b;
+    box-shadow: 0 4px 20px rgba(233, 69, 96, 0.6);
+    animation: radioPulse 2s ease-in-out infinite;
+}
+
+.modal-radio-btn.active i {
+    color: #fff;
+    animation: radioWave 1s ease-in-out infinite;
+}
+
+@keyframes radioPulse {
+    0%, 100% {
+        box-shadow: 0 4px 20px rgba(233, 69, 96, 0.6);
+    }
+    50% {
+        box-shadow: 0 4px 30px rgba(233, 69, 96, 0.9);
+    }
+}
+
+@keyframes radioWave {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
 .modal-primary-btn {
     background: linear-gradient(135deg, #00ff41 0%, #00b32d 100%);
     border: none;

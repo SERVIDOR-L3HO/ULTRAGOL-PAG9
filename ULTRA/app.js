@@ -1392,6 +1392,143 @@ function openLiveChat() {
     }
 }
 
+// ==================== MODO RADIO (AUDIO EN SEGUNDO PLANO) ====================
+let radioModeActive = false;
+let radioAudioElement = null;
+
+function toggleRadioMode() {
+    if (radioModeActive) {
+        deactivateRadioMode();
+    } else {
+        activateRadioMode();
+    }
+}
+
+function activateRadioMode() {
+    radioModeActive = true;
+    
+    // Actualizar botón visualmente
+    const radioBtn = document.querySelector('.modal-radio-btn');
+    if (radioBtn) {
+        radioBtn.classList.add('active');
+        radioBtn.style.background = 'linear-gradient(135deg, #e94560 0%, #ff6b6b 100%)';
+        radioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    }
+    
+    // Crear elemento de audio para mantener reproducción en segundo plano
+    if (!radioAudioElement) {
+        radioAudioElement = document.createElement('audio');
+        radioAudioElement.id = 'radioBackgroundAudio';
+        radioAudioElement.loop = true;
+        radioAudioElement.volume = 0.01; // Volumen muy bajo (casi silencioso)
+        
+        // Audio silencioso para mantener la sesión de audio activa
+        radioAudioElement.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+        
+        document.body.appendChild(radioAudioElement);
+    }
+    
+    // Reproducir audio silencioso para mantener sesión activa
+    radioAudioElement.play().catch(e => console.log('Audio play error:', e));
+    
+    // Configurar MediaSession API para controles de audio en pantalla de bloqueo
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+            title: currentStreamTitle || 'ULTRAGOL Radio',
+            artist: 'Transmisión en vivo',
+            album: 'ULTRAGOL',
+            artwork: [
+                { src: 'ultragol-logo.png', sizes: '96x96', type: 'image/png' },
+                { src: 'ultragol-logo.png', sizes: '128x128', type: 'image/png' },
+                { src: 'ultragol-logo.png', sizes: '192x192', type: 'image/png' },
+                { src: 'ultragol-logo.png', sizes: '256x256', type: 'image/png' },
+                { src: 'ultragol-logo.png', sizes: '384x384', type: 'image/png' },
+                { src: 'ultragol-logo.png', sizes: '512x512', type: 'image/png' }
+            ]
+        });
+        
+        // Configurar acciones de MediaSession
+        navigator.mediaSession.setActionHandler('play', () => {
+            if (radioAudioElement) radioAudioElement.play();
+            showToast('Modo Radio activado');
+        });
+        
+        navigator.mediaSession.setActionHandler('pause', () => {
+            deactivateRadioMode();
+        });
+        
+        navigator.mediaSession.setActionHandler('stop', () => {
+            deactivateRadioMode();
+        });
+        
+        navigator.mediaSession.playbackState = 'playing';
+    }
+    
+    // Prevenir que la pantalla se apague (si está disponible)
+    requestWakeLock();
+    
+    showToast('Modo Radio activado - El audio continuará en segundo plano');
+}
+
+function deactivateRadioMode() {
+    radioModeActive = false;
+    
+    // Restaurar botón
+    const radioBtn = document.querySelector('.modal-radio-btn');
+    if (radioBtn) {
+        radioBtn.classList.remove('active');
+        radioBtn.style.background = '';
+        radioBtn.innerHTML = '<i class="fas fa-podcast"></i>';
+    }
+    
+    // Detener audio
+    if (radioAudioElement) {
+        radioAudioElement.pause();
+    }
+    
+    // Limpiar MediaSession
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'none';
+    }
+    
+    // Liberar wake lock
+    releaseWakeLock();
+    
+    showToast('Modo Radio desactivado');
+}
+
+// Wake Lock API para mantener la pantalla activa (opcional)
+let wakeLock = null;
+
+async function requestWakeLock() {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('Wake Lock activado');
+            
+            wakeLock.addEventListener('release', () => {
+                console.log('Wake Lock liberado');
+            });
+        }
+    } catch (err) {
+        console.log('Wake Lock no disponible:', err);
+    }
+}
+
+function releaseWakeLock() {
+    if (wakeLock) {
+        wakeLock.release();
+        wakeLock = null;
+    }
+}
+
+// Re-adquirir wake lock cuando la página vuelve a ser visible
+document.addEventListener('visibilitychange', async () => {
+    if (wakeLock !== null && document.visibilityState === 'visible' && radioModeActive) {
+        requestWakeLock();
+    }
+});
+
 function openStream(url) {
     currentStreamUrl = url;
     const modal = document.getElementById('playerModal');
