@@ -458,9 +458,6 @@ function updateFeaturedMatch(data) {
                 </div>
 
                 <div class="match-info">
-                    <div class="match-time-display">
-                        <i class="far fa-clock"></i> ${hora}
-                    </div>
                     <h2 class="match-title">${partido.local.nombreCorto} vs. ${partido.visitante.nombreCorto}</h2>
                     <div class="match-badges">
                         <span class="badge-icon" title="Marcador"><i class="fas fa-circle"></i></span>
