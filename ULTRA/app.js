@@ -1553,6 +1553,65 @@ function toggleSettings() {
     panel.classList.toggle('active');
 }
 
+// ==================== FUNCIONES DE ELIMINAR CACHÉ ====================
+
+function showClearCacheConfirmation() {
+    const modal = document.getElementById('clearCacheModal');
+    if (modal) {
+        modal.classList.add('active');
+    }
+}
+
+function closeClearCacheModal() {
+    const modal = document.getElementById('clearCacheModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
+}
+
+function confirmClearCache() {
+    // Cerrar el modal primero
+    closeClearCacheModal();
+    
+    // Cerrar panel de configuración
+    const settingsPanel = document.getElementById('settingsPanel');
+    if (settingsPanel) {
+        settingsPanel.classList.remove('active');
+    }
+    
+    // Limpiar caché del navegador
+    if ('caches' in window) {
+        caches.keys().then(function(names) {
+            for (let name of names) {
+                caches.delete(name);
+            }
+        });
+    }
+    
+    // Limpiar localStorage
+    localStorage.clear();
+    
+    // Limpiar sessionStorage
+    sessionStorage.clear();
+    
+    // Desregistrar Service Workers
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (let registration of registrations) {
+                registration.unregister();
+            }
+        });
+    }
+    
+    // Mostrar mensaje de éxito antes de recargar
+    showToast('Caché eliminado correctamente. Recargando página...');
+    
+    // Recargar la página sin caché después de un breve delay
+    setTimeout(function() {
+        window.location.reload(true);
+    }, 1500);
+}
+
 function shareApp() {
     if (navigator.share) {
         navigator.share({

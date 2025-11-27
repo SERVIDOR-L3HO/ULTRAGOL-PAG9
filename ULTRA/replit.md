@@ -12,7 +12,15 @@ ULTRAGOL is a Spanish football streaming platform created by L3HO that allows us
 - ✅ Deployment configuration set up for production (autoscale)
 - ✅ Application fully functional and ready to use
 
-## Recent Changes (September 29, 2025)
+## Recent Changes (November 27, 2025)
+- ✅ **NEW**: Added "Eliminar caché" (Clear Cache) button in settings panel
+  - Located in the Configuración (Settings) panel
+  - Shows confirmation dialog before clearing cache
+  - Clears browser cache, localStorage, sessionStorage, and unregisters Service Workers
+  - Automatically reloads the page after clearing
+  - Warning message about losing saved design and configuration
+
+## Previous Changes (September 29, 2025)
 - ✅ **FRESH PROJECT IMPORT COMPLETED**: Successfully set up from GitHub import
 - ✅ Installed Node.js dependencies (Express.js, CORS) via npm install
 - ✅ Fixed missing dependencies issue and restarted server workflow

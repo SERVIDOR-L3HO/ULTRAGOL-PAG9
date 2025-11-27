@@ -372,6 +372,28 @@
                         <span class="slider"></span>
                     </label>
                 </div>
+                <div class="setting-item setting-item-btn">
+                    <button class="clear-cache-btn" onclick="showClearCacheConfirmation()">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Eliminar caché</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación para Eliminar Caché -->
+    <div id="clearCacheModal" class="clear-cache-modal">
+        <div class="clear-cache-overlay" onclick="closeClearCacheModal()"></div>
+        <div class="clear-cache-container">
+            <div class="clear-cache-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="clear-cache-title">¿Estás seguro?</h3>
+            <p class="clear-cache-message">Al eliminar el caché se perderá el diseño y configuración guardada de esta página. La página se recargará automáticamente.</p>
+            <div class="clear-cache-buttons">
+                <button class="clear-cache-cancel" onclick="closeClearCacheModal()">Cancelar</button>
+                <button class="clear-cache-confirm" onclick="confirmClearCache()">Sí, eliminar</button>
             </div>
         </div>
     </div>
