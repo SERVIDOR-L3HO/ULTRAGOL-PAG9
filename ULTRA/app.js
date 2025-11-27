@@ -1186,7 +1186,9 @@ function closeChannelSelector() {
 }
 
 function selectStream(streamUrl, streamTitle) {
-    closeChannelSelector();
+    // Solo cerrar visualmente el modal, pero mantenerlo en el historial
+    // para que el usuario pueda volver a él con el botón "Regresar"
+    closeChannelSelectorOnly();
     playStreamInModal(streamUrl, streamTitle, false);
 }
 
