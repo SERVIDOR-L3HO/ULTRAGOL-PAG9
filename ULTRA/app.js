@@ -3318,27 +3318,41 @@ async function shareStream() {
         return;
     }
     
-    // Crear datos para compartir (versión compacta)
-    const shareData = {
-        u: currentStreamUrl,    // 'u' en lugar de 'url' para ahorrar espacio
-        t: currentStreamTitle   // 't' en lugar de 'title' para ahorrar espacio
+    // Crear ID corto único basado en la URL y título (hash simple)
+    const hashCode = (str) => {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return Math.abs(hash).toString(36).substring(0, 6);
     };
     
-    // Convertir a JSON y comprimir con LZ-String
-    const jsonData = JSON.stringify(shareData);
-    const compressed = LZString.compressToEncodedURIComponent(jsonData);
+    // Crear datos compactos
+    const shortId = hashCode(currentStreamUrl + currentStreamTitle);
     
-    // URL corta usando compresión
-    const shareUrl = `${window.location.origin}${window.location.pathname}?s=${compressed}`;
+    // Guardar en localStorage para poder recuperar después
+    const streamCache = JSON.parse(localStorage.getItem('streamCache') || '{}');
+    streamCache[shortId] = {
+        u: currentStreamUrl,
+        t: currentStreamTitle,
+        ts: Date.now()
+    };
+    // Limpiar cache viejo (más de 7 días)
+    const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+    Object.keys(streamCache).forEach(key => {
+        if (streamCache[key].ts < weekAgo) delete streamCache[key];
+    });
+    localStorage.setItem('streamCache', JSON.stringify(streamCache));
     
-    // Calcular reducción de tamaño
-    const oldSize = btoa(JSON.stringify({url: currentStreamUrl, title: currentStreamTitle})).length;
-    const newSize = compressed.length;
-    const reduction = Math.round(((oldSize - newSize) / oldSize) * 100);
+    // URL mucho más corta usando el ID
+    const baseUrl = window.location.origin + window.location.pathname;
+    const shareUrl = `${baseUrl}?id=${shortId}`;
     
-    console.log(`🔗 URL comprimida: ${oldSize} → ${newSize} caracteres (${reduction}% más corta)`);
+    console.log(`🔗 URL corta generada: ${shareUrl}`);
     
-    // Crear mensajes creativos según el tipo de partido
+    // Mensaje creativo sin duplicar el link
     const mensajesCreativos = [
         `⚽🔥 ${currentStreamTitle} | ¡No te lo pierdas EN VIVO!`,
         `🎯 ${currentStreamTitle} | ¡Transmisión en directo!`,
@@ -3349,26 +3363,25 @@ async function shareStream() {
     // Seleccionar mensaje aleatorio
     const mensajeAleatorio = mensajesCreativos[Math.floor(Math.random() * mensajesCreativos.length)];
     
-    // Mensaje completo con emojis y el link
-    const mensajeCompleto = `${mensajeAleatorio}\n\n${shareUrl}`;
-    
     // Intentar usar la API nativa de compartir si está disponible
     if (navigator.share) {
         try {
             await navigator.share({
                 title: `⚽ UltraGol - ${currentStreamTitle}`,
-                text: mensajeCompleto,
+                text: mensajeAleatorio,
                 url: shareUrl
             });
-            showToast(`¡Link compartido! (${reduction}% más corto) 🎉`);
+            showToast('¡Link compartido! 🎉');
         } catch (error) {
             // Si el usuario cancela, solo copiar al portapapeles
             if (error.name !== 'AbortError') {
+                const mensajeCompleto = `${mensajeAleatorio}\n\n${shareUrl}`;
                 copyToClipboardWithMessage(mensajeCompleto);
             }
         }
     } else {
         // Fallback: copiar al portapapeles
+        const mensajeCompleto = `${mensajeAleatorio}\n\n${shareUrl}`;
         copyToClipboardWithMessage(mensajeCompleto);
     }
 }
@@ -3422,7 +3435,36 @@ function fallbackCopyToClipboard(text) {
 function checkSharedStream() {
     const urlParams = new URLSearchParams(window.location.search);
     const streamParam = urlParams.get('s') || urlParams.get('stream');
+    const shortId = urlParams.get('id');
     
+    // Nuevo formato: ID corto
+    if (shortId) {
+        try {
+            const streamCache = JSON.parse(localStorage.getItem('streamCache') || '{}');
+            const cached = streamCache[shortId];
+            
+            if (cached && cached.u && cached.t) {
+                console.log('✅ Transmisión encontrada en cache:', shortId);
+                
+                setTimeout(() => {
+                    playStreamInModal(cached.u, cached.t, false);
+                    showToast('Abriendo transmisión compartida... 📺');
+                    
+                    // Limpiar la URL sin recargar la página
+                    const cleanUrl = window.location.origin + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }, 1000);
+                return;
+            } else {
+                console.log('⚠️ Link compartido no encontrado en cache');
+                showToast('Este link ya expiró o no está disponible');
+            }
+        } catch (error) {
+            console.error('❌ Error al procesar link corto:', error);
+        }
+    }
+    
+    // Formato antiguo: parámetro comprimido
     if (streamParam) {
         try {
             let shareData;
