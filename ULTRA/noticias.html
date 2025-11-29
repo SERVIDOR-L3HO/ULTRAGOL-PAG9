@@ -6,17 +6,15 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <title>Noticias - ULTRAGOL</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20251110">
-    <link rel="stylesheet" href="noticias-styles.css?v=20251110">
+    <link rel="stylesheet" href="styles.css?v=20251129">
+    <link rel="stylesheet" href="noticias-styles.css?v=20251129">
     
-    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e94560">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="UltraGol LIVE">
     
-    <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3612607805789879"
      crossorigin="anonymous"></script>
 </head>
@@ -86,15 +84,16 @@
             </div>
         </section>
 
+        <section class="featured-section" id="featuredNews">
+        </section>
+
         <section class="news-section">
             <div class="section-header">
                 <h3 id="newsLeagueName">NOTICIAS Y RESÚMENES - Liga MX</h3>
-                <button class="crown-btn">
-                    <i class="fas fa-crown"></i>
-                </button>
+                <span class="update-info" id="updateInfo"></span>
             </div>
             <div class="news-grid" id="newsGrid">
-                <div class="news-loading">Cargando noticias...</div>
+                <div class="news-loading"><i class="fas fa-spinner fa-spin"></i> Cargando noticias...</div>
             </div>
         </section>
     </div>
@@ -102,18 +101,27 @@
     <div id="newsModal" class="news-modal">
         <div class="news-modal-content">
             <div class="news-modal-header">
-                <h3 id="newsModalTitle">Noticia</h3>
                 <button class="close-news-modal" onclick="closeNewsModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="news-modal-body">
                 <img id="newsModalImage" src="" alt="Noticia">
+                <div class="news-modal-info">
+                    <span id="newsModalSource" class="modal-source"></span>
+                    <span id="newsModalDate" class="modal-date"></span>
+                </div>
+                <h2 id="newsModalTitle" class="modal-title"></h2>
                 <div id="newsModalText" class="news-modal-text"></div>
+                <div class="modal-actions">
+                    <a id="newsOriginalLink" href="#" target="_blank" class="original-link-btn">
+                        <i class="fas fa-external-link-alt"></i> Ver artículo original
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="noticias.js"></script>
+    <script src="noticias.js?v=20251129"></script>
 </body>
 </html>
