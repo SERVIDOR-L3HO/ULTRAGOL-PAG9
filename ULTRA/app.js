@@ -2851,24 +2851,37 @@ function showLockedLeagueMessage(leagueName) {
     showToast(`${leagueName} estará disponible próximamente`);
 }
 
-// Modo oscuro
+// Modo claro/oscuro
 function initDarkMode() {
     const darkModeToggle = document.getElementById('darkModeToggle');
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+    const savedDarkMode = localStorage.getItem('darkMode');
     
-    if (savedDarkMode) {
-        document.body.classList.add('dark-mode');
+    // Por defecto está en modo oscuro (sin clase light-mode)
+    // Si el usuario desactiva "Modo oscuro", se agrega la clase light-mode
+    if (savedDarkMode === 'false') {
+        document.body.classList.add('light-mode');
+        document.body.classList.remove('dark-mode');
+        if (darkModeToggle) darkModeToggle.checked = false;
+    } else {
+        // Modo oscuro activo (predeterminado)
+        document.body.classList.remove('light-mode');
         if (darkModeToggle) darkModeToggle.checked = true;
     }
     
     if (darkModeToggle) {
         darkModeToggle.addEventListener('change', function() {
             if (this.checked) {
+                // Activar modo oscuro (quitar light-mode)
+                document.body.classList.remove('light-mode');
                 document.body.classList.add('dark-mode');
                 localStorage.setItem('darkMode', 'true');
+                showToast('Modo oscuro activado');
             } else {
+                // Activar modo claro (agregar light-mode)
+                document.body.classList.add('light-mode');
                 document.body.classList.remove('dark-mode');
                 localStorage.setItem('darkMode', 'false');
+                showToast('Modo claro activado');
             }
         });
     }
