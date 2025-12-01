@@ -6,7 +6,7 @@
     <title>UltraGol - Enlaces Oficiales</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -15,618 +15,298 @@
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0f0f0f;
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        .gradient-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0d1117 0%, #1a2332 25%, #0d1117 50%, #1a2332 75%, #0d1117 100%);
-            background-size: 400% 400%;
-            animation: gradientMove 20s ease infinite;
-            z-index: 0;
-        }
-
-        @keyframes gradientMove {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .orb-1, .orb-2, .orb-3 {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.25;
-            animation: float 25s infinite;
-            pointer-events: none;
-        }
-
-        .orb-1 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(255, 140, 0, 0.4), transparent);
-            top: -250px;
-            left: -250px;
-            animation: float 30s infinite;
-        }
-
-        .orb-2 {
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(34, 197, 94, 0.4), transparent);
-            bottom: -300px;
-            right: -300px;
-            animation: float 35s infinite reverse;
-        }
-
-        .orb-3 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(255, 165, 0, 0.2), transparent);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation: pulse 8s infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(50px, -50px); }
-            50% { transform: translate(0, -100px); }
-            75% { transform: translate(-50px, -50px); }
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.2; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.35; }
+            align-items: flex-start;
+            padding: 40px 20px;
         }
 
         .container {
-            max-width: 680px;
+            max-width: 480px;
             width: 100%;
-            padding: 60px 24px;
-            position: relative;
-            z-index: 2;
         }
 
-        .logo-container {
+        .header {
             text-align: center;
-            margin-bottom: 48px;
-            animation: fadeInDown 0.8s ease-out;
+            margin-bottom: 32px;
         }
 
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .logo-wrapper {
+        .logo-box {
             display: inline-block;
-            position: relative;
-            padding: 32px 48px;
-            background: linear-gradient(145deg, rgba(255, 140, 0, 0.08), rgba(34, 197, 94, 0.08));
-            border-radius: 24px;
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 140, 0, 0.2);
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba(255, 255, 255, 0.05),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transition: all 0.4s ease;
-        }
-
-        .logo-wrapper:hover {
-            transform: translateY(-8px);
-            border-color: rgba(255, 140, 0, 0.4);
-            box-shadow: 
-                0 30px 80px rgba(255, 140, 0, 0.2),
-                0 0 0 1px rgba(255, 255, 255, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            padding: 24px 40px;
+            background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+            border: 1px solid #2a2a2a;
+            border-radius: 16px;
+            margin-bottom: 16px;
         }
 
         .logo-img {
-            height: 120px;
+            height: 80px;
             width: auto;
-            filter: drop-shadow(0 8px 24px rgba(255, 140, 0, 0.3));
         }
 
-        .company-tag {
+        .brand-tag {
             display: inline-block;
-            margin-top: 20px;
-            padding: 8px 24px;
-            background: linear-gradient(135deg, #ff8c00, #ff6600);
+            padding: 6px 16px;
+            background: #ff6b00;
             color: white;
-            border-radius: 50px;
-            font-size: 12px;
+            border-radius: 20px;
+            font-size: 11px;
             font-weight: 600;
-            letter-spacing: 2px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
-            box-shadow: 0 4px 16px rgba(255, 140, 0, 0.3);
         }
 
         .title {
             text-align: center;
-            margin-bottom: 48px;
-            animation: fadeIn 0.8s ease-out 0.2s both;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            margin-bottom: 28px;
         }
 
         .title h1 {
-            font-size: 2.8rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #ff8c00 0%, #22c55e 50%, #ff8c00 100%);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 12px;
-            animation: gradientText 4s ease infinite;
-            letter-spacing: -0.5px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 8px;
         }
 
-        @keyframes gradientText {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+        .title h1 span {
+            color: #ff6b00;
         }
 
         .title p {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.05rem;
+            color: #888;
+            font-size: 14px;
             font-weight: 400;
-            letter-spacing: 0.5px;
         }
 
-        .links-container {
+        .links {
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
-        .link-card {
-            position: relative;
-            background: rgba(22, 27, 34, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 16px;
-            padding: 24px 28px;
-            text-decoration: none;
-            color: white;
+        .link-item {
             display: flex;
             align-items: center;
-            gap: 20px;
-            transition: all 0.3s ease;
-            overflow: hidden;
-            animation: slideInUp 0.6s ease-out both;
+            gap: 16px;
+            padding: 16px 20px;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            text-decoration: none;
+            color: white;
+            transition: border-color 0.2s, background 0.2s;
         }
 
-        .link-card:nth-child(1) { animation-delay: 0.1s; }
-        .link-card:nth-child(2) { animation-delay: 0.15s; }
-        .link-card:nth-child(3) { animation-delay: 0.2s; }
-        .link-card:nth-child(4) { animation-delay: 0.25s; }
-        .link-card:nth-child(5) { animation-delay: 0.3s; }
-        .link-card:nth-child(6) { animation-delay: 0.35s; }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .link-item:hover {
+            background: #222;
+            border-color: #3a3a3a;
         }
 
-        .link-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.02));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .link-card:hover::before {
-            opacity: 1;
-        }
-
-        .link-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 255, 255, 0.12);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .link-card.whatsapp:hover {
-            border-color: rgba(37, 211, 102, 0.5);
-            box-shadow: 0 20px 40px rgba(37, 211, 102, 0.15);
-        }
-
-        .link-card.facebook:hover {
-            border-color: rgba(24, 119, 242, 0.5);
-            box-shadow: 0 20px 40px rgba(24, 119, 242, 0.15);
-        }
-
-        .link-card.website:hover {
-            border-color: rgba(34, 197, 94, 0.5);
-            box-shadow: 0 20px 40px rgba(34, 197, 94, 0.15);
-        }
-
-        .link-card.tiktok:hover {
-            border-color: rgba(255, 0, 80, 0.5);
-            box-shadow: 0 20px 40px rgba(255, 0, 80, 0.15);
-        }
-
-        .link-card.telegram:hover {
-            border-color: rgba(0, 136, 204, 0.5);
-            box-shadow: 0 20px 40px rgba(0, 136, 204, 0.15);
-        }
-
-        .link-card.company:hover {
-            border-color: rgba(255, 140, 0, 0.5);
-            box-shadow: 0 20px 40px rgba(255, 140, 0, 0.15);
-        }
+        .link-item.whatsapp:hover { border-color: #25d366; }
+        .link-item.facebook:hover { border-color: #1877f2; }
+        .link-item.website:hover { border-color: #22c55e; }
+        .link-item.tiktok:hover { border-color: #ff0050; }
+        .link-item.telegram:hover { border-color: #0088cc; }
+        .link-item.company:hover { border-color: #ff6b00; }
 
         .link-icon {
-            width: 56px;
-            height: 56px;
+            width: 44px;
+            height: 44px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 14px;
-            font-size: 24px;
+            border-radius: 10px;
+            font-size: 20px;
             flex-shrink: 0;
-            transition: all 0.3s ease;
-            position: relative;
         }
 
-        .link-card:hover .link-icon {
-            transform: scale(1.08);
-        }
+        .whatsapp .link-icon { background: #25d366; }
+        .facebook .link-icon { background: #1877f2; }
+        .website .link-icon { background: #22c55e; }
+        .tiktok .link-icon { background: linear-gradient(135deg, #ff0050, #00f2ea); }
+        .telegram .link-icon { background: #0088cc; }
+        .company .link-icon { background: #ff6b00; }
 
-        .whatsapp .link-icon {
-            background: linear-gradient(135deg, #25d366, #128c7e);
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.35);
-        }
-
-        .facebook .link-icon {
-            background: linear-gradient(135deg, #1877f2, #0d65d9);
-            box-shadow: 0 6px 20px rgba(24, 119, 242, 0.35);
-        }
-
-        .website .link-icon {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
-            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
-        }
-
-        .tiktok .link-icon {
-            background: linear-gradient(135deg, #ff0050, #00f2ea);
-            box-shadow: 0 6px 20px rgba(255, 0, 80, 0.35);
-        }
-
-        .telegram .link-icon {
-            background: linear-gradient(135deg, #0088cc, #006699);
-            box-shadow: 0 6px 20px rgba(0, 136, 204, 0.35);
-        }
-
-        .company .link-icon {
-            background: linear-gradient(135deg, #ff8c00, #ff6600);
-            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.35);
-        }
-
-        .link-content {
+        .link-text {
             flex: 1;
         }
 
         .link-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 4px;
             display: block;
-            color: #ffffff;
-            letter-spacing: 0.2px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
         }
 
-        .link-description {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.55);
-            font-weight: 400;
+        .link-desc {
+            font-size: 13px;
+            color: #666;
         }
 
         .link-arrow {
-            font-size: 18px;
-            transition: all 0.3s ease;
-            color: rgba(255, 255, 255, 0.3);
+            color: #444;
+            font-size: 14px;
         }
 
-        .link-card:hover .link-arrow {
-            transform: translateX(6px);
-            color: rgba(255, 255, 255, 0.8);
+        .link-item:hover .link-arrow {
+            color: #666;
         }
 
         .footer {
             text-align: center;
-            margin-top: 64px;
-            padding: 32px 20px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
-            animation: fadeIn 0.8s ease-out 0.6s both;
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid #1a1a1a;
         }
 
-        .footer-logo {
-            font-size: 40px;
-            margin: 0 auto 16px;
-            display: block;
-            background: linear-gradient(135deg, #ff8c00, #22c55e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .footer-icon {
+            font-size: 24px;
+            color: #ff6b00;
+            margin-bottom: 12px;
         }
 
         .footer p {
-            margin: 8px 0;
+            color: #555;
+            font-size: 13px;
+            margin: 4px 0;
         }
 
-        .footer-divider {
-            width: 60px;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(255, 140, 0, 0.5), transparent);
-            margin: 16px auto;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 40px 16px;
-            }
-
-            .logo-wrapper {
-                padding: 24px 36px;
-            }
-
-            .logo-img {
-                height: 100px;
-            }
-
-            .title h1 {
-                font-size: 2.2rem;
-            }
-
-            .title p {
-                font-size: 0.95rem;
-            }
-
-            .links-container {
-                gap: 12px;
-            }
-
-            .link-card {
-                padding: 20px 22px;
-                gap: 16px;
-            }
-
-            .link-icon {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-            }
-
-            .link-title {
-                font-size: 1rem;
-            }
-
-            .link-description {
-                font-size: 0.85rem;
-            }
-
-            .footer {
-                margin-top: 48px;
-                padding: 24px 16px;
-            }
+        .footer .copyright {
+            margin-top: 12px;
+            font-size: 12px;
+            color: #333;
         }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 32px 14px;
+            body {
+                padding: 24px 16px;
             }
 
-            .logo-wrapper {
-                padding: 20px 28px;
-                border-radius: 18px;
+            .logo-box {
+                padding: 20px 32px;
             }
 
             .logo-img {
-                height: 80px;
-            }
-
-            .company-tag {
-                font-size: 10px;
-                padding: 6px 18px;
-            }
-
-            .title {
-                margin-bottom: 36px;
+                height: 60px;
             }
 
             .title h1 {
-                font-size: 1.8rem;
+                font-size: 24px;
             }
 
-            .links-container {
-                gap: 10px;
-            }
-
-            .link-card {
-                padding: 18px;
+            .link-item {
+                padding: 14px 16px;
                 gap: 14px;
-                border-radius: 14px;
             }
 
             .link-icon {
-                width: 46px;
-                height: 46px;
+                width: 40px;
+                height: 40px;
                 font-size: 18px;
-                border-radius: 12px;
             }
 
             .link-title {
-                font-size: 0.95rem;
+                font-size: 14px;
             }
 
-            .link-description {
-                font-size: 0.8rem;
-            }
-
-            .link-arrow {
-                font-size: 16px;
-            }
-
-            .footer {
-                margin-top: 40px;
-            }
-
-            .footer-logo {
-                font-size: 32px;
-            }
-
-            .orb-1, .orb-2, .orb-3 {
-                opacity: 0.15;
-            }
-        }
-
-        @media (min-width: 1200px) {
-            .container {
-                max-width: 720px;
-            }
-
-            .title h1 {
-                font-size: 3rem;
-            }
-
-            .link-card {
-                padding: 28px 32px;
-            }
-
-            .link-icon {
-                width: 64px;
-                height: 64px;
-                font-size: 28px;
+            .link-desc {
+                font-size: 12px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="gradient-bg"></div>
-    
-    <div class="orb-1"></div>
-    <div class="orb-2"></div>
-    <div class="orb-3"></div>
-    
     <div class="container">
-        <div class="logo-container">
-            <div class="logo-wrapper">
-                <img src="attached_assets/1001854642-removebg-preview_1764575635170.png" alt="UltraGol Logo" class="logo-img">
+        <div class="header">
+            <div class="logo-box">
+                <img src="attached_assets/1001854642-removebg-preview_1764575635170.png" alt="UltraGol" class="logo-img">
             </div>
-            <div class="company-tag">by L3HO</div>
+            <div class="brand-tag">by L3HO</div>
         </div>
 
         <div class="title">
-            <h1>UltraGol</h1>
+            <h1>Ultra<span>Gol</span></h1>
             <p>Plataforma oficial de transmisiones deportivas</p>
         </div>
 
-        <div class="links-container">
-            <a href="https://chat.whatsapp.com/JPZ8c9P4cBV9SgjWISBppJ?mode=hqrt1" target="_blank" class="link-card whatsapp">
+        <div class="links">
+            <a href="https://chat.whatsapp.com/JPZ8c9P4cBV9SgjWISBppJ?mode=hqrt1" target="_blank" class="link-item whatsapp">
                 <div class="link-icon">
                     <i class="fab fa-whatsapp"></i>
                 </div>
-                <div class="link-content">
+                <div class="link-text">
                     <span class="link-title">Grupo de WhatsApp</span>
-                    <span class="link-description">Comunidad oficial UltraGol</span>
+                    <span class="link-desc">Comunidad oficial UltraGol</span>
                 </div>
-                <i class="fas fa-arrow-right link-arrow"></i>
+                <i class="fas fa-chevron-right link-arrow"></i>
             </a>
 
-            <a href="https://www.facebook.com/share/1EnBr7R98Y/" target="_blank" class="link-card facebook">
+            <a href="https://www.facebook.com/share/1EnBr7R98Y/" target="_blank" class="link-item facebook">
                 <div class="link-icon">
                     <i class="fab fa-facebook-f"></i>
                 </div>
-                <div class="link-content">
+                <div class="link-text">
                     <span class="link-title">Pagina de UltraGol</span>
-                    <span class="link-description">Siguenos en Facebook</span>
+                    <span class="link-desc">Siguenos en Facebook</span>
                 </div>
-                <i class="fas fa-arrow-right link-arrow"></i>
+                <i class="fas fa-chevron-right link-arrow"></i>
             </a>
 
-            <a href="https://ultragol-l3ho.com.mx/ULTRA/index.html" target="_blank" class="link-card website">
+            <a href="https://ultragol-l3ho.com.mx/ULTRA/index.html" target="_blank" class="link-item website">
                 <div class="link-icon">
                     <i class="fas fa-tv"></i>
                 </div>
-                <div class="link-content">
+                <div class="link-text">
                     <span class="link-title">Transmisiones en Vivo</span>
-                    <span class="link-description">Ver partidos en directo</span>
+                    <span class="link-desc">Ver partidos en directo</span>
                 </div>
-                <i class="fas fa-arrow-right link-arrow"></i>
+                <i class="fas fa-chevron-right link-arrow"></i>
             </a>
 
-            <a href="https://www.tiktok.com/@ultragol.nacional?_r=1&_t=ZS-91KNojuwnkG" target="_blank" class="link-card tiktok">
+            <a href="https://www.tiktok.com/@ultragol.nacional?_r=1&_t=ZS-91KNojuwnkG" target="_blank" class="link-item tiktok">
                 <div class="link-icon">
                     <i class="fab fa-tiktok"></i>
                 </div>
-                <div class="link-content">
+                <div class="link-text">
                     <span class="link-title">Canal de TikTok</span>
-                    <span class="link-description">Contenido exclusivo y highlights</span>
+                    <span class="link-desc">Contenido exclusivo</span>
                 </div>
-                <i class="fas fa-arrow-right link-arrow"></i>
+                <i class="fas fa-chevron-right link-arrow"></i>
             </a>
 
-            <a href="https://t.me/+TZ0lMDwXfAoyZDg5" target="_blank" class="link-card telegram">
+            <a href="https://t.me/+TZ0lMDwXfAoyZDg5" target="_blank" class="link-item telegram">
                 <div class="link-icon">
                     <i class="fab fa-telegram-plane"></i>
                 </div>
-                <div class="link-content">
+                <div class="link-text">
                     <span class="link-title">Canal de Telegram</span>
-                    <span class="link-description">Noticias y actualizaciones</span>
+                    <span class="link-desc">Noticias y actualizaciones</span>
                 </div>
-                <i class="fas fa-arrow-right link-arrow"></i>
+                <i class="fas fa-chevron-right link-arrow"></i>
             </a>
 
-            <a href="https://www.facebook.com/share/1CjTbCvkfY/" target="_blank" class="link-card company">
+            <a href="https://www.facebook.com/share/1CjTbCvkfY/" target="_blank" class="link-item company">
                 <div class="link-icon">
                     <i class="fas fa-briefcase"></i>
                 </div>
-                <div class="link-content">
+                <div class="link-text">
                     <span class="link-title">Pagina de Empresa</span>
-                    <span class="link-description">Contacto y colaboraciones</span>
+                    <span class="link-desc">Contacto y colaboraciones</span>
                 </div>
-                <i class="fas fa-arrow-right link-arrow"></i>
+                <i class="fas fa-chevron-right link-arrow"></i>
             </a>
         </div>
 
         <div class="footer">
-            <i class="fas fa-futbol footer-logo"></i>
-            <div class="footer-divider"></div>
+            <i class="fas fa-futbol footer-icon"></i>
             <p><strong>UltraGol</strong></p>
-            <p style="font-size: 0.85rem; opacity: 0.7;">Plataforma Deportiva Profesional</p>
-            <p style="margin-top: 16px; font-size: 0.8rem; opacity: 0.5;">© 2025 Todos los derechos reservados</p>
+            <p>Plataforma Deportiva Profesional</p>
+            <p class="copyright">© 2025 Todos los derechos reservados</p>
         </div>
     </div>
 </body>
