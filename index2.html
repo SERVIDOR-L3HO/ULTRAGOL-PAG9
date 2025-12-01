@@ -6,7 +6,7 @@
     <title>UltraGol - Enlaces Oficiales</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -16,7 +16,7 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: #0a0e1a;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -25,16 +25,15 @@
             position: relative;
         }
 
-        /* Animated Gradient Background */
         .gradient-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 25%, #0f1520 50%, #1a1f35 75%, #0a0e1a 100%);
+            background: linear-gradient(135deg, #0d1117 0%, #1a2332 25%, #0d1117 50%, #1a2332 75%, #0d1117 100%);
             background-size: 400% 400%;
-            animation: gradientMove 15s ease infinite;
+            animation: gradientMove 20s ease infinite;
             z-index: 0;
         }
 
@@ -43,505 +42,128 @@
             50% { background-position: 100% 50%; }
         }
 
-        /* Advanced Particle System */
-        .particles-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
         .orb-1, .orb-2, .orb-3 {
             position: fixed;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.4;
-            animation: float 20s infinite;
+            filter: blur(100px);
+            opacity: 0.25;
+            animation: float 25s infinite;
             pointer-events: none;
         }
 
         .orb-1 {
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(255, 140, 0, 0.3), transparent);
-            top: -200px;
-            left: -200px;
-            animation: float 25s infinite, colorPulse 8s infinite;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 140, 0, 0.4), transparent);
+            top: -250px;
+            left: -250px;
+            animation: float 30s infinite;
         }
 
         .orb-2 {
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(76, 175, 80, 0.3), transparent);
-            bottom: -250px;
-            right: -250px;
-            animation: float 30s infinite reverse, colorPulse 10s infinite 2s;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.4), transparent);
+            bottom: -300px;
+            right: -300px;
+            animation: float 35s infinite reverse;
         }
 
         .orb-3 {
-            width: 350px;
-            height: 350px;
-            background: radial-gradient(circle, rgba(255, 140, 0, 0.2), transparent);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255, 165, 0, 0.2), transparent);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            animation: float 20s infinite, pulse 6s infinite;
+            animation: pulse 8s infinite;
         }
 
         @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(100px, -100px) rotate(90deg); }
-            50% { transform: translate(0, -200px) rotate(180deg); }
-            75% { transform: translate(-100px, -100px) rotate(270deg); }
-        }
-
-        @keyframes colorPulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.6; }
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(50px, -50px); }
+            50% { transform: translate(0, -100px); }
+            75% { transform: translate(-50px, -50px); }
         }
 
         @keyframes pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.2); }
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.2; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.35; }
         }
 
         .container {
-            max-width: 650px;
+            max-width: 680px;
             width: 100%;
-            padding: 60px 20px;
+            padding: 60px 24px;
             position: relative;
             z-index: 2;
         }
 
-        /* Logo with Advanced Effects */
         .logo-container {
             text-align: center;
-            margin-bottom: 50px;
-            animation: fadeInDown 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            perspective: 1000px;
+            margin-bottom: 48px;
+            animation: fadeInDown 0.8s ease-out;
         }
 
         @keyframes fadeInDown {
             from {
                 opacity: 0;
-                transform: translateY(-60px) rotateX(-30deg);
+                transform: translateY(-30px);
             }
             to {
                 opacity: 1;
-                transform: translateY(0) rotateX(0);
+                transform: translateY(0);
             }
         }
 
         .logo-wrapper {
             display: inline-block;
             position: relative;
-            padding: 30px 40px;
-            background: rgba(15, 20, 35, 0.8);
-            border-radius: 35px;
+            padding: 32px 48px;
+            background: linear-gradient(145deg, rgba(255, 140, 0, 0.08), rgba(34, 197, 94, 0.08));
+            border-radius: 24px;
             backdrop-filter: blur(20px);
-            border: 3px solid transparent;
-            background-clip: padding-box;
-            animation: borderGlow 3s ease-in-out infinite;
-            transform-style: preserve-3d;
-            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        }
-
-        .logo-wrapper::before {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 35px;
-            padding: 3px;
-            background: linear-gradient(135deg, #ff8c00, #4CAF50, #ff8c00);
-            background-size: 200% 200%;
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            animation: borderRotate 4s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes borderRotate {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+            border: 1px solid rgba(255, 140, 0, 0.2);
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.4s ease;
         }
 
         .logo-wrapper:hover {
-            transform: translateY(-10px) rotateY(5deg) rotateX(5deg);
-        }
-
-        @keyframes borderGlow {
-            0%, 100% {
-                box-shadow: 
-                    0 0 30px rgba(255, 140, 0, 0.3),
-                    0 0 60px rgba(76, 175, 80, 0.2),
-                    inset 0 0 30px rgba(255, 140, 0, 0.05);
-            }
-            50% {
-                box-shadow: 
-                    0 0 50px rgba(255, 140, 0, 0.6),
-                    0 0 100px rgba(76, 175, 80, 0.4),
-                    inset 0 0 50px rgba(255, 140, 0, 0.1);
-            }
+            transform: translateY(-8px);
+            border-color: rgba(255, 140, 0, 0.4);
+            box-shadow: 
+                0 30px 80px rgba(255, 140, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
         }
 
         .logo-img {
-            height: 130px;
+            height: 120px;
             width: auto;
-            filter: drop-shadow(0 10px 30px rgba(255, 140, 0, 0.5));
-            animation: logoFloat 4s ease-in-out infinite;
-        }
-
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-10px) scale(1.05); }
+            filter: drop-shadow(0 8px 24px rgba(255, 140, 0, 0.3));
         }
 
         .company-tag {
             display: inline-block;
             margin-top: 20px;
-            padding: 10px 25px;
-            background: linear-gradient(135deg, #ff8c00, #ffa500, #ff8c00);
-            background-size: 200% 200%;
+            padding: 8px 24px;
+            background: linear-gradient(135deg, #ff8c00, #ff6600);
             color: white;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 700;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 600;
             letter-spacing: 2px;
-            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
-            animation: tagGlow 3s ease-in-out infinite;
             text-transform: uppercase;
+            box-shadow: 0 4px 16px rgba(255, 140, 0, 0.3);
         }
 
-        @keyframes tagGlow {
-            0%, 100% { 
-                background-position: 0% 50%;
-                box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
-            }
-            50% { 
-                background-position: 100% 50%;
-                box-shadow: 0 8px 30px rgba(255, 140, 0, 0.7);
-            }
-        }
-
-        /* Title with Gradient Animation */
         .title {
             text-align: center;
-            margin-bottom: 60px;
-            animation: fadeInScale 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s both;
-        }
-
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.8) translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        .title h1 {
-            font-size: 3rem;
-            font-weight: 900;
-            background: linear-gradient(135deg, #ff8c00 0%, #4CAF50 50%, #ff8c00 100%);
-            background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 15px;
-            animation: gradientText 4s ease infinite;
-            position: relative;
-            text-shadow: 0 0 80px rgba(255, 140, 0, 0.5);
-        }
-
-        @keyframes gradientText {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .title h1::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 4px;
-            background: linear-gradient(90deg, transparent, #ff8c00, transparent);
-            animation: lineExpand 2s ease-in-out infinite;
-        }
-
-        @keyframes lineExpand {
-            0%, 100% { width: 100px; opacity: 0.5; }
-            50% { width: 200px; opacity: 1; }
-        }
-
-        .title p {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 1.1rem;
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-
-        /* Advanced Link Cards */
-        .links-container {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .link-card {
-            position: relative;
-            background: rgba(20, 25, 45, 0.6);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.08);
-            border-radius: 25px;
-            padding: 30px;
-            text-decoration: none;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 25px;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            overflow: hidden;
-            animation: slideInUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) both;
-            transform-style: preserve-3d;
-        }
-
-        .link-card:nth-child(1) { animation-delay: 0.1s; }
-        .link-card:nth-child(2) { animation-delay: 0.2s; }
-        .link-card:nth-child(3) { animation-delay: 0.3s; }
-        .link-card:nth-child(4) { animation-delay: 0.4s; }
-        .link-card:nth-child(5) { animation-delay: 0.5s; }
-
-        @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px) rotateX(-20deg);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) rotateX(0);
-            }
-        }
-
-        .link-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 140, 0, 0.1), transparent);
-            transform: rotate(0deg);
-            transition: transform 0.6s;
-        }
-
-        .link-card:hover::before {
-            transform: rotate(180deg);
-        }
-
-        .link-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 25px;
-            padding: 2px;
-            background: linear-gradient(135deg, transparent, rgba(255, 140, 0, 0.3), transparent);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        .link-card:hover::after {
-            opacity: 1;
-        }
-
-        .link-card:hover {
-            transform: translateY(-12px) scale(1.03) rotateY(2deg);
-            border-color: rgba(255, 140, 0, 0.6);
-            box-shadow: 
-                0 20px 60px rgba(255, 140, 0, 0.4),
-                0 0 80px rgba(76, 175, 80, 0.3),
-                inset 0 0 40px rgba(255, 140, 0, 0.05);
-        }
-
-        .link-card.facebook:hover {
-            border-color: rgba(24, 119, 242, 0.7);
-            box-shadow: 
-                0 20px 60px rgba(24, 119, 242, 0.4),
-                0 0 80px rgba(24, 119, 242, 0.3);
-        }
-
-        .link-card.website:hover {
-            border-color: rgba(76, 175, 80, 0.7);
-            box-shadow: 
-                0 20px 60px rgba(76, 175, 80, 0.4),
-                0 0 80px rgba(76, 175, 80, 0.3);
-        }
-
-        .link-card.tiktok:hover {
-            border-color: rgba(255, 0, 80, 0.7);
-            box-shadow: 
-                0 20px 60px rgba(255, 0, 80, 0.4),
-                0 0 80px rgba(255, 0, 80, 0.3);
-        }
-
-        .link-card.telegram:hover {
-            border-color: rgba(0, 136, 204, 0.7);
-            box-shadow: 
-                0 20px 60px rgba(0, 136, 204, 0.4),
-                0 0 80px rgba(0, 136, 204, 0.3);
-        }
-
-        /* Advanced Icon Animations */
-        .link-icon {
-            width: 70px;
-            height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 20px;
-            font-size: 32px;
-            flex-shrink: 0;
-            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .link-icon::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 20px;
-            transform: translateX(-100%) rotate(45deg);
-            transition: transform 0.6s;
-        }
-
-        .link-card:hover .link-icon::before {
-            transform: translateX(200%) rotate(45deg);
-        }
-
-        .link-card:hover .link-icon {
-            transform: rotate(360deg) scale(1.15);
-        }
-
-        .facebook .link-icon {
-            background: linear-gradient(135deg, #1877f2, #0c63d4);
-            box-shadow: 0 8px 25px rgba(24, 119, 242, 0.4);
-        }
-
-        .website .link-icon {
-            background: linear-gradient(135deg, #4CAF50, #45a049);
-            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4);
-        }
-
-        .tiktok .link-icon {
-            background: linear-gradient(135deg, #ff0050, #000);
-            box-shadow: 0 8px 25px rgba(255, 0, 80, 0.4);
-        }
-
-        .telegram .link-icon {
-            background: linear-gradient(135deg, #0088cc, #005580);
-            box-shadow: 0 8px 25px rgba(0, 136, 204, 0.4);
-        }
-
-        .company .link-icon {
-            background: linear-gradient(135deg, #ff8c00, #ffa500);
-            box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4);
-        }
-
-        .link-content {
-            flex: 1;
-        }
-
-        .link-title {
-            font-size: 1.3rem;
-            font-weight: 800;
-            margin-bottom: 6px;
-            display: block;
-            background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0.8));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .link-description {
-            font-size: 0.95rem;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 400;
-            letter-spacing: 0.5px;
-        }
-
-        .link-arrow {
-            font-size: 28px;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            color: rgba(255, 255, 255, 0.4);
-        }
-
-        .link-card:hover .link-arrow {
-            transform: translateX(15px) scale(1.2);
-            color: rgba(255, 255, 255, 1);
-        }
-
-        /* Ripple Effect */
-        .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.5);
-            transform: scale(0);
-            animation: ripple 0.8s ease-out;
-            pointer-events: none;
-        }
-
-        @keyframes ripple {
-            to {
-                transform: scale(25);
-                opacity: 0;
-            }
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            margin-top: 80px;
-            padding: 40px 20px;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.95rem;
-            animation: fadeIn 1.8s ease-out 1s both;
-        }
-
-        .footer-logo {
-            font-size: 50px;
-            margin: 0 auto 20px;
-            opacity: 0.7;
-            animation: spin 20s linear infinite, colorShift 5s ease-in-out infinite;
-            display: inline-block;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes colorShift {
-            0%, 100% { color: #ff8c00; }
-            50% { color: #4CAF50; }
+            margin-bottom: 48px;
+            animation: fadeIn 0.8s ease-out 0.2s both;
         }
 
         @keyframes fadeIn {
@@ -549,311 +171,364 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Responsive Design */
-        
-        /* Tablets y pantallas medianas */
-        @media (max-width: 1024px) {
-            .container {
-                max-width: 550px;
-                padding: 50px 20px;
+        .title h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff8c00 0%, #22c55e 50%, #ff8c00 100%);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            animation: gradientText 4s ease infinite;
+            letter-spacing: -0.5px;
+        }
+
+        @keyframes gradientText {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .title p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.05rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .link-card {
+            position: relative;
+            background: rgba(22, 27, 34, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px 28px;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            animation: slideInUp 0.6s ease-out both;
+        }
+
+        .link-card:nth-child(1) { animation-delay: 0.1s; }
+        .link-card:nth-child(2) { animation-delay: 0.15s; }
+        .link-card:nth-child(3) { animation-delay: 0.2s; }
+        .link-card:nth-child(4) { animation-delay: 0.25s; }
+        .link-card:nth-child(5) { animation-delay: 0.3s; }
+        .link-card:nth-child(6) { animation-delay: 0.35s; }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
             }
-            
-            .title h1 {
-                font-size: 2.6rem;
-            }
-            
-            .orb-1, .orb-2 {
-                filter: blur(60px);
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
         }
 
-        /* Tablets pequeñas */
+        .link-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.02));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .link-card:hover::before {
+            opacity: 1;
+        }
+
+        .link-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .link-card.whatsapp:hover {
+            border-color: rgba(37, 211, 102, 0.5);
+            box-shadow: 0 20px 40px rgba(37, 211, 102, 0.15);
+        }
+
+        .link-card.facebook:hover {
+            border-color: rgba(24, 119, 242, 0.5);
+            box-shadow: 0 20px 40px rgba(24, 119, 242, 0.15);
+        }
+
+        .link-card.website:hover {
+            border-color: rgba(34, 197, 94, 0.5);
+            box-shadow: 0 20px 40px rgba(34, 197, 94, 0.15);
+        }
+
+        .link-card.tiktok:hover {
+            border-color: rgba(255, 0, 80, 0.5);
+            box-shadow: 0 20px 40px rgba(255, 0, 80, 0.15);
+        }
+
+        .link-card.telegram:hover {
+            border-color: rgba(0, 136, 204, 0.5);
+            box-shadow: 0 20px 40px rgba(0, 136, 204, 0.15);
+        }
+
+        .link-card.company:hover {
+            border-color: rgba(255, 140, 0, 0.5);
+            box-shadow: 0 20px 40px rgba(255, 140, 0, 0.15);
+        }
+
+        .link-icon {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            font-size: 24px;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .link-card:hover .link-icon {
+            transform: scale(1.08);
+        }
+
+        .whatsapp .link-icon {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.35);
+        }
+
+        .facebook .link-icon {
+            background: linear-gradient(135deg, #1877f2, #0d65d9);
+            box-shadow: 0 6px 20px rgba(24, 119, 242, 0.35);
+        }
+
+        .website .link-icon {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.35);
+        }
+
+        .tiktok .link-icon {
+            background: linear-gradient(135deg, #ff0050, #00f2ea);
+            box-shadow: 0 6px 20px rgba(255, 0, 80, 0.35);
+        }
+
+        .telegram .link-icon {
+            background: linear-gradient(135deg, #0088cc, #006699);
+            box-shadow: 0 6px 20px rgba(0, 136, 204, 0.35);
+        }
+
+        .company .link-icon {
+            background: linear-gradient(135deg, #ff8c00, #ff6600);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.35);
+        }
+
+        .link-content {
+            flex: 1;
+        }
+
+        .link-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: block;
+            color: #ffffff;
+            letter-spacing: 0.2px;
+        }
+
+        .link-description {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.55);
+            font-weight: 400;
+        }
+
+        .link-arrow {
+            font-size: 18px;
+            transition: all 0.3s ease;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .link-card:hover .link-arrow {
+            transform: translateX(6px);
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 64px;
+            padding: 32px 20px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            animation: fadeIn 0.8s ease-out 0.6s both;
+        }
+
+        .footer-logo {
+            font-size: 40px;
+            margin: 0 auto 16px;
+            display: block;
+            background: linear-gradient(135deg, #ff8c00, #22c55e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer p {
+            margin: 8px 0;
+        }
+
+        .footer-divider {
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 140, 0, 0.5), transparent);
+            margin: 16px auto;
+        }
+
         @media (max-width: 768px) {
-            body {
-                padding: 20px 0;
-            }
-            
             .container {
-                padding: 40px 15px;
+                padding: 40px 16px;
             }
-            
-            .logo-container {
-                margin-bottom: 40px;
-            }
-            
+
             .logo-wrapper {
-                padding: 25px 35px;
+                padding: 24px 36px;
             }
 
             .logo-img {
                 height: 100px;
             }
-            
-            .company-tag {
-                font-size: 12px;
-                padding: 8px 18px;
-                margin-top: 15px;
-            }
-            
-            .title {
-                margin-bottom: 50px;
-            }
 
             .title h1 {
                 font-size: 2.2rem;
             }
-            
-            .title p {
-                font-size: 1rem;
-            }
-            
-            .links-container {
-                gap: 20px;
-            }
 
-            .link-card {
-                padding: 22px 20px;
-                gap: 20px;
-            }
-
-            .link-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 26px;
-            }
-
-            .link-title {
-                font-size: 1.1rem;
-            }
-
-            .link-description {
-                font-size: 0.88rem;
-            }
-            
-            .link-arrow {
-                font-size: 24px;
-            }
-            
-            .footer {
-                margin-top: 60px;
-                padding: 30px 15px;
-            }
-            
-            .footer-logo {
-                font-size: 40px;
-            }
-        }
-        
-        /* Móviles grandes */
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 15px;
-            }
-            
-            .logo-wrapper {
-                padding: 20px 30px;
-                border-radius: 25px;
-            }
-            
-            .logo-img {
-                height: 85px;
-            }
-            
-            .company-tag {
-                font-size: 11px;
-                padding: 6px 15px;
-                letter-spacing: 1px;
-            }
-            
-            .title {
-                margin-bottom: 40px;
-            }
-            
-            .title h1 {
-                font-size: 1.9rem;
-            }
-            
-            .title h1::after {
-                width: 80px;
-            }
-            
             .title p {
                 font-size: 0.95rem;
             }
-            
-            .links-container {
-                gap: 18px;
-            }
-            
-            .link-card {
-                padding: 20px 18px;
-                gap: 18px;
-                border-radius: 20px;
-            }
-            
-            .link-icon {
-                width: 55px;
-                height: 55px;
-                font-size: 24px;
-                border-radius: 16px;
-            }
-            
-            .link-title {
-                font-size: 1.05rem;
-            }
-            
-            .link-description {
-                font-size: 0.85rem;
-            }
-            
-            .link-arrow {
-                font-size: 22px;
-            }
-            
-            .footer {
-                margin-top: 50px;
-                padding: 25px 15px;
-                font-size: 0.88rem;
-            }
-            
-            .footer-logo {
-                font-size: 35px;
-            }
-            
-            /* Reduce animation intensity on mobile */
-            .link-card:hover {
-                transform: translateY(-8px) scale(1.02);
-            }
-            
-            .orb-1, .orb-2, .orb-3 {
-                filter: blur(50px);
-                opacity: 0.3;
-            }
-        }
-        
-        /* Móviles pequeños */
-        @media (max-width: 375px) {
-            .container {
-                padding: 25px 12px;
-            }
-            
-            .logo-wrapper {
-                padding: 18px 25px;
-            }
-            
-            .logo-img {
-                height: 75px;
-            }
-            
-            .company-tag {
-                font-size: 10px;
-                padding: 5px 12px;
-            }
-            
-            .title h1 {
-                font-size: 1.7rem;
-            }
-            
-            .title p {
-                font-size: 0.9rem;
-            }
-            
-            .links-container {
-                gap: 15px;
-            }
-            
-            .link-card {
-                padding: 18px 15px;
-                gap: 15px;
-            }
-            
-            .link-icon {
-                width: 50px;
-                height: 50px;
-                font-size: 22px;
-            }
-            
-            .link-title {
-                font-size: 1rem;
-            }
-            
-            .link-description {
-                font-size: 0.82rem;
-            }
-            
-            .link-arrow {
-                font-size: 20px;
-            }
-            
-            .footer {
-                margin-top: 40px;
-                padding: 20px 12px;
-            }
-        }
-        
-        /* Landscape móviles */
-        @media (max-height: 600px) and (orientation: landscape) {
-            body {
-                align-items: flex-start;
-                padding: 20px 0;
-            }
-            
-            .container {
-                padding: 30px 15px;
-            }
-            
-            .logo-container {
-                margin-bottom: 30px;
-            }
-            
-            .logo-wrapper {
-                padding: 15px 25px;
-            }
-            
-            .logo-img {
-                height: 70px;
-            }
-            
-            .title {
-                margin-bottom: 30px;
-            }
-            
-            .title h1 {
-                font-size: 1.8rem;
-            }
-            
+
             .links-container {
                 gap: 12px;
             }
-            
+
             .link-card {
-                padding: 15px;
+                padding: 20px 22px;
+                gap: 16px;
             }
-            
+
+            .link-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .link-title {
+                font-size: 1rem;
+            }
+
+            .link-description {
+                font-size: 0.85rem;
+            }
+
             .footer {
-                margin-top: 30px;
-                padding: 20px;
+                margin-top: 48px;
+                padding: 24px 16px;
             }
         }
-        
-        /* Pantallas extra grandes */
-        @media (min-width: 1400px) {
+
+        @media (max-width: 480px) {
             .container {
-                max-width: 700px;
+                padding: 32px 14px;
             }
-            
-            .title h1 {
-                font-size: 3.3rem;
+
+            .logo-wrapper {
+                padding: 20px 28px;
+                border-radius: 18px;
             }
-            
-            .link-card {
-                padding: 35px;
-            }
-            
-            .link-icon {
-                width: 80px;
+
+            .logo-img {
                 height: 80px;
-                font-size: 36px;
+            }
+
+            .company-tag {
+                font-size: 10px;
+                padding: 6px 18px;
+            }
+
+            .title {
+                margin-bottom: 36px;
+            }
+
+            .title h1 {
+                font-size: 1.8rem;
+            }
+
+            .links-container {
+                gap: 10px;
+            }
+
+            .link-card {
+                padding: 18px;
+                gap: 14px;
+                border-radius: 14px;
+            }
+
+            .link-icon {
+                width: 46px;
+                height: 46px;
+                font-size: 18px;
+                border-radius: 12px;
+            }
+
+            .link-title {
+                font-size: 0.95rem;
+            }
+
+            .link-description {
+                font-size: 0.8rem;
+            }
+
+            .link-arrow {
+                font-size: 16px;
+            }
+
+            .footer {
+                margin-top: 40px;
+            }
+
+            .footer-logo {
+                font-size: 32px;
+            }
+
+            .orb-1, .orb-2, .orb-3 {
+                opacity: 0.15;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .container {
+                max-width: 720px;
+            }
+
+            .title h1 {
+                font-size: 3rem;
+            }
+
+            .link-card {
+                padding: 28px 32px;
+            }
+
+            .link-icon {
+                width: 64px;
+                height: 64px;
+                font-size: 28px;
             }
         }
     </style>
@@ -865,29 +540,38 @@
     <div class="orb-2"></div>
     <div class="orb-3"></div>
     
-    <div class="particles-container" id="particles"></div>
-    
     <div class="container">
         <div class="logo-container">
             <div class="logo-wrapper">
-                <img src="attached_assets/1001721720-removebg-preview_1759201879566.png" alt="UltraGol Logo" class="logo-img">
+                <img src="attached_assets/1001854642-removebg-preview_1764575635170.png" alt="UltraGol Logo" class="logo-img">
             </div>
             <div class="company-tag">by L3HO</div>
         </div>
 
         <div class="title">
             <h1>UltraGol</h1>
-            <p>Síguenos en todas nuestras plataformas</p>
+            <p>Plataforma oficial de transmisiones deportivas</p>
         </div>
 
         <div class="links-container">
+            <a href="https://chat.whatsapp.com/JPZ8c9P4cBV9SgjWISBppJ?mode=hqrt1" target="_blank" class="link-card whatsapp">
+                <div class="link-icon">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <div class="link-content">
+                    <span class="link-title">Grupo de WhatsApp</span>
+                    <span class="link-description">Comunidad oficial UltraGol</span>
+                </div>
+                <i class="fas fa-arrow-right link-arrow"></i>
+            </a>
+
             <a href="https://www.facebook.com/share/1EnBr7R98Y/" target="_blank" class="link-card facebook">
                 <div class="link-icon">
                     <i class="fab fa-facebook-f"></i>
                 </div>
                 <div class="link-content">
-                    <span class="link-title">Página UltraGol</span>
-                    <span class="link-description">Síguenos en Facebook</span>
+                    <span class="link-title">Pagina de UltraGol</span>
+                    <span class="link-description">Siguenos en Facebook</span>
                 </div>
                 <i class="fas fa-arrow-right link-arrow"></i>
             </a>
@@ -920,7 +604,7 @@
                 </div>
                 <div class="link-content">
                     <span class="link-title">Canal de Telegram</span>
-                    <span class="link-description">Únete a nuestra comunidad</span>
+                    <span class="link-description">Noticias y actualizaciones</span>
                 </div>
                 <i class="fas fa-arrow-right link-arrow"></i>
             </a>
@@ -930,7 +614,7 @@
                     <i class="fas fa-briefcase"></i>
                 </div>
                 <div class="link-content">
-                    <span class="link-title">Página de Empresa</span>
+                    <span class="link-title">Pagina de Empresa</span>
                     <span class="link-description">Contacto y colaboraciones</span>
                 </div>
                 <i class="fas fa-arrow-right link-arrow"></i>
@@ -939,159 +623,11 @@
 
         <div class="footer">
             <i class="fas fa-futbol footer-logo"></i>
-            <p><strong>© 2025 UltraGol</strong> - Plataforma Deportiva Profesional</p>
-            <p style="margin-top: 12px; font-size: 0.9rem; opacity: 0.8;">
-                La mejor experiencia de fútbol mexicano
-            </p>
+            <div class="footer-divider"></div>
+            <p><strong>UltraGol</strong></p>
+            <p style="font-size: 0.85rem; opacity: 0.7;">Plataforma Deportiva Profesional</p>
+            <p style="margin-top: 16px; font-size: 0.8rem; opacity: 0.5;">© 2025 Todos los derechos reservados</p>
         </div>
     </div>
-
-    <script>
-        // Advanced Particle System
-        const particlesContainer = document.getElementById('particles');
-        const particleCount = 50;
-
-        for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            
-            const size = Math.random() * 4 + 2;
-            const x = Math.random() * 100;
-            const duration = Math.random() * 20 + 15;
-            const delay = Math.random() * 20;
-            const isGreen = Math.random() > 0.5;
-            
-            particle.style.cssText = `
-                left: ${x}%;
-                width: ${size}px;
-                height: ${size}px;
-                background: ${isGreen ? 'rgba(76, 175, 80, 0.4)' : 'rgba(255, 140, 0, 0.4)'};
-                box-shadow: 0 0 ${size * 3}px ${isGreen ? 'rgba(76, 175, 80, 0.6)' : 'rgba(255, 140, 0, 0.6)'};
-                animation: floatUp ${duration}s linear ${delay}s infinite;
-            `;
-            
-            particlesContainer.appendChild(particle);
-        }
-
-        // Float Up Animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes floatUp {
-                0% {
-                    transform: translateY(100vh) translateX(0) scale(0);
-                    opacity: 0;
-                }
-                10% {
-                    opacity: 1;
-                }
-                90% {
-                    opacity: 1;
-                }
-                100% {
-                    transform: translateY(-100vh) translateX(${Math.random() * 200 - 100}px) scale(1);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Advanced Ripple Effect
-        document.querySelectorAll('.link-card').forEach(card => {
-            card.addEventListener('click', function(e) {
-                const ripple = document.createElement('div');
-                ripple.className = 'ripple';
-                
-                const rect = this.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                ripple.style.left = x + 'px';
-                ripple.style.top = y + 'px';
-                ripple.style.width = '20px';
-                ripple.style.height = '20px';
-                
-                this.appendChild(ripple);
-                
-                setTimeout(() => ripple.remove(), 800);
-            });
-
-            // 3D Tilt Effect
-            card.addEventListener('mousemove', function(e) {
-                const rect = this.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                const rotateX = (y - centerY) / 20;
-                const rotateY = (centerX - x) / 20;
-                
-                this.style.transform = `translateY(-12px) scale(1.03) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-            });
-
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = '';
-            });
-        });
-
-        // Cursor Trail Effect
-        const trail = [];
-        const trailLength = 10;
-
-        document.addEventListener('mousemove', (e) => {
-            const dot = document.createElement('div');
-            dot.style.cssText = `
-                position: fixed;
-                width: 6px;
-                height: 6px;
-                background: linear-gradient(135deg, #ff8c00, #4CAF50);
-                border-radius: 50%;
-                pointer-events: none;
-                left: ${e.clientX}px;
-                top: ${e.clientY}px;
-                transform: translate(-50%, -50%);
-                z-index: 9999;
-                opacity: 0.6;
-                box-shadow: 0 0 10px rgba(255, 140, 0, 0.8);
-            `;
-            
-            document.body.appendChild(dot);
-            trail.push(dot);
-            
-            if (trail.length > trailLength) {
-                const removed = trail.shift();
-                removed.remove();
-            }
-            
-            setTimeout(() => {
-                dot.style.transition = 'all 0.5s ease-out';
-                dot.style.opacity = '0';
-                dot.style.transform = 'translate(-50%, -50%) scale(2)';
-            }, 50);
-            
-            setTimeout(() => dot.remove(), 550);
-        });
-
-        // Logo 3D Effect
-        const logoWrapper = document.querySelector('.logo-wrapper');
-        logoWrapper.addEventListener('mousemove', function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            
-            const rotateX = (y - centerY) / 10;
-            const rotateY = (centerX - x) / 10;
-            
-            this.style.transform = `translateY(-10px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-        });
-
-        logoWrapper.addEventListener('mouseleave', function() {
-            this.style.transform = '';
-        });
-    </script>
 </body>
 </html>

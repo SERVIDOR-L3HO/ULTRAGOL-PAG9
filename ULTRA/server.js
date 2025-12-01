@@ -33,6 +33,14 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Ruta para index2 (enlaces oficiales)
+app.get('/enlaces', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'index2.html'));
+});
+
+// Servir attached_assets desde el directorio padre
+app.use('/attached_assets', express.static(path.join(__dirname, '..', 'attached_assets')));
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 ULTRAGOL servidor iniciado en puerto ${PORT}`);
     console.log(`🌐 Servidor disponible en: http://0.0.0.0:${PORT}`);
