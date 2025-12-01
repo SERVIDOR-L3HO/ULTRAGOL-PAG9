@@ -707,42 +707,99 @@ function updateUpcomingMatches(data) {
     
     container.innerHTML = partidosProgramados.map(partido => {
         const hora = formatearHora(partido.fecha);
+        const fechaInfo = formatearFechaCreativa(partido.fechaISO || partido.fecha);
         
         return `
-        <div class="match-card">
-            <div class="match-card-bg">
+        <div class="match-card-creative">
+            <div class="shine-effect"></div>
+            <div class="card-header">
                 <img src="ultragol-vs-stadium.jpg" alt="Match">
+                <div class="creative-date">
+                    <span class="date-day">${fechaInfo.diaSemana}</span>
+                    <span class="date-number">${fechaInfo.diaNumero}</span>
+                    <span class="date-month">${fechaInfo.mes}</span>
+                </div>
+                <div class="creative-time">
+                    <i class="fas fa-clock"></i>
+                    <span class="time-value">${hora}</span>
+                </div>
             </div>
-            <div class="match-card-content">
-                <div class="match-time-badge">
-                    <i class="far fa-clock"></i> ${hora}
-                </div>
-                <div class="teams">
-                    <div class="team">
-                        <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
-                        <span>${partido.local.nombreCorto}</span>
+            <div class="card-content">
+                <div class="teams-creative">
+                    <div class="team-creative">
+                        <div class="team-logo-wrapper">
+                            <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
+                        </div>
+                        <span class="team-name">${partido.local.nombreCorto}</span>
                     </div>
-                    <div class="team">
-                        <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" class="team-badge" onerror="this.src='https://via.placeholder.com/50'">
-                        <span>${partido.visitante.nombreCorto}</span>
+                    <div class="vs-creative">
+                        <span class="vs-badge">VS</span>
+                        <div class="vs-line"></div>
                     </div>
-                </div>
-                <div class="match-score-mini">
-                    <span class="vs-text">VS</span>
+                    <div class="team-creative">
+                        <div class="team-logo-wrapper">
+                            <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
+                        </div>
+                        <span class="team-name">${partido.visitante.nombreCorto}</span>
+                    </div>
                 </div>
                 ${partido.detalles?.estadio ? `
-                    <div class="match-venue">
+                    <div class="venue-creative">
                         <i class="fas fa-map-marker-alt"></i>
-                        ${partido.detalles.estadio}
+                        <span>${partido.detalles.estadio}</span>
                     </div>
                 ` : ''}
-                <button class="watch-btn secondary" onclick="showToast('Este partido aún no ha comenzado')">
+                <button class="btn-upcoming-creative" onclick="showToast('⚽ Este partido aún no ha comenzado')">
+                    <i class="far fa-calendar-check"></i>
                     <span>PRÓXIMAMENTE</span>
                 </button>
             </div>
         </div>
         `;
     }).join('');
+}
+
+// Formatear fecha de manera creativa
+function formatearFechaCreativa(fechaStr) {
+    const diasSemana = ['DOM', 'LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB'];
+    const meses = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+    
+    try {
+        let fecha;
+        
+        if (fechaStr && fechaStr.includes('T')) {
+            fecha = new Date(fechaStr);
+        } else if (fechaStr) {
+            const match = fechaStr.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+            if (match) {
+                const dia = parseInt(match[1]);
+                const mes = parseInt(match[2]) - 1;
+                let anio = parseInt(match[3]);
+                if (anio < 100) anio += 2000;
+                fecha = new Date(anio, mes, dia);
+            }
+        }
+        
+        if (!fecha || isNaN(fecha.getTime())) {
+            return {
+                diaSemana: '---',
+                diaNumero: '--',
+                mes: '---'
+            };
+        }
+        
+        return {
+            diaSemana: diasSemana[fecha.getDay()],
+            diaNumero: fecha.getDate().toString().padStart(2, '0'),
+            mes: meses[fecha.getMonth()]
+        };
+    } catch (e) {
+        return {
+            diaSemana: '---',
+            diaNumero: '--',
+            mes: '---'
+        };
+    }
 }
 
 // Formatear hora del partido
