@@ -38,6 +38,11 @@ app.get('/enlaces', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index2.html'));
 });
 
+// Ruta para L3HO-LINKS
+app.get('/l3ho-links', (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'l3ho-links.html'));
+});
+
 // Servir attached_assets desde el directorio padre
 app.use('/attached_assets', express.static(path.join(__dirname, '..', 'attached_assets')));
 
