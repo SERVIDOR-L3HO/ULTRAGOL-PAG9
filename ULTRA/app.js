@@ -172,7 +172,7 @@ async function loadMarcadores() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
         const endpoint = leagueConfig ? leagueConfig.marcadores : '/marcadores';
-        const response = await fetch(`https://ultragol-api3.onrender.com${endpoint}`);
+        const response = await fetch(`https://ultragol-api-3.vercel.app${endpoint}`);
         const data = await response.json();
         marcadoresData = data;
         
@@ -200,13 +200,13 @@ async function loadTransmisiones() {
     try {
         // Cargar las 5 APIs en paralelo con manejo individual de errores
         const [data1, data2, data3, data4, data5] = await Promise.all([
-            fetch('https://ultragol-api3.onrender.com/transmisiones')
+            fetch('https://ultragol-api-3.vercel.app/transmisiones')
                 .then(res => res.json())
                 .catch(err => {
                     console.warn('⚠️ Error cargando API 1 (rereyano):', err);
                     return { transmisiones: [] };
                 }),
-            fetch('https://ultragol-api3.onrender.com/transmisiones3')
+            fetch('https://ultragol-api-3.vercel.app/transmisiones3')
                 .then(res => res.json())
                 .catch(err => {
                     console.warn('⚠️ Error cargando API 2 (e1link):', err);
@@ -218,7 +218,7 @@ async function loadTransmisiones() {
                     console.warn('⚠️ Error cargando API 3 (voodc):', err);
                     return { transmisiones: [] };
                 }),
-            fetch('https://ultragol-api3.onrender.com/transmisiones4')
+            fetch('https://ultragol-api-3.vercel.app/transmisiones4')
                 .then(res => res.json())
                 .catch(err => {
                     console.warn('⚠️ Error cargando API 4 (transmisiones4):', err);
@@ -2633,7 +2633,7 @@ async function loadReplays() {
     container.innerHTML = '<div class="loading-spinner">Cargando mejores momentos de Liga MX...</div>';
     
     try {
-        const response = await fetch('https://ultragol-api3.onrender.com/videos');
+        const response = await fetch('https://ultragol-api-3.vercel.app/videos');
         const data = await response.json();
         
         let allVideos = [];
@@ -2688,7 +2688,7 @@ async function loadStandings() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
         const endpoint = leagueConfig ? leagueConfig.tabla : '/tabla';
-        const response = await fetch(`https://ultragol-api3.onrender.com${endpoint}`);
+        const response = await fetch(`https://ultragol-api-3.vercel.app${endpoint}`);
         const data = await response.json();
         
         const standingsTable = document.getElementById('standingsTable');
@@ -2761,7 +2761,7 @@ async function loadNews() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
         const endpoint = leagueConfig ? leagueConfig.noticias : '/noticias';
-        const response = await fetch(`https://ultragol-api3.onrender.com${endpoint}`);
+        const response = await fetch(`https://ultragol-api-3.vercel.app${endpoint}`);
         const data = await response.json();
         
         const newsGrid = document.getElementById('newsGrid');
@@ -3209,7 +3209,7 @@ async function loadLineups() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
         const endpoint = leagueConfig ? leagueConfig.alineaciones : '/alineaciones';
-        const response = await fetch(`https://ultragol-api3.onrender.com${endpoint}`);
+        const response = await fetch(`https://ultragol-api-3.vercel.app${endpoint}`);
         const data = await response.json();
         lineupsData = data;
         

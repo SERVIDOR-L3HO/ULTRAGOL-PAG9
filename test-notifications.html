@@ -273,7 +273,7 @@
             document.getElementById('apiStatus').textContent = 'Consultando...';
             
             try {
-                const response = await fetch('https://ultragol-api3.onrender.com/notificaciones/ligamx');
+                const response = await fetch('https://ultragol-api-3.vercel.app/notificaciones/ligamx');
                 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);

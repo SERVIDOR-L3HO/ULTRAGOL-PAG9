@@ -1,7 +1,7 @@
 // Live Scoreboard Module
 class LiveScoreboard {
     constructor() {
-        this.apiUrl = 'https://ultragol-api3.onrender.com/transmisiones3';
+        this.apiUrl = 'https://ultragol-api-3.vercel.app/transmisiones3';
         this.currentFilter = 'live'; // live, upcoming, all
         this.matches = [];
         this.lastUpdated = null;

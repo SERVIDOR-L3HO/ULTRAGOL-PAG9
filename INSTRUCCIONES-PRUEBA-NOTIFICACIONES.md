@@ -65,7 +65,7 @@ git push origin main
 6. En la consola deberías ver:
    ```
    🔔 Starting notifications for team: america
-   📡 Polling API: https://ultragol-api3.onrender.com/notificaciones/ligamx
+   📡 Polling API: https://ultragol-api-3.vercel.app/notificaciones/ligamx
    ```
 
 7. Click en **"3. Obtener Notificaciones de la API"** en test-notifications.html para forzar una verificación

@@ -81,7 +81,7 @@ Preferred communication style: Simple, everyday language.
 - **Push Notification System**:
   - Permission request modal appears 3 seconds after page load
   - Team selector modal to choose favorite team
-  - Real-time notifications from https://ultragol-api3.onrender.com/notificaciones API
+  - Real-time notifications from https://ultragol-api-3.vercel.app/notificaciones API
   - Automatic polling every 60 seconds for new notifications
   - Smart filtering: only shows notifications for user's selected team
   - Browser notification API integration with custom icons and badges

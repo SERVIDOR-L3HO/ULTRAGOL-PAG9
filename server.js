@@ -45,7 +45,7 @@ app.use((req, res, next) => {
 });
 
 // UltraGol API Proxy (para evitar problemas de CORS)
-const API_BASE_URL = 'https://ultragol-api3.onrender.com';
+const API_BASE_URL = 'https://ultragol-api-3.vercel.app';
 
 // Authentication API Configuration
 const AUTH_API_URL = process.env.AUTH_API_URL || 'https://472832aade2073.lhr.life';

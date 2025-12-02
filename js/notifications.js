@@ -270,7 +270,7 @@ class NotificationManager {
             
             // Try API first with timeout
             try {
-                const response = await fetchWithTimeout('https://ultragol-api3.onrender.com/Equipos', 5000);
+                const response = await fetchWithTimeout('https://ultragol-api-3.vercel.app/Equipos', 5000);
                 if (response.ok) {
                     const teams = await response.json();
                     console.log('✅ Teams fetched from API:', teams.length);
@@ -348,7 +348,7 @@ class NotificationManager {
         }
 
         console.log(`🔔 Starting notifications for team: ${this.favoriteTeam}`);
-        console.log('📡 Polling API: https://ultragol-api3.onrender.com/notificaciones/ligamx');
+        console.log('📡 Polling API: https://ultragol-api-3.vercel.app/notificaciones/ligamx');
         
         // Check immediately
         this.checkForNotifications();
@@ -363,7 +363,7 @@ class NotificationManager {
         try {
             // Usar el endpoint específico de Liga MX (más eficiente)
             // Endpoints disponibles: ligamx, premier, laliga, series, bundesliga, ligue1
-            const apiUrl = 'https://ultragol-api3.onrender.com/notificaciones/ligamx';
+            const apiUrl = 'https://ultragol-api-3.vercel.app/notificaciones/ligamx';
             
             console.log('📡 Checking notifications...', new Date().toLocaleTimeString());
             const response = await fetch(apiUrl);
@@ -371,7 +371,7 @@ class NotificationManager {
             if (!response.ok) {
                 console.error('❌ Error fetching notifications:', response.status);
                 // Fallback a todas las notificaciones si falla
-                const fallbackResponse = await fetch('https://ultragol-api3.onrender.com/notificaciones');
+                const fallbackResponse = await fetch('https://ultragol-api-3.vercel.app/notificaciones');
                 if (!fallbackResponse.ok) return;
                 const fallbackData = await fallbackResponse.json();
                 console.log('✅ Fallback data loaded:', fallbackData.total, 'notifications');
