@@ -2932,6 +2932,12 @@ async function loadImportantMatches() {
     }
 }
 
+// Carousel state
+let carouselCurrentIndex = 0;
+let carouselTotalItems = 0;
+let carouselTouchStartX = 0;
+let carouselTouchEndX = 0;
+
 function renderImportantMatches() {
     const body = document.getElementById('importantMatchesBody');
     
@@ -2953,7 +2959,10 @@ function renderImportantMatches() {
         return bCanales - aCanales;
     });
     
-    body.innerHTML = transmisionesSorted.map((transmision, index) => {
+    carouselTotalItems = transmisionesSorted.length;
+    carouselCurrentIndex = 0;
+    
+    const cardsHTML = transmisionesSorted.map((transmision, index) => {
         const equipos = transmision.evento.split(' vs ');
         const equipoLocal = equipos[0]?.trim() || 'Equipo 1';
         const equipoVisitante = equipos[1]?.trim() || 'Equipo 2';
@@ -2963,12 +2972,10 @@ function renderImportantMatches() {
         if (transmision.canales && transmision.canales.length > 0) {
             transmision.canales.forEach(canal => {
                 if (canal.links) {
-                    // API 1 (rereyano) - links con hoca, caster, wigi
                     if (canal.links.hoca) totalLinks++;
                     if (canal.links.caster) totalLinks++;
                     if (canal.links.wigi) totalLinks++;
                 } else if (canal.enlaces && canal.enlaces.length > 0) {
-                    // API 2, 3, 4 - enlaces como array
                     totalLinks += canal.enlaces.length;
                 }
             });
@@ -3007,13 +3014,12 @@ function renderImportantMatches() {
             minute: '2-digit'
         }) : '';
         
-        const inicialLocal = equipoLocal.substring(0, 2).toUpperCase();
-        const inicialVisitante = equipoVisitante.substring(0, 2).toUpperCase();
-        
         const eventoEscapado = (transmision.evento || transmision.titulo || '').replace(/'/g, "\\'");
         
+        const activeClass = index === 0 ? 'active' : (index === 1 ? 'adjacent' : '');
+        
         return `
-            <div class="important-match-card-new" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
+            <div class="important-match-card-new ${activeClass}" data-index="${index}" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
                 <div class="match-image-container">
                     <img src="${backgroundImage}" alt="${deporte}" class="match-bg-image">
                     <div class="match-image-overlay"></div>
@@ -3052,6 +3058,196 @@ function renderImportantMatches() {
             </div>
         `;
     }).join('');
+    
+    // Generate indicators (max 10 visible)
+    const maxIndicators = Math.min(carouselTotalItems, 10);
+    const indicatorsHTML = Array.from({ length: maxIndicators }, (_, i) => 
+        `<button class="carousel-indicator ${i === 0 ? 'active' : ''}" data-index="${i}" onclick="carouselGoTo(${i})"></button>`
+    ).join('');
+    
+    body.innerHTML = `
+        <div class="carousel-wrapper">
+            <button class="carousel-nav prev" onclick="carouselPrev()" ${carouselCurrentIndex === 0 ? 'disabled' : ''}>
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            
+            <div class="carousel-container" id="carouselContainer">
+                ${cardsHTML}
+            </div>
+            
+            <button class="carousel-nav next" onclick="carouselNext()" ${carouselCurrentIndex >= carouselTotalItems - 1 ? 'disabled' : ''}>
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            
+            <div class="carousel-counter">
+                <span>${carouselCurrentIndex + 1}</span> / ${carouselTotalItems}
+            </div>
+            
+            ${carouselTotalItems > 1 ? `<div class="carousel-indicators">${indicatorsHTML}</div>` : ''}
+        </div>
+    `;
+    
+    // Initialize carousel after rendering
+    initCarouselEvents();
+}
+
+function initCarouselEvents() {
+    const container = document.getElementById('carouselContainer');
+    if (!container) return;
+    
+    // Touch events for swipe
+    container.addEventListener('touchstart', handleCarouselTouchStart, { passive: true });
+    container.addEventListener('touchmove', handleCarouselTouchMove, { passive: true });
+    container.addEventListener('touchend', handleCarouselTouchEnd);
+    
+    // Mouse wheel for desktop
+    container.addEventListener('wheel', handleCarouselWheel, { passive: false });
+    
+    // Scroll event to update active card
+    container.addEventListener('scroll', handleCarouselScroll);
+    
+    // Center first card initially
+    setTimeout(() => {
+        carouselGoTo(0);
+    }, 100);
+}
+
+function handleCarouselTouchStart(e) {
+    carouselTouchStartX = e.touches[0].clientX;
+}
+
+function handleCarouselTouchMove(e) {
+    carouselTouchEndX = e.touches[0].clientX;
+}
+
+function handleCarouselTouchEnd(e) {
+    const swipeThreshold = 50;
+    const diff = carouselTouchStartX - carouselTouchEndX;
+    
+    if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+            carouselNext();
+        } else {
+            carouselPrev();
+        }
+    }
+    
+    carouselTouchStartX = 0;
+    carouselTouchEndX = 0;
+}
+
+function handleCarouselWheel(e) {
+    e.preventDefault();
+    
+    if (e.deltaX > 30 || e.deltaY > 30) {
+        carouselNext();
+    } else if (e.deltaX < -30 || e.deltaY < -30) {
+        carouselPrev();
+    }
+}
+
+function handleCarouselScroll() {
+    const container = document.getElementById('carouselContainer');
+    if (!container) return;
+    
+    const cards = container.querySelectorAll('.important-match-card-new');
+    const containerRect = container.getBoundingClientRect();
+    const containerCenter = containerRect.left + containerRect.width / 2;
+    
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+    
+    cards.forEach((card, index) => {
+        const cardRect = card.getBoundingClientRect();
+        const cardCenter = cardRect.left + cardRect.width / 2;
+        const distance = Math.abs(containerCenter - cardCenter);
+        
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestIndex = index;
+        }
+    });
+    
+    if (closestIndex !== carouselCurrentIndex) {
+        carouselCurrentIndex = closestIndex;
+        updateCarouselActiveStates();
+    }
+}
+
+function carouselNext() {
+    if (carouselCurrentIndex < carouselTotalItems - 1) {
+        carouselCurrentIndex++;
+        carouselGoTo(carouselCurrentIndex);
+    }
+}
+
+function carouselPrev() {
+    if (carouselCurrentIndex > 0) {
+        carouselCurrentIndex--;
+        carouselGoTo(carouselCurrentIndex);
+    }
+}
+
+function carouselGoTo(index) {
+    const container = document.getElementById('carouselContainer');
+    if (!container) return;
+    
+    const cards = container.querySelectorAll('.important-match-card-new');
+    if (index < 0 || index >= cards.length) return;
+    
+    carouselCurrentIndex = index;
+    
+    const targetCard = cards[index];
+    const containerWidth = container.offsetWidth;
+    const cardWidth = targetCard.offsetWidth;
+    const scrollPosition = targetCard.offsetLeft - (containerWidth / 2) + (cardWidth / 2);
+    
+    container.scrollTo({
+        left: scrollPosition,
+        behavior: 'smooth'
+    });
+    
+    updateCarouselActiveStates();
+}
+
+function updateCarouselActiveStates() {
+    const container = document.getElementById('carouselContainer');
+    if (!container) return;
+    
+    const cards = container.querySelectorAll('.important-match-card-new');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    const counter = document.querySelector('.carousel-counter span');
+    const prevBtn = document.querySelector('.carousel-nav.prev');
+    const nextBtn = document.querySelector('.carousel-nav.next');
+    
+    // Update card classes
+    cards.forEach((card, index) => {
+        card.classList.remove('active', 'adjacent');
+        
+        if (index === carouselCurrentIndex) {
+            card.classList.add('active');
+        } else if (Math.abs(index - carouselCurrentIndex) === 1) {
+            card.classList.add('adjacent');
+        }
+    });
+    
+    // Update indicators
+    indicators.forEach((indicator, index) => {
+        indicator.classList.toggle('active', index === carouselCurrentIndex);
+    });
+    
+    // Update counter
+    if (counter) {
+        counter.textContent = carouselCurrentIndex + 1;
+    }
+    
+    // Update navigation buttons
+    if (prevBtn) {
+        prevBtn.disabled = carouselCurrentIndex === 0;
+    }
+    if (nextBtn) {
+        nextBtn.disabled = carouselCurrentIndex >= carouselTotalItems - 1;
+    }
 }
 
 function findTransmisionForMatch(partido) {
