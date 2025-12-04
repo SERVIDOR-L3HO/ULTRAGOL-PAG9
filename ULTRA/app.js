@@ -3766,15 +3766,21 @@ function checkSharedStream() {
     const channelParam = urlParams.get('ch');
     
     if (channelParam) {
-        try {
-            const decompressed = LZString.decompressFromEncodedURIComponent(channelParam);
-            if (decompressed) {
-                const shareData = JSON.parse(decompressed);
-                console.log('✅ Canales compartidos decodificados:', shareData);
+        (async () => {
+            try {
+                const response = await fetch(`/api/get-channels/${channelParam}`);
+                
+                if (!response.ok) {
+                    showToast('Enlace no encontrado o expirado');
+                    return;
+                }
+                
+                const shareData = await response.json();
+                console.log('✅ Canales compartidos recuperados:', shareData);
                 
                 const transmision = {
-                    evento: shareData.e,
-                    titulo: shareData.e,
+                    evento: shareData.t,
+                    titulo: shareData.t,
                     canales: shareData.c.map(canal => ({
                         nombre: canal.n,
                         numero: canal.u,
@@ -3791,12 +3797,12 @@ function checkSharedStream() {
                     const cleanUrl = window.location.origin + window.location.pathname;
                     window.history.replaceState({}, document.title, cleanUrl);
                 }, 1000);
-                return;
+            } catch (error) {
+                console.error('❌ Error al procesar canales compartidos:', error);
+                showToast('Error: Link de canales inválido');
             }
-        } catch (error) {
-            console.error('❌ Error al procesar canales compartidos:', error);
-            showToast('Error: Link de canales inválido');
-        }
+        })();
+        return;
     }
     
     // Nuevo formato: ID corto
@@ -3916,22 +3922,31 @@ async function shareChannelModal() {
         const { transmision, partidoNombre } = currentModalData.data;
         const title = partidoNombre || 'UltraGol - Canales';
         
-        const shareData = {
-            t: title,
-            e: transmision.evento || transmision.titulo,
-            c: transmision.canales.map(canal => ({
-                n: canal.nombre,
-                u: canal.numero,
-                l: canal.enlaces,
-                a: canal.tipoAPI,
-                k: canal.links
-            }))
-        };
+        showToast('Generando enlace...');
         
-        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(shareData));
-        const shareUrl = `${window.location.origin}${window.location.pathname}?ch=${compressed}`;
+        const response = await fetch('/api/share-channels', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title: title,
+                channels: transmision.canales.map(canal => ({
+                    n: canal.nombre,
+                    u: canal.numero,
+                    l: canal.enlaces,
+                    a: canal.tipoAPI,
+                    k: canal.links
+                }))
+            })
+        });
         
-        console.log('🔗 URL de canales generada:', shareUrl);
+        if (!response.ok) {
+            throw new Error('Error al generar enlace');
+        }
+        
+        const { id } = await response.json();
+        const shareUrl = `${window.location.origin}${window.location.pathname}?ch=${id}`;
+        
+        console.log('🔗 URL corta generada:', shareUrl);
         
         if (navigator.share) {
             await navigator.share({
