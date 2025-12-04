@@ -3766,8 +3766,11 @@ function checkSharedStream() {
     const channelParam = urlParams.get('ch');
     
     if (channelParam) {
+        console.log('🔗 Detectado parámetro ch:', channelParam.substring(0, 50) + '...');
         try {
             const decompressed = LZString.decompressFromEncodedURIComponent(channelParam);
+            console.log('🔓 Resultado decompresión:', decompressed ? 'OK' : 'FALLÓ');
+            
             if (decompressed) {
                 const shareData = JSON.parse(decompressed);
                 console.log('✅ Canales compartidos decodificados:', shareData);
@@ -3784,12 +3787,16 @@ function checkSharedStream() {
                 };
                 
                 setTimeout(() => {
+                    console.log('🚀 Abriendo modal de canales compartidos...');
                     showChannelSelector(transmision, shareData.t);
                     showToast('Abriendo canales compartidos... 📺');
                     
                     const cleanUrl = window.location.origin + window.location.pathname;
                     window.history.replaceState({}, document.title, cleanUrl);
-                }, 1000);
+                }, 1500);
+            } else {
+                console.error('❌ Decompresión retornó null');
+                showToast('Error: Link de canales inválido');
             }
         } catch (error) {
             console.error('❌ Error al procesar canales compartidos:', error);

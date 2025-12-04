@@ -51,8 +51,21 @@ app.use(express.static('.', {
     }
 }));
 
-// Ruta principal
+// Ruta principal (incluyendo parámetros de query para links compartidos)
 app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Manejar cualquier ruta que no sea archivo para SPA
+app.get('/ULTRA', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/ULTRA/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/ULTRA/index.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
