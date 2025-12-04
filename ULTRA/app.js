@@ -3763,6 +3763,41 @@ function checkSharedStream() {
     const urlParams = new URLSearchParams(window.location.search);
     const streamParam = urlParams.get('s') || urlParams.get('stream');
     const shortId = urlParams.get('id');
+    const channelParam = urlParams.get('ch');
+    
+    if (channelParam) {
+        try {
+            const decompressed = LZString.decompressFromEncodedURIComponent(channelParam);
+            if (decompressed) {
+                const shareData = JSON.parse(decompressed);
+                console.log('✅ Canales compartidos decodificados:', shareData);
+                
+                const transmision = {
+                    evento: shareData.e,
+                    titulo: shareData.e,
+                    canales: shareData.c.map(canal => ({
+                        nombre: canal.n,
+                        numero: canal.u,
+                        enlaces: canal.l,
+                        tipoAPI: canal.a,
+                        links: canal.k
+                    }))
+                };
+                
+                setTimeout(() => {
+                    showChannelSelector(transmision, shareData.t);
+                    showToast('Abriendo canales compartidos... 📺');
+                    
+                    const cleanUrl = window.location.origin + window.location.pathname;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                }, 1000);
+                return;
+            }
+        } catch (error) {
+            console.error('❌ Error al procesar canales compartidos:', error);
+            showToast('Error: Link de canales inválido');
+        }
+    }
     
     // Nuevo formato: ID corto
     if (shortId) {
@@ -3871,43 +3906,50 @@ function showToast(message) {
 // Función para compartir el modal de canales
 async function shareChannelModal() {
     try {
-        const title = document.getElementById('channelSelectorTitle')?.textContent || 'UltraGol - Canales';
-        const body = document.getElementById('channelSelectorBody');
+        const currentModalData = modalNavigation.getCurrent();
         
-        let channelsList = '';
-        if (body) {
-            const channels = body.querySelectorAll('.channel-option');
-            channels.forEach((channel, index) => {
-                const channelName = channel.querySelector('.channel-name')?.textContent?.trim() || `Canal ${index + 1}`;
-                channelsList += `${index + 1}. ${channelName}\n`;
-            });
+        if (!currentModalData || currentModalData.id !== 'channelSelector') {
+            showToast('No hay canales para compartir');
+            return;
         }
         
-        const shareText = `${title}\n\nCanales disponibles:\n${channelsList}\nVer en: ${window.location.href}`;
+        const { transmision, partidoNombre } = currentModalData.data;
+        const title = partidoNombre || 'UltraGol - Canales';
+        
+        const shareData = {
+            t: title,
+            e: transmision.evento || transmision.titulo,
+            c: transmision.canales.map(canal => ({
+                n: canal.nombre,
+                u: canal.numero,
+                l: canal.enlaces,
+                a: canal.tipoAPI,
+                k: canal.links
+            }))
+        };
+        
+        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(shareData));
+        const shareUrl = `${window.location.origin}${window.location.pathname}?ch=${compressed}`;
+        
+        console.log('🔗 URL de canales generada:', shareUrl);
         
         if (navigator.share) {
             await navigator.share({
-                title: title,
-                text: shareText,
-                url: window.location.href
+                title: `${title} - UltraGol`,
+                text: `Ver ${title} en UltraGol`,
+                url: shareUrl
             });
             showToast('Compartido exitosamente');
         } else {
-            await navigator.clipboard.writeText(shareText);
+            await navigator.clipboard.writeText(shareUrl);
             showToast('Enlace copiado al portapapeles');
         }
         
-        console.log('✅ Modal compartido:', title);
+        console.log('✅ Modal de canales compartido:', title);
     } catch (error) {
         if (error.name !== 'AbortError') {
             console.error('Error al compartir:', error);
-            try {
-                const title = document.getElementById('channelSelectorTitle')?.textContent || 'UltraGol';
-                await navigator.clipboard.writeText(`${title}\n${window.location.href}`);
-                showToast('Enlace copiado al portapapeles');
-            } catch (clipError) {
-                showToast('No se pudo compartir');
-            }
+            showToast('No se pudo compartir');
         }
     }
 }
