@@ -156,6 +156,16 @@ const modalNavigation = {
 
 // Inicializar cuando se carga la página
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('📱 ULTRAGOL iniciando... URL:', window.location.href);
+    console.log('🔗 Query params:', window.location.search);
+    
+    // Verificar inmediatamente si hay link compartido
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('ch')) {
+        console.log('⚡ Link compartido detectado, procesando primero...');
+        checkSharedStream();
+    }
+    
     await loadMarcadores();
     await loadTransmisiones();
     startAutoUpdate();
@@ -163,8 +173,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadNews();
     await loadLineups();
     
-    // Detectar si hay un link compartido y abrir la transmisión automáticamente
-    checkSharedStream();
+    // Verificar también después de cargar (por si acaso)
+    if (!urlParams.get('ch')) {
+        checkSharedStream();
+    }
 });
 
 // Función principal para cargar marcadores desde la API
@@ -3765,15 +3777,25 @@ function checkSharedStream() {
     const shortId = urlParams.get('id');
     const channelParam = urlParams.get('ch');
     
+    console.log('🔍 checkSharedStream - ch:', channelParam ? 'SÍ' : 'NO');
+    
     if (channelParam) {
-        console.log('🔗 Detectado parámetro ch:', channelParam.substring(0, 50) + '...');
+        console.log('🔗 Detectado parámetro ch:', channelParam.length + ' caracteres');
+        
+        // Verificar que LZString esté disponible
+        if (typeof LZString === 'undefined') {
+            console.error('❌ LZString no está disponible, reintentando en 500ms...');
+            setTimeout(() => checkSharedStream(), 500);
+            return;
+        }
+        
         try {
             const decompressed = LZString.decompressFromEncodedURIComponent(channelParam);
-            console.log('🔓 Resultado decompresión:', decompressed ? 'OK' : 'FALLÓ');
+            console.log('🔓 Resultado decompresión:', decompressed ? 'OK (' + decompressed.length + ' chars)' : 'FALLÓ');
             
             if (decompressed) {
                 const shareData = JSON.parse(decompressed);
-                console.log('✅ Canales compartidos decodificados:', shareData);
+                console.log('✅ Canales compartidos decodificados:', shareData.t, '- Canales:', shareData.c.length);
                 
                 const transmision = {
                     evento: shareData.t,
@@ -3795,11 +3817,11 @@ function checkSharedStream() {
                     window.history.replaceState({}, document.title, cleanUrl);
                 }, 1500);
             } else {
-                console.error('❌ Decompresión retornó null');
+                console.error('❌ Decompresión retornó null - datos corruptos');
                 showToast('Error: Link de canales inválido');
             }
         } catch (error) {
-            console.error('❌ Error al procesar canales compartidos:', error);
+            console.error('❌ Error al procesar canales compartidos:', error.message);
             showToast('Error: Link de canales inválido');
         }
         return;
