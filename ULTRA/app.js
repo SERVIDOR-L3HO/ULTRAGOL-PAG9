@@ -3868,6 +3868,50 @@ function showToast(message) {
     }, 3000);
 }
 
+// Función para compartir el modal de canales
+async function shareChannelModal() {
+    try {
+        const title = document.getElementById('channelSelectorTitle')?.textContent || 'UltraGol - Canales';
+        const body = document.getElementById('channelSelectorBody');
+        
+        let channelsList = '';
+        if (body) {
+            const channels = body.querySelectorAll('.channel-option');
+            channels.forEach((channel, index) => {
+                const channelName = channel.querySelector('.channel-name')?.textContent?.trim() || `Canal ${index + 1}`;
+                channelsList += `${index + 1}. ${channelName}\n`;
+            });
+        }
+        
+        const shareText = `${title}\n\nCanales disponibles:\n${channelsList}\nVer en: ${window.location.href}`;
+        
+        if (navigator.share) {
+            await navigator.share({
+                title: title,
+                text: shareText,
+                url: window.location.href
+            });
+            showToast('Compartido exitosamente');
+        } else {
+            await navigator.clipboard.writeText(shareText);
+            showToast('Enlace copiado al portapapeles');
+        }
+        
+        console.log('✅ Modal compartido:', title);
+    } catch (error) {
+        if (error.name !== 'AbortError') {
+            console.error('Error al compartir:', error);
+            try {
+                const title = document.getElementById('channelSelectorTitle')?.textContent || 'UltraGol';
+                await navigator.clipboard.writeText(`${title}\n${window.location.href}`);
+                showToast('Enlace copiado al portapapeles');
+            } catch (clipError) {
+                showToast('No se pudo compartir');
+            }
+        }
+    }
+}
+
 // Variables globales para el QR modal
 let currentQRUrl = '';
 let currentQRTitle = '';

@@ -2862,7 +2862,8 @@ input:checked + .slider:before {
     align-items: center;
 }
 
-.qr-modal-btn {
+.qr-modal-btn,
+.share-modal-btn {
     background: rgba(255, 255, 255, 0.1);
     border: none;
     width: 36px;
@@ -2877,7 +2878,8 @@ input:checked + .slider:before {
     font-size: 18px;
 }
 
-.qr-modal-btn:hover {
+.qr-modal-btn:hover,
+.share-modal-btn:hover {
     background: var(--primary);
     transform: scale(1.1);
 }
