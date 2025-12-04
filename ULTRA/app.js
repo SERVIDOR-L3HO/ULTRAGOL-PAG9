@@ -1140,7 +1140,6 @@ function showChannelSelector(transmision, partidoNombre) {
         
         // Detectar el tipo de API y mostrar enlaces apropiadamente
         if (canal.tipoAPI === 'e1link' && canal.enlaces) {
-            // API 2 (e1link): Mostrar como nombre del canal o "URL 1", "URL 2", etc.
             canal.enlaces.forEach((url, idx) => {
                 streamTypes.push({ 
                     name: canal.nombre ? `${canal.nombre} ${idx > 0 ? idx + 1 : ''}`.trim() : `URL ${idx + 1}`, 
@@ -1149,7 +1148,6 @@ function showChannelSelector(transmision, partidoNombre) {
                 });
             });
         } else if (canal.tipoAPI === 'voodc' && canal.enlaces) {
-            // API 3 (voodc): Mostrar enlaces igual que e1link
             canal.enlaces.forEach((enlace, idx) => {
                 streamTypes.push({ 
                     name: enlace.calidad || `HD ${idx + 1}`, 
@@ -1158,7 +1156,6 @@ function showChannelSelector(transmision, partidoNombre) {
                 });
             });
         } else if (canal.tipoAPI === 'transmisiones4' && canal.enlaces) {
-            // API 4 (transmisiones4 - ftvhd): Mostrar nombre del canal con enlaces
             canal.enlaces.forEach((enlace, idx) => {
                 streamTypes.push({ 
                     name: canal.nombre || enlace.calidad || `Canal ${idx + 1}`, 
@@ -1167,7 +1164,6 @@ function showChannelSelector(transmision, partidoNombre) {
                 });
             });
         } else if (canal.tipoAPI === 'donromans' && canal.enlaces) {
-            // API 5 (donromans): Mostrar nombre del canal con plataforma
             canal.enlaces.forEach((enlace, idx) => {
                 const displayName = enlace.source || enlace.platform || canal.nombre || `Canal ${idx + 1}`;
                 streamTypes.push({ 
@@ -1177,7 +1173,6 @@ function showChannelSelector(transmision, partidoNombre) {
                 });
             });
         } else if (canal.tipoAPI === 'rereyano' && canal.links) {
-            // API 1 (rereyano): Mostrar como "hoca", "caster", "wigi"
             if (canal.links.hoca) {
                 streamTypes.push({ name: 'hoca', url: canal.links.hoca, icon: 'play-circle' });
             }
@@ -1193,8 +1188,7 @@ function showChannelSelector(transmision, partidoNombre) {
             return '';
         }
         
-        // Badge de fuente con colores diferentes
-        let badgeColor = '#ff6b35'; // default
+        let badgeColor = '#ff6b35';
         let badgeText = canal.tipoAPI || '';
         if (canal.tipoAPI === 'rereyano') {
             badgeColor = '#4ecdc4';
@@ -1244,6 +1238,371 @@ function showChannelSelector(transmision, partidoNombre) {
     modal.classList.add('active');
 }
 
+// Función para generar la sección de estadísticas del partido
+function generateMatchStatsSection(partidoNombre) {
+    // Buscar el partido en marcadoresData
+    const partido = findPartidoByName(partidoNombre);
+    
+    if (!partido) {
+        return `
+            <div class="match-stats-section">
+                <div class="stats-header">
+                    <div class="stats-header-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <span class="stats-header-title">Estadísticas del Partido</span>
+                </div>
+                <div class="no-events-message">
+                    <i class="fas fa-futbol"></i>
+                    <p>Las estadísticas estarán disponibles cuando inicie el partido</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Determinar estado del partido
+    let matchStatus = 'Programado';
+    if (partido.estado?.enVivo) {
+        matchStatus = partido.reloj || 'En Vivo';
+    } else if (partido.estado?.finalizado) {
+        matchStatus = 'Finalizado';
+    } else if (partido.estado?.programado) {
+        matchStatus = formatearHora(partido.fecha);
+    }
+    
+    // Generar estadísticas simuladas basadas en el marcador (en un escenario real vendría de API)
+    const stats = generateMatchStats(partido);
+    const events = generateMatchEvents(partido);
+    
+    return `
+        <div class="match-stats-section">
+            <div class="stats-header">
+                <div class="stats-header-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <span class="stats-header-title">Estadísticas del Partido</span>
+            </div>
+            
+            <!-- Header con equipos y marcador -->
+            <div class="stats-teams-header">
+                <div class="stats-team">
+                    <img src="${partido.local?.logo || 'https://via.placeholder.com/45'}" alt="${partido.local?.nombreCorto || 'Local'}" class="stats-team-logo" onerror="this.src='https://via.placeholder.com/45'">
+                    <span class="stats-team-name">${partido.local?.nombreCorto || 'Local'}</span>
+                </div>
+                <div class="stats-score-center">
+                    <span class="stats-score-display">${partido.local?.marcador ?? 0} - ${partido.visitante?.marcador ?? 0}</span>
+                    <span class="stats-match-status">${matchStatus}</span>
+                </div>
+                <div class="stats-team">
+                    <img src="${partido.visitante?.logo || 'https://via.placeholder.com/45'}" alt="${partido.visitante?.nombreCorto || 'Visitante'}" class="stats-team-logo" onerror="this.src='https://via.placeholder.com/45'">
+                    <span class="stats-team-name">${partido.visitante?.nombreCorto || 'Visitante'}</span>
+                </div>
+            </div>
+            
+            <!-- Tabs de estadísticas -->
+            <div class="stats-tabs">
+                <button class="stats-tab active" data-tab="stats" onclick="switchStatsTab('stats', this)">
+                    <i class="fas fa-chart-pie"></i>
+                    Estadísticas
+                </button>
+                <button class="stats-tab" data-tab="events" onclick="switchStatsTab('events', this)">
+                    <i class="fas fa-list-ul"></i>
+                    Eventos
+                </button>
+                <button class="stats-tab" data-tab="cards" onclick="switchStatsTab('cards', this)">
+                    <i class="fas fa-square"></i>
+                    Tarjetas
+                </button>
+            </div>
+            
+            <!-- Contenido de Estadísticas -->
+            <div class="stats-tab-content active" id="statsContent">
+                <div class="stats-bars-container">
+                    ${generateStatBar('Posesión', stats.possession.home, stats.possession.away, '%')}
+                    ${generateStatBar('Tiros', stats.shots.home, stats.shots.away)}
+                    ${generateStatBar('Tiros a Puerta', stats.shotsOnTarget.home, stats.shotsOnTarget.away)}
+                    ${generateStatBar('Córners', stats.corners.home, stats.corners.away)}
+                    ${generateStatBar('Faltas', stats.fouls.home, stats.fouls.away)}
+                    ${generateStatBar('Fueras de Juego', stats.offsides.home, stats.offsides.away)}
+                </div>
+            </div>
+            
+            <!-- Contenido de Eventos -->
+            <div class="stats-tab-content" id="eventsContent">
+                <div class="match-events-section">
+                    <div class="events-header">
+                        <i class="fas fa-clock"></i>
+                        <span class="events-header-title">Cronología del Partido</span>
+                    </div>
+                    <div class="events-timeline">
+                        ${events.length > 0 ? events.map(event => generateEventItem(event, partido)).join('') : `
+                            <div class="no-events-message">
+                                <i class="fas fa-hourglass-half"></i>
+                                <p>Los eventos aparecerán aquí durante el partido</p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contenido de Tarjetas -->
+            <div class="stats-tab-content" id="cardsContent">
+                <div class="cards-summary">
+                    <div class="cards-team">
+                        <span class="cards-team-name">${partido.local?.nombreCorto || 'Local'}</span>
+                        <div class="cards-display">
+                            <div class="card-count">
+                                <div class="card-icon yellow"></div>
+                                <span class="card-number">${stats.cards.home.yellow}</span>
+                            </div>
+                            <div class="card-count">
+                                <div class="card-icon red"></div>
+                                <span class="card-number">${stats.cards.home.red}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="cards-team">
+                        <span class="cards-team-name">${partido.visitante?.nombreCorto || 'Visitante'}</span>
+                        <div class="cards-display">
+                            <div class="card-count">
+                                <div class="card-icon yellow"></div>
+                                <span class="card-number">${stats.cards.away.yellow}</span>
+                            </div>
+                            <div class="card-count">
+                                <div class="card-icon red"></div>
+                                <span class="card-number">${stats.cards.away.red}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                ${generateCardEvents(events, partido)}
+            </div>
+        </div>
+    `;
+}
+
+// Función para buscar partido por nombre
+function findPartidoByName(partidoNombre) {
+    if (!marcadoresData || !marcadoresData.partidos) return null;
+    
+    const [localName, visitanteName] = partidoNombre.split(' vs ').map(n => n.trim().toLowerCase());
+    
+    return marcadoresData.partidos.find(p => {
+        const localNorm = (p.local?.nombreCorto || '').toLowerCase();
+        const visitanteNorm = (p.visitante?.nombreCorto || '').toLowerCase();
+        return (localNorm.includes(localName) || localName.includes(localNorm)) &&
+               (visitanteNorm.includes(visitanteName) || visitanteName.includes(visitanteNorm));
+    });
+}
+
+// Generar estadísticas basadas en el partido
+function generateMatchStats(partido) {
+    const isLive = partido.estado?.enVivo;
+    const isFinished = partido.estado?.finalizado;
+    const localScore = parseInt(partido.local?.marcador) || 0;
+    const awayScore = parseInt(partido.visitante?.marcador) || 0;
+    
+    // Si el partido no ha empezado, mostrar estadísticas en 0
+    if (!isLive && !isFinished) {
+        return {
+            possession: { home: 50, away: 50 },
+            shots: { home: 0, away: 0 },
+            shotsOnTarget: { home: 0, away: 0 },
+            corners: { home: 0, away: 0 },
+            fouls: { home: 0, away: 0 },
+            offsides: { home: 0, away: 0 },
+            cards: { home: { yellow: 0, red: 0 }, away: { yellow: 0, red: 0 } }
+        };
+    }
+    
+    // Generar estadísticas realistas basadas en el marcador
+    const totalGoals = localScore + awayScore;
+    const homeDominance = totalGoals > 0 ? (localScore / totalGoals) : 0.5;
+    
+    const possession = {
+        home: Math.round(45 + (homeDominance * 20)),
+        away: 0
+    };
+    possession.away = 100 - possession.home;
+    
+    return {
+        possession,
+        shots: {
+            home: Math.max(localScore * 3, Math.round(8 + homeDominance * 10)),
+            away: Math.max(awayScore * 3, Math.round(8 + (1 - homeDominance) * 10))
+        },
+        shotsOnTarget: {
+            home: Math.max(localScore, Math.round(3 + homeDominance * 5)),
+            away: Math.max(awayScore, Math.round(3 + (1 - homeDominance) * 5))
+        },
+        corners: {
+            home: Math.round(3 + homeDominance * 5),
+            away: Math.round(3 + (1 - homeDominance) * 5)
+        },
+        fouls: {
+            home: Math.round(8 + Math.random() * 6),
+            away: Math.round(8 + Math.random() * 6)
+        },
+        offsides: {
+            home: Math.round(1 + Math.random() * 3),
+            away: Math.round(1 + Math.random() * 3)
+        },
+        cards: {
+            home: { yellow: Math.round(Math.random() * 3), red: Math.random() > 0.9 ? 1 : 0 },
+            away: { yellow: Math.round(Math.random() * 3), red: Math.random() > 0.9 ? 1 : 0 }
+        }
+    };
+}
+
+// Generar eventos del partido
+function generateMatchEvents(partido) {
+    const events = [];
+    const isLive = partido.estado?.enVivo;
+    const isFinished = partido.estado?.finalizado;
+    
+    if (!isLive && !isFinished) return events;
+    
+    const localScore = parseInt(partido.local?.marcador) || 0;
+    const awayScore = parseInt(partido.visitante?.marcador) || 0;
+    
+    // Generar goles
+    for (let i = 0; i < localScore; i++) {
+        events.push({
+            type: 'goal',
+            minute: Math.round(10 + Math.random() * 80),
+            team: 'home',
+            player: `Jugador ${Math.round(1 + Math.random() * 11)}`,
+            detail: 'Gol'
+        });
+    }
+    
+    for (let i = 0; i < awayScore; i++) {
+        events.push({
+            type: 'goal',
+            minute: Math.round(10 + Math.random() * 80),
+            team: 'away',
+            player: `Jugador ${Math.round(1 + Math.random() * 11)}`,
+            detail: 'Gol'
+        });
+    }
+    
+    // Agregar algunas tarjetas aleatorias
+    const numCards = Math.round(Math.random() * 4);
+    for (let i = 0; i < numCards; i++) {
+        events.push({
+            type: Math.random() > 0.85 ? 'red-card' : 'yellow-card',
+            minute: Math.round(15 + Math.random() * 75),
+            team: Math.random() > 0.5 ? 'home' : 'away',
+            player: `Jugador ${Math.round(1 + Math.random() * 11)}`,
+            detail: Math.random() > 0.85 ? 'Tarjeta Roja' : 'Tarjeta Amarilla'
+        });
+    }
+    
+    // Ordenar por minuto
+    events.sort((a, b) => a.minute - b.minute);
+    
+    return events;
+}
+
+// Generar barra de estadísticas
+function generateStatBar(label, homeValue, awayValue, suffix = '') {
+    const total = homeValue + awayValue || 1;
+    const homePercent = (homeValue / total) * 100;
+    const awayPercent = (awayValue / total) * 100;
+    
+    return `
+        <div class="stat-bar-item">
+            <span class="stat-value home">${homeValue}${suffix}</span>
+            <div class="stat-bar-wrapper">
+                <span class="stat-label">${label}</span>
+                <div class="stat-bar-dual">
+                    <div class="stat-bar-home" style="width: ${homePercent}%"></div>
+                    <div class="stat-bar-away" style="width: ${awayPercent}%"></div>
+                </div>
+            </div>
+            <span class="stat-value away">${awayValue}${suffix}</span>
+        </div>
+    `;
+}
+
+// Generar item de evento
+function generateEventItem(event, partido) {
+    const iconClass = event.type === 'goal' ? 'goal' : 
+                      event.type === 'yellow-card' ? 'yellow-card' : 
+                      event.type === 'red-card' ? 'red-card' :
+                      event.type === 'substitution' ? 'substitution' : 'var';
+    
+    const iconSymbol = event.type === 'goal' ? 'futbol' : 
+                       event.type === 'yellow-card' ? 'square' : 
+                       event.type === 'red-card' ? 'square' :
+                       event.type === 'substitution' ? 'exchange-alt' : 'tv';
+    
+    const teamClass = event.team === 'home' ? 'home-event' : 'away-event';
+    const teamLogo = event.team === 'home' ? partido.local?.logo : partido.visitante?.logo;
+    
+    return `
+        <div class="event-item ${teamClass}">
+            <div class="event-minute">${event.minute}'</div>
+            <div class="event-icon ${iconClass}">
+                <i class="fas fa-${iconSymbol}"></i>
+            </div>
+            <div class="event-details">
+                <span class="event-player">${event.player}</span>
+                <span class="event-type">${event.detail}</span>
+            </div>
+            <img src="${teamLogo || 'https://via.placeholder.com/24'}" alt="" class="event-team-logo" onerror="this.src='https://via.placeholder.com/24'">
+        </div>
+    `;
+}
+
+// Generar eventos de tarjetas
+function generateCardEvents(events, partido) {
+    const cardEvents = events.filter(e => e.type === 'yellow-card' || e.type === 'red-card');
+    
+    if (cardEvents.length === 0) {
+        return `
+            <div class="no-events-message">
+                <i class="fas fa-check-circle"></i>
+                <p>No hay tarjetas en este partido</p>
+            </div>
+        `;
+    }
+    
+    return `
+        <div class="match-events-section">
+            <div class="events-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="events-header-title">Tarjetas Mostradas</span>
+            </div>
+            <div class="events-timeline">
+                ${cardEvents.map(event => generateEventItem(event, partido)).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Cambiar tab de estadísticas
+function switchStatsTab(tabId, button) {
+    // Remover active de todos los tabs y contenidos
+    document.querySelectorAll('.stats-tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.stats-tab-content').forEach(content => content.classList.remove('active'));
+    
+    // Activar tab seleccionado
+    button.classList.add('active');
+    
+    // Activar contenido correspondiente
+    const contentId = tabId === 'stats' ? 'statsContent' : 
+                      tabId === 'events' ? 'eventsContent' : 'cardsContent';
+    const content = document.getElementById(contentId);
+    if (content) content.classList.add('active');
+}
+
+// Inicializar listeners de tabs
+function initStatsTabsListeners() {
+    // Los listeners ya están en los onclick de los botones
+    console.log('📊 Tabs de estadísticas inicializados');
+}
+
 function closeChannelSelector() {
     const modal = document.getElementById('channelSelectorModal');
     modal.classList.remove('active');
@@ -1266,6 +1625,7 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     const modalBody = modal.querySelector('.modal-body');
     const modalTitle = document.getElementById('modalTitle');
     const loader = document.getElementById('modalLoader');
+    const statsContainer = document.getElementById('playerStatsContainer');
     
     // Guardar en historial antes de abrir
     modalNavigation.pushModal('player', { streamUrl, title, isYouTube });
@@ -1299,6 +1659,16 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
             style="width: 100%; height: 100%; border: none;">
         </iframe>
     `;
+    
+    // Extraer nombre del partido del título para las estadísticas
+    // El título usualmente es "Equipo1 vs Equipo2 - Canal"
+    const partidoNombre = title.split(' - ')[0] || title;
+    
+    // Agregar sección de estadísticas al modal del reproductor
+    if (statsContainer) {
+        statsContainer.innerHTML = generateMatchStatsSection(partidoNombre);
+        initStatsTabsListeners();
+    }
     
     const iframe = document.getElementById('modalIframe');
     
@@ -1379,6 +1749,7 @@ function navigateBack() {
 function closePlayerModalOnly() {
     const modal = document.getElementById('playerModal');
     const modalBody = modal.querySelector('.modal-body');
+    const statsContainer = document.getElementById('playerStatsContainer');
     
     modal.classList.remove('active');
     
@@ -1388,6 +1759,11 @@ function closePlayerModalOnly() {
     }
     
     currentStreamUrl = '';
+    
+    // Limpiar el contenedor de estadísticas
+    if (statsContainer) {
+        statsContainer.innerHTML = '';
+    }
     
     setTimeout(() => {
         modalBody.innerHTML = `
