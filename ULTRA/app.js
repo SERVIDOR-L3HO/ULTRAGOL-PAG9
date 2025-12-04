@@ -3766,27 +3766,20 @@ function checkSharedStream() {
     const channelParam = urlParams.get('ch');
     
     if (channelParam) {
-        (async () => {
-            try {
-                const response = await fetch(`/api/get-channels/${channelParam}`);
-                
-                if (!response.ok) {
-                    showToast('Enlace no encontrado o expirado');
-                    return;
-                }
-                
-                const shareData = await response.json();
-                console.log('✅ Canales compartidos recuperados:', shareData);
+        try {
+            const decompressed = LZString.decompressFromEncodedURIComponent(channelParam);
+            if (decompressed) {
+                const shareData = JSON.parse(decompressed);
+                console.log('✅ Canales compartidos decodificados:', shareData);
                 
                 const transmision = {
                     evento: shareData.t,
                     titulo: shareData.t,
                     canales: shareData.c.map(canal => ({
-                        nombre: canal.n,
-                        numero: canal.u,
-                        enlaces: canal.l,
-                        tipoAPI: canal.a,
-                        links: canal.k
+                        nombre: canal[0],
+                        numero: '',
+                        enlaces: [{ url: canal[1], calidad: 'HD' }],
+                        tipoAPI: canal[2] || 'shared'
                     }))
                 };
                 
@@ -3797,11 +3790,11 @@ function checkSharedStream() {
                     const cleanUrl = window.location.origin + window.location.pathname;
                     window.history.replaceState({}, document.title, cleanUrl);
                 }, 1000);
-            } catch (error) {
-                console.error('❌ Error al procesar canales compartidos:', error);
-                showToast('Error: Link de canales inválido');
             }
-        })();
+        } catch (error) {
+            console.error('❌ Error al procesar canales compartidos:', error);
+            showToast('Error: Link de canales inválido');
+        }
         return;
     }
     
@@ -3922,31 +3915,21 @@ async function shareChannelModal() {
         const { transmision, partidoNombre } = currentModalData.data;
         const title = partidoNombre || 'UltraGol - Canales';
         
-        showToast('Generando enlace...');
+        const minimalChannels = transmision.canales.slice(0, 8).map(canal => {
+            let url = '';
+            if (canal.enlaces && canal.enlaces.length > 0) {
+                url = canal.enlaces[0].url || canal.enlaces[0];
+            } else if (canal.links) {
+                url = canal.links.hoca || canal.links.caster || canal.links.wigi || '';
+            }
+            return [canal.nombre || 'Canal', url, canal.tipoAPI || ''];
+        }).filter(c => c[1]);
         
-        const response = await fetch('/api/share-channels', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                title: title,
-                channels: transmision.canales.map(canal => ({
-                    n: canal.nombre,
-                    u: canal.numero,
-                    l: canal.enlaces,
-                    a: canal.tipoAPI,
-                    k: canal.links
-                }))
-            })
-        });
+        const shareData = { t: title, c: minimalChannels };
+        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(shareData));
+        const shareUrl = `${window.location.origin}${window.location.pathname}?ch=${compressed}`;
         
-        if (!response.ok) {
-            throw new Error('Error al generar enlace');
-        }
-        
-        const { id } = await response.json();
-        const shareUrl = `${window.location.origin}${window.location.pathname}?ch=${id}`;
-        
-        console.log('🔗 URL corta generada:', shareUrl);
+        console.log('🔗 URL generada:', shareUrl.length, 'caracteres');
         
         if (navigator.share) {
             await navigator.share({
