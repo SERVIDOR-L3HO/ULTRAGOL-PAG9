@@ -304,42 +304,52 @@
         </nav>
     </div>
 
-    <div id="playerModal" class="player-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button class="back-modal-btn" onclick="closeModal()" title="Regresar">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Regresar</span>
+    <div id="playerModal" class="player-modal-fullscreen">
+        <div class="player-video-container">
+            <div class="loading-spinner" id="modalLoader">
+                <div class="spinner"></div>
+            </div>
+            <iframe id="modalIframe" frameborder="0" allowfullscreen></iframe>
+            
+            <div class="player-overlay-top">
+                <button class="player-back-btn" onclick="closeModal()" title="Regresar">
+                    <i class="fas fa-chevron-left"></i>
                 </button>
-                <h3 id="modalTitle">Transmisión en Vivo</h3>
-                <button class="close-modal" onclick="closeAllModals()" title="Cerrar">
+                <div class="player-title-container">
+                    <div class="player-live-badge">
+                        <span class="live-dot"></span>
+                        <span>EN VIVO</span>
+                    </div>
+                    <h3 id="modalTitle" class="player-title">Transmisión en Vivo</h3>
+                </div>
+                <button class="player-close-btn" onclick="closeAllModals()" title="Cerrar">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <div class="modal-body">
-                <div class="loading-spinner" id="modalLoader">
-                    <div class="spinner"></div>
-                </div>
-                <iframe id="modalIframe" frameborder="0" allowfullscreen></iframe>
-            </div>
-            <div class="modal-footer">
-                <div class="modal-actions-group">
-                    <button class="modal-action-btn" onclick="refreshStream()" title="Recargar stream">
-                        <i class="fas fa-sync-alt"></i>
+            
+            <div class="player-overlay-controls">
+                <div class="player-controls-group">
+                    <button class="player-control-btn" onclick="refreshStream()" title="Recargar">
+                        <i class="fas fa-redo-alt"></i>
+                        <span>Recargar</span>
                     </button>
-                    <button class="modal-action-btn modal-share" onclick="shareStream()" title="Compartir">
+                    <button class="player-control-btn" onclick="shareStream()" title="Compartir">
                         <i class="fas fa-share-alt"></i>
+                        <span>Compartir</span>
                     </button>
-                    <button class="modal-action-btn modal-radio-btn" onclick="toggleRadioMode()" title="Modo Radio (audio en segundo plano)">
+                    <button class="player-control-btn radio-btn" onclick="toggleRadioMode()" title="Modo Radio">
                         <i class="fas fa-podcast"></i>
+                        <span>Radio</span>
                     </button>
-                    <button class="modal-action-btn" onclick="fullscreenStream()" title="Pantalla completa">
+                    <button class="player-control-btn fullscreen-btn" onclick="fullscreenStream()" title="Pantalla completa">
                         <i class="fas fa-expand"></i>
+                        <span>Expandir</span>
                     </button>
                 </div>
             </div>
-            <div class="modal-stats-container" id="playerStatsContainer"></div>
         </div>
+        
+        <div class="player-stats-section" id="playerStatsContainer"></div>
     </div>
 
     <div id="settingsPanel" class="settings-panel">

@@ -1622,9 +1622,8 @@ function selectStream(streamUrl, streamTitle) {
 
 function playStreamInModal(streamUrl, title, isYouTube = false) {
     const modal = document.getElementById('playerModal');
-    const modalBody = modal.querySelector('.modal-body');
+    const videoContainer = modal.querySelector('.player-video-container');
     const modalTitle = document.getElementById('modalTitle');
-    const loader = document.getElementById('modalLoader');
     const statsContainer = document.getElementById('playerStatsContainer');
     
     // Guardar en historial antes de abrir
@@ -1641,49 +1640,38 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     
     currentStreamUrl = embedUrl;
     currentStreamTitle = title;
-    modalTitle.textContent = title;
+    
+    // Actualizar título de forma más elegante
+    const displayTitle = title.split(' - ')[0] || title;
+    modalTitle.textContent = displayTitle;
+    
     modal.classList.add('active');
-    loader.style.display = 'flex';
     
-    modalBody.innerHTML = `
-        <div class="loading-spinner" id="modalLoader" style="display: flex;">
-            <div class="spinner"></div>
-        </div>
-        <iframe 
-            id="modalIframe" 
-            src="${embedUrl}" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; microphone; camera" 
-            allowfullscreen 
-            scrolling="no"
-            style="width: 100%; height: 100%; border: none;">
-        </iframe>
-    `;
+    // Configurar iframe
+    const iframe = document.getElementById('modalIframe');
+    const loader = document.getElementById('modalLoader');
     
-    // Extraer nombre del partido del título para las estadísticas
-    // El título usualmente es "Equipo1 vs Equipo2 - Canal"
-    const partidoNombre = title.split(' - ')[0] || title;
+    if (loader) loader.style.display = 'flex';
     
-    // Agregar sección de estadísticas al modal del reproductor
+    iframe.src = embedUrl;
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; microphone; camera';
+    
+    // Agregar sección de estadísticas
     if (statsContainer) {
-        statsContainer.innerHTML = generateMatchStatsSection(partidoNombre);
+        statsContainer.innerHTML = generateMatchStatsSection(displayTitle);
         initStatsTabsListeners();
     }
     
-    const iframe = document.getElementById('modalIframe');
-    
     iframe.onload = () => {
         setTimeout(() => {
-            const loaderEl = document.getElementById('modalLoader');
-            if (loaderEl) loaderEl.style.display = 'none';
+            if (loader) loader.style.display = 'none';
         }, 800);
     };
     
     iframe.onerror = () => {
         console.error('Error cargando stream:', embedUrl);
-        const loaderEl = document.getElementById('modalLoader');
-        if (loaderEl) {
-            loaderEl.innerHTML = `
+        if (loader) {
+            loader.innerHTML = `
                 <div style="text-align: center; color: white;">
                     <i class="fas fa-exclamation-triangle" style="font-size: 48px; margin-bottom: 16px;"></i>
                     <p>Error al cargar la transmisión</p>
