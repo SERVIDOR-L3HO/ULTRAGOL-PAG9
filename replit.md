@@ -233,6 +233,12 @@ Preferred communication style: Simple, everyday language.
 - PayPal REST API
 - Stripe API
 - Google OAuth API
+- **ULTRAGOL Statistics API** (https://ultragol-api-3.vercel.app/):
+  - Real-time match statistics for 6 major leagues (Liga MX, Premier League, La Liga, Serie A, Bundesliga, Ligue 1)
+  - Endpoints: `/estadisticas/partido/{eventId}` for match stats, events, and lineups
+  - Auto-updates every 30 seconds for live matches
+  - Provides: possession, shots, passes, corners, fouls, cards, saves, clearances, interceptions, tackles, duels
+  - Integrated in player modal statistics tab
 
 ### Environment Configuration
 Required environment variables:
