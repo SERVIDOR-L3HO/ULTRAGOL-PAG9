@@ -1818,14 +1818,49 @@ function generateMatchStatsSection(partidoNombre) {
 // Función para buscar partido por nombre
 function findPartidoByName(partidoNombre) {
     if (!marcadoresData || !marcadoresData.partidos) return null;
+    if (!partidoNombre) return null;
     
-    const [localName, visitanteName] = partidoNombre.split(' vs ').map(n => n.trim().toLowerCase());
+    // Limpiar el nombre del partido (quitar prefijo de liga como "Ligue 1 : ")
+    let cleanName = partidoNombre;
+    if (cleanName.includes(' : ')) {
+        cleanName = cleanName.split(' : ').pop();
+    }
+    
+    // Manejar diferentes formatos de separador (vs, -, vs.)
+    let parts = [];
+    if (cleanName.includes(' vs ')) {
+        parts = cleanName.split(' vs ');
+    } else if (cleanName.includes(' - ')) {
+        parts = cleanName.split(' - ');
+    } else if (cleanName.includes(' vs. ')) {
+        parts = cleanName.split(' vs. ');
+    }
+    
+    if (parts.length < 2) return null;
+    
+    const localName = (parts[0] || '').trim().toLowerCase();
+    const visitanteName = (parts[1] || '').trim().toLowerCase();
+    
+    if (!localName || !visitanteName) return null;
     
     return marcadoresData.partidos.find(p => {
-        const localNorm = (p.local?.nombreCorto || '').toLowerCase();
-        const visitanteNorm = (p.visitante?.nombreCorto || '').toLowerCase();
-        return (localNorm.includes(localName) || localName.includes(localNorm)) &&
-               (visitanteNorm.includes(visitanteName) || visitanteName.includes(visitanteNorm));
+        const localNorm = (p.local?.nombreCorto || p.local?.nombre || '').toLowerCase();
+        const visitanteNorm = (p.visitante?.nombreCorto || p.visitante?.nombre || '').toLowerCase();
+        const localNombreCompleto = (p.local?.nombre || '').toLowerCase();
+        const visitanteNombreCompleto = (p.visitante?.nombre || '').toLowerCase();
+        
+        // Buscar coincidencias flexibles
+        const localMatch = localNorm.includes(localName) || 
+                          localName.includes(localNorm) ||
+                          localNombreCompleto.includes(localName) ||
+                          localName.includes(localNombreCompleto);
+        
+        const visitanteMatch = visitanteNorm.includes(visitanteName) || 
+                               visitanteName.includes(visitanteNorm) ||
+                               visitanteNombreCompleto.includes(visitanteName) ||
+                               visitanteName.includes(visitanteNombreCompleto);
+        
+        return localMatch && visitanteMatch;
     });
 }
 
