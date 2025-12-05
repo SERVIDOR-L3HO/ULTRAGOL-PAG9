@@ -1422,6 +1422,31 @@ function processAPIStats(apiData) {
     return null;
 }
 
+// Función para extraer nombre del jugador de la descripción
+function extractPlayerName(descripcion) {
+    if (!descripcion) return null;
+    
+    // Formato: "Takumi Minamino (Monaco) is shown the yellow card..."
+    // Extraer el nombre antes del primer paréntesis
+    const match = descripcion.match(/^([^(]+)\s*\(/);
+    if (match && match[1]) {
+        return match[1].trim();
+    }
+    
+    // Formato alternativo: buscar nombre al inicio de la descripción
+    const words = descripcion.split(' ');
+    if (words.length >= 2) {
+        // Tomar las primeras 2-3 palabras como nombre (típicamente nombre y apellido)
+        const possibleName = words.slice(0, 3).join(' ');
+        if (possibleName.length > 3 && !possibleName.toLowerCase().includes('goal') && 
+            !possibleName.toLowerCase().includes('card') && !possibleName.toLowerCase().includes('foul')) {
+            return possibleName;
+        }
+    }
+    
+    return null;
+}
+
 // Función para procesar eventos de la API
 function processAPIEvents(apiData) {
     const events = [];
@@ -1433,11 +1458,15 @@ function processAPIEvents(apiData) {
     // Procesar goles
     if (eventosData.goles && eventosData.goles.length > 0) {
         eventosData.goles.forEach(gol => {
+            let playerName = gol.jugador || gol.anotador;
+            if (!playerName || playerName === 'Desconocido') {
+                playerName = extractPlayerName(gol.descripcion || gol.motivo) || 'Desconocido';
+            }
             events.push({
                 type: 'goal',
                 minute: parseInt(gol.minuto) || 0,
                 team: gol.equipo === 'local' ? 'home' : 'away',
-                player: gol.jugador || gol.anotador || 'Desconocido',
+                player: playerName,
                 detail: gol.tipo || 'Gol'
             });
         });
@@ -1446,12 +1475,19 @@ function processAPIEvents(apiData) {
     // Procesar tarjetas
     if (eventosData.tarjetas && eventosData.tarjetas.length > 0) {
         eventosData.tarjetas.forEach(tarjeta => {
-            const isRed = tarjeta.tipo === 'roja' || tarjeta.tipo === 'red' || tarjeta.color === 'roja';
+            const isRed = tarjeta.tipo === 'roja' || tarjeta.tipo === 'red' || tarjeta.color === 'roja' || 
+                         tarjeta.tipo === 'Red Card' || tarjeta.tipoTarjeta === 'roja';
+            
+            let playerName = tarjeta.jugador;
+            if (!playerName || playerName === 'Desconocido') {
+                playerName = extractPlayerName(tarjeta.descripcion || tarjeta.motivo) || 'Desconocido';
+            }
+            
             events.push({
                 type: isRed ? 'red-card' : 'yellow-card',
                 minute: parseInt(tarjeta.minuto) || 0,
                 team: tarjeta.equipo === 'local' ? 'home' : 'away',
-                player: tarjeta.jugador || 'Desconocido',
+                player: playerName,
                 detail: isRed ? 'Tarjeta Roja' : 'Tarjeta Amarilla'
             });
         });
