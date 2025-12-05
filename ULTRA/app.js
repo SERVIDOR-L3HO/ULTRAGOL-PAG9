@@ -23,7 +23,8 @@ const leaguesConfig = {
         goleadores: '/goleadores',
         calendario: '/calendario',
         marcadores: '/marcadores',
-        alineaciones: '/alineaciones'
+        alineaciones: '/alineaciones',
+        estadisticas: '/estadisticas'
     },
     'Premier League': {
         apiPath: '/premier',
@@ -32,7 +33,8 @@ const leaguesConfig = {
         goleadores: '/premier/goleadores',
         calendario: '/premier/calendario',
         marcadores: '/premier/marcadores',
-        alineaciones: '/premier/alineaciones'
+        alineaciones: '/premier/alineaciones',
+        estadisticas: '/premier/estadisticas'
     },
     'La Liga': {
         apiPath: '/laliga',
@@ -41,7 +43,8 @@ const leaguesConfig = {
         goleadores: '/laliga/goleadores',
         calendario: '/laliga/calendario',
         marcadores: '/laliga/marcadores',
-        alineaciones: '/laliga/alineaciones'
+        alineaciones: '/laliga/alineaciones',
+        estadisticas: '/laliga/estadisticas'
     },
     'Serie A': {
         apiPath: '/seriea',
@@ -50,7 +53,8 @@ const leaguesConfig = {
         goleadores: '/seriea/goleadores',
         calendario: '/seriea/calendario',
         marcadores: '/seriea/marcadores',
-        alineaciones: '/seriea/alineaciones'
+        alineaciones: '/seriea/alineaciones',
+        estadisticas: '/seriea/estadisticas'
     },
     'Bundesliga': {
         apiPath: '/bundesliga',
@@ -59,7 +63,8 @@ const leaguesConfig = {
         goleadores: '/bundesliga/goleadores',
         calendario: '/bundesliga/calendario',
         marcadores: '/bundesliga/marcadores',
-        alineaciones: '/bundesliga/alineaciones'
+        alineaciones: '/bundesliga/alineaciones',
+        estadisticas: '/bundesliga/estadisticas'
     },
     'Ligue 1': {
         apiPath: '/ligue1',
@@ -68,9 +73,13 @@ const leaguesConfig = {
         goleadores: '/ligue1/goleadores',
         calendario: '/ligue1/calendario',
         marcadores: '/ligue1/marcadores',
-        alineaciones: '/ligue1/alineaciones'
+        alineaciones: '/ligue1/alineaciones',
+        estadisticas: '/ligue1/estadisticas'
     }
 };
+
+let currentStatsEventId = null;
+let statsUpdateInterval = null;
 
 // Diccionario de aliases para equipos de Liga MX (compartido)
 const aliasesEquipos = {
@@ -1238,6 +1247,431 @@ function showChannelSelector(transmision, partidoNombre) {
     modal.classList.add('active');
 }
 
+// ==================== FUNCIONES DE ESTADÍSTICAS EN TIEMPO REAL ====================
+
+// Cache para estadísticas cargadas de la API
+let statsCache = {};
+
+// Función para obtener estadísticas reales desde la API
+async function fetchRealMatchStats(eventId) {
+    if (!eventId) return null;
+    
+    try {
+        console.log(`📊 Cargando estadísticas del partido ${eventId}...`);
+        const response = await fetch(`https://ultragol-api-3.vercel.app/estadisticas/partido/${eventId}`);
+        
+        if (!response.ok) {
+            console.warn(`⚠️ Error al cargar estadísticas: ${response.status}`);
+            return null;
+        }
+        
+        const data = await response.json();
+        console.log(`✅ Estadísticas cargadas para partido ${eventId}:`, data);
+        
+        // Guardar en cache
+        statsCache[eventId] = {
+            data: data,
+            timestamp: Date.now()
+        };
+        
+        return data;
+    } catch (error) {
+        console.error(`❌ Error al obtener estadísticas del partido ${eventId}:`, error);
+        return null;
+    }
+}
+
+// Función auxiliar para extraer valor numérico de string con %
+function parseStatValue(value) {
+    if (!value) return 0;
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+        return parseInt(value.replace('%', '').trim()) || 0;
+    }
+    if (value.valor) {
+        return parseInt(value.valor.replace('%', '').trim()) || 0;
+    }
+    return 0;
+}
+
+// Función para procesar las estadísticas de la API al formato interno
+function processAPIStats(apiData) {
+    if (!apiData) return null;
+    
+    // La API puede tener dos formatos:
+    // 1. Formato estadisticasEquipos: { local: { estadisticas: {...} }, visitante: { estadisticas: {...} } }
+    // 2. Formato estadisticas: { posesion: { local, visitante }, ... }
+    
+    let localStats, visitanteStats;
+    
+    if (apiData.estadisticasEquipos) {
+        // Nuevo formato con estadisticasEquipos
+        localStats = apiData.estadisticasEquipos.local?.estadisticas || {};
+        visitanteStats = apiData.estadisticasEquipos.visitante?.estadisticas || {};
+        
+        return {
+            possession: {
+                home: parseStatValue(localStats.posesion),
+                away: parseStatValue(visitanteStats.posesion)
+            },
+            shots: {
+                home: parseStatValue(localStats.tiros?.totales),
+                away: parseStatValue(visitanteStats.tiros?.totales)
+            },
+            shotsOnTarget: {
+                home: parseStatValue(localStats.tiros?.aPorteria),
+                away: parseStatValue(visitanteStats.tiros?.aPorteria)
+            },
+            corners: {
+                home: parseStatValue(localStats.corners),
+                away: parseStatValue(visitanteStats.corners)
+            },
+            fouls: {
+                home: parseStatValue(localStats.faltas),
+                away: parseStatValue(visitanteStats.faltas)
+            },
+            offsides: {
+                home: parseStatValue(localStats.fuerasDeJuego),
+                away: parseStatValue(visitanteStats.fuerasDeJuego)
+            },
+            cards: {
+                home: {
+                    yellow: parseStatValue(localStats.tarjetas?.amarillas),
+                    red: parseStatValue(localStats.tarjetas?.rojas)
+                },
+                away: {
+                    yellow: parseStatValue(visitanteStats.tarjetas?.amarillas),
+                    red: parseStatValue(visitanteStats.tarjetas?.rojas)
+                }
+            },
+            pases: {
+                home: parseStatValue(localStats.pases?.totales),
+                away: parseStatValue(visitanteStats.pases?.totales)
+            },
+            precision: {
+                home: parseStatValue(localStats.pases?.precision),
+                away: parseStatValue(visitanteStats.pases?.precision)
+            },
+            salvadas: {
+                home: parseStatValue(localStats.salvadas),
+                away: parseStatValue(visitanteStats.salvadas)
+            },
+            intercepciones: {
+                home: parseStatValue(localStats.intercepciones),
+                away: parseStatValue(visitanteStats.intercepciones)
+            }
+        };
+    } else if (apiData.estadisticas) {
+        // Formato alternativo con estadisticas directas
+        const stats = apiData.estadisticas;
+        
+        return {
+            possession: {
+                home: parseInt(stats.posesion?.local) || 50,
+                away: parseInt(stats.posesion?.visitante) || 50
+            },
+            shots: {
+                home: parseInt(stats.tiros?.local) || 0,
+                away: parseInt(stats.tiros?.visitante) || 0
+            },
+            shotsOnTarget: {
+                home: parseInt(stats.tirosAlArco?.local) || parseInt(stats.tirosAPuerta?.local) || 0,
+                away: parseInt(stats.tirosAlArco?.visitante) || parseInt(stats.tirosAPuerta?.visitante) || 0
+            },
+            corners: {
+                home: parseInt(stats.corners?.local) || parseInt(stats.tiroDeEsquina?.local) || 0,
+                away: parseInt(stats.corners?.visitante) || parseInt(stats.tiroDeEsquina?.visitante) || 0
+            },
+            fouls: {
+                home: parseInt(stats.faltas?.local) || 0,
+                away: parseInt(stats.faltas?.visitante) || 0
+            },
+            offsides: {
+                home: parseInt(stats.fuerasDeJuego?.local) || parseInt(stats.offside?.local) || 0,
+                away: parseInt(stats.fuerasDeJuego?.visitante) || parseInt(stats.offside?.visitante) || 0
+            },
+            cards: {
+                home: {
+                    yellow: parseInt(stats.tarjetasAmarillas?.local) || 0,
+                    red: parseInt(stats.tarjetasRojas?.local) || 0
+                },
+                away: {
+                    yellow: parseInt(stats.tarjetasAmarillas?.visitante) || 0,
+                    red: parseInt(stats.tarjetasRojas?.visitante) || 0
+                }
+            },
+            pases: {
+                home: parseInt(stats.pases?.local) || 0,
+                away: parseInt(stats.pases?.visitante) || 0
+            },
+            precision: {
+                home: parseInt(stats.precisionPases?.local) || 0,
+                away: parseInt(stats.precisionPases?.visitante) || 0
+            },
+            salvadas: {
+                home: 0,
+                away: 0
+            },
+            intercepciones: {
+                home: 0,
+                away: 0
+            }
+        };
+    }
+    
+    return null;
+}
+
+// Función para procesar eventos de la API
+function processAPIEvents(apiData) {
+    const events = [];
+    
+    if (!apiData || !apiData.eventos) return events;
+    
+    const eventosData = apiData.eventos;
+    
+    // Procesar goles
+    if (eventosData.goles && eventosData.goles.length > 0) {
+        eventosData.goles.forEach(gol => {
+            events.push({
+                type: 'goal',
+                minute: parseInt(gol.minuto) || 0,
+                team: gol.equipo === 'local' ? 'home' : 'away',
+                player: gol.jugador || gol.anotador || 'Desconocido',
+                detail: gol.tipo || 'Gol'
+            });
+        });
+    }
+    
+    // Procesar tarjetas
+    if (eventosData.tarjetas && eventosData.tarjetas.length > 0) {
+        eventosData.tarjetas.forEach(tarjeta => {
+            const isRed = tarjeta.tipo === 'roja' || tarjeta.tipo === 'red' || tarjeta.color === 'roja';
+            events.push({
+                type: isRed ? 'red-card' : 'yellow-card',
+                minute: parseInt(tarjeta.minuto) || 0,
+                team: tarjeta.equipo === 'local' ? 'home' : 'away',
+                player: tarjeta.jugador || 'Desconocido',
+                detail: isRed ? 'Tarjeta Roja' : 'Tarjeta Amarilla'
+            });
+        });
+    }
+    
+    // Procesar cambios/sustituciones
+    if (eventosData.cambios && eventosData.cambios.length > 0) {
+        eventosData.cambios.forEach(cambio => {
+            events.push({
+                type: 'substitution',
+                minute: parseInt(cambio.minuto) || 0,
+                team: cambio.equipo === 'local' ? 'home' : 'away',
+                player: `${cambio.entra || cambio.jugadorEntra || 'Jugador'} por ${cambio.sale || cambio.jugadorSale || 'Jugador'}`,
+                detail: 'Cambio'
+            });
+        });
+    }
+    
+    // Procesar sustituciones (alias alternativo)
+    if (eventosData.sustituciones && eventosData.sustituciones.length > 0) {
+        eventosData.sustituciones.forEach(sub => {
+            events.push({
+                type: 'substitution',
+                minute: parseInt(sub.minuto) || 0,
+                team: sub.equipo === 'local' ? 'home' : 'away',
+                player: `${sub.entra || sub.jugadorEntra || 'Jugador'} por ${sub.sale || sub.jugadorSale || 'Jugador'}`,
+                detail: 'Cambio'
+            });
+        });
+    }
+    
+    // Si hay eventos en 'todos', procesarlos también
+    if (eventosData.todos && eventosData.todos.length > 0) {
+        eventosData.todos.forEach(evento => {
+            const type = evento.tipo === 'gol' ? 'goal' :
+                        evento.tipo === 'tarjeta_amarilla' ? 'yellow-card' :
+                        evento.tipo === 'tarjeta_roja' ? 'red-card' :
+                        evento.tipo === 'cambio' ? 'substitution' : 'other';
+            
+            if (type !== 'other' && !events.find(e => e.minute === parseInt(evento.minuto) && e.type === type)) {
+                events.push({
+                    type: type,
+                    minute: parseInt(evento.minuto) || 0,
+                    team: evento.equipo === 'local' ? 'home' : 'away',
+                    player: evento.jugador || evento.descripcion || 'Evento',
+                    detail: evento.descripcion || evento.tipo
+                });
+            }
+        });
+    }
+    
+    // Ordenar por minuto
+    events.sort((a, b) => a.minute - b.minute);
+    
+    return events;
+}
+
+// Función para actualizar las estadísticas en el DOM
+async function updateStatsInDOM(eventId, partido) {
+    if (!eventId) return;
+    
+    const apiData = await fetchRealMatchStats(eventId);
+    
+    if (!apiData) {
+        console.log('📊 No hay datos de API, usando estadísticas generadas');
+        return;
+    }
+    
+    const stats = processAPIStats(apiData);
+    const events = processAPIEvents(apiData);
+    
+    if (!stats) return;
+    
+    // Actualizar barras de estadísticas
+    const statsContent = document.getElementById('statsContent');
+    if (statsContent) {
+        statsContent.innerHTML = `
+            <div class="stats-bars-container">
+                ${generateStatBar('Posesión', stats.possession.home, stats.possession.away, '%')}
+                ${generateStatBar('Tiros', stats.shots.home, stats.shots.away)}
+                ${generateStatBar('Tiros a Puerta', stats.shotsOnTarget.home, stats.shotsOnTarget.away)}
+                ${generateStatBar('Córners', stats.corners.home, stats.corners.away)}
+                ${generateStatBar('Faltas', stats.fouls.home, stats.fouls.away)}
+                ${generateStatBar('Fueras de Juego', stats.offsides.home, stats.offsides.away)}
+                ${stats.pases.home > 0 ? generateStatBar('Pases', stats.pases.home, stats.pases.away) : ''}
+                ${stats.precision.home > 0 ? generateStatBar('Precisión Pases', stats.precision.home, stats.precision.away, '%') : ''}
+            </div>
+            <div class="stats-source" style="text-align: center; font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 8px;">
+                <i class="fas fa-sync-alt"></i> Datos en tiempo real
+            </div>
+        `;
+    }
+    
+    // Actualizar eventos
+    const eventsContent = document.getElementById('eventsContent');
+    if (eventsContent && partido) {
+        eventsContent.innerHTML = `
+            <div class="match-events-section">
+                <div class="events-header">
+                    <i class="fas fa-clock"></i>
+                    <span class="events-header-title">Cronología del Partido</span>
+                </div>
+                <div class="events-timeline">
+                    ${events.length > 0 ? events.map(event => generateEventItem(event, partido)).join('') : `
+                        <div class="no-events-message">
+                            <i class="fas fa-hourglass-half"></i>
+                            <p>Los eventos aparecerán aquí durante el partido</p>
+                        </div>
+                    `}
+                </div>
+            </div>
+        `;
+    }
+    
+    // Actualizar tarjetas
+    const cardsContent = document.getElementById('cardsContent');
+    if (cardsContent && partido) {
+        const cardEvents = events.filter(e => e.type === 'yellow-card' || e.type === 'red-card');
+        cardsContent.innerHTML = `
+            <div class="cards-summary">
+                <div class="cards-team">
+                    <span class="cards-team-name">${partido.local?.nombreCorto || 'Local'}</span>
+                    <div class="cards-display">
+                        <div class="card-count">
+                            <div class="card-icon yellow"></div>
+                            <span class="card-number">${stats.cards.home.yellow}</span>
+                        </div>
+                        <div class="card-count">
+                            <div class="card-icon red"></div>
+                            <span class="card-number">${stats.cards.home.red}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="cards-team">
+                    <span class="cards-team-name">${partido.visitante?.nombreCorto || 'Visitante'}</span>
+                    <div class="cards-display">
+                        <div class="card-count">
+                            <div class="card-icon yellow"></div>
+                            <span class="card-number">${stats.cards.away.yellow}</span>
+                        </div>
+                        <div class="card-count">
+                            <div class="card-icon red"></div>
+                            <span class="card-number">${stats.cards.away.red}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            ${cardEvents.length > 0 ? `
+                <div class="match-events-section">
+                    <div class="events-header">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span class="events-header-title">Tarjetas Mostradas</span>
+                    </div>
+                    <div class="events-timeline">
+                        ${cardEvents.map(event => generateEventItem(event, partido)).join('')}
+                    </div>
+                </div>
+            ` : `
+                <div class="no-events-message">
+                    <i class="fas fa-check-circle"></i>
+                    <p>No hay tarjetas en este partido</p>
+                </div>
+            `}
+        `;
+    }
+    
+    // Actualizar marcador si está disponible
+    if (apiData.estado) {
+        const scoreDisplay = document.querySelector('.stats-score-display');
+        const statusDisplay = document.querySelector('.stats-match-status');
+        
+        if (scoreDisplay && apiData.marcador) {
+            scoreDisplay.textContent = `${apiData.marcador.local ?? 0} - ${apiData.marcador.visitante ?? 0}`;
+        }
+        
+        if (statusDisplay) {
+            if (apiData.estado.enVivo) {
+                statusDisplay.textContent = apiData.estado.reloj || 'En Vivo';
+                statusDisplay.style.color = '#4ecdc4';
+            } else if (apiData.estado.finalizado) {
+                statusDisplay.textContent = 'Finalizado';
+                statusDisplay.style.color = '#888';
+            }
+        }
+    }
+    
+    console.log('✅ Estadísticas actualizadas en el DOM');
+}
+
+// Función para iniciar la actualización automática de estadísticas
+function startStatsAutoUpdate(eventId, partido) {
+    // Limpiar intervalo anterior si existe
+    stopStatsAutoUpdate();
+    
+    currentStatsEventId = eventId;
+    
+    // Cargar estadísticas inmediatamente
+    updateStatsInDOM(eventId, partido);
+    
+    // Configurar actualización automática cada 30 segundos
+    statsUpdateInterval = setInterval(() => {
+        if (currentStatsEventId === eventId) {
+            console.log('🔄 Actualizando estadísticas automáticamente...');
+            updateStatsInDOM(eventId, partido);
+        }
+    }, 30000); // 30 segundos
+    
+    console.log(`⏱️ Auto-actualización de estadísticas iniciada para partido ${eventId}`);
+}
+
+// Función para detener la actualización automática
+function stopStatsAutoUpdate() {
+    if (statsUpdateInterval) {
+        clearInterval(statsUpdateInterval);
+        statsUpdateInterval = null;
+        currentStatsEventId = null;
+        console.log('⏹️ Auto-actualización de estadísticas detenida');
+    }
+}
+
 // Función para generar la sección de estadísticas del partido
 function generateMatchStatsSection(partidoNombre) {
     // Buscar el partido en marcadoresData
@@ -1660,6 +2094,16 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     if (statsContainer) {
         statsContainer.innerHTML = generateMatchStatsSection(displayTitle);
         initStatsTabsListeners();
+        
+        // Buscar el partido y cargar estadísticas reales si está disponible
+        const partido = findPartidoByName(displayTitle);
+        if (partido && partido.id) {
+            console.log(`📊 Partido encontrado con ID: ${partido.id}, cargando estadísticas reales...`);
+            // Iniciar carga de estadísticas reales desde la API
+            startStatsAutoUpdate(partido.id, partido);
+        } else {
+            console.log('📊 No se encontró partido con ID, usando estadísticas generadas');
+        }
     }
     
     iframe.onload = () => {
@@ -1747,6 +2191,9 @@ function closePlayerModalOnly() {
     }
     
     currentStreamUrl = '';
+    
+    // Detener la actualización automática de estadísticas
+    stopStatsAutoUpdate();
     
     // Limpiar el contenedor de estadísticas
     if (statsContainer) {
