@@ -1624,7 +1624,9 @@ async function updateStatsInDOM(eventId, partido) {
         const statusDisplay = document.querySelector('.stats-match-status');
         
         if (scoreDisplay && apiData.marcador) {
-            scoreDisplay.textContent = `${apiData.marcador.local ?? 0} - ${apiData.marcador.visitante ?? 0}`;
+            const localScore = apiData.marcador.local?.goles ?? apiData.marcador.local ?? 0;
+            const visitanteScore = apiData.marcador.visitante?.goles ?? apiData.marcador.visitante ?? 0;
+            scoreDisplay.textContent = `${localScore} - ${visitanteScore}`;
         }
         
         if (statusDisplay) {
