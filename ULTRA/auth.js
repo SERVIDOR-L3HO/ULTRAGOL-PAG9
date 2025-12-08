@@ -1,26 +1,56 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { 
+    getAuth, 
+    GoogleAuthProvider, 
+    signInWithPopup, 
+    signOut, 
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    updateProfile
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    getDoc,
+    serverTimestamp 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAneyRjnZzvhIFLzykATmW4ShN3IVuf5E0",
+    authDomain: "ligamx-daf3d.firebaseapp.com",
+    projectId: "ligamx-daf3d",
+    storageBucket: "ligamx-daf3d.appspot.com",
+    messagingSenderId: "437421248316",
+    appId: "1:437421248316:web:38e9f436a57389d2c49839",
+    measurementId: "G-LKVTFN2463"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
+
 let currentUser = null;
-let isAuthenticated = false;
 
-document.addEventListener('DOMContentLoaded', function() {
-    checkAuthSession();
-});
-
-async function checkAuthSession() {
-    try {
-        const response = await fetch('/api/auth/session', {
-            credentials: 'include'
-        });
-        const data = await response.json();
-        
-        if (data.authenticated && data.user) {
-            currentUser = data.user;
-            isAuthenticated = true;
-            updateUserUI();
-        }
-    } catch (error) {
-        console.log('No hay sesión activa');
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUser = {
+            uid: user.uid,
+            username: user.displayName || user.email?.split('@')[0] || 'Usuario',
+            email: user.email,
+            photoURL: user.photoURL
+        };
+        updateUserUI();
+        console.log('✅ Usuario autenticado:', currentUser.username);
+    } else {
+        currentUser = null;
+        updateUserUI();
+        console.log('👤 Usuario no autenticado');
     }
-}
+});
 
 function updateUserUI() {
     const userBtn = document.getElementById('userBtn');
@@ -30,23 +60,27 @@ function updateUserUI() {
     const userMenuLogged = document.getElementById('userMenuLogged');
     const userAvatar = document.querySelector('.user-avatar');
     
-    if (isAuthenticated && currentUser) {
-        userBtn.classList.add('logged-in');
-        userDisplayName.textContent = currentUser.username;
-        userStatus.textContent = currentUser.email || 'Usuario verificado';
-        userMenuBody.style.display = 'none';
-        userMenuLogged.style.display = 'block';
+    if (currentUser) {
+        if (userBtn) userBtn.classList.add('logged-in');
+        if (userDisplayName) userDisplayName.textContent = currentUser.username;
+        if (userStatus) userStatus.textContent = currentUser.email || 'Usuario verificado';
+        if (userMenuBody) userMenuBody.style.display = 'none';
+        if (userMenuLogged) userMenuLogged.style.display = 'block';
         
         if (userAvatar) {
-            userAvatar.innerHTML = `<span class="avatar-initial">${currentUser.username.charAt(0).toUpperCase()}</span>`;
+            if (currentUser.photoURL) {
+                userAvatar.innerHTML = `<img src="${currentUser.photoURL}" alt="${currentUser.username}" class="avatar-img">`;
+            } else {
+                userAvatar.innerHTML = `<span class="avatar-initial">${currentUser.username.charAt(0).toUpperCase()}</span>`;
+            }
             userAvatar.classList.add('has-user');
         }
     } else {
-        userBtn.classList.remove('logged-in');
-        userDisplayName.textContent = 'Invitado';
-        userStatus.textContent = 'No has iniciado sesión';
-        userMenuBody.style.display = 'block';
-        userMenuLogged.style.display = 'none';
+        if (userBtn) userBtn.classList.remove('logged-in');
+        if (userDisplayName) userDisplayName.textContent = 'Invitado';
+        if (userStatus) userStatus.textContent = 'No has iniciado sesión';
+        if (userMenuBody) userMenuBody.style.display = 'block';
+        if (userMenuLogged) userMenuLogged.style.display = 'none';
         
         if (userAvatar) {
             userAvatar.innerHTML = '<i class="fas fa-user"></i>';
@@ -55,17 +89,17 @@ function updateUserUI() {
     }
 }
 
-function toggleUserMenu() {
+window.toggleUserMenu = function() {
     const userMenu = document.getElementById('userMenu');
     userMenu.classList.toggle('active');
 }
 
-function closeUserMenu() {
+window.closeUserMenu = function() {
     const userMenu = document.getElementById('userMenu');
     userMenu.classList.remove('active');
 }
 
-function openLoginModal() {
+window.openLoginModal = function() {
     closeUserMenu();
     const loginModal = document.getElementById('loginModal');
     loginModal.classList.add('active');
@@ -75,13 +109,13 @@ function openLoginModal() {
     document.getElementById('loginForm').reset();
 }
 
-function closeLoginModal() {
+window.closeLoginModal = function() {
     const loginModal = document.getElementById('loginModal');
     loginModal.classList.remove('active');
     document.body.style.overflow = '';
 }
 
-function openRegisterModal() {
+window.openRegisterModal = function() {
     closeUserMenu();
     closeLoginModal();
     const registerModal = document.getElementById('registerModal');
@@ -92,23 +126,23 @@ function openRegisterModal() {
     document.getElementById('registerForm').reset();
 }
 
-function closeRegisterModal() {
+window.closeRegisterModal = function() {
     const registerModal = document.getElementById('registerModal');
     registerModal.classList.remove('active');
     document.body.style.overflow = '';
 }
 
-function switchToRegister() {
+window.switchToRegister = function() {
     closeLoginModal();
     setTimeout(() => openRegisterModal(), 100);
 }
 
-function switchToLogin() {
+window.switchToLogin = function() {
     closeRegisterModal();
     setTimeout(() => openLoginModal(), 100);
 }
 
-function togglePasswordVisibility(inputId) {
+window.togglePasswordVisibility = function(inputId) {
     const input = document.getElementById(inputId);
     const button = input.parentElement.querySelector('.toggle-password i');
     
@@ -123,10 +157,10 @@ function togglePasswordVisibility(inputId) {
     }
 }
 
-async function handleLogin(event) {
+window.handleLogin = async function(event) {
     event.preventDefault();
     
-    const username = document.getElementById('loginUsername').value.trim();
+    const email = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value;
     const submitBtn = document.getElementById('loginSubmitBtn');
     const errorDiv = document.getElementById('loginError');
@@ -137,30 +171,36 @@ async function handleLogin(event) {
     errorDiv.style.display = 'none';
     
     try {
-        const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({ username, password })
-        });
+        const emailToUse = email.includes('@') ? email : `${email}@ultragol.app`;
         
-        const data = await response.json();
-        
-        if (response.ok) {
-            currentUser = data.user;
-            isAuthenticated = true;
-            updateUserUI();
-            closeLoginModal();
-            showNotification('¡Bienvenido ' + currentUser.username + '!', 'success');
-        } else {
-            errorText.textContent = data.error || 'Usuario o contraseña incorrectos';
-            errorDiv.style.display = 'flex';
-        }
+        await signInWithEmailAndPassword(auth, emailToUse, password);
+        closeLoginModal();
+        showNotification('¡Bienvenido de vuelta!', 'success');
     } catch (error) {
         console.error('Error en login:', error);
-        errorText.textContent = 'Error de conexión. Intenta más tarde.';
+        let errorMessage = 'Error al iniciar sesión';
+        
+        switch (error.code) {
+            case 'auth/user-not-found':
+                errorMessage = 'Usuario no encontrado';
+                break;
+            case 'auth/wrong-password':
+                errorMessage = 'Contraseña incorrecta';
+                break;
+            case 'auth/invalid-email':
+                errorMessage = 'Email inválido';
+                break;
+            case 'auth/invalid-credential':
+                errorMessage = 'Usuario o contraseña incorrectos';
+                break;
+            case 'auth/too-many-requests':
+                errorMessage = 'Demasiados intentos. Intenta más tarde';
+                break;
+            default:
+                errorMessage = error.message;
+        }
+        
+        errorText.textContent = errorMessage;
         errorDiv.style.display = 'flex';
     } finally {
         submitBtn.disabled = false;
@@ -168,7 +208,7 @@ async function handleLogin(event) {
     }
 }
 
-async function handleRegister(event) {
+window.handleRegister = async function(event) {
     event.preventDefault();
     
     const username = document.getElementById('registerUsername').value.trim();
@@ -184,30 +224,44 @@ async function handleRegister(event) {
     errorDiv.style.display = 'none';
     
     try {
-        const response = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            credentials: 'include',
-            body: JSON.stringify({ username, password, email, favoriteTeam })
+        const emailToUse = email || `${username.toLowerCase().replace(/\s/g, '')}@ultragol.app`;
+        
+        const userCredential = await createUserWithEmailAndPassword(auth, emailToUse, password);
+        const user = userCredential.user;
+        
+        await updateProfile(user, {
+            displayName: username
         });
         
-        const data = await response.json();
+        await setDoc(doc(db, 'users', user.uid), {
+            username: username,
+            email: emailToUse,
+            favoriteTeam: favoriteTeam || null,
+            createdAt: serverTimestamp(),
+            role: 'user'
+        });
         
-        if (response.ok) {
-            currentUser = data.user;
-            isAuthenticated = true;
-            updateUserUI();
-            closeRegisterModal();
-            showNotification('¡Cuenta creada exitosamente! Bienvenido ' + currentUser.username, 'success');
-        } else {
-            errorText.textContent = data.error || 'Error al crear la cuenta';
-            errorDiv.style.display = 'flex';
-        }
+        closeRegisterModal();
+        showNotification('¡Cuenta creada exitosamente! Bienvenido ' + username, 'success');
     } catch (error) {
         console.error('Error en registro:', error);
-        errorText.textContent = 'Error de conexión. Intenta más tarde.';
+        let errorMessage = 'Error al crear la cuenta';
+        
+        switch (error.code) {
+            case 'auth/email-already-in-use':
+                errorMessage = 'Este usuario ya existe';
+                break;
+            case 'auth/invalid-email':
+                errorMessage = 'Email inválido';
+                break;
+            case 'auth/weak-password':
+                errorMessage = 'La contraseña debe tener al menos 6 caracteres';
+                break;
+            default:
+                errorMessage = error.message;
+        }
+        
+        errorText.textContent = errorMessage;
         errorDiv.style.display = 'flex';
     } finally {
         submitBtn.disabled = false;
@@ -215,30 +269,56 @@ async function handleRegister(event) {
     }
 }
 
-async function logoutUser() {
+window.signInWithGoogle = async function() {
     closeUserMenu();
     
     try {
-        await fetch('/api/auth/logout', {
-            method: 'POST',
-            credentials: 'include'
-        });
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+        
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (!userDoc.exists()) {
+            await setDoc(doc(db, 'users', user.uid), {
+                username: user.displayName,
+                email: user.email,
+                photoURL: user.photoURL,
+                createdAt: serverTimestamp(),
+                role: 'user'
+            });
+        }
+        
+        showNotification('¡Bienvenido ' + user.displayName + '!', 'success');
+    } catch (error) {
+        console.error('Error con Google Sign-In:', error);
+        
+        if (error.code === 'auth/unauthorized-domain') {
+            showNotification('Dominio no autorizado. Contacta al administrador.', 'error');
+        } else if (error.code !== 'auth/popup-closed-by-user') {
+            showNotification('Error al iniciar sesión con Google', 'error');
+        }
+    }
+}
+
+window.logoutUser = async function() {
+    closeUserMenu();
+    
+    try {
+        await signOut(auth);
+        showNotification('Sesión cerrada', 'info');
     } catch (error) {
         console.error('Error en logout:', error);
+        showNotification('Error al cerrar sesión', 'error');
     }
-    
-    currentUser = null;
-    isAuthenticated = false;
-    updateUserUI();
-    showNotification('Sesión cerrada', 'info');
 }
 
-function viewProfile() {
+window.viewProfile = function() {
     closeUserMenu();
-    showNotification('Perfil de usuario - Próximamente', 'info');
+    if (currentUser) {
+        showNotification('Perfil: ' + currentUser.username + ' (' + currentUser.email + ')', 'info');
+    }
 }
 
-function viewFavorites() {
+window.viewFavorites = function() {
     closeUserMenu();
     showNotification('Mis favoritos - Próximamente', 'info');
 }
@@ -263,3 +343,13 @@ function showNotification(message, type = 'info') {
         setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
+
+window.getCurrentUser = function() {
+    return currentUser;
+}
+
+window.isUserLoggedIn = function() {
+    return currentUser !== null;
+}
+
+console.log('🔐 Firebase Auth inicializado');
