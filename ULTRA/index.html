@@ -49,6 +49,9 @@
                 <button class="icon-btn settings-btn" onclick="toggleSettings()">
                     <i class="fas fa-cog"></i>
                 </button>
+                <button class="icon-btn user-btn" id="userBtn" onclick="toggleUserMenu()">
+                    <i class="fas fa-user"></i>
+                </button>
             </div>
         </header>
 
@@ -599,6 +602,179 @@
         </div>
     </div>
 
+    <!-- User Menu Dropdown -->
+    <div id="userMenu" class="user-menu">
+        <div class="user-menu-overlay" onclick="closeUserMenu()"></div>
+        <div class="user-menu-content">
+            <div class="user-menu-header" id="userMenuHeader">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name" id="userDisplayName">Invitado</span>
+                    <span class="user-status" id="userStatus">No has iniciado sesión</span>
+                </div>
+            </div>
+            <div class="user-menu-body" id="userMenuBody">
+                <button class="user-menu-item" onclick="openLoginModal()">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Iniciar Sesión</span>
+                </button>
+                <button class="user-menu-item" onclick="openRegisterModal()">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Registrarse</span>
+                </button>
+            </div>
+            <div class="user-menu-body user-menu-logged" id="userMenuLogged" style="display: none;">
+                <button class="user-menu-item" onclick="viewProfile()">
+                    <i class="fas fa-id-card"></i>
+                    <span>Mi Perfil</span>
+                </button>
+                <button class="user-menu-item" onclick="viewFavorites()">
+                    <i class="fas fa-heart"></i>
+                    <span>Mis Favoritos</span>
+                </button>
+                <button class="user-menu-item logout-item" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="auth-modal">
+        <div class="auth-modal-overlay" onclick="closeLoginModal()"></div>
+        <div class="auth-modal-container">
+            <div class="auth-modal-header">
+                <div class="auth-logo">
+                    <img src="ultragol-logo.png" alt="ULTRAGOL">
+                </div>
+                <h2 class="auth-title">Iniciar Sesión</h2>
+                <p class="auth-subtitle">Accede a tu cuenta ULTRAGOL</p>
+                <button class="close-auth-modal" onclick="closeLoginModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="auth-input-group">
+                        <label for="loginUsername">Usuario</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="loginUsername" name="username" placeholder="Tu nombre de usuario" required>
+                        </div>
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="loginPassword">Contraseña</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="loginPassword" name="password" placeholder="Tu contraseña" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('loginPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="auth-error" id="loginError" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="loginErrorText">Error de autenticación</span>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" id="loginSubmitBtn">
+                        <span>Iniciar Sesión</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+                <div class="auth-footer">
+                    <p>¿No tienes cuenta? <a href="#" onclick="switchToRegister()">Regístrate aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="auth-modal">
+        <div class="auth-modal-overlay" onclick="closeRegisterModal()"></div>
+        <div class="auth-modal-container">
+            <div class="auth-modal-header">
+                <div class="auth-logo">
+                    <img src="ultragol-logo.png" alt="ULTRAGOL">
+                </div>
+                <h2 class="auth-title">Crear Cuenta</h2>
+                <p class="auth-subtitle">Únete a la comunidad ULTRAGOL</p>
+                <button class="close-auth-modal" onclick="closeRegisterModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="auth-input-group">
+                        <label for="registerUsername">Usuario</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="registerUsername" name="username" placeholder="Elige un nombre de usuario" required minlength="3">
+                        </div>
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="registerEmail">Email (opcional)</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="registerEmail" name="email" placeholder="tu@email.com">
+                        </div>
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="registerPassword">Contraseña</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="registerPassword" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('registerPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="registerTeam">Equipo Favorito (opcional)</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-futbol"></i>
+                            <select id="registerTeam" name="favoriteTeam">
+                                <option value="">Selecciona tu equipo</option>
+                                <option value="america">América</option>
+                                <option value="chivas">Chivas</option>
+                                <option value="tigres">Tigres</option>
+                                <option value="monterrey">Monterrey</option>
+                                <option value="cruz-azul">Cruz Azul</option>
+                                <option value="pumas">Pumas</option>
+                                <option value="santos">Santos</option>
+                                <option value="toluca">Toluca</option>
+                                <option value="leon">León</option>
+                                <option value="atlas">Atlas</option>
+                                <option value="pachuca">Pachuca</option>
+                                <option value="tijuana">Tijuana</option>
+                                <option value="puebla">Puebla</option>
+                                <option value="queretaro">Querétaro</option>
+                                <option value="necaxa">Necaxa</option>
+                                <option value="mazatlan">Mazatlán</option>
+                                <option value="juarez">Juárez</option>
+                                <option value="san-luis">San Luis</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="auth-error" id="registerError" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="registerErrorText">Error en el registro</span>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" id="registerSubmitBtn">
+                        <span>Crear Cuenta</span>
+                        <i class="fas fa-user-plus"></i>
+                    </button>
+                </form>
+                <div class="auth-footer">
+                    <p>¿Ya tienes cuenta? <a href="#" onclick="switchToLogin()">Inicia sesión</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js?v=20251207"></script>
     <script src="app.js?v=20251119-api4fix"></script>
     <script>
         // Forzar recarga si hay nueva versión
