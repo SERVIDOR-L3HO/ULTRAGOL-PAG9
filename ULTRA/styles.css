@@ -1506,6 +1506,190 @@ input:checked + .slider:before {
     font-size: 16px;
 }
 
+/* Sección Código Promocional */
+.promo-code-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-top: 20px;
+    padding: 20px 0;
+    border-bottom: none;
+}
+
+.promo-code-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.promo-code-header i {
+    color: var(--primary);
+    font-size: 18px;
+}
+
+.promo-code-status {
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+}
+
+.promo-code-status .promo-status-text {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.promo-code-status.active {
+    background: linear-gradient(135deg, rgba(0, 255, 65, 0.1), rgba(0, 200, 50, 0.05));
+    border-color: rgba(0, 255, 65, 0.3);
+}
+
+.promo-code-status .promo-active {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #00ff41;
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.promo-code-status .promo-active i {
+    font-size: 16px;
+}
+
+.promo-code-status .promo-expires {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.promo-code-status .promo-expires i {
+    font-size: 12px;
+    color: #ffc107;
+}
+
+.promo-code-input-wrapper {
+    display: flex;
+    gap: 10px;
+}
+
+.promo-code-input {
+    flex: 1;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.promo-code-input:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.promo-code-input::placeholder {
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--text-muted);
+}
+
+.promo-code-btn {
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.promo-code-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(255, 69, 0, 0.4);
+}
+
+.promo-code-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.promo-code-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: 5px;
+}
+
+/* Notificación Código Promocional */
+.promo-notification {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+    padding: 15px 25px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 9999;
+    max-width: 90%;
+}
+
+.promo-notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.promo-notification.success {
+    border-color: rgba(0, 255, 65, 0.3);
+}
+
+.promo-notification.success i {
+    color: #00ff41;
+}
+
+.promo-notification.error {
+    border-color: rgba(255, 69, 0, 0.3);
+}
+
+.promo-notification.error i {
+    color: #ff4500;
+}
+
+.promo-notification span {
+    color: var(--text);
+    font-size: 14px;
+}
+
+/* Ocultar anuncios cuando está activo el código */
+body.ads-hidden .adsbygoogle,
+body.ads-hidden [data-ad-slot],
+body.ads-hidden ins.adsbygoogle {
+    display: none !important;
+}
+
 /* Modal de Confirmación Eliminar Caché */
 .clear-cache-modal {
     position: fixed;

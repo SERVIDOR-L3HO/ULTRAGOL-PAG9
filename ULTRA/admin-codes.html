@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Códigos Promocionales | ULTRAGOL</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF4500;
+            --secondary: #1a1a1a;
+            --dark: #0d0d0d;
+            --accent: #FF6B35;
+            --text: #ffffff;
+            --text-muted: #999;
+            --border: rgba(255, 255, 255, 0.1);
+            --success: #00ff41;
+            --error: #ff4444;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #1a1a2e 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .admin-header h1 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .admin-header h1 i {
+            font-size: 28px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(-3px);
+        }
+
+        .auth-section {
+            background: var(--secondary);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .auth-section i.fa-lock {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .auth-section h2 {
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+
+        .auth-section p {
+            color: var(--text-muted);
+            margin-bottom: 25px;
+        }
+
+        .google-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 30px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .google-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .google-btn img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .admin-panel {
+            display: none;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(0, 255, 65, 0.1);
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 255, 65, 0.2);
+        }
+
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .user-info .user-details {
+            flex: 1;
+        }
+
+        .user-info .user-name {
+            font-weight: 600;
+            color: var(--success);
+        }
+
+        .user-info .user-role {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid rgba(255, 68, 68, 0.3);
+            border-radius: 8px;
+            color: #ff4444;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 68, 68, 0.3);
+        }
+
+        .section-card {
+            background: var(--secondary);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .section-card h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 14px 25px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 69, 0, 0.4);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .generated-code {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(0, 255, 65, 0.1), rgba(0, 200, 50, 0.05));
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            text-align: center;
+        }
+
+        .generated-code.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .generated-code .code-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .generated-code .code-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--success);
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+
+        .copy-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .codes-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .code-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .code-item .code-info {
+            flex: 1;
+        }
+
+        .code-item .code-name {
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 1px;
+            color: var(--text);
+        }
+
+        .code-item .code-meta {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .code-item .code-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .code-item .code-status.active {
+            background: rgba(0, 255, 65, 0.15);
+            color: var(--success);
+        }
+
+        .code-item .code-status.expired {
+            background: rgba(255, 68, 68, 0.15);
+            color: #ff4444;
+        }
+
+        .code-item .code-status.maxed {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 15px;
+        }
+
+        .code-action-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .code-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .code-action-btn.delete:hover {
+            background: rgba(255, 68, 68, 0.3);
+            color: #ff4444;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .access-denied {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .access-denied.active {
+            display: block;
+        }
+
+        .access-denied i {
+            font-size: 64px;
+            color: #ff4444;
+            margin-bottom: 20px;
+        }
+
+        .access-denied h2 {
+            color: #ff4444;
+            margin-bottom: 10px;
+        }
+
+        .access-denied p {
+            color: var(--text-muted);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .loading i {
+            font-size: 32px;
+            color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--secondary);
+            padding: 15px 25px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .notification.success {
+            border-color: rgba(0, 255, 65, 0.3);
+        }
+
+        .notification.error {
+            border-color: rgba(255, 68, 68, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .code-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+            
+            .code-actions {
+                margin-left: 0;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1><i class="fas fa-ticket-alt"></i> Códigos Promocionales</h1>
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Volver a ULTRAGOL
+            </a>
+        </div>
+
+        <div id="authSection" class="auth-section">
+            <i class="fas fa-lock"></i>
+            <h2>Acceso Restringido</h2>
+            <p>Inicia sesión con tu cuenta de administrador para gestionar códigos promocionales</p>
+            <button class="google-btn" onclick="signInWithGoogle()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                Iniciar sesión con Google
+            </button>
+        </div>
+
+        <div id="loadingSection" class="auth-section" style="display: none;">
+            <div class="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            <p>Verificando permisos...</p>
+        </div>
+
+        <div id="accessDenied" class="auth-section access-denied">
+            <i class="fas fa-ban"></i>
+            <h2>Acceso Denegado</h2>
+            <p>Tu cuenta no tiene permisos de administrador. Contacta al administrador del sitio.</p>
+            <button class="logout-btn" onclick="signOutUser()" style="margin-top: 20px;">
+                <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+            </button>
+        </div>
+
+        <div id="adminPanel" class="admin-panel">
+            <div class="user-info">
+                <img id="userPhoto" src="" alt="User">
+                <div class="user-details">
+                    <div class="user-name" id="userName">Admin</div>
+                    <div class="user-role">Administrador</div>
+                </div>
+                <button class="logout-btn" onclick="signOutUser()">
+                    <i class="fas fa-sign-out-alt"></i> Salir
+                </button>
+            </div>
+
+            <div class="section-card">
+                <h3><i class="fas fa-plus-circle"></i> Generar Nuevo Código</h3>
+                <form id="generateForm" onsubmit="generateCode(event)">
+                    <div class="form-group">
+                        <label>Código personalizado (opcional)</label>
+                        <input type="text" id="customCode" placeholder="Dejar vacío para generar automáticamente" maxlength="20" style="text-transform: uppercase;">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Duración sin anuncios</label>
+                            <select id="durationDays">
+                                <option value="7">7 días</option>
+                                <option value="14" selected>14 días</option>
+                                <option value="30">30 días</option>
+                                <option value="60">60 días</option>
+                                <option value="90">90 días</option>
+                                <option value="365">1 año</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Usos máximos</label>
+                            <select id="maxUses">
+                                <option value="1">1 uso</option>
+                                <option value="5">5 usos</option>
+                                <option value="10">10 usos</option>
+                                <option value="25">25 usos</option>
+                                <option value="50">50 usos</option>
+                                <option value="100">100 usos</option>
+                                <option value="0">Ilimitado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Válido hasta</label>
+                        <input type="date" id="expiresAt" required>
+                    </div>
+                    <button type="submit" class="generate-btn" id="generateBtn">
+                        <i class="fas fa-magic"></i>
+                        Generar Código
+                    </button>
+                </form>
+
+                <div class="generated-code" id="generatedCode">
+                    <div class="code-label">Código generado:</div>
+                    <div class="code-value" id="newCodeValue">ULTRA2024</div>
+                    <button class="copy-btn" onclick="copyCode()">
+                        <i class="fas fa-copy"></i> Copiar código
+                    </button>
+                </div>
+            </div>
+
+            <div class="section-card">
+                <h3><i class="fas fa-list"></i> Códigos Existentes</h3>
+                <div class="codes-list" id="codesList">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup, 
+            signOut, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            collection,
+            doc, 
+            getDoc,
+            getDocs,
+            setDoc,
+            deleteDoc,
+            updateDoc,
+            query,
+            orderBy,
+            serverTimestamp,
+            Timestamp
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAneyRjnZzvhIFLzykATmW4ShN3IVuf5E0",
+            authDomain: "ligamx-daf3d.firebaseapp.com",
+            projectId: "ligamx-daf3d",
+            storageBucket: "ligamx-daf3d.appspot.com",
+            messagingSenderId: "437421248316",
+            appId: "1:437421248316:web:38e9f436a57389d2c49839",
+            measurementId: "G-LKVTFN2463"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        let currentUser = null;
+        let lastGeneratedCode = '';
+
+        const authSection = document.getElementById('authSection');
+        const loadingSection = document.getElementById('loadingSection');
+        const accessDenied = document.getElementById('accessDenied');
+        const adminPanel = document.getElementById('adminPanel');
+
+        function setDefaultExpiry() {
+            const expiresAt = document.getElementById('expiresAt');
+            const date = new Date();
+            date.setMonth(date.getMonth() + 1);
+            expiresAt.value = date.toISOString().split('T')[0];
+        }
+
+        setDefaultExpiry();
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                showSection('loading');
+                
+                const isAdmin = await checkAdminRole(user.uid);
+                
+                if (isAdmin) {
+                    document.getElementById('userName').textContent = user.displayName || user.email;
+                    document.getElementById('userPhoto').src = user.photoURL || 'https://via.placeholder.com/40';
+                    showSection('admin');
+                    loadCodes();
+                } else {
+                    showSection('denied');
+                }
+            } else {
+                currentUser = null;
+                showSection('auth');
+            }
+        });
+
+        async function checkAdminRole(uid) {
+            try {
+                const userDoc = await getDoc(doc(db, 'users', uid));
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    return userData.role === 'admin';
+                }
+                return false;
+            } catch (error) {
+                console.error('Error checking admin role:', error);
+                return false;
+            }
+        }
+
+        function showSection(section) {
+            authSection.style.display = 'none';
+            loadingSection.style.display = 'none';
+            accessDenied.classList.remove('active');
+            adminPanel.classList.remove('active');
+
+            switch(section) {
+                case 'auth':
+                    authSection.style.display = 'block';
+                    break;
+                case 'loading':
+                    loadingSection.style.display = 'block';
+                    break;
+                case 'denied':
+                    accessDenied.classList.add('active');
+                    break;
+                case 'admin':
+                    adminPanel.classList.add('active');
+                    break;
+            }
+        }
+
+        window.signInWithGoogle = async function() {
+            try {
+                await signInWithPopup(auth, googleProvider);
+            } catch (error) {
+                console.error('Error signing in:', error);
+                showNotification('Error al iniciar sesión', 'error');
+            }
+        };
+
+        window.signOutUser = async function() {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error('Error signing out:', error);
+            }
+        };
+
+        function generateRandomCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let code = 'UG';
+            for (let i = 0; i < 6; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return code;
+        }
+
+        window.generateCode = async function(event) {
+            event.preventDefault();
+            
+            const btn = document.getElementById('generateBtn');
+            const customCode = document.getElementById('customCode').value.trim().toUpperCase();
+            const durationDays = parseInt(document.getElementById('durationDays').value);
+            const maxUses = parseInt(document.getElementById('maxUses').value);
+            const expiresAtInput = document.getElementById('expiresAt').value;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+
+            try {
+                const code = customCode || generateRandomCode();
+                
+                const codeRef = doc(db, 'promoCodes', code);
+                const existingCode = await getDoc(codeRef);
+                
+                if (existingCode.exists()) {
+                    showNotification('Este código ya existe. Usa otro.', 'error');
+                    return;
+                }
+
+                const expiresAt = new Date(expiresAtInput + 'T23:59:59');
+
+                await setDoc(codeRef, {
+                    code: code,
+                    createdAt: serverTimestamp(),
+                    expiresAt: Timestamp.fromDate(expiresAt),
+                    maxUses: maxUses,
+                    currentUses: 0,
+                    durationDays: durationDays,
+                    isActive: true,
+                    createdBy: currentUser.email
+                });
+
+                lastGeneratedCode = code;
+                document.getElementById('newCodeValue').textContent = code;
+                document.getElementById('generatedCode').classList.add('show');
+                document.getElementById('customCode').value = '';
+                
+                showNotification('Código generado exitosamente', 'success');
+                loadCodes();
+
+            } catch (error) {
+                console.error('Error generating code:', error);
+                showNotification('Error al generar código', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-magic"></i> Generar Código';
+            }
+        };
+
+        window.copyCode = function() {
+            navigator.clipboard.writeText(lastGeneratedCode).then(() => {
+                showNotification('Código copiado al portapapeles', 'success');
+            }).catch(() => {
+                showNotification('Error al copiar código', 'error');
+            });
+        };
+
+        async function loadCodes() {
+            const codesList = document.getElementById('codesList');
+            codesList.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i></div>';
+
+            try {
+                const codesQuery = query(collection(db, 'promoCodes'), orderBy('createdAt', 'desc'));
+                const snapshot = await getDocs(codesQuery);
+
+                if (snapshot.empty) {
+                    codesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-ticket-alt"></i>
+                            <p>No hay códigos creados aún</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                const now = new Date();
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const expiresAt = data.expiresAt?.toDate();
+                    const isExpired = expiresAt && expiresAt < now;
+                    const isMaxed = data.maxUses > 0 && data.currentUses >= data.maxUses;
+                    
+                    let statusClass = 'active';
+                    let statusText = 'Activo';
+                    
+                    if (!data.isActive) {
+                        statusClass = 'expired';
+                        statusText = 'Desactivado';
+                    } else if (isExpired) {
+                        statusClass = 'expired';
+                        statusText = 'Expirado';
+                    } else if (isMaxed) {
+                        statusClass = 'maxed';
+                        statusText = 'Límite alcanzado';
+                    }
+
+                    const expiresText = expiresAt ? expiresAt.toLocaleDateString('es-MX') : 'Sin expiración';
+                    const usesText = data.maxUses > 0 ? `${data.currentUses}/${data.maxUses} usos` : `${data.currentUses} usos`;
+
+                    html += `
+                        <div class="code-item">
+                            <div class="code-info">
+                                <div class="code-name">${data.code}</div>
+                                <div class="code-meta">
+                                    ${data.durationDays} días sin anuncios | ${usesText} | Expira: ${expiresText}
+                                </div>
+                            </div>
+                            <span class="code-status ${statusClass}">${statusText}</span>
+                            <div class="code-actions">
+                                <button class="code-action-btn" onclick="copyToClipboard('${data.code}')" title="Copiar">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="code-action-btn" onclick="toggleCodeStatus('${data.code}', ${data.isActive})" title="${data.isActive ? 'Desactivar' : 'Activar'}">
+                                    <i class="fas ${data.isActive ? 'fa-toggle-on' : 'fa-toggle-off'}"></i>
+                                </button>
+                                <button class="code-action-btn delete" onclick="deleteCode('${data.code}')" title="Eliminar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                codesList.innerHTML = html;
+
+            } catch (error) {
+                console.error('Error loading codes:', error);
+                codesList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Error al cargar códigos</p>
+                    </div>
+                `;
+            }
+        }
+
+        window.copyToClipboard = function(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                showNotification('Código copiado', 'success');
+            });
+        };
+
+        window.toggleCodeStatus = async function(code, currentStatus) {
+            try {
+                await updateDoc(doc(db, 'promoCodes', code), {
+                    isActive: !currentStatus
+                });
+                showNotification(currentStatus ? 'Código desactivado' : 'Código activado', 'success');
+                loadCodes();
+            } catch (error) {
+                console.error('Error toggling code:', error);
+                showNotification('Error al actualizar código', 'error');
+            }
+        };
+
+        window.deleteCode = async function(code) {
+            if (!confirm(`¿Estás seguro de eliminar el código ${code}?`)) {
+                return;
+            }
+
+            try {
+                await deleteDoc(doc(db, 'promoCodes', code));
+                showNotification('Código eliminado', 'success');
+                loadCodes();
+            } catch (error) {
+                console.error('Error deleting code:', error);
+                showNotification('Error al eliminar código', 'error');
+            }
+        };
+
+        function showNotification(message, type) {
+            const existing = document.querySelector('.notification');
+            if (existing) existing.remove();
+
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}" style="color: ${type === 'success' ? 'var(--success)' : 'var(--error)'}"></i>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(notification);
+            setTimeout(() => notification.classList.add('show'), 10);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
