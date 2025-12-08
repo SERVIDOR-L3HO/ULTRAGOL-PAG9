@@ -4,14 +4,37 @@ service cloud.firestore {
     
     // Colección de usuarios
     match /users/{userId} {
-      // Cualquiera puede leer perfiles de usuarios
-      allow read: if true;
+      // Solo el propio usuario puede leer su perfil completo
+      allow read: if request.auth != null && request.auth.uid == userId;
       
       // Solo el propio usuario puede crear o actualizar su perfil
       allow create, update: if request.auth != null && request.auth.uid == userId;
       
       // Solo el propio usuario puede eliminar su perfil
       allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Códigos promocionales
+    match /promoCodes/{codeId} {
+      // Solo usuarios autenticados pueden leer códigos
+      allow read: if request.auth != null;
+      
+      // Permitir incrementar currentUses si el usuario está autenticado
+      // y el código está activo y no ha alcanzado el límite
+      allow update: if request.auth != null &&
+                      resource.data.isActive == true &&
+                      (resource.data.maxUses == 0 || resource.data.currentUses < resource.data.maxUses) &&
+                      request.resource.data.diff(resource.data).affectedKeys()
+                        .hasOnly(['currentUses', 'lastUsedAt']) &&
+                      request.resource.data.currentUses == resource.data.currentUses + 1;
+      
+      // Solo admins pueden crear/eliminar códigos
+      allow create, delete: if request.auth != null && 
+                             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      
+      // Solo admins pueden hacer actualizaciones completas (activar/desactivar)
+      allow update: if request.auth != null && 
+                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     
     // Colección de mensajes del chat en vivo
