@@ -681,7 +681,7 @@
                 currentUser = user;
                 showSection('loading');
                 
-                const isAdmin = await checkAdminRole(user.uid);
+                const isAdmin = await checkAdminRole(user);
                 
                 if (isAdmin) {
                     document.getElementById('userName').textContent = user.displayName || user.email;
@@ -697,13 +697,24 @@
             }
         });
 
-        async function checkAdminRole(uid) {
+        async function checkAdminRole(user) {
             try {
-                const userDoc = await getDoc(doc(db, 'users', uid));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    return userData.role === 'admin';
+                // Primero intentar buscar por UID
+                const userDocByUid = await getDoc(doc(db, 'users', user.uid));
+                if (userDocByUid.exists()) {
+                    const userData = userDocByUid.data();
+                    if (userData.role === 'admin') return true;
                 }
+                
+                // Si no encuentra por UID, buscar por email en todos los documentos
+                const usersSnapshot = await getDocs(collection(db, 'users'));
+                for (const userDoc of usersSnapshot.docs) {
+                    const userData = userDoc.data();
+                    if (userData.email === user.email && userData.role === 'admin') {
+                        return true;
+                    }
+                }
+                
                 return false;
             } catch (error) {
                 console.error('Error checking admin role:', error);

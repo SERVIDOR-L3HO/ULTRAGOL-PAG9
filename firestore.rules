@@ -2,11 +2,10 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Colección de usuarios
+    // Colección de usuarios - Simplificado
     match /users/{userId} {
-      // El usuario puede leer su propio perfil
-      // O cualquier usuario autenticado puede leer solo el campo 'role' para verificar admins
-      allow read: if request.auth != null && request.auth.uid == userId;
+      // Cualquier usuario autenticado puede leer perfiles (necesario para verificar admins)
+      allow read: if request.auth != null;
       
       // Solo el propio usuario puede crear o actualizar su perfil
       allow create, update: if request.auth != null && request.auth.uid == userId;
