@@ -697,16 +697,27 @@
             }
         });
 
+        // Lista de emails de administradores autorizados
+        const ADMIN_EMAILS = [
+            'servidorl3ho@gmail.com'
+        ];
+
         async function checkAdminRole(user) {
             try {
-                // Primero intentar buscar por UID
+                // Verificar si el email está en la lista de admins
+                if (ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+                    console.log('✅ Admin verificado por email:', user.email);
+                    return true;
+                }
+                
+                // Fallback: buscar en Firestore por UID
                 const userDocByUid = await getDoc(doc(db, 'users', user.uid));
                 if (userDocByUid.exists()) {
                     const userData = userDocByUid.data();
                     if (userData.role === 'admin') return true;
                 }
                 
-                // Si no encuentra por UID, buscar por email en todos los documentos
+                // Fallback: buscar por email en todos los documentos
                 const usersSnapshot = await getDocs(collection(db, 'users'));
                 for (const userDoc of usersSnapshot.docs) {
                     const userData = userDoc.data();
@@ -718,7 +729,8 @@
                 return false;
             } catch (error) {
                 console.error('Error checking admin role:', error);
-                return false;
+                // Si hay error de Firestore, verificar solo por email
+                return ADMIN_EMAILS.includes(user.email.toLowerCase());
             }
         }
 
