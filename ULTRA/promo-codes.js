@@ -36,6 +36,8 @@ onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     if (user) {
         await syncPromoStatusFromFirestore(user.uid);
+    } else {
+        localStorage.removeItem(PROMO_STORAGE_KEY);
     }
     updatePromoUI();
 });
@@ -72,6 +74,10 @@ async function syncPromoStatusFromFirestore(uid) {
 
 function getPromoStatus() {
     try {
+        if (!currentUser) {
+            return null;
+        }
+        
         const stored = localStorage.getItem(PROMO_STORAGE_KEY);
         if (!stored) return null;
         
