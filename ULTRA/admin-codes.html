@@ -848,10 +848,23 @@
             codesList.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i></div>';
 
             try {
-                const codesQuery = query(collection(db, 'promoCodes'), orderBy('createdAt', 'desc'));
-                const snapshot = await getDocs(codesQuery);
+                // Cargar sin orderBy para evitar necesidad de índice compuesto
+                const snapshot = await getDocs(collection(db, 'promoCodes'));
+                
+                // Ordenar manualmente en el cliente
+                const codes = [];
+                snapshot.forEach(doc => {
+                    codes.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Ordenar por createdAt descendente
+                codes.sort((a, b) => {
+                    const dateA = a.createdAt?.toDate?.() || new Date(0);
+                    const dateB = b.createdAt?.toDate?.() || new Date(0);
+                    return dateB - dateA;
+                });
 
-                if (snapshot.empty) {
+                if (codes.length === 0) {
                     codesList.innerHTML = `
                         <div class="empty-state">
                             <i class="fas fa-ticket-alt"></i>
@@ -864,8 +877,7 @@
                 let html = '';
                 const now = new Date();
 
-                snapshot.forEach(doc => {
-                    const data = doc.data();
+                codes.forEach(data => {
                     const expiresAt = data.expiresAt?.toDate();
                     const isExpired = expiresAt && expiresAt < now;
                     const isMaxed = data.maxUses > 0 && data.currentUses >= data.maxUses;
