@@ -233,7 +233,7 @@ async function loadTransmisiones() {
                     console.warn('⚠️ Error cargando API 2 (e1link):', err);
                     return { transmisiones: [] };
                 }),
-            fetch('https://9fa7ec8e-6960-4b03-a65e-79d58e7b8ab8-00-1lvbttqhuwaz0.kirk.replit.dev/transmisiones2')
+            fetch('https://ultragol-api-3.vercel.app/transmisiones2')
                 .then(res => res.json())
                 .catch(err => {
                     console.warn('⚠️ Error cargando API 3 (voodc):', err);
