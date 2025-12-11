@@ -3204,3 +3204,23 @@ body {
         display: none;
     }
 }
+
+/* Ocultar anuncios cuando está activo el código promocional */
+body.ads-hidden .adsbygoogle,
+body.ads-hidden [data-ad-slot],
+body.ads-hidden ins.adsbygoogle,
+body.ads-hidden [id^="ad-"],
+body.ads-hidden [class*="adsterra"],
+body.ads-hidden [id*="adsterra"],
+body.ads-hidden [class*="effectivegatecpm"],
+body.ads-hidden iframe[src*="effectivegatecpm"],
+body.ads-hidden div[id^="container-"],
+body.ads-hidden .social-bar,
+body.ads-hidden [class*="social-bar"],
+body.ads-hidden div[style*="z-index: 2147483647"],
+body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}

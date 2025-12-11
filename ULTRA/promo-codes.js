@@ -159,10 +159,53 @@ function updatePromoUI() {
 function hideAds() {
     document.body.classList.add('ads-hidden');
     
-    const adElements = document.querySelectorAll('.adsbygoogle, [data-ad-slot], ins.adsbygoogle');
+    const adSelectors = [
+        '.adsbygoogle',
+        '[data-ad-slot]',
+        'ins.adsbygoogle',
+        '[id^="ad-"]',
+        '[class*="adsterra"]',
+        '[id*="adsterra"]',
+        '[class*="effectivegatecpm"]',
+        'iframe[src*="effectivegatecpm"]',
+        'div[id^="container-"]',
+        '.social-bar',
+        '[class*="social-bar"]'
+    ];
+    
+    const adElements = document.querySelectorAll(adSelectors.join(', '));
     adElements.forEach(ad => {
         ad.style.display = 'none';
+        ad.style.visibility = 'hidden';
     });
+    
+    const scripts = document.querySelectorAll('script[src*="effectivegatecpm"]');
+    scripts.forEach(script => {
+        script.remove();
+    });
+    
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1) {
+                    const isAd = adSelectors.some(selector => {
+                        try {
+                            return node.matches && node.matches(selector);
+                        } catch (e) {
+                            return false;
+                        }
+                    });
+                    if (isAd) {
+                        node.style.display = 'none';
+                        node.style.visibility = 'hidden';
+                    }
+                }
+            });
+        });
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.adBlockObserver = observer;
     
     console.log('🎉 Anuncios ocultos - Código promocional activo');
 }
@@ -170,9 +213,28 @@ function hideAds() {
 function showAds() {
     document.body.classList.remove('ads-hidden');
     
-    const adElements = document.querySelectorAll('.adsbygoogle, [data-ad-slot], ins.adsbygoogle');
+    if (window.adBlockObserver) {
+        window.adBlockObserver.disconnect();
+        window.adBlockObserver = null;
+    }
+    
+    const adSelectors = [
+        '.adsbygoogle',
+        '[data-ad-slot]',
+        'ins.adsbygoogle',
+        '[id^="ad-"]',
+        '[class*="adsterra"]',
+        '[id*="adsterra"]',
+        '[class*="effectivegatecpm"]',
+        'div[id^="container-"]',
+        '.social-bar',
+        '[class*="social-bar"]'
+    ];
+    
+    const adElements = document.querySelectorAll(adSelectors.join(', '));
     adElements.forEach(ad => {
         ad.style.display = '';
+        ad.style.visibility = '';
     });
 }
 
