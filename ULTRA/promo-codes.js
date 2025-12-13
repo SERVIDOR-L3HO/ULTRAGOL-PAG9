@@ -32,14 +32,23 @@ const auth = getAuth(app);
 const PROMO_STORAGE_KEY = 'ultragol_promo_status';
 let currentUser = null;
 
+let wasLoggedIn = false;
+
 onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     if (user) {
+        wasLoggedIn = true;
         await syncPromoStatusFromFirestore(user.uid);
+        updatePromoUI();
     } else {
         localStorage.removeItem(PROMO_STORAGE_KEY);
+        if (wasLoggedIn) {
+            wasLoggedIn = false;
+            window.location.reload();
+        } else {
+            updatePromoUI();
+        }
     }
-    updatePromoUI();
 });
 
 async function syncPromoStatusFromFirestore(uid) {
@@ -177,11 +186,6 @@ function hideAds() {
     adElements.forEach(ad => {
         ad.style.display = 'none';
         ad.style.visibility = 'hidden';
-    });
-    
-    const scripts = document.querySelectorAll('script[src*="effectivegatecpm"]');
-    scripts.forEach(script => {
-        script.remove();
     });
     
     const observer = new MutationObserver((mutations) => {
