@@ -2140,13 +2140,15 @@ function generateMatchStatsSection(partidoNombre) {
 
 // Función para buscar partido por nombre
 function findPartidoByName(partidoNombre) {
-    if (!marcadoresData || !marcadoresData.partidos) return null;
     if (!partidoNombre) return null;
     
     // Limpiar el nombre del partido (quitar prefijo de liga como "Ligue 1 : ")
     let cleanName = partidoNombre;
+    let ligaPrefix = null;
     if (cleanName.includes(' : ')) {
-        cleanName = cleanName.split(' : ').pop();
+        const splitParts = cleanName.split(' : ');
+        ligaPrefix = splitParts[0].toLowerCase();
+        cleanName = splitParts.pop();
     }
     
     // Manejar diferentes formatos de separador (vs, -, vs.)
@@ -2166,25 +2168,137 @@ function findPartidoByName(partidoNombre) {
     
     if (!localName || !visitanteName) return null;
     
-    return marcadoresData.partidos.find(p => {
-        const localNorm = (p.local?.nombreCorto || p.local?.nombre || '').toLowerCase();
-        const visitanteNorm = (p.visitante?.nombreCorto || p.visitante?.nombre || '').toLowerCase();
-        const localNombreCompleto = (p.local?.nombre || '').toLowerCase();
-        const visitanteNombreCompleto = (p.visitante?.nombre || '').toLowerCase();
+    // Función auxiliar para buscar en un array de partidos
+    const buscarEnPartidos = (partidos) => {
+        if (!partidos) return null;
+        return partidos.find(p => {
+            const localNorm = (p.local?.nombreCorto || p.local?.nombre || '').toLowerCase();
+            const visitanteNorm = (p.visitante?.nombreCorto || p.visitante?.nombre || '').toLowerCase();
+            const localNombreCompleto = (p.local?.nombre || '').toLowerCase();
+            const visitanteNombreCompleto = (p.visitante?.nombre || '').toLowerCase();
+            
+            const localMatch = localNorm.includes(localName) || 
+                              localName.includes(localNorm) ||
+                              localNombreCompleto.includes(localName) ||
+                              localName.includes(localNombreCompleto);
+            
+            const visitanteMatch = visitanteNorm.includes(visitanteName) || 
+                                   visitanteName.includes(visitanteNorm) ||
+                                   visitanteNombreCompleto.includes(visitanteName) ||
+                                   visitanteName.includes(visitanteNombreCompleto);
+            
+            return localMatch && visitanteMatch;
+        });
+    };
+    
+    // 1. Buscar primero en marcadoresData (liga actual)
+    if (marcadoresData && marcadoresData.partidos) {
+        const encontrado = buscarEnPartidos(marcadoresData.partidos);
+        if (encontrado) return encontrado;
+    }
+    
+    // 2. Si hay datos de todas las ligas, buscar ahí
+    if (todasLasLigasData && todasLasLigasData.categorias) {
+        for (const [catKey, categoria] of Object.entries(todasLasLigasData.categorias)) {
+            if (categoria.ligas) {
+                for (const liga of categoria.ligas) {
+                    if (liga.partidos && liga.partidos.length > 0) {
+                        const partidosConvertidos = liga.partidos.map(p => convertDatafactoryPartido(p));
+                        const encontrado = buscarEnPartidos(partidosConvertidos);
+                        if (encontrado) {
+                            encontrado.ligaNombre = liga.nombre;
+                            return encontrado;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    return null;
+}
+
+// Función para buscar y cargar estadísticas de un partido desde cualquier liga
+async function fetchStatsForMatch(partidoNombre) {
+    if (!partidoNombre) return null;
+    
+    // Detectar la liga basándose en el nombre de la transmisión
+    const ligaMapping = {
+        'premier': 'premierleague',
+        'la liga': 'laliga',
+        'serie a': 'seriea',
+        'bundesliga': 'bundesliga',
+        'ligue 1': 'ligue1',
+        'liga mx': 'mexico',
+        'liga pro': 'ecuador',
+        'superliga argentina': 'argentina',
+        'liga profesional argentina': 'argentina',
+        'liga betplay': 'colombia',
+        'brasileirao': 'brasil',
+        'brasileirão': 'brasil',
+        'champions': 'championsleague',
+        'europa league': 'europaleague',
+        'libertadores': 'copalibertadores',
+        'sudamericana': 'copasudamericana',
+        'mls': 'mls',
+        'saudi': 'arabia_saudita'
+    };
+    
+    const nombreLower = partidoNombre.toLowerCase();
+    let ligaCodigo = null;
+    
+    for (const [key, value] of Object.entries(ligaMapping)) {
+        if (nombreLower.includes(key)) {
+            ligaCodigo = value;
+            break;
+        }
+    }
+    
+    if (!ligaCodigo) {
+        console.log('📊 No se pudo detectar la liga para:', partidoNombre);
+        return null;
+    }
+    
+    try {
+        console.log(`📊 Buscando partido en liga: ${ligaCodigo}`);
+        const response = await fetch(`${API_BASE}/datafactory/${ligaCodigo}`);
+        const data = await response.json();
         
-        // Buscar coincidencias flexibles
-        const localMatch = localNorm.includes(localName) || 
-                          localName.includes(localNorm) ||
-                          localNombreCompleto.includes(localName) ||
-                          localName.includes(localNombreCompleto);
-        
-        const visitanteMatch = visitanteNorm.includes(visitanteName) || 
-                               visitanteName.includes(visitanteNorm) ||
-                               visitanteNombreCompleto.includes(visitanteName) ||
-                               visitanteName.includes(visitanteNombreCompleto);
-        
-        return localMatch && visitanteMatch;
-    });
+        if (data && data.partidos) {
+            // Buscar el partido en los datos de la liga
+            const cleanName = partidoNombre.includes(' : ') ? 
+                partidoNombre.split(' : ').pop() : partidoNombre;
+            
+            let parts = [];
+            if (cleanName.includes(' vs ')) {
+                parts = cleanName.split(' vs ');
+            } else if (cleanName.includes(' - ')) {
+                parts = cleanName.split(' - ');
+            }
+            
+            if (parts.length >= 2) {
+                const localName = parts[0].trim().toLowerCase();
+                const visitanteName = parts[1].trim().toLowerCase();
+                
+                const partido = data.partidos.find(p => {
+                    const localNorm = (p.local?.nombre || '').toLowerCase();
+                    const visitanteNorm = (p.visitante?.nombre || '').toLowerCase();
+                    
+                    return (localNorm.includes(localName) || localName.includes(localNorm)) &&
+                           (visitanteNorm.includes(visitanteName) || visitanteName.includes(visitanteNorm));
+                });
+                
+                if (partido) {
+                    console.log(`✅ Partido encontrado en ${ligaCodigo}:`, partido.id);
+                    return convertDatafactoryPartido(partido);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error buscando partido:', error);
+    }
+    
+    return null;
 }
 
 // Generar estadísticas basadas en el partido
@@ -2453,14 +2567,25 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
         statsContainer.innerHTML = generateMatchStatsSection(displayTitle);
         initStatsTabsListeners();
         
-        // Buscar el partido y cargar estadísticas reales si está disponible
-        const partido = findPartidoByName(displayTitle);
+        // Buscar el partido localmente primero
+        let partido = findPartidoByName(displayTitle);
+        
         if (partido && partido.id) {
-            console.log(`📊 Partido encontrado con ID: ${partido.id}, cargando estadísticas reales...`);
-            // Iniciar carga de estadísticas reales desde la API
+            console.log(`📊 Partido encontrado localmente con ID: ${partido.id}, cargando estadísticas...`);
             startStatsAutoUpdate(partido.id, partido);
         } else {
-            console.log('📊 No se encontró partido con ID, usando estadísticas generadas');
+            // Si no se encuentra localmente, buscar en la API de la liga correspondiente
+            console.log('📊 Buscando partido en API externa...');
+            fetchStatsForMatch(title).then(partidoRemoto => {
+                if (partidoRemoto && partidoRemoto.id) {
+                    console.log(`📊 Partido encontrado en API: ${partidoRemoto.id}`);
+                    startStatsAutoUpdate(partidoRemoto.id, partidoRemoto);
+                } else {
+                    console.log('📊 No se encontró partido, mostrando estadísticas generadas');
+                }
+            }).catch(err => {
+                console.warn('📊 Error buscando estadísticas:', err);
+            });
         }
     }
     
