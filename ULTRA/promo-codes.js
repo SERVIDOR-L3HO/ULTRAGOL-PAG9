@@ -173,10 +173,6 @@ function hideAds() {
         '[data-ad-slot]',
         'ins.adsbygoogle',
         '[id^="ad-"]',
-        '[class*="adsterra"]',
-        '[id*="adsterra"]',
-        '[class*="effectivegatecpm"]',
-        'iframe[src*="effectivegatecpm"]',
         'div[id^="container-"]',
         '.social-bar',
         '[class*="social-bar"]'
@@ -227,9 +223,6 @@ function showAds() {
         '[data-ad-slot]',
         'ins.adsbygoogle',
         '[id^="ad-"]',
-        '[class*="adsterra"]',
-        '[id*="adsterra"]',
-        '[class*="effectivegatecpm"]',
         'div[id^="container-"]',
         '.social-bar',
         '[class*="social-bar"]'
