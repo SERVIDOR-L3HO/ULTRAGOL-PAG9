@@ -9412,3 +9412,58 @@ body.dark-mode .news-content p {
 .search-match-card:hover .search-match-score-badge {
     box-shadow: 0 4px 12px rgba(0, 170, 68, 0.5);
 }
+
+/* ===== SEARCH HISTORY STYLES ===== */
+.search-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.clear-history-btn {
+    background: rgba(255, 69, 0, 0.2);
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FF4500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 12px;
+}
+
+.clear-history-btn:hover {
+    background: rgba(255, 69, 0, 0.3);
+    transform: scale(1.1);
+}
+
+.search-tag-history {
+    background: rgba(255, 69, 0, 0.1);
+    border: 1px solid rgba(255, 69, 0, 0.3);
+    color: #FF4500;
+    padding: 8px 14px;
+    border-radius: 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.search-tag-history:hover {
+    background: rgba(255, 69, 0, 0.2);
+    border-color: #FF4500;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(255, 69, 0, 0.2);
+}
+
+.search-tag-history i {
+    font-size: 11px;
+}

@@ -2802,6 +2802,37 @@ function navTo(section, element) {
 
 // ==================== FUNCIONES DE BÚSQUEDA ====================
 
+// Historial de búsquedas
+const SEARCH_HISTORY_KEY = 'ultragol_search_history';
+const MAX_HISTORY_ITEMS = 10;
+
+function saveSearchToHistory(term) {
+    if (!term || term.trim() === '') return;
+    
+    let history = getSearchHistory();
+    
+    // Remover duplicado si existe
+    history = history.filter(item => item.toLowerCase() !== term.toLowerCase());
+    
+    // Agregar al principio
+    history.unshift(term);
+    
+    // Mantener solo los últimos MAX_HISTORY_ITEMS
+    history = history.slice(0, MAX_HISTORY_ITEMS);
+    
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(history));
+}
+
+function getSearchHistory() {
+    const stored = localStorage.getItem(SEARCH_HISTORY_KEY);
+    return stored ? JSON.parse(stored) : [];
+}
+
+function clearSearchHistory() {
+    localStorage.removeItem(SEARCH_HISTORY_KEY);
+    showSearchWelcome();
+}
+
 function showSearchModal() {
     const modal = document.getElementById('searchModal');
     if (modal) {
@@ -2840,6 +2871,29 @@ function quickSearch(term) {
 
 function showSearchWelcome() {
     const resultsContainer = document.getElementById('searchResults');
+    const history = getSearchHistory();
+    
+    let historyHtml = '';
+    if (history.length > 0) {
+        historyHtml = `
+            <div class="search-category-section">
+                <div class="search-history-header">
+                    <h4><i class="fas fa-clock"></i> Búsquedas Recientes</h4>
+                    <button class="clear-history-btn" onclick="clearSearchHistory()" title="Limpiar historial">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+                <div class="search-tags-grid">
+                    ${history.map(item => `
+                        <span class="search-tag-history" onclick="quickSearch('${item}')">
+                            <i class="fas fa-history"></i> ${item}
+                        </span>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
     resultsContainer.innerHTML = `
         <div class="search-welcome">
             <div class="search-welcome-animation">
@@ -2856,6 +2910,8 @@ function showSearchWelcome() {
             <p class="search-welcome-subtitle">Busca entre cientos de partidos en vivo y próximos eventos</p>
             
             <div class="search-categories">
+                ${historyHtml}
+
                 <div class="search-category-section">
                     <h4><i class="fas fa-fire"></i> Populares</h4>
                     <div class="search-tags-grid">
@@ -2945,6 +3001,9 @@ async function performSearch(query) {
         showSearchWelcome();
         return;
     }
+    
+    // Guardar en historial
+    saveSearchToHistory(query);
     
     const resultsContainer = document.getElementById('searchResults');
     const clearBtn = document.querySelector('.clear-search-btn');
