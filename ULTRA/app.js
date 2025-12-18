@@ -3274,7 +3274,10 @@ function displaySearchResults(results, query) {
                             <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" onerror="this.src='https://via.placeholder.com/40'">
                         </div>
                     </div>
-                    <div class="search-match-time">${partido.reloj || 'EN VIVO'}</div>
+                    <div class="search-match-status">
+                        <span class="search-match-time">${partido.reloj || 'EN VIVO'}</span>
+                        <span class="search-match-score-badge">${partido.local.marcador} - ${partido.visitante.marcador}</span>
+                    </div>
                 </div>`;
         });
         
