@@ -894,7 +894,26 @@ function updateLiveMatches(data) {
     const container = document.getElementById('liveMatches');
     if (!container) return;
     
+    const isMatchFinished = (reloj) => {
+        if (!reloj) return false;
+        // Check for final time indicators
+        if (reloj === 'FT' || reloj === 'Terminado' || reloj === '+' || reloj === 'Fin') {
+            return true;
+        }
+        // Extract minute number and check if >= 120 (match went to extra time and finished)
+        const minuteMatch = reloj.match(/^(\d+)/);
+        if (minuteMatch) {
+            const minuto = parseInt(minuteMatch[1]);
+            // If match shows 120+ minutes, it's likely finished
+            if (minuto >= 120) return true;
+        }
+        return false;
+    };
+    
     const partidosEnVivo = data.partidos.filter(p => {
+        // Don't show finished matches
+        if (isMatchFinished(p.reloj)) return false;
+        
         return p.estado?.enVivo || 
                (!p.estado?.finalizado && !p.estado?.programado && p.reloj && p.reloj !== '0\'');
     });
