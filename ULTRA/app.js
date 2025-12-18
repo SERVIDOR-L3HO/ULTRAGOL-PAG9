@@ -21,7 +21,6 @@ const API_BASE = 'https://ultragol-api-3.vercel.app';
 const leaguesConfig = {
     'Todas las Ligas': {
         apiPath: '/todo-todas-las-ligas',
-        datafactory: null,
         tabla: null,
         noticias: null,
         goleadores: null,
@@ -33,7 +32,6 @@ const leaguesConfig = {
     },
     'Liga MX': {
         apiPath: '',
-        datafactory: '/datafactory/mexico',
         tabla: '/tabla',
         noticias: '/Noticias',
         goleadores: '/goleadores',
@@ -44,7 +42,6 @@ const leaguesConfig = {
     },
     'Liga Pro Ecuador': {
         apiPath: '/ecuador',
-        datafactory: '/datafactory/ecuador',
         tabla: '/ecuador/tabla',
         noticias: '/ecuador/noticias',
         goleadores: '/ecuador/goleadores',
@@ -55,7 +52,6 @@ const leaguesConfig = {
     },
     'Liga Argentina': {
         apiPath: '/argentina',
-        datafactory: '/datafactory/argentina',
         tabla: '/argentina/tabla',
         noticias: '/argentina/noticias',
         goleadores: '/argentina/goleadores',
@@ -66,7 +62,6 @@ const leaguesConfig = {
     },
     'Liga Colombia': {
         apiPath: '/colombia',
-        datafactory: '/datafactory/colombia',
         tabla: '/colombia/tabla',
         noticias: '/colombia/noticias',
         goleadores: '/colombia/goleadores',
@@ -77,7 +72,6 @@ const leaguesConfig = {
     },
     'Brasileirão': {
         apiPath: '/brasil',
-        datafactory: '/datafactory/brasil',
         tabla: '/brasil/tabla',
         noticias: '/brasil/noticias',
         goleadores: '/brasil/goleadores',
@@ -88,7 +82,6 @@ const leaguesConfig = {
     },
     'Premier League': {
         apiPath: '/premier',
-        datafactory: '/datafactory/premierleague',
         tabla: '/premier/tabla',
         noticias: '/premier/noticias',
         goleadores: '/premier/goleadores',
@@ -99,7 +92,6 @@ const leaguesConfig = {
     },
     'La Liga': {
         apiPath: '/laliga',
-        datafactory: '/datafactory/laliga',
         tabla: '/laliga/tabla',
         noticias: '/laliga/noticias',
         goleadores: '/laliga/goleadores',
@@ -110,7 +102,6 @@ const leaguesConfig = {
     },
     'Serie A': {
         apiPath: '/seriea',
-        datafactory: '/datafactory/seriea',
         tabla: '/seriea/tabla',
         noticias: '/seriea/noticias',
         goleadores: '/seriea/goleadores',
@@ -121,7 +112,6 @@ const leaguesConfig = {
     },
     'Bundesliga': {
         apiPath: '/bundesliga',
-        datafactory: '/datafactory/bundesliga',
         tabla: '/bundesliga/tabla',
         noticias: '/bundesliga/noticias',
         goleadores: '/bundesliga/goleadores',
@@ -132,7 +122,6 @@ const leaguesConfig = {
     },
     'Ligue 1': {
         apiPath: '/ligue1',
-        datafactory: '/datafactory/ligue1',
         tabla: '/ligue1/tabla',
         noticias: '/ligue1/noticias',
         goleadores: '/ligue1/goleadores',
@@ -143,7 +132,6 @@ const leaguesConfig = {
     },
     'Champions League': {
         apiPath: '/champions',
-        datafactory: '/datafactory/championsleague',
         tabla: '/champions/tabla',
         noticias: '/champions/noticias',
         goleadores: '/champions/goleadores',
@@ -154,7 +142,6 @@ const leaguesConfig = {
     },
     'Europa League': {
         apiPath: '/europaleague',
-        datafactory: '/datafactory/europaleague',
         tabla: '/europaleague/tabla',
         noticias: '/europaleague/noticias',
         goleadores: '/europaleague/goleadores',
@@ -165,7 +152,6 @@ const leaguesConfig = {
     },
     'Copa Libertadores': {
         apiPath: '/libertadores',
-        datafactory: '/datafactory/copalibertadores',
         tabla: '/libertadores/tabla',
         noticias: '/libertadores/noticias',
         goleadores: '/libertadores/goleadores',
@@ -176,7 +162,6 @@ const leaguesConfig = {
     },
     'Copa Sudamericana': {
         apiPath: '/sudamericana',
-        datafactory: '/datafactory/copasudamericana',
         tabla: '/sudamericana/tabla',
         noticias: '/sudamericana/noticias',
         goleadores: '/sudamericana/goleadores',
@@ -187,7 +172,6 @@ const leaguesConfig = {
     },
     'MLS': {
         apiPath: '/mls',
-        datafactory: '/datafactory/mls',
         tabla: '/mls/tabla',
         noticias: '/mls/noticias',
         goleadores: '/mls/goleadores',
@@ -198,7 +182,6 @@ const leaguesConfig = {
     },
     'Saudi Pro League': {
         apiPath: '/arabia',
-        datafactory: '/datafactory/arabia_saudita',
         tabla: '/arabia/tabla',
         noticias: '/arabia/noticias',
         goleadores: '/arabia/goleadores',
@@ -323,45 +306,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function loadMarcadores() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
-        
-        // Si es "Todas las Ligas", cargar datos completos
-        if (leagueConfig && leagueConfig.isAllLeagues) {
-            return await loadTodasLasLigas();
-        }
-        
-        // Intentar primero con datafactory (datos más completos)
-        if (leagueConfig && leagueConfig.datafactory) {
-            try {
-                const response = await fetch(`${API_BASE}${leagueConfig.datafactory}`);
-                const data = await response.json();
-                
-                // Convertir formato datafactory al formato esperado
-                const convertedData = convertDatafactoryToMarcadores(data);
-                marcadoresData = convertedData;
-                
-                console.log('✅ Marcadores cargados desde Datafactory:', data.liga, '-', data.totalPartidos, 'partidos');
-                
-                updateFeaturedMatch(convertedData);
-                
-                if (activeTab === 'live') {
-                    updateLiveMatches(convertedData);
-                } else if (activeTab === 'upcoming') {
-                    updateUpcomingMatches(convertedData);
-                }
-                
-                return convertedData;
-            } catch (err) {
-                console.warn('⚠️ Error con Datafactory, usando marcadores legacy:', err);
-            }
-        }
-        
-        // Fallback a endpoint legacy de marcadores
         const endpoint = leagueConfig ? leagueConfig.marcadores : '/marcadores';
+        
         const response = await fetch(`${API_BASE}${endpoint}`);
         const data = await response.json();
         marcadoresData = data;
         
-        console.log('✅ Marcadores cargados (legacy):', data);
+        console.log('✅ Marcadores cargados:', endpoint);
         
         updateFeaturedMatch(data);
         
@@ -378,128 +329,6 @@ async function loadMarcadores() {
     }
 }
 
-// Función para cargar todas las ligas del mundo
-async function loadTodasLasLigas() {
-    try {
-        const response = await fetch(`${API_BASE}/todo-todas-las-ligas`);
-        const data = await response.json();
-        todasLasLigasData = data;
-        
-        console.log('✅ Todas las ligas cargadas:', data.resumen);
-        
-        // Combinar todos los partidos de todas las categorías
-        const todosLosPartidos = [];
-        
-        if (data.categorias) {
-            for (const [catKey, categoria] of Object.entries(data.categorias)) {
-                if (categoria.ligas) {
-                    for (const liga of categoria.ligas) {
-                        if (liga.partidos && liga.partidos.length > 0) {
-                            liga.partidos.forEach(partido => {
-                                todosLosPartidos.push({
-                                    ...convertDatafactoryPartido(partido),
-                                    ligaNombre: liga.nombre,
-                                    pais: liga.pais,
-                                    categoria: categoria.nombre
-                                });
-                            });
-                        }
-                    }
-                }
-            }
-        }
-        
-        const convertedData = {
-            partidos: todosLosPartidos,
-            resumen: data.resumen,
-            categorias: data.categorias,
-            totalPartidos: data.resumen?.totalPartidos || todosLosPartidos.length
-        };
-        
-        marcadoresData = convertedData;
-        
-        updateFeaturedMatch(convertedData);
-        
-        if (activeTab === 'live') {
-            updateLiveMatches(convertedData);
-        } else if (activeTab === 'upcoming') {
-            updateUpcomingMatches(convertedData);
-        }
-        
-        return convertedData;
-    } catch (error) {
-        console.error('❌ Error cargando todas las ligas:', error);
-        return null;
-    }
-}
-
-// Convertir formato Datafactory al formato de marcadores esperado por la app
-function convertDatafactoryToMarcadores(data) {
-    if (!data || !data.partidos) {
-        return { partidos: [] };
-    }
-    
-    const partidos = data.partidos.map(partido => convertDatafactoryPartido(partido));
-    
-    return {
-        partidos: partidos,
-        liga: data.liga,
-        pais: data.pais,
-        equipos: data.equipos,
-        tablaPosiciones: data.tablaPosiciones,
-        estadisticas: data.estadisticas,
-        actualizacion: data.actualizacion
-    };
-}
-
-// Convertir un partido individual del formato Datafactory
-function convertDatafactoryPartido(partido) {
-    const esEnVivo = partido.estado === 'In Progress' || 
-                     partido.estadoCorto === 'LIVE' || 
-                     (partido.minuto && partido.minuto !== "0'" && partido.estado !== 'Scheduled' && partido.estado !== 'Final');
-    const esFinalizado = partido.estado === 'Final' || partido.estadoCorto === 'FT';
-    const esProgramado = partido.estado === 'Scheduled' || partido.estadoCorto === 'Scheduled';
-    
-    return {
-        id: partido.id,
-        nombre: partido.nombre,
-        fecha: partido.fecha,
-        fechaFormateada: partido.fechaFormateada,
-        hora: partido.hora,
-        reloj: esEnVivo ? partido.minuto : (esFinalizado ? 'FT' : partido.hora),
-        local: {
-            id: partido.local?.id,
-            nombre: partido.local?.nombre,
-            nombreCorto: partido.local?.nombre,
-            nombreCompleto: partido.local?.nombreCompleto,
-            logo: partido.local?.logo,
-            abreviatura: partido.local?.abreviatura,
-            marcador: partido.local?.goles || 0,
-            goles: partido.local?.goles || 0
-        },
-        visitante: {
-            id: partido.visitante?.id,
-            nombre: partido.visitante?.nombre,
-            nombreCorto: partido.visitante?.nombre,
-            nombreCompleto: partido.visitante?.nombreCompleto,
-            logo: partido.visitante?.logo,
-            abreviatura: partido.visitante?.abreviatura,
-            marcador: partido.visitante?.goles || 0,
-            goles: partido.visitante?.goles || 0
-        },
-        marcador: partido.marcador,
-        estadio: partido.estadio,
-        ciudad: partido.ciudad,
-        jornada: partido.jornada,
-        transmision: partido.transmision || [],
-        estado: {
-            enVivo: esEnVivo,
-            finalizado: esFinalizado,
-            programado: esProgramado
-        },
-        detalles: partido.detalles
-    };
-}
 
 // Función para cargar transmisiones desde las 5 APIs
 async function loadTransmisiones() {
@@ -2216,23 +2045,6 @@ function findPartidoByName(partidoNombre) {
         if (encontrado) return encontrado;
     }
     
-    // 2. Si hay datos de todas las ligas, buscar ahí
-    if (todasLasLigasData && todasLasLigasData.categorias) {
-        for (const [catKey, categoria] of Object.entries(todasLasLigasData.categorias)) {
-            if (categoria.ligas) {
-                for (const liga of categoria.ligas) {
-                    if (liga.partidos && liga.partidos.length > 0) {
-                        const partidosConvertidos = liga.partidos.map(p => convertDatafactoryPartido(p));
-                        const encontrado = buscarEnPartidos(partidosConvertidos);
-                        if (encontrado) {
-                            encontrado.ligaNombre = liga.nombre;
-                            return encontrado;
-                        }
-                    }
-                }
-            }
-        }
-    }
     
     return null;
 }
@@ -2278,45 +2090,7 @@ async function fetchStatsForMatch(partidoNombre) {
         return null;
     }
     
-    try {
-        console.log(`📊 Buscando partido en liga: ${ligaCodigo}`);
-        const response = await fetch(`${API_BASE}/datafactory/${ligaCodigo}`);
-        const data = await response.json();
-        
-        if (data && data.partidos) {
-            // Buscar el partido en los datos de la liga
-            const cleanName = partidoNombre.includes(' : ') ? 
-                partidoNombre.split(' : ').pop() : partidoNombre;
-            
-            let parts = [];
-            if (cleanName.includes(' vs ')) {
-                parts = cleanName.split(' vs ');
-            } else if (cleanName.includes(' - ')) {
-                parts = cleanName.split(' - ');
-            }
-            
-            if (parts.length >= 2) {
-                const localName = parts[0].trim().toLowerCase();
-                const visitanteName = parts[1].trim().toLowerCase();
-                
-                const partido = data.partidos.find(p => {
-                    const localNorm = (p.local?.nombre || '').toLowerCase();
-                    const visitanteNorm = (p.visitante?.nombre || '').toLowerCase();
-                    
-                    return (localNorm.includes(localName) || localName.includes(localNorm)) &&
-                           (visitanteNorm.includes(visitanteName) || visitanteName.includes(visitanteNorm));
-                });
-                
-                if (partido) {
-                    console.log(`✅ Partido encontrado en ${ligaCodigo}:`, partido.id);
-                    return convertDatafactoryPartido(partido);
-                }
-            }
-        }
-    } catch (error) {
-        console.error('❌ Error buscando partido:', error);
-    }
-    
+    console.log('📊 Buscando partido en datos cargados...');
     return null;
 }
 
