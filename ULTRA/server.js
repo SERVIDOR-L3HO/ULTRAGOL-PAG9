@@ -43,10 +43,19 @@ function isRateLimited(ip) {
     return false;
 }
 
-// Detectar bots
+// Detectar bots - Solo bloquear herramientas de scraping, no navegadores
 function isBot(userAgent) {
     if (!userAgent) return true; // Sin user agent = probablemente bot
     const ua = userAgent.toLowerCase();
+    
+    // Permitir navegadores legítimos
+    const legitimateBrowsers = ['mozilla', 'chrome', 'safari', 'edge', 'firefox', 'opera'];
+    const hasLegitBrowser = legitimateBrowsers.some(browser => ua.includes(browser));
+    
+    // Si tiene navegador legítimo, permitir
+    if (hasLegitBrowser) return false;
+    
+    // Si no tiene navegador legítimo, revisar si es herramienta de scraping
     return BOT_USER_AGENTS.some(bot => ua.includes(bot));
 }
 
@@ -99,7 +108,7 @@ app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
-    res.setHeader('Content-Security-Policy', "default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https:");
+    res.setHeader('Content-Security-Policy', "default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com https://www.gstatic.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https: wss:;");
     
     // Prevenir descarga directa de archivos
     if (req.path.match(/\.(html|css|js)$/i)) {
@@ -113,15 +122,15 @@ app.use((req, res, next) => {
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' ? ['https://yourdomain.com'] : '*',
     credentials: false,
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'HEAD'],
     allowedHeaders: ['Content-Type']
 }));
 
 app.use(express.json());
 
-// Deshabilitar métodos HTTP innecesarios
+// Deshabilitar métodos HTTP innecesarios (pero permitir HEAD para navegadores)
 app.use((req, res, next) => {
-    if (['PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'].includes(req.method)) {
+    if (['PUT', 'DELETE', 'PATCH', 'OPTIONS'].includes(req.method)) {
         return res.status(405).json({ error: 'Método no permitido' });
     }
     next();
