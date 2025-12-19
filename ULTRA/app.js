@@ -3002,9 +3002,6 @@ async function performSearch(query) {
         return;
     }
     
-    // Guardar en historial
-    saveSearchToHistory(query);
-    
     const resultsContainer = document.getElementById('searchResults');
     const clearBtn = document.querySelector('.clear-search-btn');
     
@@ -3751,7 +3748,11 @@ document.addEventListener('DOMContentLoaded', () => {
         
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
-                performSearch(e.target.value);
+                const searchValue = e.target.value.trim();
+                if (searchValue) {
+                    saveSearchToHistory(searchValue);
+                }
+                performSearch(searchValue);
             }
         });
         
