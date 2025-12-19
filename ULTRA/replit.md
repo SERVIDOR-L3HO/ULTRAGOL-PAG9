@@ -10,9 +10,22 @@ ULTRAGOL is a Spanish football streaming platform created by L3HO that allows us
 - ✅ Frontend and backend integrated as a single-page application
 - ✅ Firebase integration configured for real-time stream data
 - ✅ Deployment configuration set up for production (autoscale)
+- ✅ **NEW**: Professional anti-scraping and anti-cloning security measures implemented
 - ✅ Application fully functional and ready to use
 
-## Recent Changes (November 27, 2025)
+## Recent Changes (December 19, 2025)
+- ✅ **SECURITY UPGRADE**: Implemented comprehensive anti-scraping and anti-cloning protections
+  - Rate limiting: Maximum 100 requests per minute per IP address
+  - Bot detection: Blocks curl, wget, Python, Selenium, Puppeteer, and other automation tools
+  - Advanced HTTP headers: X-Content-Type-Options, X-Frame-Options, CSP, Referrer-Policy
+  - CORS restrictions: Only allows GET/POST methods with limited headers
+  - Disabled unnecessary HTTP methods: PUT, DELETE, PATCH, HEAD, OPTIONS
+  - robots.txt: Aggressively blocks all crawlers and search engine bots
+  - .htaccess protections: Server-level bot and scraper blocking
+  - Copyright metadata: Added HTML meta tags and legal notices
+  - Cache control: Completely disables browser caching for all resources
+
+## Previous Changes (November 27, 2025)
 - ✅ **NEW**: Added "Eliminar caché" (Clear Cache) button in settings panel
   - Located in the Configuración (Settings) panel
   - Shows confirmation dialog before clearing cache

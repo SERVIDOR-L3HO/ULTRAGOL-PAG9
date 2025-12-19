@@ -1,0 +1,25 @@
+User-agent: *
+Disallow: /
+Disallow: /api/
+Disallow: /*.html
+Disallow: /*.js
+Disallow: /*.css
+Crawl-delay: 10
+
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: Slurp
+Disallow: /
+
+User-agent: DuckDuckBot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
