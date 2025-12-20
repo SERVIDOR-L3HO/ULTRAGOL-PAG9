@@ -423,22 +423,41 @@ async function loadTransmisiones() {
             const canalesNormalizados = [];
             
             // Procesar cada link en el array de links
-            if (match.links && match.links.length > 0) {
+            if (match.links && Array.isArray(match.links) && match.links.length > 0) {
                 match.links.forEach(linkGroup => {
-                    if (linkGroup.type === 'urls_list' && linkGroup.data && linkGroup.data.length > 0) {
+                    // Soportar múltiples formatos de estructura de datos
+                    if (linkGroup.type === 'urls_list' && linkGroup.data && Array.isArray(linkGroup.data) && linkGroup.data.length > 0) {
                         // Cada enlace en el grupo se convierte en un canal
-                        linkGroup.data.forEach(stream => {
-                            canalesNormalizados.push({
-                                numero: '',
-                                nombre: stream.stream_source || stream.platform || 'Canal',
-                                enlaces: [{
-                                    url: stream.match_url,
-                                    calidad: stream.stream_quality === 'hd' ? 'HD' : 'SD',
-                                    platform: stream.platform,
-                                    source: stream.stream_source
-                                }],
-                                tipoAPI: 'donromans'
-                            });
+                        linkGroup.data.forEach((stream, idx) => {
+                            if (stream && stream.match_url) {
+                                canalesNormalizados.push({
+                                    numero: '',
+                                    nombre: stream.stream_source || stream.platform || `Canal ${idx + 1}`,
+                                    enlaces: [{
+                                        url: stream.match_url,
+                                        calidad: stream.stream_quality === 'hd' ? 'HD' : 'SD',
+                                        platform: stream.platform,
+                                        source: stream.stream_source
+                                    }],
+                                    tipoAPI: 'donromans'
+                                });
+                            }
+                        });
+                    }
+                    // Soportar estructura alternativa de objeto urls
+                    else if (linkGroup.urls && Array.isArray(linkGroup.urls) && linkGroup.urls.length > 0) {
+                        linkGroup.urls.forEach((url, idx) => {
+                            if (url) {
+                                canalesNormalizados.push({
+                                    numero: '',
+                                    nombre: `Enlace ${idx + 1}`,
+                                    enlaces: [{
+                                        url: url,
+                                        calidad: 'SD'
+                                    }],
+                                    tipoAPI: 'donromans'
+                                });
+                            }
                         });
                     }
                 });
@@ -506,6 +525,14 @@ async function loadTransmisiones() {
         console.log('✅ Transmisiones cargadas desde API 3 (voodc):', data3.transmisiones?.length || 0);
         console.log('✅ Transmisiones cargadas desde API 4 (transmisiones4):', data4.transmisiones?.length || 0);
         console.log('✅ Transmisiones cargadas desde API 5 (donromans):', data5.matches?.length || 0);
+        
+        // Log detallado de API 5 para debugging
+        const totalCanalesAPI5 = transmisionesNormalizadasAPI5.reduce((sum, t) => sum + (t.canales?.length || 0), 0);
+        console.log(`✅ Total canales en API 5 (donromans): ${totalCanalesAPI5}`);
+        if (totalCanalesAPI5 === 0 && data5.matches?.length > 0) {
+            console.warn('⚠️ API 5 tiene matches pero sin canales procesados. Estructura:', data5.matches[0]);
+        }
+        
         console.log('✅ Total transmisiones combinadas:', transmisionesCombinadas.length);
         
         return transmisionesData;
