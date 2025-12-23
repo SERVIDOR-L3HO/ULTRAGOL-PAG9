@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ULTRAJUMPER - Offline Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .offline-game-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .offline-game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #000;
+        }
+        
+        .offline-game-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #000;
+            margin: 0;
+        }
+        
+        #offlineGameCanvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: white;
+            border: 2px solid #000;
+            border-radius: 8px;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+        
+        .offline-status {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: #ffcccc;
+            border: 1px solid #ff0000;
+            border-radius: 6px;
+            color: #ff0000;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .offline-status.online {
+            background: #ccffcc;
+            border-color: #00ff00;
+            color: #00aa00;
+        }
+        
+        @media (max-width: 480px) {
+            .offline-game-container {
+                width: 95vw;
+                max-width: 95vw;
+                padding: 15px;
+            }
+            
+            #offlineGameCanvas {
+                max-height: 80vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-game-container">
+        <div class="offline-game-header">
+            <h2 class="offline-game-title">⚽ ULTRAJUMPER</h2>
+        </div>
+        <canvas id="offlineGameCanvas" width="400" height="600"></canvas>
+        <div class="offline-status" id="offlineStatus">📡 Sin conexión a internet</div>
+    </div>
+
+    <script>
+        class OfflineGame {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                if (!this.canvas) return;
+                
+                this.ctx = this.canvas.getContext('2d');
+                this.canvas.width = 400;
+                this.canvas.height = 600;
+                
+                this.ball = {
+                    x: this.canvas.width / 2,
+                    y: this.canvas.height - 100,
+                    radius: 12,
+                    velocityY: 0,
+                    velocityX: 0,
+                    gravity: 0.5,
+                    jumpPower: -15,
+                    maxVelocity: 15
+                };
+                
+                this.platforms = [];
+                this.generatePlatforms();
+                
+                this.score = 0;
+                this.isGameOver = false;
+                this.isPaused = false;
+                this.gameStarted = false;
+                this.cameraY = 0;
+                
+                this.keys = {};
+                this.setupControls();
+                this.gameLoop();
+            }
+            
+            setupControls() {
+                document.addEventListener('keydown', (e) => {
+                    this.keys[e.key] = true;
+                    if (e.key === ' ') {
+                        e.preventDefault();
+                        if (!this.gameStarted) {
+                            this.gameStarted = true;
+                            this.ball.velocityY = this.ball.jumpPower;
+                        }
+                    }
+                    if (e.key === 'p' || e.key === 'P') {
+                        this.isPaused = !this.isPaused;
+                    }
+                });
+                
+                document.addEventListener('keyup', (e) => {
+                    this.keys[e.key] = false;
+                });
+                
+                document.addEventListener('touchstart', () => {
+                    if (!this.gameStarted) {
+                        this.gameStarted = true;
+                        this.ball.velocityY = this.ball.jumpPower;
+                    }
+                });
+            }
+            
+            generatePlatforms() {
+                this.platforms = [];
+                for (let i = 0; i < 8; i++) {
+                    const platformY = i * 80 - 40;
+                    this.platforms.push({
+                        x: Math.random() * (this.canvas.width - 80),
+                        y: platformY,
+                        width: 80,
+                        height: 15,
+                        type: Math.random() > 0.85 ? 'bouncy' : 'normal'
+                    });
+                }
+            }
+            
+            update() {
+                if (this.isPaused || !this.gameStarted) return;
+                
+                this.ball.velocityY += this.ball.gravity;
+                
+                if (this.keys['ArrowLeft'] || this.keys['a'] || this.keys['A']) {
+                    this.ball.velocityX = -8;
+                } else if (this.keys['ArrowRight'] || this.keys['d'] || this.keys['D']) {
+                    this.ball.velocityX = 8;
+                } else {
+                    this.ball.velocityX *= 0.95;
+                }
+                
+                if (this.ball.velocityY > this.ball.maxVelocity) {
+                    this.ball.velocityY = this.ball.maxVelocity;
+                }
+                
+                this.ball.x += this.ball.velocityX;
+                this.ball.y += this.ball.velocityY;
+                
+                if (this.ball.x - this.ball.radius < 0) {
+                    this.ball.x = this.ball.radius;
+                }
+                if (this.ball.x + this.ball.radius > this.canvas.width) {
+                    this.ball.x = this.canvas.width - this.ball.radius;
+                }
+                
+                for (let platform of this.platforms) {
+                    if (this.checkCollision(platform)) {
+                        if (this.ball.velocityY > 0) {
+                            this.ball.y = platform.y - this.ball.radius;
+                            this.ball.velocityY = platform.type === 'bouncy' ? -20 : this.ball.jumpPower;
+                            this.score += platform.type === 'bouncy' ? 10 : 5;
+                        }
+                    }
+                }
+                
+                if (this.ball.y < this.cameraY + this.canvas.height / 2) {
+                    const highestPlatform = Math.min(...this.platforms.map(p => p.y));
+                    for (let i = 0; i < 3; i++) {
+                        this.platforms.push({
+                            x: Math.random() * (this.canvas.width - 80),
+                            y: highestPlatform - 80,
+                            width: 80,
+                            height: 15,
+                            type: Math.random() > 0.85 ? 'bouncy' : 'normal'
+                        });
+                    }
+                }
+                
+                if (this.ball.y < this.cameraY + this.canvas.height / 3) {
+                    this.cameraY = this.ball.y - this.canvas.height / 3;
+                }
+                
+                this.platforms = this.platforms.filter(p => p.y < this.cameraY + this.canvas.height + 100);
+                
+                if (this.ball.y > this.cameraY + this.canvas.height + 100) {
+                    this.isGameOver = true;
+                }
+            }
+            
+            checkCollision(platform) {
+                return this.ball.x + this.ball.radius > platform.x &&
+                       this.ball.x - this.ball.radius < platform.x + platform.width &&
+                       this.ball.y + this.ball.radius > platform.y &&
+                       this.ball.y + this.ball.radius < platform.y + platform.height &&
+                       this.ball.velocityY >= 0;
+            }
+            
+            draw() {
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.ctx.strokeStyle = '#f0f0f0';
+                this.ctx.lineWidth = 1;
+                for (let i = 0; i < this.canvas.height + 100; i += 50) {
+                    const y = i - (this.cameraY % 50);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y);
+                    this.ctx.lineTo(this.canvas.width, y);
+                    this.ctx.stroke();
+                }
+                
+                for (let platform of this.platforms) {
+                    const screenY = platform.y - this.cameraY;
+                    if (screenY > -50 && screenY < this.canvas.height + 50) {
+                        this.ctx.fillStyle = platform.type === 'bouncy' ? '#333333' : '#000000';
+                        this.ctx.fillRect(platform.x, screenY, platform.width, platform.height);
+                        
+                        if (platform.type === 'bouncy') {
+                            this.ctx.fillStyle = '#666666';
+                            this.ctx.fillRect(platform.x + 5, screenY + 2, 70, 4);
+                        }
+                    }
+                }
+                
+                const ballScreenY = this.ball.y - this.cameraY;
+                this.ctx.fillStyle = '#000000';
+                this.ctx.beginPath();
+                this.ctx.arc(this.ball.x, ballScreenY, this.ball.radius, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.beginPath();
+                this.ctx.arc(this.ball.x - 5, ballScreenY - 3, 3, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.beginPath();
+                this.ctx.arc(this.ball.x + 5, ballScreenY - 3, 3, 0, Math.PI * 2);
+                this.ctx.fill();
+                
+                this.ctx.fillStyle = '#000000';
+                this.ctx.font = 'bold 24px Arial';
+                this.ctx.fillText(`SCORE: ${this.score}`, 10, 30);
+                
+                const height = Math.max(0, Math.floor((this.canvas.height - this.ball.y + this.cameraY) / 10));
+                this.ctx.font = 'bold 18px Arial';
+                this.ctx.fillText(`HEIGHT: ${height}`, 10, 60);
+                
+                if (!this.gameStarted) {
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.font = 'bold 32px Arial';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText('ULTRAJUMPER', this.canvas.width / 2, 150);
+                    
+                    this.ctx.font = '18px Arial';
+                    this.ctx.fillText('Press SPACE or TAP to start', this.canvas.width / 2, 250);
+                    this.ctx.fillText('Arrow Keys or A/D to move', this.canvas.width / 2, 280);
+                    this.ctx.fillText('Jump on black platforms to survive', this.canvas.width / 2, 310);
+                    this.ctx.fillText('Dark platforms give extra bounce!', this.canvas.width / 2, 340);
+                    
+                    this.ctx.textAlign = 'left';
+                }
+                
+                if (this.isPaused && this.gameStarted) {
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.font = 'bold 32px Arial';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText('PAUSED', this.canvas.width / 2, this.canvas.height / 2);
+                    this.ctx.font = '18px Arial';
+                    this.ctx.fillText('Press P to resume', this.canvas.width / 2, this.canvas.height / 2 + 50);
+                    this.ctx.textAlign = 'left';
+                }
+                
+                if (this.isGameOver) {
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.font = 'bold 32px Arial';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText('GAME OVER', this.canvas.width / 2, 200);
+                    this.ctx.font = 'bold 24px Arial';
+                    this.ctx.fillText(`FINAL SCORE: ${this.score}`, this.canvas.width / 2, 260);
+                    this.ctx.font = '18px Arial';
+                    this.ctx.fillText('Refresh the page when connection returns', this.canvas.width / 2, 310);
+                    this.ctx.textAlign = 'left';
+                }
+            }
+            
+            gameLoop = () => {
+                if (!this.isGameOver && this.gameStarted) {
+                    this.update();
+                }
+                this.draw();
+                requestAnimationFrame(this.gameLoop);
+            }
+        }
+        
+        // Monitor connection status
+        window.addEventListener('online', () => {
+            document.getElementById('offlineStatus').textContent = '✓ Conexión restaurada - Recargando...';
+            document.getElementById('offlineStatus').classList.add('online');
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        });
+        
+        // Initialize game
+        window.addEventListener('load', () => {
+            new OfflineGame('offlineGameCanvas');
+        });
+    </script>
+</body>
+</html>
