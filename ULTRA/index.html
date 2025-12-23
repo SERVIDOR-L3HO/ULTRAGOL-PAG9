@@ -863,5 +863,35 @@
     
     <!-- TV Remote Navigation -->
     <script src="tv-remote-navigation.js?v=20251109c"></script>
+    
+    <!-- Offline Game -->
+    <link rel="stylesheet" href="offline-game.css">
+    <div id="offlineGameModal">
+        <div class="offline-game-container">
+            <div class="offline-game-header">
+                <h2 class="offline-game-title">⚽ ULTRAJUMPER</h2>
+                <button class="offline-game-close-btn" onclick="document.getElementById('offlineGameModal').style.display='none';">✕</button>
+            </div>
+            <canvas id="offlineGameCanvas" width="400" height="600"></canvas>
+            <div class="offline-status" id="offlineStatus">📡 Sin conexión a internet</div>
+        </div>
+    </div>
+    <script src="offline-game.js"></script>
+    <script>
+        // Monitor online/offline status
+        window.addEventListener('online', () => {
+            document.getElementById('offlineStatus').textContent = '✓ Conexión restaurada';
+            document.getElementById('offlineStatus').classList.add('online');
+            setTimeout(() => {
+                document.getElementById('offlineGameModal').style.display = 'none';
+            }, 2000);
+        });
+        
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineStatus').textContent = '📡 Sin conexión a internet';
+            document.getElementById('offlineStatus').classList.remove('online');
+            showOfflineGame();
+        });
+    </script>
 </body>
 </html>

@@ -31,5 +31,140 @@
         allowfullscreen
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
     ></iframe>
+    
+    <!-- Offline Game Fallback for l3ho-links -->
+    <div id="offlineGameModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.95); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; font-family: Arial, sans-serif;">
+        <div style="position: relative; width: 100%; max-width: 500px; background: white; border-radius: 16px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); padding: 20px; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #000;">
+                <h2 style="font-size: 20px; font-weight: bold; color: #000; margin: 0;">⚽ ULTRAJUMPER</h2>
+                <button onclick="document.getElementById('offlineGameModal').style.display='none';" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #000; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">✕</button>
+            </div>
+            <canvas id="offlineGameCanvas" width="400" height="600" style="display: block; width: 100%; height: auto; background: white; border: 2px solid #000; border-radius: 8px;"></canvas>
+            <div id="offlineStatus" style="margin-top: 10px; padding: 8px 12px; background: #ffcccc; border: 1px solid #ff0000; border-radius: 6px; color: #ff0000; font-size: 12px; font-weight: bold; text-align: center;">📡 Sin conexión a internet</div>
+        </div>
+    </div>
+    
+    <script>
+        class OfflineGame {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                if (!this.canvas) return;
+                this.ctx = this.canvas.getContext('2d');
+                this.canvas.width = 400;
+                this.canvas.height = 600;
+                this.ball = {x: 200, y: 500, radius: 12, velocityY: 0, velocityX: 0, gravity: 0.5, jumpPower: -15, maxVelocity: 15};
+                this.platforms = [];
+                this.generatePlatforms();
+                this.score = 0;
+                this.isGameOver = false;
+                this.gameStarted = false;
+                this.cameraY = 0;
+                this.keys = {};
+                this.setupControls();
+                this.gameLoop();
+            }
+            setupControls() {
+                document.addEventListener('keydown', (e) => {
+                    this.keys[e.key] = true;
+                    if (e.key === ' ') {e.preventDefault(); if (!this.gameStarted) {this.gameStarted = true; this.ball.velocityY = this.ball.jumpPower;}}
+                });
+                document.addEventListener('keyup', (e) => {this.keys[e.key] = false;});
+                document.addEventListener('touchstart', () => {if (!this.gameStarted) {this.gameStarted = true; this.ball.velocityY = this.ball.jumpPower;}});
+            }
+            generatePlatforms() {
+                this.platforms = [];
+                for (let i = 0; i < 8; i++) {
+                    this.platforms.push({x: Math.random() * 320, y: i * 80 - 40, width: 80, height: 15, type: Math.random() > 0.85 ? 'bouncy' : 'normal'});
+                }
+            }
+            update() {
+                if (!this.gameStarted) return;
+                this.ball.velocityY += this.ball.gravity;
+                if (this.keys['ArrowLeft'] || this.keys['a']) this.ball.velocityX = -8;
+                else if (this.keys['ArrowRight'] || this.keys['d']) this.ball.velocityX = 8;
+                else this.ball.velocityX *= 0.95;
+                this.ball.x += this.ball.velocityX;
+                this.ball.y += this.ball.velocityY;
+                if (this.ball.x < 12) this.ball.x = 12;
+                if (this.ball.x > 388) this.ball.x = 388;
+                for (let p of this.platforms) {
+                    if (this.ball.x > p.x && this.ball.x < p.x + p.width && this.ball.y + 12 > p.y && this.ball.y + 12 < p.y + 15 && this.ball.velocityY > 0) {
+                        this.ball.y = p.y - 12;
+                        this.ball.velocityY = p.type === 'bouncy' ? -20 : -15;
+                        this.score += p.type === 'bouncy' ? 10 : 5;
+                    }
+                }
+                if (this.ball.y < this.cameraY + 200) {
+                    const high = Math.min(...this.platforms.map(p => p.y));
+                    for (let i = 0; i < 3; i++) this.platforms.push({x: Math.random() * 320, y: high - 80, width: 80, height: 15, type: Math.random() > 0.85 ? 'bouncy' : 'normal'});
+                }
+                if (this.ball.y < this.cameraY + 200) this.cameraY = this.ball.y - 200;
+                this.platforms = this.platforms.filter(p => p.y < this.cameraY + 700);
+                if (this.ball.y > this.cameraY + 700) this.isGameOver = true;
+            }
+            draw() {
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillRect(0, 0, 400, 600);
+                this.ctx.strokeStyle = '#f0f0f0';
+                for (let i = 0; i < 700; i += 50) {
+                    const y = i - (this.cameraY % 50);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, y);
+                    this.ctx.lineTo(400, y);
+                    this.ctx.stroke();
+                }
+                for (let p of this.platforms) {
+                    const sy = p.y - this.cameraY;
+                    if (sy > -50 && sy < 650) {
+                        this.ctx.fillStyle = p.type === 'bouncy' ? '#333333' : '#000000';
+                        this.ctx.fillRect(p.x, sy, p.width, p.height);
+                    }
+                }
+                this.ctx.fillStyle = '#000000';
+                this.ctx.beginPath();
+                this.ctx.arc(this.ball.x, this.ball.y - this.cameraY, 12, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.font = 'bold 24px Arial';
+                this.ctx.fillText(`SCORE: ${this.score}`, 10, 30);
+                if (!this.gameStarted) {
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    this.ctx.fillRect(0, 0, 400, 600);
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.font = 'bold 32px Arial';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText('ULTRAJUMPER', 200, 150);
+                    this.ctx.font = '18px Arial';
+                    this.ctx.fillText('Press SPACE or TAP', 200, 250);
+                    this.ctx.textAlign = 'left';
+                }
+                if (this.isGameOver) {
+                    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                    this.ctx.fillRect(0, 0, 400, 600);
+                    this.ctx.fillStyle = '#ffffff';
+                    this.ctx.font = 'bold 32px Arial';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText('GAME OVER', 200, 200);
+                    this.ctx.font = 'bold 24px Arial';
+                    this.ctx.fillText(`FINAL SCORE: ${this.score}`, 200, 260);
+                    this.ctx.textAlign = 'left';
+                }
+            }
+            gameLoop = () => {
+                if (!this.isGameOver && this.gameStarted) this.update();
+                this.draw();
+                requestAnimationFrame(this.gameLoop);
+            }
+        }
+        
+        function showOfflineGame() {
+            const m = document.getElementById('offlineGameModal');
+            if (m) {
+                m.style.display = 'flex';
+                if (!window.offlineGameInstance) window.offlineGameInstance = new OfflineGame('offlineGameCanvas');
+            }
+        }
+        window.addEventListener('offline', showOfflineGame);
+        window.addEventListener('load', () => {if (!navigator.onLine) setTimeout(showOfflineGame, 500);});
+    </script>
 </body>
 </html>
