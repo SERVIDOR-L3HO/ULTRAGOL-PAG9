@@ -30,11 +30,13 @@ class OfflineGame {
         this.cameraY = 0;
         
         this.keys = {};
+        this.touchStartX = 0;
         this.setupControls();
         this.gameLoop();
     }
     
     setupControls() {
+        // Keyboard controls
         document.addEventListener('keydown', (e) => {
             this.keys[e.key] = true;
             if (e.key === ' ') {
@@ -53,13 +55,27 @@ class OfflineGame {
             this.keys[e.key] = false;
         });
         
-        // Mobile touch controls
-        document.addEventListener('touchstart', () => {
-            if (!this.gameStarted) {
+        // Touch controls with swipe
+        document.addEventListener('touchstart', (e) => {
+            this.touchStartX = e.touches[0].clientX;
+            if (!this.gameStarted && !this.isGameOver) {
                 this.gameStarted = true;
                 this.ball.velocityY = this.ball.jumpPower;
             }
-        });
+        }, false);
+        
+        document.addEventListener('touchmove', (e) => {
+            if (!this.gameStarted || this.isGameOver) return;
+            const touchX = e.touches[0].clientX;
+            const diffX = touchX - this.touchStartX;
+            if (diffX < -30) {
+                this.ball.velocityX = -8;
+            } else if (diffX > 30) {
+                this.ball.velocityX = 8;
+            } else {
+                this.ball.velocityX *= 0.95;
+            }
+        }, false);
     }
     
     generatePlatforms() {
@@ -79,10 +95,8 @@ class OfflineGame {
     update() {
         if (this.isPaused || !this.gameStarted) return;
         
-        // Apply gravity
         this.ball.velocityY += this.ball.gravity;
         
-        // Horizontal movement
         if (this.keys['ArrowLeft'] || this.keys['a'] || this.keys['A']) {
             this.ball.velocityX = -8;
         } else if (this.keys['ArrowRight'] || this.keys['d'] || this.keys['D']) {
@@ -91,16 +105,13 @@ class OfflineGame {
             this.ball.velocityX *= 0.95;
         }
         
-        // Cap velocity
         if (this.ball.velocityY > this.ball.maxVelocity) {
             this.ball.velocityY = this.ball.maxVelocity;
         }
         
-        // Update position
         this.ball.x += this.ball.velocityX;
         this.ball.y += this.ball.velocityY;
         
-        // Wrap around edges
         if (this.ball.x - this.ball.radius < 0) {
             this.ball.x = this.ball.radius;
         }
@@ -108,7 +119,6 @@ class OfflineGame {
             this.ball.x = this.canvas.width - this.ball.radius;
         }
         
-        // Check platform collisions
         for (let platform of this.platforms) {
             if (this.checkCollision(platform)) {
                 if (this.ball.velocityY > 0) {
@@ -119,7 +129,6 @@ class OfflineGame {
             }
         }
         
-        // Generate new platforms as camera moves up
         if (this.ball.y < this.cameraY + this.canvas.height / 2) {
             const highestPlatform = Math.min(...this.platforms.map(p => p.y));
             for (let i = 0; i < 3; i++) {
@@ -133,15 +142,12 @@ class OfflineGame {
             }
         }
         
-        // Update camera
         if (this.ball.y < this.cameraY + this.canvas.height / 3) {
             this.cameraY = this.ball.y - this.canvas.height / 3;
         }
         
-        // Remove off-screen platforms
         this.platforms = this.platforms.filter(p => p.y < this.cameraY + this.canvas.height + 100);
         
-        // Game over check
         if (this.ball.y > this.cameraY + this.canvas.height + 100) {
             this.isGameOver = true;
         }
@@ -156,11 +162,9 @@ class OfflineGame {
     }
     
     draw() {
-        // Clear canvas
         this.ctx.fillStyle = '#ffffff';
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // Draw grid background
         this.ctx.strokeStyle = '#f0f0f0';
         this.ctx.lineWidth = 1;
         for (let i = 0; i < this.canvas.height + 100; i += 50) {
@@ -171,7 +175,6 @@ class OfflineGame {
             this.ctx.stroke();
         }
         
-        // Draw platforms
         for (let platform of this.platforms) {
             const screenY = platform.y - this.cameraY;
             if (screenY > -50 && screenY < this.canvas.height + 50) {
@@ -185,14 +188,12 @@ class OfflineGame {
             }
         }
         
-        // Draw ball
         const ballScreenY = this.ball.y - this.cameraY;
         this.ctx.fillStyle = '#000000';
         this.ctx.beginPath();
         this.ctx.arc(this.ball.x, ballScreenY, this.ball.radius, 0, Math.PI * 2);
         this.ctx.fill();
         
-        // Draw eyes
         this.ctx.fillStyle = '#ffffff';
         this.ctx.beginPath();
         this.ctx.arc(this.ball.x - 5, ballScreenY - 3, 3, 0, Math.PI * 2);
@@ -201,17 +202,14 @@ class OfflineGame {
         this.ctx.arc(this.ball.x + 5, ballScreenY - 3, 3, 0, Math.PI * 2);
         this.ctx.fill();
         
-        // Draw UI
         this.ctx.fillStyle = '#000000';
         this.ctx.font = 'bold 24px Arial';
         this.ctx.fillText(`SCORE: ${this.score}`, 10, 30);
         
-        // Draw height
         const height = Math.max(0, Math.floor((this.canvas.height - this.ball.y + this.cameraY) / 10));
         this.ctx.font = 'bold 18px Arial';
         this.ctx.fillText(`HEIGHT: ${height}`, 10, 60);
         
-        // Draw instructions
         if (!this.gameStarted) {
             this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
@@ -222,10 +220,10 @@ class OfflineGame {
             this.ctx.fillText('ULTRAJUMPER', this.canvas.width / 2, 150);
             
             this.ctx.font = '18px Arial';
-            this.ctx.fillText('Press SPACE or TAP to start', this.canvas.width / 2, 250);
-            this.ctx.fillText('Arrow Keys or A/D to move', this.canvas.width / 2, 280);
-            this.ctx.fillText('Jump on black platforms to survive', this.canvas.width / 2, 310);
-            this.ctx.fillText('Dark platforms give extra bounce!', this.canvas.width / 2, 340);
+            this.ctx.fillText('Swipe or Press SPACE to start', this.canvas.width / 2, 250);
+            this.ctx.fillText('Swipe left/right or use A/D', this.canvas.width / 2, 280);
+            this.ctx.fillText('Jump on black platforms', this.canvas.width / 2, 310);
+            this.ctx.fillText('Gray platforms give extra bounce!', this.canvas.width / 2, 340);
             
             this.ctx.textAlign = 'left';
         }
@@ -254,9 +252,22 @@ class OfflineGame {
             this.ctx.font = 'bold 24px Arial';
             this.ctx.fillText(`FINAL SCORE: ${this.score}`, this.canvas.width / 2, 260);
             this.ctx.font = '18px Arial';
-            this.ctx.fillText('Refresh the page to play again', this.canvas.width / 2, 310);
+            this.ctx.fillText('Click or TAP to play again', this.canvas.width / 2, 310);
             this.ctx.textAlign = 'left';
         }
+    }
+    
+    reset() {
+        this.ball.x = this.canvas.width / 2;
+        this.ball.y = this.canvas.height - 100;
+        this.ball.velocityY = 0;
+        this.ball.velocityX = 0;
+        this.score = 0;
+        this.isGameOver = false;
+        this.gameStarted = false;
+        this.cameraY = 0;
+        this.platforms = [];
+        this.generatePlatforms();
     }
     
     gameLoop = () => {
@@ -268,7 +279,6 @@ class OfflineGame {
     }
 }
 
-// Detect offline and show game
 window.addEventListener('offline', () => {
     showOfflineGame();
 });
@@ -283,12 +293,26 @@ function showOfflineGame() {
     }
 }
 
-// Auto-show game if offline when page loads
 window.addEventListener('load', () => {
     if (!navigator.onLine) {
         setTimeout(showOfflineGame, 500);
     }
 });
 
-// Make function globally available
+document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('offlineGameCanvas');
+    if (canvas) {
+        canvas.addEventListener('click', () => {
+            if (window.offlineGameInstance && window.offlineGameInstance.isGameOver) {
+                window.offlineGameInstance.reset();
+            }
+        });
+        canvas.addEventListener('touchstart', (e) => {
+            if (window.offlineGameInstance && window.offlineGameInstance.isGameOver) {
+                window.offlineGameInstance.reset();
+            }
+        }, { passive: false });
+    }
+});
+
 window.showOfflineGame = showOfflineGame;

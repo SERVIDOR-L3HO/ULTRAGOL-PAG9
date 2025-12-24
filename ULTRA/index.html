@@ -878,7 +878,22 @@
     </div>
     <script src="offline-game.js"></script>
     <script>
-        // Monitor online/offline status
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('offlineGameCanvas');
+            if (canvas) {
+                canvas.addEventListener('click', () => {
+                    if (window.offlineGameInstance && window.offlineGameInstance.isGameOver) {
+                        window.offlineGameInstance.reset();
+                    }
+                });
+                canvas.addEventListener('touchstart', (e) => {
+                    if (window.offlineGameInstance && window.offlineGameInstance.isGameOver) {
+                        window.offlineGameInstance.reset();
+                    }
+                }, { passive: false });
+            }
+        });
+        
         window.addEventListener('online', () => {
             document.getElementById('offlineStatus').textContent = '✓ Conexión restaurada';
             document.getElementById('offlineStatus').classList.add('online');

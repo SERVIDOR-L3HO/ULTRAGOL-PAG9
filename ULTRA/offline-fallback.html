@@ -130,11 +130,18 @@
                 this.cameraY = 0;
                 
                 this.keys = {};
+                
+                // Touch/swipe variables
+                this.touchStartX = 0;
+                this.touchStartY = 0;
+                this.touchStartTime = 0;
+                
                 this.setupControls();
                 this.gameLoop();
             }
             
             setupControls() {
+                // Keyboard controls
                 document.addEventListener('keydown', (e) => {
                     this.keys[e.key] = true;
                     if (e.key === ' ') {
@@ -153,10 +160,53 @@
                     this.keys[e.key] = false;
                 });
                 
-                document.addEventListener('touchstart', () => {
-                    if (!this.gameStarted) {
+                // Touch controls
+                this.canvas.addEventListener('touchstart', (e) => {
+                    this.touchStartX = e.touches[0].clientX;
+                    this.touchStartY = e.touches[0].clientY;
+                    this.touchStartTime = Date.now();
+                    
+                    if (!this.gameStarted && !this.isGameOver) {
                         this.gameStarted = true;
                         this.ball.velocityY = this.ball.jumpPower;
+                    }
+                }, false);
+                
+                this.canvas.addEventListener('touchmove', (e) => {
+                    if (!this.gameStarted || this.isGameOver) return;
+                    e.preventDefault();
+                    
+                    const touchX = e.touches[0].clientX;
+                    const diffX = touchX - this.touchStartX;
+                    
+                    // Swipe left/right detection
+                    if (diffX < -30) {
+                        this.ball.velocityX = -8;
+                    } else if (diffX > 30) {
+                        this.ball.velocityX = 8;
+                    } else {
+                        this.ball.velocityX *= 0.95;
+                    }
+                }, false);
+                
+                this.canvas.addEventListener('touchend', () => {
+                    this.ball.velocityX *= 0.95;
+                }, false);
+                
+                // Mouse controls (for testing on desktop)
+                this.canvas.addEventListener('mousemove', (e) => {
+                    if (!this.gameStarted || this.isGameOver) return;
+                    
+                    const rect = this.canvas.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const canvasCenterX = this.canvas.width / 2;
+                    
+                    if (mouseX < canvasCenterX - 50) {
+                        this.ball.velocityX = -8;
+                    } else if (mouseX > canvasCenterX + 50) {
+                        this.ball.velocityX = 8;
+                    } else {
+                        this.ball.velocityX *= 0.95;
                     }
                 });
             }
@@ -335,9 +385,22 @@
                     this.ctx.font = 'bold 24px Arial';
                     this.ctx.fillText(`FINAL SCORE: ${this.score}`, this.canvas.width / 2, 260);
                     this.ctx.font = '18px Arial';
-                    this.ctx.fillText('Refresh the page when connection returns', this.canvas.width / 2, 310);
+                    this.ctx.fillText('TAP to play again', this.canvas.width / 2, 310);
                     this.ctx.textAlign = 'left';
                 }
+            }
+            
+            reset() {
+                this.ball.x = this.canvas.width / 2;
+                this.ball.y = this.canvas.height - 100;
+                this.ball.velocityY = 0;
+                this.ball.velocityX = 0;
+                this.score = 0;
+                this.isGameOver = false;
+                this.gameStarted = false;
+                this.cameraY = 0;
+                this.platforms = [];
+                this.generatePlatforms();
             }
             
             gameLoop = () => {
@@ -348,6 +411,8 @@
                 requestAnimationFrame(this.gameLoop);
             }
         }
+        
+        let gameInstance = null;
         
         // Monitor connection status
         window.addEventListener('online', () => {
@@ -360,7 +425,20 @@
         
         // Initialize game
         window.addEventListener('load', () => {
-            new OfflineGame('offlineGameCanvas');
+            gameInstance = new OfflineGame('offlineGameCanvas');
+            
+            // Replay on game over
+            document.getElementById('offlineGameCanvas').addEventListener('click', () => {
+                if (gameInstance && gameInstance.isGameOver) {
+                    gameInstance.reset();
+                }
+            });
+            
+            document.getElementById('offlineGameCanvas').addEventListener('touchstart', (e) => {
+                if (gameInstance && gameInstance.isGameOver) {
+                    gameInstance.reset();
+                }
+            }, { passive: false });
         });
     </script>
 </body>
