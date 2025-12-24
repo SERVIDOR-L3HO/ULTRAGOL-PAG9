@@ -146,6 +146,16 @@ app.use(express.static('.', {
     }
 }));
 
+// Servir ULTRACANALES desde el directorio padre
+app.use('/ULTRACANALES', express.static(path.join(__dirname, '..', 'ULTRACANALES'), {
+    setHeaders: (res, path) => {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+    }
+}));
+
 // Ruta principal (incluyendo parámetros de query para links compartidos)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
