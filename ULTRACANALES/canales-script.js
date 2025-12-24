@@ -74,9 +74,17 @@ async function loadChannels() {
         });
         
         renderChannels(allChannels);
+        updateChannelCount(allChannels.length);
         checkDeepLink();
     } catch (error) {
         console.error('Error loading channels:', error);
+    }
+}
+
+function updateChannelCount(count) {
+    const countEl = document.getElementById('channel-count');
+    if (countEl) {
+        countEl.textContent = `${count} canales disponibles`;
     }
 }
 
@@ -88,6 +96,8 @@ function renderChannels(channels) {
         const card = createChannelCard(channel);
         container.appendChild(card);
     });
+    
+    updateChannelCount(channels.length);
 }
 
 function createChannelCard(channel) {
@@ -105,18 +115,22 @@ function createChannelCard(channel) {
     }
     
     const imageContent = logo 
-        ? `<img src="${logo}" alt="${channel.name}" onerror="this.parentElement.innerHTML='<div class=\\'channel-icon-large\\'>${channel.categoryIcon}</div>'">`
-        : `<div class="channel-icon-large">${channel.categoryIcon}</div>`;
+        ? `<img src="${logo}" alt="${channel.name}" onerror="this.parentElement.innerHTML='<div style=\\'font-size: 2.5rem;\\'>${channel.categoryIcon}</div>'">`
+        : `<div style="font-size: 2.5rem;">${channel.categoryIcon}</div>`;
     
     card.innerHTML = `
         <div class="channel-card-image">
             ${imageContent}
         </div>
         <div class="channel-card-content">
-            <div class="channel-card-name">${channel.name}</div>
-            <div class="channel-card-category">${channel.categoryName}</div>
-            ${channel.live ? '<span class="channel-card-badge">En Vivo</span>' : ''}
-            <div class="channel-sources">${channel.sources.length} fuente${channel.sources.length > 1 ? 's' : ''} disponible${channel.sources.length > 1 ? 's' : ''}</div>
+            <div>
+                <div class="channel-card-name">${channel.name}</div>
+                <div class="channel-card-category">${channel.categoryName}</div>
+            </div>
+            <div>
+                ${channel.live ? '<span class="channel-card-badge">EN VIVO</span>' : ''}
+                <div class="channel-sources">${channel.sources.length} fuente${channel.sources.length > 1 ? 's' : ''}</div>
+            </div>
         </div>
     `;
     
@@ -130,28 +144,20 @@ function openChannel(channel) {
     const channelName = document.getElementById('current-channel-name');
     const player = document.getElementById('player');
     const sourceButtons = document.getElementById('source-buttons');
-    const heroBanner = document.getElementById('hero-banner');
-
-    if (heroBanner) {
-        heroBanner.classList.add('hide');
-    }
 
     channelName.textContent = channel.name;
     playerSection.classList.remove('hidden');
 
     sourceButtons.innerHTML = '';
     
-    // Crear array de fuentes con el nuevo dominio al inicio
     let sourcesArray = [...channel.sources];
     
-    // Buscar si hay un link de rereyano.ru y extraer el número
     const rereyanoLink = sourcesArray.find(s => s.includes('rereyano.ru/player/3/'));
     if (rereyanoLink) {
         const match = rereyanoLink.match(/\/player\/3\/(\d+)/);
         if (match) {
             const channelNumber = match[1];
             const newLink = `https://golazotvhd.com/evento.html?get=https://rereyano.ru/player/3/${channelNumber}`;
-            // Insertar el nuevo link al inicio
             sourcesArray.unshift(newLink);
         }
     }
@@ -178,13 +184,8 @@ function openChannel(channel) {
 }
 
 function updateMetaTags(channel) {
-    // Actualizar título de la página para el navegador
     document.title = `${channel.name} - ULTRACANALES`;
     
-    // NOTA: Los meta tags se actualizan aquí para mejorar la experiencia del usuario,
-    // pero los crawlers de redes sociales (WhatsApp, Facebook, Twitter) no ejecutan JavaScript,
-    // por lo que verán los meta tags por defecto del HTML.
-    // Para meta tags dinámicos reales se necesitaría server-side rendering o edge functions.
     const metaTags = {
         'og:title': `${channel.name} - ULTRACANALES`,
         'og:description': `Mira ${channel.name} en vivo en ULTRACANALES 🔥 ${channel.categoryName}`,
@@ -211,15 +212,10 @@ function loadSource(source) {
 function closePlayer() {
     const playerSection = document.getElementById('player-section');
     const player = document.getElementById('player');
-    const heroBanner = document.getElementById('hero-banner');
     
     playerSection.classList.add('hidden');
     player.src = '';
     currentChannel = null;
-    
-    if (heroBanner) {
-        heroBanner.classList.remove('hide');
-    }
 }
 
 function filterChannelsByCategory(category) {
@@ -262,16 +258,13 @@ function setupAuthUI(user) {
         currentUser = user;
         loginBtn.innerHTML = `
             <img src="${user.photoURL}" alt="${user.displayName}" 
-                 style="width: 24px; height: 24px; border-radius: 50%;">
+                 style="width: 28px; height: 28px; border-radius: 50%; margin-right: 0.5rem;">
             <span>${user.displayName?.split(' ')[0] || 'Usuario'}</span>
         `;
         loginBtn.onclick = handleSignOut;
     } else {
         currentUser = null;
-        loginBtn.innerHTML = `
-            <span class="login-icon">G</span>
-            <span>Iniciar Sesión</span>
-        `;
+        loginBtn.innerHTML = `👤 Iniciar Sesión`;
         loginBtn.onclick = handleSignIn;
     }
 }
@@ -294,14 +287,6 @@ async function handleSignOut() {
         await signOutUser();
     } catch (error) {
         console.error('Error al cerrar sesión:', error);
-    }
-}
-
-function updateLikes() {
-    const likes = ['7.2K', '8.5K', '9.1K', '6.8K', '10.3K'];
-    const likesEl = document.getElementById('likes');
-    if (likesEl) {
-        likesEl.textContent = likes[Math.floor(Math.random() * likes.length)];
     }
 }
 
@@ -370,9 +355,8 @@ onAuthStateChanged(auth, (user) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadChannels();
-    setInterval(updateLikes, 5000);
     
-    const categoryFilters = document.querySelectorAll('.category-filter');
+    const categoryFilters = document.querySelectorAll('.category-btn');
     categoryFilters.forEach(filter => {
         filter.addEventListener('click', () => {
             categoryFilters.forEach(f => f.classList.remove('active'));
@@ -381,17 +365,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
     
+    const navTabs = document.querySelectorAll('.nav-tab');
+    navTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            navTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+        });
+    });
+    
     const searchInput = document.getElementById('searchInput');
     searchInput.addEventListener('input', (e) => {
         searchChannels(e.target.value);
     });
     
-    const searchBtn = document.querySelector('.search-icon-btn');
+    const searchBtn = document.querySelector('.search-btn');
     searchBtn.addEventListener('click', () => {
         searchChannels(searchInput.value);
     });
     
-    const shareBtn = document.querySelector('.action-btn[data-action="share"]');
+    const shareBtn = document.querySelector('.share-btn');
     if (shareBtn) {
         shareBtn.addEventListener('click', shareChannel);
     }

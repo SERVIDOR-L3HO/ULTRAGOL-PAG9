@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todos los Canales - ULTRACANALES</title>
+    <title>ULTRACANALES - Transmisiones Deportivas en Vivo</title>
     
-    <!-- Verificar codigo promocional antes de cargar anuncios -->
     <script>
     (function() {
         try {
@@ -21,7 +20,6 @@
     })();
     </script>
     
-    <!-- Google Ads -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3612607805789879"
      crossorigin="anonymous"></script>
     
@@ -31,81 +29,97 @@
     <meta property="og:image" content="https://ultracanales.com/attached_assets/297938-removebg-preview_1760222866015.png">
     <meta name="twitter:card" content="summary_large_image">
     
-    <link href="style.css?v=20251109c?v=20251109c" rel="stylesheet" type="text/css" />
-    <link href="canales-style.css?v=20251109c?v=20251109c" rel="stylesheet" type="text/css" />
+    <link href="canales-style.css?v=20251224" rel="stylesheet" type="text/css" />
 </head>
 <body>
+    <!-- Header Navigation -->
     <header class="header">
-        <div class="header-content">
+        <div class="header-container">
             <div class="header-left">
-                <a href="index.html" class="back-btn">← Inicio</a>
-                <div class="logo">
-                    <img src="attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="logo-image">
-                </div>
+                <a href="index.html" class="logo-link">
+                    <img src="attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="logo">
+                    <span class="logo-text">ULTRACANALES</span>
+                </a>
             </div>
+            
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="live">📺 EN VIVO</button>
+                <button class="nav-tab" data-tab="ondemand">📹 A DEMANDA</button>
+                <button class="nav-tab" data-tab="schedule">📅 HORARIO</button>
+                <button class="nav-tab" data-tab="featured">⭐ DESTACADOS</button>
+            </nav>
+            
             <div class="header-right">
-                <button class="login-btn" id="loginBtn">
-                    <span class="login-icon">G</span>
-                    <span class="login-text">Iniciar Sesión</span>
-                </button>
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar canal...">
+                    <button class="search-btn">🔍</button>
+                </div>
+                <button class="login-btn" id="loginBtn">👤 Iniciar Sesión</button>
             </div>
         </div>
     </header>
 
-    <div class="search-bar-section">
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="Buscar canales, equipos o ligas...">
-            <button class="search-icon-btn">🔍</button>
+    <!-- Hero Section with Featured Content -->
+    <section class="hero-section">
+        <div class="hero-featured">
+            <h1 class="hero-title">🌎 ULTRACANALES</h1>
+            <p class="hero-subtitle">Transmisiones deportivas en vivo de todo el mundo</p>
         </div>
-    </div>
+    </section>
 
-    <div id="hero-banner" class="hero-banner">
-        <img src="attached_assets/1760230812607~2_1760232142546.jpg" alt="El Fútbol Respira Aquí" class="hero-banner-image">
-    </div>
+    <!-- Category Filter Carousel -->
+    <section class="categories-section">
+        <div class="categories-container">
+            <button class="category-btn active" data-category="all">Todos</button>
+            <button class="category-btn" data-category="mexico">🇲🇽 México</button>
+            <button class="category-btn" data-category="fox">🦊 Fox Sports</button>
+            <button class="category-btn" data-category="espn">🎯 ESPN</button>
+            <button class="category-btn" data-category="dazn">🏁 DAZN</button>
+            <button class="category-btn" data-category="sudamerica">🌎 Sudamérica</button>
+            <button class="category-btn" data-category="entretenimiento">🎬 Entretenimiento</button>
+            <button class="category-btn" data-category="noticias">📰 Noticias</button>
+            <button class="category-btn" data-category="otros">📺 Otros</button>
+        </div>
+    </section>
 
-    <div id="player-section" class="player-section hidden">
+    <!-- Player Section -->
+    <section id="player-section" class="player-section hidden">
         <div class="player-container">
             <button class="close-player" onclick="closePlayer()">✕</button>
             <div class="player-wrapper">
                 <iframe id="player" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
             </div>
             <div class="player-info">
-                <h2 id="current-channel-name">Canal</h2>
-                <div class="player-actions">
-                    <button class="action-btn" data-action="share">📤 Compartir</button>
-                    <button class="action-btn">❤️ <span id="likes">7.2K</span></button>
+                <div class="player-header">
+                    <div>
+                        <h2 id="current-channel-name">Canal</h2>
+                        <p class="channel-badge">En Vivo</p>
+                    </div>
+                    <div class="player-actions">
+                        <button class="action-btn share-btn">📤 Compartir</button>
+                        <button class="action-btn like-btn">❤️ <span class="like-count">0</span></button>
+                    </div>
                 </div>
-            </div>
-            <div class="source-selector">
                 <div id="source-buttons" class="source-buttons"></div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <main class="canales-main">
-        <div class="hero-section">
-            <h1 class="hero-title">🌎 Explora Todos los Canales</h1>
-            <p class="hero-subtitle">Transmisiones deportivas de todo el mundo</p>
+    <!-- Channels Grid -->
+    <main class="main-content">
+        <div class="grid-header">
+            <h2 class="section-title">Canales Disponibles</h2>
+            <p class="section-subtitle" id="channel-count">Cargando canales...</p>
         </div>
-
-        <div class="filter-section">
-            <button class="category-filter active" data-category="all">Todos</button>
-            <button class="category-filter" data-category="mexico">🇲🇽 México</button>
-            <button class="category-filter" data-category="fox">🦊 Fox Sports</button>
-            <button class="category-filter" data-category="espn">🎯 ESPN</button>
-            <button class="category-filter" data-category="dazn">🏁 DAZN</button>
-            <button class="category-filter" data-category="sudamerica">🌎 Sudamérica</button>
-            <button class="category-filter" data-category="entretenimiento">🎬 Entretenimiento</button>
-            <button class="category-filter" data-category="infantil">👶 Infantiles</button>
-            <button class="category-filter" data-category="cultura">📚 Cultura</button>
-            <button class="category-filter" data-category="noticias">📰 Noticias</button>
-            <button class="category-filter" data-category="otros">📺 Otros</button>
-        </div>
-
         <div id="all-channels-grid" class="channels-grid"></div>
     </main>
 
-    <script type="module" src="firebase-config.js?v=20251109c?v=20251109c"></script>
-    <script type="module" src="canales-script.js?v=20251109c?v=20251109c"></script>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 ULTRACANALES. Todos los derechos reservados.</p>
+    </footer>
+
+    <script type="module" src="firebase-config.js?v=20251224"></script>
+    <script type="module" src="canales-script.js?v=20251224"></script>
 </body>
 </html>
