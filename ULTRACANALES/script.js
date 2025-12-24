@@ -160,7 +160,7 @@ function openChannel(channel) {
         const match = rereyanoLink.match(/\/player\/3\/(\d+)/);
         if (match) {
             const channelNumber = match[1];
-            const newLink = `https://golazotvhd.com/evento.html?get=https://rereyano.ru/player/3/${channelNumber}`;
+            const newLink = `https://ultragol-api-3.vercel.app/ultragol-l3ho?get=https://rereyano.ru/player/3/${channelNumber}`;
             // Insertar el nuevo link al inicio
             sourcesArray.unshift(newLink);
         }
