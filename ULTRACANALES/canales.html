@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ULTRACANALES - Transmisiones deportivas en vivo de todo el mundo">
+    <meta name="theme-color" content="#ff8c00">
     <title>ULTRACANALES - Transmisiones Deportivas en Vivo</title>
     
     <script>
@@ -29,7 +31,7 @@
     <meta property="og:image" content="https://ultracanales.com/attached_assets/297938-removebg-preview_1760222866015.png">
     <meta name="twitter:card" content="summary_large_image">
     
-    <link href="canales-style.css?v=20251224" rel="stylesheet" type="text/css" />
+    <link href="canales-style.css?v=20251224b" rel="stylesheet" type="text/css" />
 </head>
 <body>
     <!-- Header Navigation -->
@@ -52,7 +54,7 @@
             <div class="header-right">
                 <div class="search-container">
                     <input type="text" id="searchInput" class="search-input" placeholder="Buscar canal...">
-                    <button class="search-btn">🔍</button>
+                    <button class="search-btn" aria-label="Buscar">🔍</button>
                 </div>
                 <button class="login-btn" id="loginBtn">👤 Iniciar Sesión</button>
             </div>
@@ -62,8 +64,9 @@
     <!-- Hero Section with Featured Content -->
     <section class="hero-section">
         <div class="hero-featured">
-            <h1 class="hero-title">🌎 ULTRACANALES</h1>
-            <p class="hero-subtitle">Transmisiones deportivas en vivo de todo el mundo</p>
+            <div class="hero-badge">Transmisiones en Vivo</div>
+            <h1 class="hero-title">ULTRACANALES</h1>
+            <p class="hero-subtitle">Acceso a los mejores canales deportivos del mundo</p>
         </div>
     </section>
 
@@ -85,7 +88,7 @@
     <!-- Player Section -->
     <section id="player-section" class="player-section hidden">
         <div class="player-container">
-            <button class="close-player" onclick="closePlayer()">✕</button>
+            <button class="close-player" onclick="closePlayer()" aria-label="Cerrar reproductor">✕</button>
             <div class="player-wrapper">
                 <iframe id="player" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
             </div>
@@ -93,11 +96,11 @@
                 <div class="player-header">
                     <div>
                         <h2 id="current-channel-name">Canal</h2>
-                        <p class="channel-badge">En Vivo</p>
+                        <span class="channel-badge">En Vivo</span>
                     </div>
                     <div class="player-actions">
-                        <button class="action-btn share-btn">📤 Compartir</button>
-                        <button class="action-btn like-btn">❤️ <span class="like-count">0</span></button>
+                        <button class="action-btn share-btn" aria-label="Compartir canal">📤 Compartir</button>
+                        <button class="action-btn like-btn" aria-label="Me gusta">❤️ <span class="like-count">0</span></button>
                     </div>
                 </div>
                 <div id="source-buttons" class="source-buttons"></div>
@@ -108,18 +111,22 @@
     <!-- Channels Grid -->
     <main class="main-content">
         <div class="grid-header">
-            <h2 class="section-title">Canales Disponibles</h2>
-            <p class="section-subtitle" id="channel-count">Cargando canales...</p>
+            <div>
+                <h2 class="section-title">Canales Disponibles</h2>
+                <p class="section-subtitle" id="channel-count">Cargando canales...</p>
+            </div>
         </div>
         <div id="all-channels-grid" class="channels-grid"></div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2025 ULTRACANALES. Todos los derechos reservados.</p>
+        <div class="footer-content">
+            <p>&copy; 2025 ULTRACANALES. Todos los derechos reservados.</p>
+        </div>
     </footer>
 
-    <script type="module" src="firebase-config.js?v=20251224"></script>
-    <script type="module" src="canales-script.js?v=20251224"></script>
+    <script type="module" src="firebase-config.js?v=20251224b"></script>
+    <script type="module" src="canales-script.js?v=20251224b"></script>
 </body>
 </html>
