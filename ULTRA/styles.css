@@ -9468,78 +9468,6 @@ body.dark-mode .news-content p {
     font-size: 11px;
 }
 
-/* ==================== ESTILOS DE RACHA ==================== */
-
-.streak-section {
-    background: linear-gradient(135deg, rgba(255, 107, 53, 0.1) 0%, rgba(255, 69, 0, 0.05) 100%) !important;
-    border: 1px solid rgba(255, 107, 53, 0.3) !important;
-    border-radius: 12px !important;
-    padding: 16px !important;
-}
-
-.streak-header {
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: #fff;
-}
-
-.streak-container {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 12px;
-    align-items: center;
-}
-
-.streak-display {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: rgba(255, 69, 0, 0.1);
-    padding: 16px 24px;
-    border-radius: 10px;
-    flex: 1;
-}
-
-.streak-number {
-    font-size: 36px;
-    font-weight: 700;
-    color: #FF4500;
-    line-height: 1;
-}
-
-.streak-label {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
-    margin-top: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.streak-rewards {
-    flex: 1;
-}
-
-.rewards-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.reward-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    font-size: 12px;
-}
-
-.reward-item.earned {
     background: rgba(255, 107, 53, 0.2);
     border-color: rgba(255, 107, 53, 0.5);
 }
@@ -9602,5 +9530,199 @@ body.dark-mode .news-content p {
     background: linear-gradient(90deg, #FF4500 0%, #FF6B35 100%);
     transition: width 0.6s ease;
     box-shadow: 0 0 10px rgba(255, 69, 0, 0.5);
+}
+
+
+/* ==================== ESTILOS DE RACHA COMPACTOS ====================*/
+
+.streak-section {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.15) 0%, rgba(255, 69, 0, 0.08) 100%) !important;
+    border: 1px solid rgba(255, 107, 53, 0.25) !important;
+    border-radius: 10px !important;
+    padding: 12px !important;
+}
+
+.streak-compact {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.streak-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+}
+
+.streak-left i {
+    font-size: 24px;
+    color: #FF4500;
+    animation: fireFlicker 2s ease-in-out infinite;
+}
+
+@keyframes fireFlicker {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.05); }
+}
+
+.streak-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.streak-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.streak-number {
+    font-size: 22px;
+    font-weight: 700;
+    color: #FF4500;
+    line-height: 1;
+}
+
+.streak-toggle {
+    background: rgba(255, 107, 53, 0.2);
+    border: 1px solid rgba(255, 107, 53, 0.3);
+    color: #FF4500;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.streak-toggle:hover {
+    background: rgba(255, 107, 53, 0.3);
+    transform: scale(1.05);
+}
+
+.streak-toggle i {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+
+.streak-toggle.active i {
+    transform: rotate(180deg);
+}
+
+.streak-progress-bar {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.streak-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FF4500 0%, #FF6B35 100%);
+    transition: width 0.6s ease;
+    box-shadow: 0 0 8px rgba(255, 69, 0, 0.6);
+}
+
+.streak-rewards-collapsed {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+.streak-rewards-collapsed.active {
+    max-height: 300px;
+}
+
+.rewards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.reward-mini {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 11px;
+    text-align: center;
+}
+
+.reward-mini.earned {
+    background: rgba(255, 107, 53, 0.2);
+    border-color: rgba(255, 107, 53, 0.4);
+}
+
+.reward-mini.claimed {
+    background: rgba(76, 175, 80, 0.15);
+    border-color: rgba(76, 175, 80, 0.4);
+}
+
+.reward-mini:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 69, 0, 0.2);
+}
+
+.reward-mini-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.reward-mini-label {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.reward-mini.earned .reward-mini-label {
+    color: #FF6B35;
+    font-weight: 600;
+}
+
+.reward-mini.claimed .reward-mini-label {
+    color: #4CAF50;
+}
+
+.reward-mini-btn {
+    background: #FF4500;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.reward-mini-btn:hover {
+    background: #FF6B35;
+    transform: scale(1.05);
+}
+
+.reward-check {
+    color: #4CAF50;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 2px;
 }
 

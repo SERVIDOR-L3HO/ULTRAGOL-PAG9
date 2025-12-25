@@ -5368,38 +5368,45 @@ function checkStreakRewards() {
     if (!rewardsDiv) return;
     
     const rewards = [
-        { days: 7, label: '1 Semana', reward: generatePromoCode('SEMANA7') },
-        { days: 14, label: '2 Semanas', reward: generatePromoCode('SEMANA14') },
-        { days: 30, label: '1 Mes', reward: generatePromoCode('MES1') },
+        { days: 7, label: 'Semana', reward: generatePromoCode('SEMANA7') },
+        { days: 14, label: '2 Sem', reward: generatePromoCode('SEMANA14') },
+        { days: 30, label: 'Mes', reward: generatePromoCode('MES1') },
         { days: 60, label: '2 Meses', reward: generatePromoCode('MES2') },
         { days: 90, label: '3 Meses', reward: generatePromoCode('MES3') },
         { days: 180, label: '6 Meses', reward: generatePromoCode('MES6') }
     ];
     
-    let rewardsHTML = '<div class="rewards-list">';
+    let rewardsHTML = '<div class="rewards-grid">';
     rewards.forEach(r => {
         const isEarned = streakData.currentStreak >= r.days;
         const isClaimed = streakData.claimedRewards.includes(r.days);
-        const status = isClaimed ? 'claimed' : (isEarned ? 'earned' : 'locked');
+        let classStatus = isClaimed ? 'claimed' : (isEarned ? 'earned' : '');
         
         rewardsHTML += `
-            <div class="reward-item ${status}">
-                <div class="reward-info">
-                    <span class="reward-days">${r.label}</span>
-                    ${isEarned && !isClaimed ? `
-                        <button class="reward-claim-btn" onclick="claimReward(${r.days}, '${r.reward}')">
-                            Reclamar
-                        </button>
-                    ` : ''}
-                    ${isClaimed ? '<span class="reward-claimed-badge">✓ Reclamado</span>' : ''}
-                </div>
-                ${isEarned || isClaimed ? `<span class="reward-icon">🎁</span>` : '<span class="reward-icon">🔒</span>'}
+            <div class="reward-mini ${classStatus}">
+                <div class="reward-mini-icon">${isClaimed ? '✓' : (isEarned ? '🎁' : '🔒')}</div>
+                <div class="reward-mini-label">${r.label}</div>
+                ${isEarned && !isClaimed ? `
+                    <button class="reward-mini-btn" onclick="claimReward(${r.days}, '${r.reward}')">
+                        Reclamar
+                    </button>
+                ` : ''}
+                ${isClaimed ? `<div class="reward-check">✓</div>` : ''}
             </div>
         `;
     });
     rewardsHTML += '</div>';
     
     rewardsDiv.innerHTML = rewardsHTML;
+}
+
+function toggleStreakRewards() {
+    const rewardsDiv = document.getElementById('streakRewardsContent');
+    const toggle = document.querySelector('.streak-toggle');
+    if (rewardsDiv) {
+        rewardsDiv.classList.toggle('active');
+        toggle.classList.toggle('active');
+    }
 }
 
 function generatePromoCode(prefix) {
