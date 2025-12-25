@@ -391,12 +391,23 @@
                         <option>SD</option>
                     </select>
                 </div>
-                <div class="setting-item">
-                    <span>Notificaciones</span>
-                    <label class="toggle">
-                        <input type="checkbox" checked>
-                        <span class="slider"></span>
-                    </label>
+                <div class="setting-item streak-section">
+                    <div class="streak-header">
+                        <i class="fas fa-fire" style="color: #ff6b35; margin-right: 0.5rem;"></i>
+                        <span>Mi Racha</span>
+                    </div>
+                    <div class="streak-container">
+                        <div class="streak-display">
+                            <div class="streak-number" id="streakDays">0</div>
+                            <div class="streak-label">días</div>
+                        </div>
+                        <div class="streak-rewards">
+                            <div id="streakRewardsContent">Cargando...</div>
+                        </div>
+                    </div>
+                    <div class="streak-progress-bar">
+                        <div class="streak-progress-fill" id="streakProgressBar"></div>
+                    </div>
                 </div>
                 <div class="setting-item">
                     <span>Modo oscuro</span>

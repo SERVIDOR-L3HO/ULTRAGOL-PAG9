@@ -15,6 +15,12 @@ let currentFeaturedIndex = 0;
 let featuredMatches = [];
 let touchStartX = 0;
 let touchEndX = 0;
+let streakData = {
+    startDate: null,
+    currentStreak: 0,
+    lastVisitDate: null,
+    claimedRewards: []
+};
 
 const API_BASE = 'https://ultragol-api-3.vercel.app';
 
@@ -295,6 +301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadStandings();
     await loadNews();
     await loadLineups();
+    initializeStreak();
     
     // Verificar también después de cargar (por si acaso)
     if (!urlParams.get('ch')) {
@@ -5296,6 +5303,126 @@ function downloadQRCode() {
     } catch (error) {
         console.error('Error al descargar QR:', error);
         showToast('Error al descargar el código QR');
+    }
+}
+
+
+// ==================== FUNCIONES DE RACHA ====================
+
+function initializeStreak() {
+    const saved = localStorage.getItem('ultragolStreak');
+    if (saved) {
+        streakData = JSON.parse(saved);
+    } else {
+        streakData = {
+            startDate: new Date().toISOString().split('T')[0],
+            currentStreak: 1,
+            lastVisitDate: new Date().toISOString().split('T')[0],
+            claimedRewards: []
+        };
+        saveStreak();
+    }
+    
+    // Verificar si pasó un día desde la última visita
+    const today = new Date().toISOString().split('T')[0];
+    if (streakData.lastVisitDate !== today) {
+        const lastDate = new Date(streakData.lastVisitDate);
+        const currentDate = new Date(today);
+        const diffTime = currentDate - lastDate;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 1) {
+            streakData.currentStreak += 1;
+        } else if (diffDays > 1) {
+            streakData.currentStreak = 1;
+            streakData.startDate = today;
+        }
+        
+        streakData.lastVisitDate = today;
+        saveStreak();
+    }
+    
+    updateStreakUI();
+    checkStreakRewards();
+}
+
+function saveStreak() {
+    localStorage.setItem('ultragolStreak', JSON.stringify(streakData));
+}
+
+function updateStreakUI() {
+    const streakDaysEl = document.getElementById('streakDays');
+    if (streakDaysEl) {
+        streakDaysEl.textContent = streakData.currentStreak;
+    }
+    
+    const progressBar = document.getElementById('streakProgressBar');
+    if (progressBar) {
+        const percentage = Math.min((streakData.currentStreak % 30) / 30 * 100, 100);
+        progressBar.style.width = percentage + '%';
+    }
+}
+
+function checkStreakRewards() {
+    const rewardsDiv = document.getElementById('streakRewardsContent');
+    if (!rewardsDiv) return;
+    
+    const rewards = [
+        { days: 7, label: '1 Semana', reward: generatePromoCode('SEMANA7') },
+        { days: 14, label: '2 Semanas', reward: generatePromoCode('SEMANA14') },
+        { days: 30, label: '1 Mes', reward: generatePromoCode('MES1') },
+        { days: 60, label: '2 Meses', reward: generatePromoCode('MES2') },
+        { days: 90, label: '3 Meses', reward: generatePromoCode('MES3') },
+        { days: 180, label: '6 Meses', reward: generatePromoCode('MES6') }
+    ];
+    
+    let rewardsHTML = '<div class="rewards-list">';
+    rewards.forEach(r => {
+        const isEarned = streakData.currentStreak >= r.days;
+        const isClaimed = streakData.claimedRewards.includes(r.days);
+        const status = isClaimed ? 'claimed' : (isEarned ? 'earned' : 'locked');
+        
+        rewardsHTML += `
+            <div class="reward-item ${status}">
+                <div class="reward-info">
+                    <span class="reward-days">${r.label}</span>
+                    ${isEarned && !isClaimed ? `
+                        <button class="reward-claim-btn" onclick="claimReward(${r.days}, '${r.reward}')">
+                            Reclamar
+                        </button>
+                    ` : ''}
+                    ${isClaimed ? '<span class="reward-claimed-badge">✓ Reclamado</span>' : ''}
+                </div>
+                ${isEarned || isClaimed ? `<span class="reward-icon">🎁</span>` : '<span class="reward-icon">🔒</span>'}
+            </div>
+        `;
+    });
+    rewardsHTML += '</div>';
+    
+    rewardsDiv.innerHTML = rewardsHTML;
+}
+
+function generatePromoCode(prefix) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = prefix + '_';
+    for (let i = 0; i < 8; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+}
+
+function claimReward(days, code) {
+    if (!streakData.claimedRewards.includes(days)) {
+        streakData.claimedRewards.push(days);
+        saveStreak();
+        
+        const input = document.getElementById('promoCodeInput');
+        if (input) {
+            input.value = code;
+        }
+        
+        alert(`¡Código promocional desbloqueado!\n\n${code}\n\nSe ha copiado en el campo de código promocional.`);
+        checkStreakRewards();
     }
 }
 
