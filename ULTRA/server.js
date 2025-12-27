@@ -231,6 +231,22 @@ app.get('/api/get-channels/:id', (req, res) => {
     }
 });
 
+// Ruta para transmisiones6
+app.get('/api/transmisiones6', (req, res) => {
+    try {
+        const fs = require('fs');
+        const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'transmisiones6.json'), 'utf8'));
+        res.json(data);
+    } catch (error) {
+        console.error('Error al leer transmisiones6:', error);
+        res.status(500).json({ error: 'Error al cargar transmisiones' });
+    }
+});
+
+app.get('/transmisiones6', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 ULTRAGOL servidor iniciado en puerto ${PORT}`);
     console.log(`🌐 Servidor disponible en: http://0.0.0.0:${PORT}`);
