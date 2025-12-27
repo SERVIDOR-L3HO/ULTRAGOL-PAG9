@@ -341,8 +341,8 @@ async function loadMarcadores() {
 // Función para cargar transmisiones desde las 5 APIs
 async function loadTransmisiones() {
     try {
-        // Cargar las 5 APIs en paralelo con manejo individual de errores
-        const [data1, data2, data3, data4, data5] = await Promise.all([
+        // Cargar las 6 APIs en paralelo con manejo individual de errores
+        const [data1, data2, data3, data4, data5, data6] = await Promise.all([
             fetch('https://ultragol-api-3.vercel.app/transmisiones')
                 .then(res => res.json())
                 .catch(err => {
@@ -372,6 +372,12 @@ async function loadTransmisiones() {
                 .catch(err => {
                     console.warn('⚠️ Error cargando API 5 (donromans):', err);
                     return { matches: [] };
+                }),
+            fetch('/api/transmisiones6')
+                .then(res => res.json())
+                .catch(err => {
+                    console.warn('⚠️ Error cargando API 6 (local):', err);
+                    return { transmisiones: [] };
                 })
         ]);
         
@@ -492,6 +498,16 @@ async function loadTransmisiones() {
             }))
         }));
         
+        // Marcar transmisiones API 6 con su tipo
+        const transmisionesAPI6Marcadas = (data6.transmisiones || []).map(t => ({
+            ...t,
+            tipoAPI: 'transmisiones6',
+            canales: (t.canales || []).map(c => ({
+                ...c,
+                tipoAPI: 'transmisiones6'
+            }))
+        }));
+        
         // Guardar datos separados de cada API
         transmisionesAPI1 = {
             ...data1,
@@ -513,14 +529,19 @@ async function loadTransmisiones() {
             matches: data5.matches || [],
             transmisiones: transmisionesNormalizadasAPI5
         };
+        transmisionesAPI6 = {
+            ...data6,
+            transmisiones: transmisionesAPI6Marcadas
+        };
         
-        // Combinar las transmisiones de las 5 APIs (partidos pueden repetirse)
+        // Combinar las transmisiones de las 6 APIs (partidos pueden repetirse)
         const transmisionesCombinadas = [
             ...transmisionesAPI1Marcadas,
             ...transmisionesNormalizadasAPI2,
             ...transmisionesNormalizadasAPI3,
             ...transmisionesNormalizadasAPI4,
-            ...transmisionesNormalizadasAPI5
+            ...transmisionesNormalizadasAPI5,
+            ...transmisionesAPI6Marcadas
         ];
         
         // Crear el objeto combinado
@@ -533,6 +554,7 @@ async function loadTransmisiones() {
         console.log('✅ Transmisiones cargadas desde API 3 (voodc):', data3.transmisiones?.length || 0);
         console.log('✅ Transmisiones cargadas desde API 4 (transmisiones4):', data4.transmisiones?.length || 0);
         console.log('✅ Transmisiones cargadas desde API 5 (donromans):', data5.matches?.length || 0);
+        console.log('✅ Transmisiones cargadas desde API 6 (local):', data6.transmisiones?.length || 0);
         
         // Log detallado de API 5 para debugging
         const totalCanalesAPI5 = transmisionesNormalizadasAPI5.reduce((sum, t) => sum + (t.canales?.length || 0), 0);
@@ -3644,6 +3666,19 @@ function selectImportantMatch(index) {
             console.log(`✅ Encontrados ${transAPI5.canales.length} canales en API 5 (donromans)`);
         }
     }
+
+    // Buscar en API 6
+    if (transmisionesAPI6 && transmisionesAPI6.transmisiones) {
+        const transAPI6 = transmisionesAPI6.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
+        if (transAPI6 && transAPI6.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI6.canales];
+            console.log(`✅ Encontrados ${transAPI6.canales.length} canales en API 6 (local)`);
+        }
+    }
     
     if (canalesCombinados.length === 0) {
         showToast('No hay canales disponibles para este partido');
@@ -3742,6 +3777,18 @@ function selectImportantMatchByName(eventoNombre) {
         if (transAPI5 && transAPI5.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI5.canales];
             console.log(`✅ Encontrados ${transAPI5.canales.length} canales en API 5 (donromans)`);
+        }
+    }
+    
+    if (transmisionesAPI6 && transmisionesAPI6.transmisiones) {
+        const transAPI6 = transmisionesAPI6.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
+        });
+        
+        if (transAPI6 && transAPI6.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI6.canales];
+            console.log(`✅ Encontrados ${transAPI6.canales.length} canales en API 6 (local)`);
         }
     }
     
