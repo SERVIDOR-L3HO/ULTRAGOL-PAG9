@@ -26,13 +26,17 @@ setInterval(() => {
     }
 }, 60 * 60 * 1000);
 
-// Middleware de seguridad
+// Middleware de seguridad global
 app.use((req, res, next) => {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
-    res.setHeader('Content-Security-Policy', "default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com https://www.gstatic.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https: wss:;");
-    
+    next();
+});
+
+// CSP para páginas estáticas (sin Google Ads)
+app.get(['/enlaces', '/l3ho-links'], (req, res, next) => {
+    res.setHeader('Content-Security-Policy', "default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https: wss:;");
     next();
 });
 
@@ -73,6 +77,14 @@ app.use('/ULTRACANALES', express.static(path.join(__dirname, '..', 'ULTRACANALES
         res.setHeader('X-Content-Type-Options', 'nosniff');
     }
 }));
+
+// Middleware CSP para app (con Google Ads)
+app.use((req, res, next) => {
+    if (req.path === '/' || req.path.startsWith('/ULTRA')) {
+        res.setHeader('Content-Security-Policy', "default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com https://www.gstatic.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https: wss:;");
+    }
+    next();
+});
 
 // Ruta principal (incluyendo parámetros de query para links compartidos)
 app.get('/', (req, res) => {
