@@ -56,25 +56,25 @@
 
         let isBlocked = false;
 
-        // 1. Detección de red (Solo dominios esenciales que AdGuard/Brave bloquean siempre)
-        // Reducimos la lista para evitar falsos positivos
+        // TÉCNICA 1: Petición de red silenciosa (Detecta DNS/Brave)
         const trapUrl = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
-
         try {
             await fetch(trapUrl, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(2500) });
         } catch (e) {
-            // Si el error es de red (bloqueo), activamos. 
-            // Si es un error de timeout, podría ser conexión lenta, pero en DNS/Brave suele ser instantáneo.
             isBlocked = true;
         }
 
-        // 2. Verificación Cosmética (Brave/uBlock)
+        // TÉCNICA 2: Elemento fantasma (Detecta uBlock/AdBlock/Brave Shields)
         if (!isBlocked) {
             const b = document.createElement('div');
-            // Usamos una clase que Brave OCULTA agresivamente
-            b.className = 'ad-label ad-slot ads-google pub_300x250 ad-container';
-            b.style.cssText = 'position:fixed; top:-100px; left:-100px; width:10px; height:10px; display:block !important;';
+            // Usamos nombres de clase que los bloqueadores SIEMPRE ocultan
+            b.className = 'ad-label ad-slot ads-google pub_300x250 ad-container ads-box';
+            b.style.cssText = 'position:fixed; top:-1000px; left:-1000px; width:10px; height:10px; opacity:0; pointer-events:none;';
             document.documentElement.appendChild(b);
+            
+            // Damos un milisegundo al navegador para aplicar las reglas de bloqueo cosmético
+            await new Promise(r => setTimeout(r, 50));
+            
             const style = window.getComputedStyle(b);
             if (style.display === 'none' || style.visibility === 'hidden' || b.offsetHeight === 0) {
                 isBlocked = true;
@@ -96,17 +96,22 @@
         }
     }
 
-    // Iniciar
-    createOverlay();
+    // Iniciar con un retraso para no interferir con la carga inicial de los anuncios reales
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            createOverlay();
+            setTimeout(checkAdBlock, 2000);
+        });
+    } else {
+        createOverlay();
+        setTimeout(checkAdBlock, 2000);
+    }
     
-    // Esperar un momento a que la red se estabilice antes de la primera prueba
-    setTimeout(checkAdBlock, 1000);
-    
-    // Verificación constante
-    setInterval(checkAdBlock, 5000);
+    // Verificación periódica menos frecuente para ahorrar recursos
+    setInterval(checkAdBlock, 8000);
 
     // Anti-tamper
-    const observer = new MutationObserver(() => {
+    const observer = new MutationObserver((mutations) => {
         if (!document.getElementById(overlayId) && !hasActivePromo()) {
             location.reload();
         }
