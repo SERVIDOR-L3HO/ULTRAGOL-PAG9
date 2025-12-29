@@ -1,6 +1,5 @@
 
 (function() {
-    // 1. Detección inmediata y bloqueo de ejecución si hay promo activa
     function hasActivePromo() {
         try {
             const stored = localStorage.getItem('ultragol_promo_status');
@@ -12,12 +11,11 @@
         return false;
     }
 
-    // 2. Definir el overlay antes de cualquier otra cosa
-    let overlayCreated = false;
     const overlayId = 'ultragol-security-overlay';
+    let isBlockedGlobal = false;
 
     function createOverlay() {
-        if (overlayCreated || document.getElementById(overlayId)) return;
+        if (document.getElementById(overlayId)) return;
         
         const overlay = document.createElement('div');
         overlay.id = overlayId;
@@ -35,8 +33,8 @@
             <div style="max-width: 500px; background: #000; padding: 40px; border-radius: 20px; border: 2px solid #ff4d4d; box-shadow: 0 0 100px rgba(255, 77, 77, 0.5);">
                 <div style="font-size: 80px; margin-bottom: 25px; filter: drop-shadow(0 0 10px #ff4d4d);">🚨</div>
                 <h2 style="color: #ff4d4d; margin-bottom: 20px; font-size: 32px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;">Acceso Denegado</h2>
-                <p style="font-size: 19px; line-height: 1.6; margin-bottom: 30px; color: #fff; font-weight: 600;">Detectamos <b>Brave Shields</b> o un bloqueo de red agresivo.</p>
-                <p style="font-size: 15px; line-height: 1.5; margin-bottom: 30px; color: #ccc;">Para acceder a <b>ULTRAGOL</b> gratuito, debes desactivar el ícono del león (Shields) o tu bloqueador y recargar.</p>
+                <p style="font-size: 19px; line-height: 1.6; margin-bottom: 30px; color: #fff; font-weight: 600;">Detectamos <b>AdGuard DNS</b>, <b>Brave Shields</b> o un bloqueo de red activo.</p>
+                <p style="font-size: 15px; line-height: 1.5; margin-bottom: 30px; color: #ccc;">Para acceder a <b>ULTRAGOL</b>, debes desactivar tu bloqueador o DNS filtrada y recargar la página.</p>
                 <button onclick="location.reload()" style="background: #ff4d4d; color: white; border: none; padding: 18px 45px; font-size: 20px; font-weight: 900; border-radius: 50px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(255, 77, 77, 0.5); text-transform: uppercase;">
                     Reintentar Acceso
                 </button>
@@ -44,16 +42,18 @@
         `;
 
         document.documentElement.appendChild(overlay);
-        overlayCreated = true;
     }
 
     async function checkAdBlock() {
-        if (hasActivePromo()) return;
+        if (hasActivePromo()) {
+            const overlay = document.getElementById(overlayId);
+            if (overlay) overlay.style.display = 'none';
+            return;
+        }
 
         let isBlocked = false;
 
-        // TÉCNICA 1: El talón de Aquiles de Brave (bloqueo de scripts externos por dominio)
-        // Brave bloquea peticiones a estos dominios incluso si el script no existe, por pura lista negra
+        // 1. Detección de DNS (AdGuard) - Verificando dominios bloqueados conocidos
         const trapUrls = [
             'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
             'https://googleads.g.doubleclick.net/pagead/ads',
@@ -63,17 +63,16 @@
 
         try {
             await Promise.any(trapUrls.map(url => 
-                fetch(url, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(1500) })
+                fetch(url, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(2000) })
             ));
         } catch (e) {
             isBlocked = true;
         }
 
-        // TÉCNICA 2: Verificación de Brave Browser (Infallible en Brave)
-        if (!isBlocked && navigator.brave && await navigator.brave.isBrave()) {
-            // Brave oculta elementos con ciertas clases usando inyección de Shadow DOM o reglas de cosmética
+        // 2. Verificación de Brave o Bloqueo Cosmético (Shadow DOM/Ocultamiento)
+        if (!isBlocked) {
             const b = document.createElement('div');
-            b.className = 'ad-label ad-slot ads-google pub_300x250';
+            b.className = 'ad-label ad-slot ads-google pub_300x250 ad-container';
             b.style.cssText = 'position:fixed; top:-100px; left:-100px; width:10px; height:10px; display:block !important;';
             document.documentElement.appendChild(b);
             const style = window.getComputedStyle(b);
@@ -83,43 +82,32 @@
             document.documentElement.removeChild(b);
         }
 
-        // TÉCNICA 3: Detección de AdBlockers Clásicos (UBlock/AdBlock)
-        if (!isBlocked) {
-            const test = document.createElement('div');
-            test.innerHTML = '&nbsp;';
-            test.className = 'adsbox';
-            document.documentElement.appendChild(test);
-            if (test.offsetHeight === 0) isBlocked = true;
-            document.documentElement.removeChild(test);
-        }
+        // 3. Persistencia del estado de bloqueo
+        if (isBlocked) isBlockedGlobal = true;
 
         const overlay = document.getElementById(overlayId);
-        if (isBlocked && overlay) {
+        if (isBlockedGlobal && overlay) {
             overlay.style.display = 'flex';
             document.documentElement.style.overflow = 'hidden';
             document.body.style.overflow = 'hidden';
+            
+            // Si el bloqueo fue detectado, nos aseguramos de que el overlay no se quite
+            // Incluso si una petición posterior parece "pasar" (falso negativo)
         }
     }
 
-    // Iniciar el proceso lo antes posible
-    if (document.documentElement) {
-        createOverlay();
-        checkAdBlock();
-    } else {
-        window.addEventListener('DOMContentLoaded', () => {
-            createOverlay();
-            checkAdBlock();
-        });
-    }
+    // Ejecución ultra-rápida
+    createOverlay();
+    checkAdBlock();
+    
+    // Verificación constante (cada segundo para AdGuard que a veces tarda en responder)
+    setInterval(checkAdBlock, 1000);
 
-    // Verificación continua agresiva
-    setInterval(checkAdBlock, 2000);
-
-    // Anti-tamper: Si borran el overlay, recargar inmediatamente
+    // Anti-tamper persistente
     const observer = new MutationObserver(() => {
         if (!document.getElementById(overlayId) && !hasActivePromo()) {
             location.reload();
         }
     });
-    observer.observe(document.documentElement, { childList: true });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
 })();
