@@ -138,6 +138,11 @@
             </button>
         </div>
 
+        <!-- Espacio para Anuncio 1 -->
+        <div style="text-align: center; margin: 10px 0;">
+            <ins class="adsbygoogle" style="display:block; width:100%; height:250px; max-width:728px; margin: 0 auto;" data-ad-client="ca-pub-3612607805789879" data-ad-slot="1234567890" data-ad-format="horizontal"></ins>
+        </div>
+
         <div class="tabs-container">
             <div class="tabs">
                 <button class="tab active" onclick="switchTab('live', this)">EN VIVO</button>
@@ -265,6 +270,11 @@
                 <div class="standings-loading">Cargando tabla...</div>
             </div>
         </section>
+
+        <!-- Espacio para Anuncio 2 -->
+        <div style="text-align: center; margin: 10px 0;">
+            <ins class="adsbygoogle" style="display:block; width:100%; height:250px; max-width:728px; margin: 0 auto;" data-ad-client="ca-pub-3612607805789879" data-ad-slot="9876543210" data-ad-format="horizontal"></ins>
+        </div>
 
         <section class="lineups-section">
             <div class="section-header">
@@ -918,6 +928,40 @@
             document.getElementById('offlineStatus').classList.remove('online');
             showOfflineGame();
         });
+    </script>
+
+    <!-- Script para procesar anuncios de Google -->
+    <script>
+        (function() {
+            function initializeAds() {
+                if (window.adsbygoogle !== undefined) {
+                    try {
+                        window.adsbygoogle.push({});
+                        console.log('✅ Anuncios procesados correctamente');
+                    } catch (e) {
+                        console.error('Error al procesar anuncios:', e);
+                    }
+                }
+            }
+
+            // Inicializar cuando el DOM esté listo
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initializeAds);
+            } else {
+                initializeAds();
+            }
+
+            // Reintentar cada 5 segundos
+            setInterval(() => {
+                if (window.adsbygoogle !== undefined && document.querySelectorAll('.adsbygoogle').length > 0) {
+                    try {
+                        window.adsbygoogle.push({});
+                    } catch (e) {
+                        // Error silencioso
+                    }
+                }
+            }, 5000);
+        })();
     </script>
 </body>
 </html>
