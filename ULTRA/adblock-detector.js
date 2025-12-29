@@ -12,7 +12,6 @@
     }
 
     const overlayId = 'ultragol-security-overlay';
-    let isBlockedGlobal = false;
 
     function createOverlay() {
         if (document.getElementById(overlayId)) return;
@@ -33,8 +32,8 @@
             <div style="max-width: 500px; background: #000; padding: 40px; border-radius: 20px; border: 2px solid #ff4d4d; box-shadow: 0 0 100px rgba(255, 77, 77, 0.5);">
                 <div style="font-size: 80px; margin-bottom: 25px; filter: drop-shadow(0 0 10px #ff4d4d);">🚨</div>
                 <h2 style="color: #ff4d4d; margin-bottom: 20px; font-size: 32px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase;">Acceso Denegado</h2>
-                <p style="font-size: 19px; line-height: 1.6; margin-bottom: 30px; color: #fff; font-weight: 600;">Detectamos <b>AdGuard DNS</b>, <b>Brave Shields</b> o un bloqueo de red activo.</p>
-                <p style="font-size: 15px; line-height: 1.5; margin-bottom: 30px; color: #ccc;">Para acceder a <b>ULTRAGOL</b>, debes desactivar tu bloqueador o DNS filtrada y recargar la página.</p>
+                <p style="font-size: 19px; line-height: 1.6; margin-bottom: 30px; color: #fff; font-weight: 600;">Detectamos un <b>Bloqueador de Anuncios</b> o <b>Brave Shields</b> activo.</p>
+                <p style="font-size: 15px; line-height: 1.5; margin-bottom: 30px; color: #ccc;">Para acceder a <b>ULTRAGOL</b>, debes desactivar tu bloqueador o los escudos de Brave y recargar la página.</p>
                 <button onclick="location.reload()" style="background: #ff4d4d; color: white; border: none; padding: 18px 45px; font-size: 20px; font-weight: 900; border-radius: 50px; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 25px rgba(255, 77, 77, 0.5); text-transform: uppercase;">
                     Reintentar Acceso
                 </button>
@@ -47,31 +46,32 @@
     async function checkAdBlock() {
         if (hasActivePromo()) {
             const overlay = document.getElementById(overlayId);
-            if (overlay) overlay.style.display = 'none';
+            if (overlay) {
+                overlay.style.display = 'none';
+                document.documentElement.style.overflow = 'auto';
+                document.body.style.overflow = 'auto';
+            }
             return;
         }
 
         let isBlocked = false;
 
-        // 1. Detección de DNS (AdGuard) - Verificando dominios bloqueados conocidos
-        const trapUrls = [
-            'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
-            'https://googleads.g.doubleclick.net/pagead/ads',
-            'https://static.ads-twitter.com/uwt.js',
-            'https://connect.facebook.net/en_US/fbevents.js'
-        ];
+        // 1. Detección de red (Solo dominios esenciales que AdGuard/Brave bloquean siempre)
+        // Reducimos la lista para evitar falsos positivos
+        const trapUrl = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
 
         try {
-            await Promise.any(trapUrls.map(url => 
-                fetch(url, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(2000) })
-            ));
+            await fetch(trapUrl, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(2500) });
         } catch (e) {
+            // Si el error es de red (bloqueo), activamos. 
+            // Si es un error de timeout, podría ser conexión lenta, pero en DNS/Brave suele ser instantáneo.
             isBlocked = true;
         }
 
-        // 2. Verificación de Brave o Bloqueo Cosmético (Shadow DOM/Ocultamiento)
+        // 2. Verificación Cosmética (Brave/uBlock)
         if (!isBlocked) {
             const b = document.createElement('div');
+            // Usamos una clase que Brave OCULTA agresivamente
             b.className = 'ad-label ad-slot ads-google pub_300x250 ad-container';
             b.style.cssText = 'position:fixed; top:-100px; left:-100px; width:10px; height:10px; display:block !important;';
             document.documentElement.appendChild(b);
@@ -82,32 +82,34 @@
             document.documentElement.removeChild(b);
         }
 
-        // 3. Persistencia del estado de bloqueo
-        if (isBlocked) isBlockedGlobal = true;
-
         const overlay = document.getElementById(overlayId);
-        if (isBlockedGlobal && overlay) {
-            overlay.style.display = 'flex';
-            document.documentElement.style.overflow = 'hidden';
-            document.body.style.overflow = 'hidden';
-            
-            // Si el bloqueo fue detectado, nos aseguramos de que el overlay no se quite
-            // Incluso si una petición posterior parece "pasar" (falso negativo)
+        if (overlay) {
+            if (isBlocked) {
+                overlay.style.display = 'flex';
+                document.documentElement.style.overflow = 'hidden';
+                document.body.style.overflow = 'hidden';
+            } else {
+                overlay.style.display = 'none';
+                document.documentElement.style.overflow = 'auto';
+                document.body.style.overflow = 'auto';
+            }
         }
     }
 
-    // Ejecución ultra-rápida
+    // Iniciar
     createOverlay();
-    checkAdBlock();
     
-    // Verificación constante (cada segundo para AdGuard que a veces tarda en responder)
-    setInterval(checkAdBlock, 1000);
+    // Esperar un momento a que la red se estabilice antes de la primera prueba
+    setTimeout(checkAdBlock, 1000);
+    
+    // Verificación constante
+    setInterval(checkAdBlock, 5000);
 
-    // Anti-tamper persistente
+    // Anti-tamper
     const observer = new MutationObserver(() => {
         if (!document.getElementById(overlayId) && !hasActivePromo()) {
             location.reload();
         }
     });
-    observer.observe(document.documentElement, { childList: true, subtree: true });
+    observer.observe(document.documentElement, { childList: true });
 })();
