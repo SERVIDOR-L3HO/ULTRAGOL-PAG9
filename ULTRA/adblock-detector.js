@@ -40,7 +40,8 @@
             </div>
         `;
 
-        document.documentElement.appendChild(overlay);
+        const target = document.body || document.documentElement;
+        if (target) target.appendChild(overlay);
     }
 
     async function checkAdBlock() {
@@ -56,7 +57,7 @@
 
         let isBlocked = false;
 
-        // TÉCNICA 1: Petición de red silenciosa (Detecta DNS/Brave)
+        // TÉCNICA 1: Petición de red silenciosa
         const trapUrl = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
         try {
             await fetch(trapUrl, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(2500) });
@@ -64,22 +65,20 @@
             isBlocked = true;
         }
 
-        // TÉCNICA 2: Elemento fantasma (Detecta uBlock/AdBlock/Brave Shields)
+        // TÉCNICA 2: Elemento fantasma
         if (!isBlocked) {
             const b = document.createElement('div');
-            // Usamos nombres de clase que los bloqueadores SIEMPRE ocultan
             b.className = 'ad-label ad-slot ads-google pub_300x250 ad-container ads-box';
             b.style.cssText = 'position:fixed; top:-1000px; left:-1000px; width:10px; height:10px; opacity:0; pointer-events:none;';
-            document.documentElement.appendChild(b);
+            (document.body || document.documentElement).appendChild(b);
             
-            // Damos un milisegundo al navegador para aplicar las reglas de bloqueo cosmético
-            await new Promise(r => setTimeout(r, 50));
+            await new Promise(r => setTimeout(r, 100));
             
             const style = window.getComputedStyle(b);
             if (style.display === 'none' || style.visibility === 'hidden' || b.offsetHeight === 0) {
                 isBlocked = true;
             }
-            document.documentElement.removeChild(b);
+            (document.body || document.documentElement).removeChild(b);
         }
 
         const overlay = document.getElementById(overlayId);
@@ -87,31 +86,30 @@
             if (isBlocked) {
                 overlay.style.display = 'flex';
                 document.documentElement.style.overflow = 'hidden';
-                document.body.style.overflow = 'hidden';
+                if (document.body) document.body.style.overflow = 'hidden';
             } else {
                 overlay.style.display = 'none';
                 document.documentElement.style.overflow = 'auto';
-                document.body.style.overflow = 'auto';
+                if (document.body) document.body.style.overflow = 'auto';
             }
         }
     }
 
-    // Iniciar con un retraso para no interferir con la carga inicial de los anuncios reales
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            createOverlay();
-            setTimeout(checkAdBlock, 2000);
-        });
-    } else {
+    // Iniciar con seguridad
+    function start() {
         createOverlay();
-        setTimeout(checkAdBlock, 2000);
+        setTimeout(checkAdBlock, 3000);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start);
+    } else {
+        start();
     }
     
-    // Verificación periódica menos frecuente para ahorrar recursos
-    setInterval(checkAdBlock, 8000);
+    setInterval(checkAdBlock, 10000);
 
-    // Anti-tamper
-    const observer = new MutationObserver((mutations) => {
+    const observer = new MutationObserver(() => {
         if (!document.getElementById(overlayId) && !hasActivePromo()) {
             location.reload();
         }
