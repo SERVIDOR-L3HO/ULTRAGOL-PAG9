@@ -29,8 +29,8 @@
             <div style="max-width: 500px; background: #111; padding: 40px; border-radius: 20px; border: 2px solid #ff4d4d; box-shadow: 0 0 50px rgba(255, 77, 77, 0.4);">
                 <div style="font-size: 70px; margin-bottom: 25px; animation: pulse-red 2s infinite;">🚫</div>
                 <h2 style="color: #ff4d4d; margin-bottom: 20px; font-size: 28px; font-weight: 800; letter-spacing: 1px;">SISTEMA BLOQUEADO</h2>
-                <p style="font-size: 18px; line-height: 1.6; margin-bottom: 30px; color: #eee;">Detectamos <b>AdGuard DNS</b>, <b>NextDNS</b> o un bloqueador activo.</p>
-                <p style="font-size: 15px; line-height: 1.5; margin-bottom: 30px; color: #aaa;">Para seguir usando ULTRAGOL gratis, desactiva el bloqueo de anuncios y recarga la página.</p>
+                <p style="font-size: 18px; line-height: 1.6; margin-bottom: 30px; color: #eee;">Detectamos <b>Brave Shields</b>, <b>AdGuard</b> o un bloqueo activo.</p>
+                <p style="font-size: 15px; line-height: 1.5; margin-bottom: 30px; color: #aaa;">Para seguir usando ULTRAGOL gratis, desactiva el bloqueo de anuncios (Shields) y recarga la página.</p>
                 <button onclick="window.location.reload()" style="background: #ff4d4d; color: white; border: none; padding: 15px 40px; font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(255, 77, 77, 0.4);">
                     RECARGAR PÁGINA
                 </button>
@@ -51,24 +51,39 @@
 
             let isBlocked = false;
 
-            // Prueba 1: Petición a dominios que AdGuard DNS SIEMPRE bloquea
+            // 1. Detección específica para Brave (Shields) y Bloqueadores agresivos
+            // Brave bloquea peticiones a dominios de trackers y ads incluso con 'no-cors'
             const trapUrls = [
                 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
                 'https://googleads.g.doubleclick.net/pagead/ads',
                 'https://adservice.google.com/adsid/google/ui',
-                'https://analytics.google.com/analytics/collect'
+                'https://analytics.google.com/analytics/collect',
+                'https://stats.g.doubleclick.net/g/collect'
             ];
 
             try {
-                // Si cualquiera de estos falla, es bloqueo de red/DNS
+                // Si Brave Shields está activo, estas peticiones fallarán inmediatamente
                 await Promise.any(trapUrls.map(url => 
-                    fetch(url, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(3000) })
+                    fetch(url, { mode: 'no-cors', cache: 'no-store', signal: AbortSignal.timeout(2000) })
                 ));
             } catch (e) {
                 isBlocked = true;
             }
 
-            // Prueba 2: Elemento trampa (Honeypot)
+            // 2. Verificación de Brave Browser Object
+            if (!isBlocked && navigator.brave && await navigator.brave.isBrave()) {
+                // Si es Brave, forzamos una verificación extra de un elemento que Brave SIEMPRE oculta
+                const braveTest = document.createElement('div');
+                braveTest.className = 'ad-provider ads-container google-ads-container';
+                braveTest.style.cssText = 'position: absolute; left: -9999px; width: 10px; height: 10px; display: block !important;';
+                document.body.appendChild(braveTest);
+                if (window.getComputedStyle(braveTest).display === 'none' || braveTest.offsetHeight === 0) {
+                    isBlocked = true;
+                }
+                document.body.removeChild(braveTest);
+            }
+
+            // 3. Honeypot Genérico (CSS)
             if (!isBlocked) {
                 const honeyPot = document.createElement('div');
                 honeyPot.className = 'adsbox ad-unit doubleclick-ad ads-google test-ad';
@@ -91,7 +106,7 @@
 
         // Ejecución inmediata y recurrente
         checkBlocking();
-        setInterval(checkBlocking, 4000);
+        setInterval(checkBlocking, 3000);
         
         // Anti-manipulación
         const observer = new MutationObserver(() => {
