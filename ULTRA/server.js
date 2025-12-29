@@ -6,14 +6,6 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 const sharedChannels = new Map();
-const requestCounts = new Map();
-const RATE_LIMIT_WINDOW = 60000; // 1 minuto
-const RATE_LIMIT_MAX = 100; // máximo de requests por minuto
-const BOT_USER_AGENTS = [
-    'bot', 'crawler', 'spider', 'scraper', 'curl', 'wget', 
-    'python', 'java', 'nodejs', 'ruby', 'perl', 'php',
-    'selenium', 'puppeteer', 'phantomjs', 'headless'
-];
 
 function generateShortId() {
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -23,54 +15,6 @@ function generateShortId() {
     }
     return id;
 }
-
-// Rate Limiting por IP
-function isRateLimited(ip) {
-    const now = Date.now();
-    if (!requestCounts.has(ip)) {
-        requestCounts.set(ip, []);
-    }
-    
-    const requests = requestCounts.get(ip);
-    const recentRequests = requests.filter(t => now - t < RATE_LIMIT_WINDOW);
-    
-    if (recentRequests.length >= RATE_LIMIT_MAX) {
-        return true;
-    }
-    
-    recentRequests.push(now);
-    requestCounts.set(ip, recentRequests);
-    return false;
-}
-
-// Detectar bots - Solo bloquear herramientas de scraping, no navegadores
-function isBot(userAgent) {
-    if (!userAgent) return true; // Sin user agent = probablemente bot
-    const ua = userAgent.toLowerCase();
-    
-    // Permitir navegadores legítimos
-    const legitimateBrowsers = ['mozilla', 'chrome', 'safari', 'edge', 'firefox', 'opera'];
-    const hasLegitBrowser = legitimateBrowsers.some(browser => ua.includes(browser));
-    
-    // Si tiene navegador legítimo, permitir
-    if (hasLegitBrowser) return false;
-    
-    // Si no tiene navegador legítimo, revisar si es herramienta de scraping
-    return BOT_USER_AGENTS.some(bot => ua.includes(bot));
-}
-
-// Limpiar requests antiguos cada 2 minutos
-setInterval(() => {
-    const now = Date.now();
-    for (const [ip, requests] of requestCounts.entries()) {
-        const recentRequests = requests.filter(t => now - t < RATE_LIMIT_WINDOW);
-        if (recentRequests.length === 0) {
-            requestCounts.delete(ip);
-        } else {
-            requestCounts.set(ip, recentRequests);
-        }
-    }
-}, 120000);
 
 setInterval(() => {
     const now = Date.now();
@@ -82,38 +26,12 @@ setInterval(() => {
     }
 }, 60 * 60 * 1000);
 
-// Middleware de seguridad avanzada
+// Middleware de seguridad
 app.use((req, res, next) => {
-    const ip = req.ip || req.connection.remoteAddress;
-    const userAgent = req.get('user-agent') || '';
-    
-    // Bloquear bots conocidos
-    if (isBot(userAgent)) {
-        console.warn(`🚫 Bot detectado: ${ip} - ${userAgent}`);
-        return res.status(403).json({ error: 'Acceso denegado' });
-    }
-    
-    // Rate limiting
-    if (isRateLimited(ip)) {
-        console.warn(`⚠️ Rate limit excedido: ${ip}`);
-        return res.status(429).json({ error: 'Demasiadas solicitudes' });
-    }
-    
-    // Headers de seguridad anti-scraping
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-    res.setHeader('X-XSS-Protection', '1; mode=block');
-    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, private');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
     res.setHeader('Content-Security-Policy', "default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com https://www.gstatic.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https: wss:;");
-    
-    // Prevenir descarga directa de archivos
-    if (req.path.match(/\.(html|css|js)$/i)) {
-        res.setHeader('Content-Disposition', 'inline');
-    }
     
     next();
 });
