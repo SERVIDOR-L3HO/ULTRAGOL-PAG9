@@ -1321,118 +1321,106 @@ function showChannelSelector(transmision, partidoNombre) {
     // Guardar en historial antes de abrir
     modalNavigation.pushModal('channelSelector', { transmision, partidoNombre });
     
-    title.textContent = `${partidoNombre} - Seleccionar Canal`;
+    title.textContent = partidoNombre;
     
     if (!transmision.canales || transmision.canales.length === 0) {
         body.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">
-                <i class="fas fa-info-circle" style="font-size: 48px; margin-bottom: 16px;"></i>
-                <p>No hay canales disponibles para este partido</p>
+            <div class="no-channels-view">
+                <i class="fas fa-satellite-dish pulse-icon"></i>
+                <p>Buscando señales disponibles...</p>
             </div>
         `;
         modal.classList.add('active');
         return;
     }
     
-    body.innerHTML = transmision.canales.map((canal, index) => {
-        const streamTypes = [];
-        
-        // Detectar el tipo de API y mostrar enlaces apropiadamente
-        if (canal.tipoAPI === 'e1link' && canal.enlaces) {
-            canal.enlaces.forEach((url, idx) => {
-                streamTypes.push({ 
-                    name: canal.nombre ? `${canal.nombre} ${idx > 0 ? idx + 1 : ''}`.trim() : `URL ${idx + 1}`, 
-                    url: url, 
-                    icon: 'play-circle' 
-                });
-            });
-        } else if (canal.tipoAPI === 'voodc' && canal.enlaces) {
-            canal.enlaces.forEach((enlace, idx) => {
-                streamTypes.push({ 
-                    name: enlace.calidad || `HD ${idx + 1}`, 
-                    url: enlace.url, 
-                    icon: 'play-circle' 
-                });
-            });
-        } else if (canal.tipoAPI === 'transmisiones4' && canal.enlaces) {
-            canal.enlaces.forEach((enlace, idx) => {
-                streamTypes.push({ 
-                    name: canal.nombre || enlace.calidad || `Canal ${idx + 1}`, 
-                    url: enlace.url, 
-                    icon: 'play-circle' 
-                });
-            });
-        } else if (canal.tipoAPI === 'donromans' && canal.enlaces) {
-            canal.enlaces.forEach((enlace, idx) => {
-                const displayName = enlace.source || enlace.platform || canal.nombre || `Canal ${idx + 1}`;
-                streamTypes.push({ 
-                    name: displayName,
-                    url: enlace.url, 
-                    icon: 'play-circle' 
-                });
-            });
-        } else if (canal.tipoAPI === 'rereyano' && canal.links) {
-            if (canal.links.hoca) {
-                streamTypes.push({ name: 'hoca', url: canal.links.hoca, icon: 'play-circle' });
-            }
-            if (canal.links.caster) {
-                streamTypes.push({ name: 'caster', url: canal.links.caster, icon: 'play-circle' });
-            }
-            if (canal.links.wigi) {
-                streamTypes.push({ name: 'wigi', url: canal.links.wigi, icon: 'play-circle' });
-            }
-        }
-        
-        if (streamTypes.length === 0) {
-            return '';
-        }
-        
-        let badgeColor = '#ff6b35';
-        let badgeText = canal.tipoAPI || '';
-        if (canal.tipoAPI === 'rereyano') {
-            badgeColor = '#4ecdc4';
-            badgeText = 'rereyano';
-        } else if (canal.tipoAPI === 'e1link') {
-            badgeColor = '#ff6b35';
-            badgeText = 'e1link';
-        } else if (canal.tipoAPI === 'voodc') {
-            badgeColor = '#9b59b6';
-            badgeText = 'voodc';
-        } else if (canal.tipoAPI === 'transmisiones4') {
-            badgeColor = '#e74c3c';
-            badgeText = 'ftvhd';
-        } else if (canal.tipoAPI === 'donromans') {
-            badgeColor = '#27ae60';
-            badgeText = 'donromans';
-        }
-        const fuenteBadge = canal.tipoAPI ? `<span class="fuente-badge" style="background: ${badgeColor}; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; color: white;">${badgeText}</span>` : '';
-        
-        return `
-            <div class="channel-option">
-                <div class="channel-info">
-                    <div class="channel-number">${canal.numero || (index + 1)}</div>
-                    <div class="channel-name">${canal.nombre || `Canal ${index + 1}`}${fuenteBadge}</div>
-                </div>
-                <div class="stream-options">
-                    ${streamTypes.map(type => `
-                        <button class="stream-option-btn" onclick='selectStream("${type.url.replace(/'/g, "\\'")}", "${(partidoNombre + ' - ' + (canal.nombre || `Canal ${index + 1}`)).replace(/'/g, "\\'")}")' title="Ver aquí">
-                            <i class="fas fa-${type.icon}"></i>
-                            ${type.name}
-                        </button>
-                    `).join('')}
-                </div>
+    body.innerHTML = `
+        <div class="selector-header-premium">
+            <div class="signal-status">
+                <span class="status-dot-green"></span>
+                SISTEMA MULTI-SEÑAL ACTIVO
             </div>
-        `;
-    }).filter(html => html !== '').join('');
-    
-    if (body.innerHTML.trim() === '') {
-        body.innerHTML = `
-            <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">
-                <i class="fas fa-info-circle" style="font-size: 48px; margin-bottom: 16px;"></i>
-                <p>No hay enlaces válidos disponibles</p>
-            </div>
-        `;
-    }
+            <p class="selector-subtitle">Selecciona una fuente de transmisión estable</p>
+        </div>
+        <div class="channels-premium-grid">
+            ${transmision.canales.map((canal, index) => {
+                const streamTypes = [];
+                
+                // Detectar el tipo de API y mostrar enlaces apropiadamente
+                if (canal.tipoAPI === 'e1link' && canal.enlaces) {
+                    canal.enlaces.forEach((url, idx) => {
+                        streamTypes.push({ 
+                            name: canal.nombre ? `${canal.nombre} ${idx > 0 ? idx + 1 : ''}`.trim() : `SEÑAL ${idx + 1}`, 
+                            url: url, 
+                            icon: 'play' 
+                        });
+                    });
+                } else if (canal.tipoAPI === 'voodc' && canal.enlaces) {
+                    canal.enlaces.forEach((enlace, idx) => {
+                        streamTypes.push({ 
+                            name: enlace.calidad || `PREMIUM ${idx + 1}`, 
+                            url: enlace.url, 
+                            icon: 'bolt' 
+                        });
+                    });
+                } else if (canal.tipoAPI === 'transmisiones4' && canal.enlaces) {
+                    canal.enlaces.forEach((enlace, idx) => {
+                        streamTypes.push({ 
+                            name: canal.nombre || enlace.calidad || `CANAL ${idx + 1}`, 
+                            url: enlace.url, 
+                            icon: 'tv' 
+                        });
+                    });
+                } else if (canal.tipoAPI === 'donromans' && canal.enlaces) {
+                    canal.enlaces.forEach((enlace, idx) => {
+                        const displayName = enlace.source || enlace.platform || canal.nombre || `OPCIÓN ${idx + 1}`;
+                        streamTypes.push({ 
+                            name: displayName,
+                            url: enlace.url, 
+                            icon: 'play-circle' 
+                        });
+                    });
+                } else if (canal.tipoAPI === 'rereyano' && canal.links) {
+                    if (canal.links.hoca) streamTypes.push({ name: 'HOCA HD', url: canal.links.hoca, icon: 'shield-alt' });
+                    if (canal.links.caster) streamTypes.push({ name: 'CASTER', url: canal.links.caster, icon: 'broadcast-tower' });
+                    if (canal.links.wigi) streamTypes.push({ name: 'WIGI LIVE', url: canal.links.wigi, icon: 'wifi' });
+                }
+                
+                if (streamTypes.length === 0) return '';
+                
+                let badgeClass = 'badge-default';
+                let badgeText = canal.tipoAPI || 'ESTÁNDAR';
+                if (canal.tipoAPI === 'rereyano') badgeClass = 'badge-rereyano';
+                else if (canal.tipoAPI === 'e1link') badgeClass = 'badge-e1link';
+                else if (canal.tipoAPI === 'voodc') badgeClass = 'badge-voodc';
+                else if (canal.tipoAPI === 'transmisiones4') badgeClass = 'badge-ftvhd';
+                else if (canal.tipoAPI === 'donromans') badgeClass = 'badge-donromans';
+
+                return `
+                    <div class="channel-card-premium" style="animation-delay: ${index * 0.1}s">
+                        <div class="channel-card-header">
+                            <div class="channel-number-circle">${canal.numero || (index + 1)}</div>
+                            <div class="channel-main-info">
+                                <span class="channel-name-text">${canal.nombre || `Señal ${index + 1}`}</span>
+                                <span class="fuente-badge-premium ${badgeClass}">${badgeText.toUpperCase()}</span>
+                            </div>
+                        </div>
+                        <div class="stream-buttons-container">
+                            ${streamTypes.map(type => `
+                                <button class="premium-stream-btn" onclick='selectStream("${type.url.replace(/'/g, "\\'")}", "${(partidoNombre + ' - ' + (canal.nombre || `Canal ${index + 1}`)).replace(/'/g, "\\'")}")'>
+                                    <div class="btn-content">
+                                        <i class="fas fa-${type.icon}"></i>
+                                        <span>${type.name}</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right arrow-icon"></i>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
     
     modal.classList.add('active');
 }
