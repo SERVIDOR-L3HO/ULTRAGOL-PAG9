@@ -2635,6 +2635,11 @@ function toggleRadioMode() {
 function updateRadioVolume(value) {
     radioVolume = value;
     const iframe = document.getElementById('modalIframe');
+    const volumeProgress = document.getElementById('volumeProgress');
+    if (volumeProgress) {
+        volumeProgress.style.width = value + '%';
+    }
+    
     // Intentar comunicar volumen al iframe si es posible (depende del reproductor)
     // Como fallback visual:
     const muteBtn = document.getElementById('radioMuteBtn');

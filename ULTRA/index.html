@@ -351,30 +351,50 @@
             
             <!-- Modo Radio Visualizador -->
             <div id="radioVisualizer" class="radio-visualizer">
+                <div class="radio-visualizer-overlay"></div>
                 <div class="visualizer-content">
-                    <div class="radio-waves" id="radioWaves">
-                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                    </div>
-                    <div class="radio-info">
-                        <i class="fas fa-podcast radio-icon-pulsing"></i>
-                        <h4 id="radioTitleText">MODO RADIO ACTIVO</h4>
-                        <p>Solo Audio • Ahorro de Datos</p>
-                    </div>
-                    <div class="radio-controls-advanced">
-                        <button class="radio-adv-btn" onclick="toggleMuteRadio()" id="radioMuteBtn">
-                            <i class="fas fa-volume-up"></i>
-                        </button>
-                        <div class="volume-slider-container">
-                            <i class="fas fa-volume-down"></i>
-                            <input type="range" min="0" max="100" value="100" class="volume-slider" id="radioVolumeSlider" oninput="updateRadioVolume(this.value)">
-                            <i class="fas fa-volume-up"></i>
+                    <div class="radio-header-info">
+                        <div class="radio-live-tag">
+                            <span class="live-dot"></span> EN VIVO
                         </div>
-                        <button class="radio-adv-btn" onclick="refreshStream()">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
+                        <h2 id="radioTitleText" class="radio-main-title">MODO RADIO</h2>
+                        <div class="radio-subtitle">
+                            <i class="fas fa-headphones"></i> Solo Audio • Alta Fidelidad
+                        </div>
+                    </div>
+
+                    <div class="radio-visualizer-main">
+                        <div class="radio-icon-container">
+                            <i class="fas fa-podcast radio-icon-pulsing"></i>
+                            <div class="radio-pulse-rings">
+                                <span></span><span></span><span></span>
+                            </div>
+                        </div>
+                        
+                        <div class="radio-waves" id="radioWaves">
+                            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                        </div>
+                    </div>
+
+                    <div class="radio-controls-advanced">
+                        <div class="volume-control-row">
+                            <button class="radio-adv-btn" onclick="toggleMuteRadio()" id="radioMuteBtn">
+                                <i class="fas fa-volume-up"></i>
+                            </button>
+                            <div class="volume-slider-container">
+                                <input type="range" min="0" max="100" value="100" class="volume-slider" id="radioVolumeSlider" oninput="updateRadioVolume(this.value)">
+                                <div class="volume-progress" id="volumeProgress"></div>
+                            </div>
+                            <button class="radio-adv-btn sync-btn" onclick="refreshStream()" title="Sincronizar">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                        <div class="radio-status-text">
+                            Transmisión optimizada para ahorro de datos
+                        </div>
                     </div>
                 </div>
             </div>
