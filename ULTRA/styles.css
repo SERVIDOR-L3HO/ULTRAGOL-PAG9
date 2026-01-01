@@ -10154,30 +10154,40 @@ body.dark-mode .news-content p {
     letter-spacing: 0.5px;
 }
 
-/* Botón Flotante Mundial 2026 */
+/* Eliminar bloques antiguos y duplicados del FAB */
 .world-cup-fab {
     position: fixed;
     bottom: 85px;
     right: 20px;
-    width: 60px;
-    height: 60px;
-    background: #fff;
+    width: 65px;
+    height: 65px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
     border: none;
-    border-radius: 50%;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(255, 165, 0, 0.4);
     z-index: 900;
     cursor: pointer;
-    padding: 10px;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: fabFloat 3s ease-in-out infinite;
+}
+
+/* Ocultar FAB cuando el reproductor o modales principales están activos */
+#playerModal.active ~ .world-cup-fab,
+#channelSelectorModal.active ~ .world-cup-fab,
+.player-modal-fullscreen.active ~ .world-cup-fab,
+body.modal-open .world-cup-fab,
+.world-cup-modal.active ~ .world-cup-fab,
+#playerModal.active .world-cup-fab,
+#channelSelectorModal.active .world-cup-fab {
+    display: none !important;
 }
 
 .world-cup-fab img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+    display: none !important;
 }
 
 .world-cup-fab:hover {
@@ -10393,24 +10403,17 @@ body.dark-mode .news-content p {
     box-shadow: 0 8px 25px rgba(255, 69, 0, 0.5);
 }
 /* Rediseño Ultra-Profesional Mundial 2026 */
-.world-cup-fab {
-    position: fixed;
-    bottom: 85px;
-    right: 20px;
-    width: 65px;
-    height: 65px;
-    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-    border: none;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(255, 165, 0, 0.4);
-    z-index: 1000;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    animation: fabFloat 3s ease-in-out infinite;
+.world-cup-fab-hidden {
+    display: none !important;
+}
+
+/* Ocultar FAB cuando el reproductor o modales principales están activos */
+#playerModal.active ~ .world-cup-fab,
+#channelSelectorModal.active ~ .world-cup-fab,
+.player-modal-fullscreen.active ~ .world-cup-fab,
+body.modal-open .world-cup-fab,
+.world-cup-modal.active ~ .world-cup-fab {
+    display: none !important;
 }
 
 .world-cup-fab .fab-content {

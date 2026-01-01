@@ -2596,6 +2596,10 @@ function openLiveChat() {
 let wcCountdownInterval = null;
 
 function openWorldCupModal() {
+    // Si el reproductor está abierto, no abrir el modal del mundial
+    if (document.getElementById('playerModal').classList.contains('active')) {
+        return;
+    }
     const modal = document.getElementById('worldCupModal');
     modal.classList.add('active');
     startWorldCupCountdown();
