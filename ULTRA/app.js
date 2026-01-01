@@ -4138,9 +4138,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ==================== PARTIDOS IMPORTANTES MODAL ====================
 
+let isLiveFilterActive = false;
+
+function toggleLiveFilter() {
+    isLiveFilterActive = !isLiveFilterActive;
+    const btn = document.getElementById('liveFilterBtn');
+    if (btn) {
+        btn.classList.toggle('active', isLiveFilterActive);
+    }
+    renderImportantMatches();
+}
+
 function openImportantMatchesModal() {
     const modal = document.getElementById('importantMatchesModal');
     const body = document.getElementById('importantMatchesBody');
+    
+    // Resetear filtro al abrir
+    isLiveFilterActive = false;
+    const btn = document.getElementById('liveFilterBtn');
+    if (btn) btn.classList.remove('active');
     
     // Resetear historial al abrir el modal de partidos importantes (es el punto de inicio)
     modalNavigation.resetHistory();
@@ -4190,7 +4206,19 @@ function renderImportantMatches() {
         return;
     }
     
-    const transmisionesSorted = [...transmisionesData.transmisiones].sort((a, b) => {
+    let transmisionesToRender = [...transmisionesData.transmisiones];
+
+    if (isLiveFilterActive) {
+        // Filtrar solo partidos de API 5 (donromans) que estén en vivo
+        transmisionesToRender = transmisionesToRender.filter(t => {
+            const isDonRomans = t.tipoAPI === 'donromans';
+            const estadoAPI = (t.estado || '').toLowerCase().trim();
+            const isLive = estadoAPI.includes('vivo') || estadoAPI.includes('live') || estadoAPI === 'en vivo';
+            return isDonRomans && isLive;
+        });
+    }
+    
+    const transmisionesSorted = transmisionesToRender.sort((a, b) => {
         const aLive = a.estado?.toLowerCase().includes('vivo') || a.estado?.toLowerCase().includes('live');
         const bLive = b.estado?.toLowerCase().includes('vivo') || b.estado?.toLowerCase().includes('live');
         

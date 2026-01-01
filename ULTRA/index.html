@@ -530,11 +530,15 @@
                         <i class="fas fa-star" style="color: #FFD700;"></i>
                         <h3 class="important-modal-title">PARTIDOS IMPORTANTES</h3>
                     </div>
-                    <p class="important-modal-subtitle">Selecciona un partido para ver los canales disponibles</p>
+                    <div class="important-modal-actions">
+                        <button id="liveFilterBtn" class="live-filter-btn" onclick="toggleLiveFilter()">
+                            <span class="live-dot"></span> EN VIVO
+                        </button>
+                        <button class="close-important-modal" onclick="closeImportantMatchesModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
                 </div>
-                <button class="close-important-modal" onclick="closeImportantMatchesModal()">
-                    <i class="fas fa-times"></i>
-                </button>
             </div>
             <div class="important-modal-body" id="importantMatchesBody">
                 <div class="loading-matches">
