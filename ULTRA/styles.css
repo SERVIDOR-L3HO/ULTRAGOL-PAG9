@@ -10392,3 +10392,218 @@ body.dark-mode .news-content p {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(255, 69, 0, 0.5);
 }
+/* Rediseño Ultra-Profesional Mundial 2026 */
+.world-cup-fab {
+    position: fixed;
+    bottom: 85px;
+    right: 20px;
+    width: 65px;
+    height: 65px;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(255, 165, 0, 0.4);
+    z-index: 1000;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: fabFloat 3s ease-in-out infinite;
+}
+
+.world-cup-fab .fab-content {
+    font-size: 24px;
+    color: #000;
+    margin-bottom: 2px;
+}
+
+.world-cup-fab .fab-text {
+    font-size: 8px;
+    font-weight: 900;
+    color: #000;
+    letter-spacing: 0.5px;
+}
+
+@keyframes fabFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.wc-modal-container {
+    background: #080808;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    max-width: 420px;
+}
+
+.wc-header-visual {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.wc-gradient-mesh {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 30%, #FFD700 0%, transparent 40%),
+                radial-gradient(circle at 70% 60%, #0074D9 0%, transparent 40%),
+                radial-gradient(circle at 40% 80%, #2ECC40 0%, transparent 40%);
+    filter: blur(40px);
+    opacity: 0.4;
+    animation: meshRotate 15s linear infinite;
+}
+
+@keyframes meshRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.wc-logo-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wc-main-icon {
+    font-size: 60px;
+    color: #fff;
+    z-index: 2;
+    filter: drop-shadow(0 0 15px rgba(255,255,255,0.5));
+}
+
+.wc-icon-glow {
+    position: absolute;
+    width: 120%;
+    height: 120%;
+    background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+    animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.wc-title-main {
+    font-size: 28px;
+    font-weight: 900;
+    background: linear-gradient(to bottom, #fff, #ccc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 15px;
+}
+
+.wc-host-badges {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.wc-badge-host {
+    background: rgba(255,255,255,0.1);
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.wc-countdown-grid {
+    background: rgba(255,255,255,0.03);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.wc-time-val {
+    font-size: 28px !important;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.wc-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.wc-stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.wc-stat-icon {
+    width: 45px;
+    height: 45px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFD700;
+    font-size: 20px;
+}
+
+.wc-stat-val {
+    display: block;
+    font-weight: 900;
+    color: #fff;
+    font-size: 14px;
+}
+
+.wc-stat-lab {
+    font-size: 8px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+}
+
+.wc-action-btn {
+    position: relative;
+    width: 100%;
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 16px;
+    border-radius: 16px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.wc-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255,255,255,0.1);
+}
+
+.btn-glow {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+    left: -100%;
+    top: 0;
+    animation: btnShine 3s infinite;
+}
+
+@keyframes btnShine {
+    from { left: -100%; }
+    to { left: 100%; }
+}
