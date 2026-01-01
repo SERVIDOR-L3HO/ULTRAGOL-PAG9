@@ -2604,7 +2604,59 @@ function openLiveChat() {
     }
 }
 
-// ==================== MODO RADIO (AUDIO EN SEGUNDO PLANO) ====================
+// ==================== MUNDIAL 2026 MODAL ====================
+let wcCountdownInterval = null;
+
+function openWorldCupModal() {
+    const modal = document.getElementById('worldCupModal');
+    modal.classList.add('active');
+    startWorldCupCountdown();
+}
+
+function closeWorldCupModal() {
+    const modal = document.getElementById('worldCupModal');
+    modal.classList.remove('active');
+    if (wcCountdownInterval) clearInterval(wcCountdownInterval);
+}
+
+function startWorldCupCountdown() {
+    // Fecha de inicio aproximada: 11 de junio de 2026
+    const startDate = new Date('June 11, 2026 00:00:00').getTime();
+    
+    if (wcCountdownInterval) clearInterval(wcCountdownInterval);
+    
+    const updateCountdown = () => {
+        const now = new Date().getTime();
+        const diff = startDate - now;
+        
+        if (diff < 0) {
+            document.querySelector('.wc-countdown-section h3').textContent = '¡EL MUNDIAL HA COMENZADO!';
+            clearInterval(wcCountdownInterval);
+            return;
+        }
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        document.getElementById('wc-days').textContent = days.toString().padStart(3, '0');
+        document.getElementById('wc-hours').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('wc-mins').textContent = mins.toString().padStart(2, '0');
+        document.getElementById('wc-secs').textContent = secs.toString().padStart(2, '0');
+    };
+    
+    updateCountdown();
+    wcCountdownInterval = setInterval(updateCountdown, 1000);
+}
+
+function initWorldCup() {
+    // Iniciar lógica si es necesario al cargar
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initWorldCup();
+});
 let radioModeActive = false;
 let radioVolume = 100;
 let isRadioMuted = false;

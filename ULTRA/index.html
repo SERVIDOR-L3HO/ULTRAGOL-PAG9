@@ -342,7 +342,76 @@
         </nav>
     </div>
 
-    <div id="playerModal" class="player-modal-fullscreen">
+    <!-- Botón Flotante Mundial 2026 -->
+    <button class="world-cup-fab" onclick="openWorldCupModal()">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/2026_FIFA_World_Cup_logo.svg/800px-2026_FIFA_World_Cup_logo.svg.png" alt="Mundial 2026">
+        <span class="fab-pulse"></span>
+    </button>
+
+    <!-- Modal Mundial 2026 -->
+    <div id="worldCupModal" class="world-cup-modal">
+        <div class="wc-modal-overlay" onclick="closeWorldCupModal()"></div>
+        <div class="wc-modal-container">
+            <div class="wc-modal-header">
+                <div class="wc-header-bg"></div>
+                <button class="wc-close-btn" onclick="closeWorldCupModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="wc-header-content">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/2026_FIFA_World_Cup_logo.svg/800px-2026_FIFA_World_Cup_logo.svg.png" alt="Logo WC 2026" class="wc-logo-large">
+                    <h2>COPA MUNDIAL 2026</h2>
+                    <p>CANADÁ • MÉXICO • ESTADOS UNIDOS</p>
+                </div>
+            </div>
+            <div class="wc-modal-body">
+                <div class="wc-countdown-section">
+                    <h3>Faltan para el pitazo inicial:</h3>
+                    <div class="wc-countdown-grid">
+                        <div class="wc-time-unit">
+                            <span id="wc-days">000</span>
+                            <label>Días</label>
+                        </div>
+                        <div class="wc-time-unit">
+                            <span id="wc-hours">00</span>
+                            <label>Horas</label>
+                        </div>
+                        <div class="wc-time-unit">
+                            <span id="wc-mins">00</span>
+                            <label>Min</label>
+                        </div>
+                        <div class="wc-time-unit">
+                            <span id="wc-secs">00</span>
+                            <label>Seg</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="wc-info-cards">
+                    <div class="wc-info-card">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h4>16 Sedes</h4>
+                        <p>3 Países anfitriones</p>
+                    </div>
+                    <div class="wc-info-card">
+                        <i class="fas fa-futbol"></i>
+                        <h4>48 Equipos</h4>
+                        <p>Nuevo formato ampliado</p>
+                    </div>
+                    <div class="wc-info-card">
+                        <i class="fas fa-trophy"></i>
+                        <h4>104 Partidos</h4>
+                        <p>Más emoción que nunca</p>
+                    </div>
+                </div>
+
+                <div class="wc-cta-section">
+                    <button class="wc-notify-btn">
+                        <i class="fas fa-bell"></i> NOTIFICARME INICIO
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
         <div class="player-video-container">
             <div class="loading-spinner" id="modalLoader">
                 <div class="spinner"></div>
