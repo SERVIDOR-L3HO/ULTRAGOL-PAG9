@@ -342,95 +342,7 @@
         </nav>
     </div>
 
-    <!-- Botón Flotante Mundial 2026 -->
-    <button class="world-cup-fab" onclick="openWorldCupModal()">
-        <div class="fab-content">
-            <i class="fas fa-trophy"></i>
-        </div>
-        <span class="fab-pulse"></span>
-        <span class="fab-text">WC 2026</span>
-    </button>
-
-    <!-- Modal Mundial 2026 -->
-    <div id="worldCupModal" class="world-cup-modal">
-        <div class="wc-modal-overlay" onclick="closeWorldCupModal()"></div>
-        <div class="wc-modal-container">
-            <div class="wc-modal-header">
-                <div class="wc-header-visual">
-                    <div class="wc-gradient-mesh"></div>
-                    <div class="wc-pattern-overlay"></div>
-                </div>
-                <button class="wc-close-btn" onclick="closeWorldCupModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="wc-header-content">
-                    <div class="wc-logo-container">
-                        <i class="fas fa-trophy wc-main-icon"></i>
-                        <div class="wc-icon-glow"></div>
-                    </div>
-                    <h2 class="wc-title-main">COPA MUNDIAL 2026</h2>
-                    <div class="wc-host-badges">
-                        <span class="wc-badge-host">🇲🇽 MÉXICO</span>
-                        <span class="wc-badge-host">🇺🇸 EE.UU.</span>
-                        <span class="wc-badge-host">🇨🇦 CANADÁ</span>
-                    </div>
-                </div>
-            </div>
-            <div class="wc-modal-body">
-                <div class="wc-countdown-section">
-                    <div class="wc-section-label">EL SUEÑO COMIENZA EN</div>
-                    <div class="wc-countdown-grid">
-                        <div class="wc-time-unit">
-                            <div class="wc-time-val" id="wc-days">000</div>
-                            <div class="wc-time-label">DÍAS</div>
-                        </div>
-                        <div class="wc-time-unit">
-                            <div class="wc-time-val" id="wc-hours">00</div>
-                            <div class="wc-time-label">HORAS</div>
-                        </div>
-                        <div class="wc-time-unit">
-                            <div class="wc-time-val" id="wc-mins">00</div>
-                            <div class="wc-time-label">MIN</div>
-                        </div>
-                        <div class="wc-time-unit">
-                            <div class="wc-time-val" id="wc-secs">00</div>
-                            <div class="wc-time-label">SEG</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="wc-stats-row">
-                    <div class="wc-stat-item">
-                        <div class="wc-stat-icon"><i class="fas fa-map-marked-alt"></i></div>
-                        <div class="wc-stat-info">
-                            <span class="wc-stat-val">16</span>
-                            <span class="wc-stat-lab">SEDES</span>
-                        </div>
-                    </div>
-                    <div class="wc-stat-item">
-                        <div class="wc-stat-icon"><i class="fas fa-users"></i></div>
-                        <div class="wc-stat-info">
-                            <span class="wc-stat-val">48</span>
-                            <span class="wc-stat-lab">EQUIPOS</span>
-                        </div>
-                    </div>
-                    <div class="wc-stat-item">
-                        <div class="wc-stat-icon"><i class="fas fa-history"></i></div>
-                        <div class="wc-stat-info">
-                            <span class="wc-stat-val">104</span>
-                            <span class="wc-stat-lab">PARTIDOS</span>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="wc-action-btn" onclick="showToast('¡Te avisaremos pronto!')">
-                    <div class="btn-glow"></div>
-                    <i class="fas fa-bell"></i>
-                    <span>ACTIVAR NOTIFICACIONES</span>
-                </button>
-            </div>
-        </div>
-    </div>
+    <div id="playerModal" class="player-modal-fullscreen">
         <div class="player-video-container">
             <div class="loading-spinner" id="modalLoader">
                 <div class="spinner"></div>
@@ -439,50 +351,30 @@
             
             <!-- Modo Radio Visualizador -->
             <div id="radioVisualizer" class="radio-visualizer">
-                <div class="radio-visualizer-overlay"></div>
                 <div class="visualizer-content">
-                    <div class="radio-header-info">
-                        <div class="radio-live-tag">
-                            <span class="live-dot"></span> EN VIVO
-                        </div>
-                        <h2 id="radioTitleText" class="radio-main-title">MODO RADIO</h2>
-                        <div class="radio-subtitle">
-                            <i class="fas fa-headphones"></i> Solo Audio • Alta Fidelidad
-                        </div>
+                    <div class="radio-waves" id="radioWaves">
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
                     </div>
-
-                    <div class="radio-visualizer-main">
-                        <div class="radio-icon-container">
-                            <i class="fas fa-podcast radio-icon-pulsing"></i>
-                            <div class="radio-pulse-rings">
-                                <span></span><span></span><span></span>
-                            </div>
-                        </div>
-                        
-                        <div class="radio-waves" id="radioWaves">
-                            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                            <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                        </div>
+                    <div class="radio-info">
+                        <i class="fas fa-podcast radio-icon-pulsing"></i>
+                        <h4 id="radioTitleText">MODO RADIO ACTIVO</h4>
+                        <p>Solo Audio • Ahorro de Datos</p>
                     </div>
-
                     <div class="radio-controls-advanced">
-                        <div class="volume-control-row">
-                            <button class="radio-adv-btn" onclick="toggleMuteRadio()" id="radioMuteBtn">
-                                <i class="fas fa-volume-up"></i>
-                            </button>
-                            <div class="volume-slider-container">
-                                <input type="range" min="0" max="100" value="100" class="volume-slider" id="radioVolumeSlider" oninput="updateRadioVolume(this.value)">
-                                <div class="volume-progress" id="volumeProgress"></div>
-                            </div>
-                            <button class="radio-adv-btn sync-btn" onclick="refreshStream()" title="Sincronizar">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
+                        <button class="radio-adv-btn" onclick="toggleMuteRadio()" id="radioMuteBtn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="volume-slider-container">
+                            <i class="fas fa-volume-down"></i>
+                            <input type="range" min="0" max="100" value="100" class="volume-slider" id="radioVolumeSlider" oninput="updateRadioVolume(this.value)">
+                            <i class="fas fa-volume-up"></i>
                         </div>
-                        <div class="radio-status-text">
-                            Transmisión optimizada para ahorro de datos
-                        </div>
+                        <button class="radio-adv-btn" onclick="refreshStream()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
                     </div>
                 </div>
             </div>
