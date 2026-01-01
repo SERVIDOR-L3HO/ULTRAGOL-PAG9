@@ -4254,9 +4254,11 @@ function renderImportantMatches() {
         }
         
         const estadoAPI = (transmision.estado || '').toLowerCase().trim();
-        const isLive = estadoAPI.includes('vivo') || estadoAPI.includes('live') || estadoAPI === 'en vivo';
-        const isUpcoming = estadoAPI.includes('próximo') || estadoAPI.includes('programado') || estadoAPI.includes('upcoming');
-        const isFinished = estadoAPI.includes('finalizado') || estadoAPI.includes('finished');
+        // Forzar "EN VIVO" si es de la API donromans, ya que el usuario indica que ya lo están
+        const isDonRomans = transmision.tipoAPI === 'donromans';
+        const isLive = isDonRomans || estadoAPI.includes('vivo') || estadoAPI.includes('live') || estadoAPI === 'en vivo';
+        const isUpcoming = !isDonRomans && (estadoAPI.includes('próximo') || estadoAPI.includes('programado') || estadoAPI.includes('upcoming'));
+        const isFinished = !isDonRomans && (estadoAPI.includes('finalizado') || estadoAPI.includes('finished'));
         
         let statusBadge = '';
         if (isLive) {
