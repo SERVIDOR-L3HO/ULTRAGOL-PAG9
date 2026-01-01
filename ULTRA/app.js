@@ -2606,13 +2606,60 @@ function openLiveChat() {
 
 // ==================== MODO RADIO (AUDIO EN SEGUNDO PLANO) ====================
 let radioModeActive = false;
-let radioAudioElement = null;
+let radioVolume = 100;
+let isRadioMuted = false;
 
 function toggleRadioMode() {
+    const visualizer = document.getElementById('radioVisualizer');
+    const iframe = document.getElementById('modalIframe');
+    const radioBtn = document.querySelector('.radio-btn');
+    
+    radioModeActive = !radioModeActive;
+    
     if (radioModeActive) {
-        deactivateRadioMode();
+        visualizer.classList.add('active');
+        iframe.style.opacity = '0';
+        iframe.style.pointerEvents = 'none';
+        radioBtn.classList.add('active');
+        document.getElementById('radioTitleText').textContent = currentStreamTitle || 'MODO RADIO ACTIVO';
+        showToast('Modo Radio: Solo audio activado');
     } else {
-        activateRadioMode();
+        visualizer.classList.remove('active');
+        iframe.style.opacity = '1';
+        iframe.style.pointerEvents = 'auto';
+        radioBtn.classList.remove('active');
+        showToast('Modo Video activado');
+    }
+}
+
+function updateRadioVolume(value) {
+    radioVolume = value;
+    const iframe = document.getElementById('modalIframe');
+    // Intentar comunicar volumen al iframe si es posible (depende del reproductor)
+    // Como fallback visual:
+    const muteBtn = document.getElementById('radioMuteBtn');
+    if (value == 0) {
+        muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+    } else if (value < 50) {
+        muteBtn.innerHTML = '<i class="fas fa-volume-down"></i>';
+    } else {
+        muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    }
+}
+
+function toggleMuteRadio() {
+    isRadioMuted = !isRadioMuted;
+    const muteBtn = document.getElementById('radioMuteBtn');
+    const slider = document.getElementById('radioVolumeSlider');
+    
+    if (isRadioMuted) {
+        muteBtn.innerHTML = '<i class="fas fa-volume-mute"></i>';
+        slider.value = 0;
+        showToast('Silenciado');
+    } else {
+        muteBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+        slider.value = radioVolume || 100;
+        showToast('Sonido activado');
     }
 }
 

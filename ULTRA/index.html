@@ -349,6 +349,36 @@
             </div>
             <iframe id="modalIframe" frameborder="0" allowfullscreen></iframe>
             
+            <!-- Modo Radio Visualizador -->
+            <div id="radioVisualizer" class="radio-visualizer">
+                <div class="visualizer-content">
+                    <div class="radio-waves" id="radioWaves">
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                    </div>
+                    <div class="radio-info">
+                        <i class="fas fa-podcast radio-icon-pulsing"></i>
+                        <h4 id="radioTitleText">MODO RADIO ACTIVO</h4>
+                        <p>Solo Audio • Ahorro de Datos</p>
+                    </div>
+                    <div class="radio-controls-advanced">
+                        <button class="radio-adv-btn" onclick="toggleMuteRadio()" id="radioMuteBtn">
+                            <i class="fas fa-volume-up"></i>
+                        </button>
+                        <div class="volume-slider-container">
+                            <i class="fas fa-volume-down"></i>
+                            <input type="range" min="0" max="100" value="100" class="volume-slider" id="radioVolumeSlider" oninput="updateRadioVolume(this.value)">
+                            <i class="fas fa-volume-up"></i>
+                        </div>
+                        <button class="radio-adv-btn" onclick="refreshStream()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
             <div class="player-overlay-top">
                 <button class="player-back-btn" onclick="closeModal()" title="Regresar">
                     <i class="fas fa-chevron-left"></i>
