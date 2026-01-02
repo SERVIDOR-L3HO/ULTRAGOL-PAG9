@@ -24,6 +24,86 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+/* Banner Copa Mundial 2026 */
+.world-cup-banner {
+    position: relative;
+    margin: 15px;
+    height: 220px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #4b0082 0%, #ff0000 100%);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800') center/cover;
+    opacity: 0.3;
+    mix-blend-mode: overlay;
+}
+
+.banner-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    width: 100%;
+    padding: 20px;
+}
+
+.banner-title {
+    font-size: 32px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    margin-bottom: 5px;
+}
+
+.banner-subtitle {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.countdown-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.countdown-item {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 10px;
+    border-radius: 12px;
+    min-width: 65px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.countdown-val {
+    display: block;
+    font-size: 22px;
+    font-weight: 800;
+    color: #fff;
+}
+
+.countdown-label {
+    display: block;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+/* Resto de estilos */
 .app-container {
     max-width: 480px;
     margin: 0 auto;
