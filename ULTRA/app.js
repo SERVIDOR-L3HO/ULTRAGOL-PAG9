@@ -1314,80 +1314,97 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
 }
 
 function showChannelSelector(transmision, partidoNombre) {
-    const modal = document.getElementById('playerModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const statsContainer = document.getElementById('playerStatsContainer');
+    const modal = document.getElementById('channelSelectorModal');
+    const body = document.getElementById('channelSelectorBody');
+    const title = document.getElementById('channelSelectorTitle');
     
-    if (!modal || !statsContainer) return;
+    if (!modal || !body || !title) return;
     
-    modalTitle.textContent = partidoNombre;
+    title.innerHTML = `<i class="fas fa-microchip"></i> ${partidoNombre}`;
+    
+    // Guardar en historial antes de abrir
+    modalNavigation.pushModal('channelSelector', { transmision, partidoNombre });
     
     // Create professional server selector UI
     let channelsHtml = `
-        <div class="server-selector-container">
-            <div class="server-header">
-                <i class="fas fa-server"></i>
-                <span>SELECCIONAR SERVIDOR DE TRANSMISIÓN</span>
+        <div class="server-selector-creative">
+            <div class="server-header-creative">
+                <div class="server-title-group">
+                    <span class="pulse-icon"></span>
+                    <span class="server-label">TERMINAL DE ACCESO A RED</span>
+                </div>
+                <div class="server-subtitle-creative">Seleccione un nodo de transmisión disponible</div>
             </div>
-            <div class="server-grid">
+            <div class="server-grid-creative">
     `;
     
     if (transmision.canales && transmision.canales.length > 0) {
         transmision.canales.forEach((canal, index) => {
             const serverNum = index + 1;
-            const apiType = canal.tipoAPI || 'Direct';
-            const quality = '1080p HD';
-            const latency = Math.floor(Math.random() * 50) + 10;
+            const apiType = canal.tipoAPI || 'DIRECT';
+            const latency = Math.floor(Math.random() * 40) + 5;
+            const quality = '4K ULTRA HD';
             const enlace = canal.links ? (canal.links.hoca || canal.links.caster || canal.links.wigi) : (canal.enlaces ? canal.enlaces[0]?.url : '');
             
             channelsHtml += `
-                <div class="server-card" onclick="playChannel('${enlace}', '${partidoNombre.replace(/'/g, "\\'")}')">
-                    <div class="server-status-bar">
-                        <span class="status-online"></span>
-                        <span class="latency">${latency}ms</span>
-                    </div>
-                    <div class="server-info">
-                        <div class="server-icon">
-                            <i class="fas fa-database"></i>
+                <div class="server-node-card" onclick="playChannelFromSelector('${enlace}', '${partidoNombre.replace(/'/g, "\\'")}')">
+                    <div class="node-edge"></div>
+                    <div class="node-content">
+                        <div class="node-visual">
+                            <div class="node-icon-wrapper">
+                                <i class="fas fa-hdd"></i>
+                                <div class="node-online-dot"></div>
+                            </div>
+                            <div class="node-latency">${latency}ms</div>
                         </div>
-                        <div class="server-details">
-                            <span class="server-name">SERVIDOR #${serverNum}</span>
-                            <span class="server-provider">${apiType.toUpperCase()} NETWORK</span>
+                        <div class="node-info">
+                            <div class="node-name">NODO CENTRAL #${serverNum}</div>
+                            <div class="node-meta">
+                                <span class="node-provider">${apiType.toUpperCase()} CLOUD</span>
+                                <span class="node-divider"></span>
+                                <span class="node-quality">${quality}</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="server-meta">
-                        <span class="quality-badge">${quality}</span>
-                        <i class="fas fa-chevron-right"></i>
+                        <div class="node-action">
+                            <div class="node-connect-btn">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
         });
     } else {
         channelsHtml += `
-            <div class="no-servers">
-                <i class="fas fa-exclamation-triangle"></i>
-                <p>Sin servidores disponibles para este evento</p>
+            <div class="no-nodes">
+                <i class="fas fa-terminal"></i>
+                <p>Error: No se detectaron nodos de transmisión activos</p>
             </div>
         `;
     }
     
     channelsHtml += `
             </div>
-            <div class="server-footer">
-                <p><i class="fas fa-shield-alt"></i> Conexión Encriptada y Segura</p>
+            <div class="server-terminal-footer">
+                <div class="terminal-line"></div>
+                <div class="terminal-text">
+                    <span class="typing-effect">ESTADO: ENCRIPTACIÓN AES-256 ACTIVA... CONEXIÓN SEGURA</span>
+                </div>
             </div>
         </div>
     `;
     
-    statsContainer.innerHTML = channelsHtml;
+    body.innerHTML = channelsHtml;
     modal.classList.add('active');
 }
 
-function playChannel(url, title) {
+function playChannelFromSelector(url, title) {
     if (!url || url === 'undefined') {
-        showToast('Error: URL de servidor no válida');
+        showToast('Error: Nodo de transmisión no válido');
         return;
     }
+    const modal = document.getElementById('channelSelectorModal');
+    if (modal) modal.classList.remove('active');
     playStreamInModal(url, title);
 }
 
