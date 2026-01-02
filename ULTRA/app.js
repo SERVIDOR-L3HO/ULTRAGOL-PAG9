@@ -1318,7 +1318,10 @@ function showChannelSelector(transmision, partidoNombre) {
     const body = document.getElementById('channelSelectorBody');
     const title = document.getElementById('channelSelectorTitle');
     
-    if (!modal || !body || !title) return;
+    if (!modal || !body || !title) {
+        console.error("❌ Error: No se encontraron los elementos del modal en el DOM");
+        return;
+    }
     
     title.innerHTML = `<i class="fas fa-microchip"></i> ${partidoNombre}`;
     
