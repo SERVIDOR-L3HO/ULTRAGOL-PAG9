@@ -1331,9 +1331,9 @@ function showChannelSelector(transmision, partidoNombre) {
             <div class="server-header-creative">
                 <div class="server-title-group">
                     <span class="pulse-icon"></span>
-                    <span class="server-label">TERMINAL DE ACCESO A RED</span>
+                    <span class="server-label">SERVIDOR DE TRANSMISIÓN</span>
                 </div>
-                <div class="server-subtitle-creative">Seleccione un nodo de transmisión disponible</div>
+                <div class="server-subtitle-creative">Selecciona una señal disponible para ver el partido</div>
             </div>
             <div class="server-grid-creative">
     `;
@@ -1342,8 +1342,8 @@ function showChannelSelector(transmision, partidoNombre) {
         transmision.canales.forEach((canal, index) => {
             const serverNum = index + 1;
             const apiType = canal.tipoAPI || 'DIRECT';
-            const latency = Math.floor(Math.random() * 40) + 5;
-            const quality = '4K ULTRA HD';
+            const latency = Math.floor(Math.random() * 25) + 5;
+            const quality = 'HD PREMIUM';
             const enlace = canal.links ? (canal.links.hoca || canal.links.caster || canal.links.wigi) : (canal.enlaces ? canal.enlaces[0]?.url : '');
             
             channelsHtml += `
@@ -1352,22 +1352,22 @@ function showChannelSelector(transmision, partidoNombre) {
                     <div class="node-content">
                         <div class="node-visual">
                             <div class="node-icon-wrapper">
-                                <i class="fas fa-hdd"></i>
+                                <i class="fas fa-server"></i>
                                 <div class="node-online-dot"></div>
                             </div>
                             <div class="node-latency">${latency}ms</div>
                         </div>
                         <div class="node-info">
-                            <div class="node-name">NODO CENTRAL #${serverNum}</div>
+                            <div class="node-name">Servidor Principal #${serverNum}</div>
                             <div class="node-meta">
-                                <span class="node-provider">${apiType.toUpperCase()} CLOUD</span>
+                                <span class="node-provider">SISTEMA ${apiType.toUpperCase()}</span>
                                 <span class="node-divider"></span>
                                 <span class="node-quality">${quality}</span>
                             </div>
                         </div>
                         <div class="node-action">
                             <div class="node-connect-btn">
-                                <i class="fas fa-bolt"></i>
+                                <i class="fas fa-play"></i>
                             </div>
                         </div>
                     </div>
@@ -1376,9 +1376,9 @@ function showChannelSelector(transmision, partidoNombre) {
         });
     } else {
         channelsHtml += `
-            <div class="no-nodes">
-                <i class="fas fa-terminal"></i>
-                <p>Error: No se detectaron nodos de transmisión activos</p>
+            <div class="no-nodes" style="text-align:center; padding: 40px 20px; color: #707070;">
+                <i class="fas fa-exclamation-circle" style="font-size: 32px; margin-bottom: 16px; color: #ff4500;"></i>
+                <p>No se encontraron señales activas en este momento</p>
             </div>
         `;
     }
@@ -1386,9 +1386,9 @@ function showChannelSelector(transmision, partidoNombre) {
     channelsHtml += `
             </div>
             <div class="server-terminal-footer">
-                <div class="terminal-line"></div>
                 <div class="terminal-text">
-                    <span class="typing-effect">ESTADO: ENCRIPTACIÓN AES-256 ACTIVA... CONEXIÓN SEGURA</span>
+                    <i class="fas fa-check-circle"></i>
+                    <span>CONEXIÓN ESTABLE Y OPTIMIZADA</span>
                 </div>
             </div>
         </div>
