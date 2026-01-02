@@ -104,72 +104,75 @@ body {
 }
 
 /* Resto de estilos */
-/* ==================== SELECTOR DE SERVIDORES CREATIVO (MODAL) ==================== */
+/* ==================== SELECTOR DE SERVIDORES PROFESIONAL (MODAL) ==================== */
 .server-selector-creative {
-    padding: 20px;
-    background: #080808;
-    color: #fff;
-    font-family: 'JetBrains Mono', monospace;
+    padding: 24px;
+    background: #0f0f0f;
+    color: #e0e0e0;
+    font-family: 'Inter', -apple-system, sans-serif;
     position: relative;
-    border-radius: 0 0 20px 20px;
+    border-radius: 0 0 24px 24px;
 }
 
 .server-header-creative {
-    margin-bottom: 25px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+    margin-bottom: 28px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .server-title-group {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 5px;
+    gap: 12px;
+    margin-bottom: 8px;
 }
 
 .pulse-icon {
-    width: 10px;
-    height: 10px;
-    background: #00ff41;
+    width: 8px;
+    height: 8px;
+    background: #4ade80;
     border-radius: 50%;
-    box-shadow: 0 0 10px #00ff41;
-    animation: neonPulse 1.5s infinite;
+    box-shadow: 0 0 12px rgba(74, 222, 128, 0.4);
+    animation: professionalPulse 2s infinite;
 }
 
-@keyframes neonPulse {
+@keyframes professionalPulse {
     0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.3); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 0.7; }
     100% { transform: scale(1); opacity: 1; }
 }
 
 .server-label {
-    font-size: 13px;
-    font-weight: 800;
-    color: #00ff41;
-    letter-spacing: 2px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
 }
 
 .server-subtitle-creative {
-    font-size: 11px;
-    color: #888;
-    text-transform: uppercase;
+    font-size: 12px;
+    color: #a0a0a0;
+    letter-spacing: 0.3px;
 }
 
 .server-grid-creative {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
 }
 
 .server-node-card {
     position: relative;
-    background: linear-gradient(90deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.05) 100%);
-    border-radius: 15px;
-    padding: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: 16px 20px;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     overflow: hidden;
+    display: flex;
+    align-items: center;
 }
 
 .node-edge {
@@ -178,70 +181,78 @@ body {
     left: 0;
     width: 4px;
     height: 100%;
-    background: #ff4500;
-    transition: all 0.3s;
-}
-
-.server-node-card:hover .node-edge {
-    width: 6px;
-    background: #00ff41;
-    box-shadow: 0 0 15px #00ff41;
+    background: transparent;
+    transition: all 0.3s ease;
 }
 
 .server-node-card:hover {
-    background: rgba(0, 255, 65, 0.05);
-    border-color: rgba(0, 255, 65, 0.2);
-    transform: translateX(8px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.server-node-card.active {
+    background: rgba(255, 69, 0, 0.08);
+    border-color: rgba(255, 69, 0, 0.3);
+}
+
+.server-node-card.active .node-edge {
+    background: #ff4500;
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.5);
 }
 
 .node-content {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
+    width: 100%;
 }
 
 .node-visual {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .node-icon-wrapper {
-    width: 45px;
-    height: 45px;
-    background: rgba(0, 0, 0, 0.3);
+    width: 42px;
+    height: 42px;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
-    color: #ff4500;
+    font-size: 20px;
+    color: #e0e0e0;
     position: relative;
-    border: 1px solid rgba(255, 69, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
 }
 
 .server-node-card:hover .node-icon-wrapper {
-    color: #00ff41;
-    border-color: #00ff41;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .node-online-dot {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 12px;
-    height: 12px;
-    background: #00ff41;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background: #4ade80;
     border-radius: 50%;
-    border: 2px solid #080808;
-    box-shadow: 0 0 5px #00ff41;
+    border: 2px solid #0f0f0f;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
 }
 
 .node-latency {
-    font-size: 10px;
-    color: #00ff41;
-    font-weight: 700;
+    font-size: 11px;
+    color: #4ade80;
+    font-weight: 600;
 }
 
 .node-info {
@@ -249,32 +260,33 @@ body {
 }
 
 .node-name {
-    font-size: 15px;
-    font-weight: 800;
-    color: #fff;
-    margin-bottom: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 4px;
 }
 
 .node-meta {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 10px;
+    gap: 8px;
+    font-size: 12px;
 }
 
 .node-provider {
-    color: #888;
+    color: #909090;
 }
 
 .node-divider {
     width: 1px;
     height: 10px;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.15);
 }
 
 .node-quality {
     color: #ff4500;
-    font-weight: 700;
+    font-weight: 600;
+    text-transform: uppercase;
 }
 
 .node-action {
@@ -283,65 +295,74 @@ body {
 }
 
 .node-connect-btn {
-    width: 35px;
-    height: 35px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #444;
-    transition: all 0.3s;
+    color: #909090;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .server-node-card:hover .node-connect-btn {
-    background: #00ff41;
-    color: #000;
-    transform: rotate(360deg);
+    background: #ff4500;
+    color: #ffffff;
+    border-color: #ff4500;
+    transform: scale(1.1);
 }
 
 .server-terminal-footer {
-    margin-top: 30px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .terminal-line {
-    height: 1px;
-    background: linear-gradient(90deg, transparent 0%, rgba(0, 255, 65, 0.2) 50%, transparent 100%);
-    margin-bottom: 15px;
+    display: none;
 }
 
 .terminal-text {
-    font-size: 9px;
-    color: #00ff41;
+    font-size: 11px;
+    color: #707070;
     text-align: center;
-    opacity: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 }
 
-.typing-effect {
-    display: inline-block;
+.terminal-text i {
+    color: #4ade80;
+    font-size: 10px;
 }
 
 /* Modal Adjustments */
 #channelSelectorModal .channel-selector-content {
-    background: #080808;
-    border: 1px solid rgba(0, 255, 65, 0.1);
-    border-radius: 20px;
+    background: #0f0f0f;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
     overflow: hidden;
-    box-shadow: 0 0 50px rgba(0, 255, 65, 0.05);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
 }
 
 #channelSelectorModal .channel-selector-header {
-    background: #0d0d0d;
-    padding: 20px;
-    border-bottom: 1px solid rgba(0, 255, 65, 0.1);
+    background: #161616;
+    padding: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 #channelSelectorModal .channel-selector-header h3 {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 800;
-    color: #fff;
-    font-size: 16px;
-    text-transform: uppercase;
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 700;
+    color: #ffffff;
+    font-size: 18px;
+    letter-spacing: -0.2px;
 }
 
 /* Resto de estilos */
