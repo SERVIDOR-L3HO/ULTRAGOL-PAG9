@@ -1348,6 +1348,7 @@ function showChannelSelector(transmision, partidoNombre) {
             const latency = Math.floor(Math.random() * 25) + 5;
             const quality = 'HD PREMIUM';
             const enlace = canal.links ? (canal.links.hoca || canal.links.caster || canal.links.wigi) : (canal.enlaces ? canal.enlaces[0]?.url : '');
+            const canalNombre = canal.nombre || `Servidor #${serverNum}`;
             
             channelsHtml += `
                 <div class="server-node-card" onclick="playChannelFromSelector('${enlace}', '${partidoNombre.replace(/'/g, "\\'")}')">
@@ -1361,7 +1362,7 @@ function showChannelSelector(transmision, partidoNombre) {
                             <div class="node-latency">${latency}ms</div>
                         </div>
                         <div class="node-info">
-                            <div class="node-name">Servidor Principal #${serverNum}</div>
+                            <div class="node-name">${canalNombre}</div>
                             <div class="node-meta">
                                 <span class="node-provider">SISTEMA ${apiType.toUpperCase()}</span>
                                 <span class="node-divider"></span>
