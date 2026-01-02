@@ -1,0 +1,451 @@
+/* ========== TV MODE STYLES & REMOTE CONTROL NAVIGATION ========== */
+
+.tv-focus-indicator {
+    position: absolute;
+    pointer-events: none;
+    border: 4px solid #ff8c00;
+    border-radius: 12px;
+    box-shadow: 
+        0 0 0 4px rgba(255, 140, 0, 0.3),
+        0 0 20px rgba(255, 140, 0, 0.6),
+        inset 0 0 20px rgba(255, 140, 0, 0.2);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9998;
+    opacity: 0;
+    animation: tvPulse 2s ease-in-out infinite;
+}
+
+@keyframes tvPulse {
+    0%, 100% {
+        box-shadow: 
+            0 0 0 4px rgba(255, 140, 0, 0.3),
+            0 0 20px rgba(255, 140, 0, 0.6),
+            inset 0 0 20px rgba(255, 140, 0, 0.2);
+    }
+    50% {
+        box-shadow: 
+            0 0 0 6px rgba(255, 140, 0, 0.4),
+            0 0 30px rgba(255, 140, 0, 0.8),
+            inset 0 0 30px rgba(255, 140, 0, 0.3);
+    }
+}
+
+.tv-focused {
+    outline: none !important;
+    transform: scale(1.05);
+    z-index: 100;
+    position: relative;
+}
+
+body.tv-mode {
+    /* cursor: none; */ /* Deshabilitado para mantener cursor visible en TV */
+}
+
+body.tv-mode * {
+    /* cursor: none !important; */ /* Deshabilitado para mantener cursor visible en TV */
+}
+
+body.tv-mode :focus {
+    outline: none;
+}
+
+/* ========== TV RESPONSIVE DESIGN - 1920px+ (Full HD TV) ========== */
+
+@media (min-width: 1920px) {
+    body {
+        font-size: 20px;
+        overflow-x: hidden;
+    }
+    
+    .app-container,
+    .container,
+    .main-container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 40px 60px;
+    }
+    
+    h1 {
+        font-size: 56px;
+        margin-bottom: 30px;
+    }
+    
+    h2 {
+        font-size: 44px;
+        margin-bottom: 25px;
+    }
+    
+    h3 {
+        font-size: 36px;
+        margin-bottom: 20px;
+    }
+    
+    h4 {
+        font-size: 28px;
+        margin-bottom: 18px;
+    }
+    
+    p, span, div {
+        font-size: 22px;
+        line-height: 1.8;
+    }
+    
+    button,
+    .btn,
+    a.button {
+        min-height: 70px;
+        min-width: 200px;
+        padding: 20px 40px;
+        font-size: 24px;
+        border-radius: 20px;
+        cursor: pointer;
+    }
+    
+    input,
+    textarea,
+    select {
+        min-height: 70px;
+        padding: 20px 30px;
+        font-size: 24px;
+        border-radius: 15px;
+    }
+    
+    .app-header,
+    header {
+        padding: 30px 60px;
+        min-height: 100px;
+    }
+    
+    .app-logo,
+    .logo,
+    .logo img {
+        height: 80px;
+        width: auto;
+    }
+    
+    .icon-btn,
+    .nav-btn {
+        width: 70px;
+        height: 70px;
+        font-size: 32px;
+    }
+    
+    .featured-carousel {
+        height: 700px;
+        margin: 40px;
+        border-radius: 30px;
+    }
+    
+    .team-logo {
+        width: 120px;
+        height: 120px;
+        padding: 15px;
+    }
+    
+    .score {
+        font-size: 64px;
+    }
+    
+    .match-title {
+        font-size: 40px;
+    }
+    
+    .tabs-container {
+        padding: 40px 60px 30px;
+    }
+    
+    .tab {
+        padding: 25px 45px;
+        font-size: 24px;
+        border-radius: 20px;
+    }
+    
+    .matches-grid,
+    .news-grid,
+    .channels-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 30px;
+        padding: 30px 0;
+    }
+    
+    .match-card,
+    .news-card,
+    .channel-card {
+        border-radius: 25px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .match-card:hover,
+    .news-card:hover,
+    .channel-card:hover,
+    .tv-focused.match-card,
+    .tv-focused.news-card,
+    .tv-focused.channel-card {
+        transform: scale(1.1);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        z-index: 10;
+    }
+    
+    .match-card-bg {
+        height: 180px;
+    }
+    
+    .match-card-content {
+        padding: 25px;
+    }
+    
+    .team-badge {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .team span {
+        font-size: 18px;
+    }
+    
+    .watch-btn {
+        padding: 20px;
+        font-size: 20px;
+        border-radius: 18px;
+        min-height: 65px;
+    }
+    
+    .league-icon {
+        width: 100px;
+        height: 100px;
+        font-size: 48px;
+    }
+    
+    .league-btn span {
+        font-size: 20px;
+    }
+    
+    .news-card img {
+        height: 250px;
+    }
+    
+    .news-content {
+        padding: 25px;
+    }
+    
+    .news-content h4 {
+        font-size: 24px;
+    }
+    
+    .news-content p {
+        font-size: 18px;
+    }
+    
+    .channel-card-mini {
+        padding: 40px;
+    }
+    
+    .channel-icon-mini {
+        width: 100px;
+        height: 100px;
+        font-size: 48px;
+    }
+    
+    .standings-table {
+        border-radius: 25px;
+        font-size: 22px;
+    }
+    
+    .standings-row {
+        grid-template-columns: 80px 3fr 100px 100px 100px 120px;
+        padding: 25px 40px;
+        font-size: 22px;
+        min-height: 80px;
+    }
+    
+    .standings-team-logo {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .standings-team-name {
+        font-size: 24px;
+    }
+    
+    .bottom-nav {
+        padding: 25px 60px;
+        min-height: 120px;
+    }
+    
+    .nav-btn {
+        font-size: 36px;
+        padding: 20px 35px;
+    }
+    
+    .important-matches-btn {
+        padding: 30px 40px;
+        border-radius: 25px;
+        min-height: 120px;
+    }
+    
+    .btn-icon-wrapper {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .btn-icon-wrapper i {
+        font-size: 36px;
+    }
+    
+    .btn-title {
+        font-size: 26px;
+    }
+    
+    .btn-subtitle {
+        font-size: 20px;
+    }
+    
+    .modal-content {
+        max-width: 1400px;
+        border-radius: 30px;
+        padding: 40px;
+    }
+    
+    .modal-header {
+        padding: 30px;
+        font-size: 32px;
+    }
+    
+    .modal-body {
+        height: 800px;
+        padding: 30px;
+    }
+    
+    .close-modal,
+    .modal-close {
+        width: 70px;
+        height: 70px;
+        font-size: 32px;
+    }
+}
+
+/* ========== 4K TV (3840px+) ========== */
+
+@media (min-width: 3840px) {
+    body {
+        font-size: 28px;
+    }
+    
+    .app-container,
+    .container {
+        max-width: 3200px;
+        padding: 60px 100px;
+    }
+    
+    h1 {
+        font-size: 96px;
+    }
+    
+    h2 {
+        font-size: 72px;
+    }
+    
+    h3 {
+        font-size: 56px;
+    }
+    
+    h4 {
+        font-size: 44px;
+    }
+    
+    button,
+    .btn {
+        min-height: 100px;
+        min-width: 300px;
+        padding: 30px 60px;
+        font-size: 36px;
+    }
+    
+    .featured-carousel {
+        height: 1200px;
+    }
+    
+    .team-logo {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .score {
+        font-size: 120px;
+    }
+    
+    .match-title {
+        font-size: 64px;
+    }
+    
+    .matches-grid,
+    .news-grid,
+    .channels-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 50px;
+    }
+}
+
+/* ========== TV SPECIFIC INTERACTIONS ========== */
+
+@media (hover: none) and (pointer: coarse) {
+    body.tv-mode button:hover,
+    body.tv-mode a:hover,
+    body.tv-mode .btn:hover {
+        background: inherit;
+    }
+    
+    body.tv-mode .tv-focused {
+        transform: scale(1.08);
+    }
+}
+
+/* ========== SMART TV USER AGENT DETECTION ========== */
+
+@supports (-webkit-overflow-scrolling: touch) {
+    body.tv-mode {
+        -webkit-overflow-scrolling: auto;
+    }
+}
+
+/* ========== TV ACCESSIBILITY ========== */
+
+body.tv-mode *:focus {
+    outline: none;
+}
+
+body.tv-mode .tv-focused {
+    animation: tvFocusPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes tvFocusPulse {
+    0%, 100% {
+        transform: scale(1.05);
+    }
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+/* ========== TV SCROLLBAR HIDDEN ========== */
+
+body.tv-mode ::-webkit-scrollbar {
+    display: none;
+}
+
+body.tv-mode {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* ========== TV LOADING STATES ========== */
+
+body.tv-mode .loading {
+    font-size: 32px;
+}
+
+body.tv-mode .spinner {
+    width: 80px;
+    height: 80px;
+    border-width: 8px;
+}

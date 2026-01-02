@@ -1,0 +1,32 @@
+{
+  "name": "UltraGol LIVE - Streaming en Vivo",
+  "short_name": "UltraGol LIVE",
+  "description": "Disfruta de partidos en vivo, repeticiones y los mejores momentos del fútbol. Streaming deportivo profesional.",
+  "start_url": "/ULTRA/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#e94560",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["sports", "entertainment", "video"],
+  "screenshots": [
+    {
+      "src": "app-icon.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ]
+}
