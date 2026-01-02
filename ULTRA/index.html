@@ -123,34 +123,34 @@
             <div class="carousel-indicators" id="carouselIndicators"></div>
         </div>
 
-        <!-- Banner Copa Mundial 2026 -->
-        <div class="world-cup-banner">
-            <div class="banner-overlay"></div>
-            <div class="banner-content">
-                <h2 class="banner-title">COPA MUNDIAL 2026</h2>
-                <p class="banner-subtitle">El evento más esperado del mundo está por comenzar.</p>
-                <div class="countdown-container">
-                    <div class="countdown-item">
-                        <span class="countdown-val" id="days">160</span>
-                        <span class="countdown-label">Días</span>
-                    </div>
-                    <div class="countdown-item">
-                        <span class="countdown-val" id="hours">23</span>
-                        <span class="countdown-label">Horas</span>
-                    </div>
-                    <div class="countdown-item">
-                        <span class="countdown-val" id="mins">08</span>
-                        <span class="countdown-label">Min</span>
-                    </div>
-                    <div class="countdown-item">
-                        <span class="countdown-val" id="secs">48</span>
-                        <span class="countdown-label">Seg</span>
-                    </div>
+    <!-- Banner Copa Mundial 2026 -->
+    <div class="world-cup-banner">
+        <div class="banner-overlay"></div>
+        <div class="banner-content">
+            <h2 class="banner-title">COPA MUNDIAL 2026</h2>
+            <p class="banner-subtitle">El evento más esperado del mundo está por comenzar.</p>
+            <div class="countdown-container">
+                <div class="countdown-item">
+                    <span class="countdown-val" id="days">160</span>
+                    <span class="countdown-label">Días</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-val" id="hours">23</span>
+                    <span class="countdown-label">Horas</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-val" id="mins">08</span>
+                    <span class="countdown-label">Min</span>
+                </div>
+                <div class="countdown-item">
+                    <span class="countdown-val" id="secs">48</span>
+                    <span class="countdown-label">Seg</span>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Botón Partidos Importantes -->
+    <!-- Botón Partidos Importantes -->
         <div class="important-matches-btn-container">
             <button class="important-matches-btn" onclick="openImportantMatchesModal()">
                 <div class="btn-icon-wrapper">
@@ -1014,6 +1014,30 @@
                 }
             }, 5000);
         })();
+    </script>
+    <script>
+        function updateCountdown() {
+            const worldCupDate = new Date('June 11, 2026 00:00:00').getTime();
+            const now = new Date().getTime();
+            const gap = worldCupDate - now;
+
+            const second = 1000;
+            const minute = second * 60;
+            const hour = minute * 60;
+            const day = hour * 24;
+
+            const d = Math.floor(gap / day);
+            const h = Math.floor((gap % day) / hour);
+            const m = Math.floor((gap % hour) / minute);
+            const s = Math.floor((gap % minute) / second);
+
+            document.getElementById('days').innerText = d;
+            document.getElementById('hours').innerText = h < 10 ? '0' + h : h;
+            document.getElementById('mins').innerText = m < 10 ? '0' + m : m;
+            document.getElementById('secs').innerText = s < 10 ? '0' + s : s;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
     </script>
 </body>
 </html>
