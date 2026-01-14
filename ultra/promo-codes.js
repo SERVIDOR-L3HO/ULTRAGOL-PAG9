@@ -124,7 +124,10 @@ function updatePromoUI() {
     const inputWrapper = document.querySelector('.promo-code-input-wrapper');
     const hint = document.querySelector('.promo-code-hint');
     
-    if (!statusDiv) return;
+    if (!statusDiv) {
+        console.warn('⚠️ No se encontró el elemento promoCodeStatus en el DOM');
+        return;
+    }
     
     const status = getPromoStatus();
     
