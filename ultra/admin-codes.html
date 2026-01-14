@@ -789,7 +789,6 @@
                 expiryDate.setHours(23, 59, 59);
                 
                 await setDoc(doc(db, 'promoCodes', code), {
-                    code: code,
                     durationDays,
                     maxUses,
                     currentUses: 0,
