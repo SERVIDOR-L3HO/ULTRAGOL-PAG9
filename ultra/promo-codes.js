@@ -242,7 +242,10 @@ async function redeemPromoCode() {
     const input = document.getElementById('promoCodeInput');
     const btn = document.getElementById('promoCodeBtn');
     
-    if (!input || !btn) return;
+    if (!input || !btn) {
+        console.error('❌ Elementos de canje no encontrados');
+        return;
+    }
     
     const code = input.value.trim().toUpperCase();
     
@@ -260,26 +263,32 @@ async function redeemPromoCode() {
     }
     
     btn.disabled = true;
+    const originalContent = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
     
     try {
+        console.log('🔍 Validando código:', code);
         const codeRef = doc(db, 'promoCodes', code);
         const codeDoc = await getDoc(codeRef);
         
         if (!codeDoc.exists()) {
+            console.warn('❌ Código no encontrado en Firestore:', code);
             showPromoNotification('Código no válido', 'error');
             return;
         }
         
         const codeData = codeDoc.data();
+        console.log('📄 Datos del código:', codeData);
         
-        if (!codeData.isActive) {
+        if (codeData.isActive === false) {
             showPromoNotification('Este código ya no está activo', 'error');
             return;
         }
         
         const now = new Date();
-        if (codeData.expiresAt && codeData.expiresAt.toDate() < now) {
+        const expiresAtDate = codeData.expiresAt?.toDate();
+        
+        if (expiresAtDate && expiresAtDate < now) {
             showPromoNotification('Este código ha expirado', 'error');
             return;
         }
@@ -292,16 +301,13 @@ async function redeemPromoCode() {
         const durationDays = codeData.durationDays || 14;
         const expiresAt = now.getTime() + (durationDays * 24 * 60 * 60 * 1000);
         
+        // Actualizar Firestore
         try {
             await updateDoc(codeRef, {
                 currentUses: increment(1),
                 lastUsedAt: serverTimestamp()
             });
-        } catch (writeError) {
-            console.warn('No se pudo actualizar el contador de usos:', writeError);
-        }
-        
-        try {
+            
             const userRef = doc(db, 'users', currentUser.uid);
             await updateDoc(userRef, {
                 promoExpiresAt: new Date(expiresAt),
@@ -309,23 +315,23 @@ async function redeemPromoCode() {
                 lastPromoCode: code,
                 promoDurationDays: durationDays
             });
-        } catch (userWriteError) {
-            console.warn('No se pudo guardar en perfil de usuario:', userWriteError);
+        } catch (writeError) {
+            console.error('❌ Error al escribir en Firestore:', writeError);
+            throw writeError;
         }
         
         savePromoStatusLocal(code, durationDays, expiresAt);
-        
         updatePromoUI();
         input.value = '';
         
         showPromoNotification(`¡Código activado! Sin anuncios por ${durationDays} días`, 'success');
         
     } catch (error) {
-        console.error('Error redeeming promo code:', error);
+        console.error('❌ Error general al canjear código:', error);
         showPromoNotification('Error al validar el código. Intenta de nuevo.', 'error');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-check"></i>';
+        btn.innerHTML = originalContent;
     }
 }
 
