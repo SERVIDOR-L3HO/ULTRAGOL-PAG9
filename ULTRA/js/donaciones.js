@@ -21,8 +21,8 @@ function initPayPalSettings() {
             return actions.order.create({
                 purchase_units: [{
                     amount: {
-                        currency_code: 'MXN',
-                        value: '5.00' // 5 Pesos Mexicanos
+                        currency_code: 'USD',
+                        value: '3.00' // 3 Dólares
                     },
                     description: 'Donación ULTRAGOL'
                 }]
