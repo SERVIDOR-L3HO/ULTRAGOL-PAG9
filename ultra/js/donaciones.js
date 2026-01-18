@@ -1,3 +1,11 @@
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('CLABE copiada al portapapeles');
+    }).catch(err => {
+        console.error('Error al copiar:', err);
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initPayPalSettings();
 });

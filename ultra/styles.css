@@ -421,11 +421,33 @@ body {
     font-weight: 700;
 }
 
-.donation-hint {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-bottom: 12px;
-    line-height: 1.4;
+.transfer-details {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px dashed rgba(255, 69, 0, 0.4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 10px;
+}
+
+.transfer-details:hover {
+    background: rgba(255, 69, 0, 0.1);
+    border-color: var(--primary);
+}
+
+.clabe-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: #fff;
+}
+
+.transfer-details i {
+    color: var(--primary);
+    font-size: 16px;
 }
 
 #paypal-button-container-settings {
