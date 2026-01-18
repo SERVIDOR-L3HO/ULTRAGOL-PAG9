@@ -81,7 +81,7 @@ app.use('/ULTRACANALES', express.static(path.join(__dirname, '..', 'ULTRACANALES
 // Middleware CSP para app (con Google Ads)
 app.use((req, res, next) => {
     if (req.path === '/' || req.path.startsWith('/ULTRA') || req.path.includes('index.html')) {
-        res.setHeader('Content-Security-Policy', "default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://pagead2.googlesyndication.com https://www.gstatic.com https://www.googletagmanager.com https://tpc.googlesyndication.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https: https://pagead2.googlesyndication.com; connect-src 'self' https: wss: https://pagead2.googlesyndication.com; frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com;");
+        res.setHeader('Content-Security-Policy', "default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://www.gstatic.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https://www.google.com;");
     }
     next();
 });
