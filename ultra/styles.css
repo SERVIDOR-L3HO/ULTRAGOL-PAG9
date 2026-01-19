@@ -452,62 +452,141 @@ body {
     line-height: 1.5;
 }
 
-.transfer-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 14px;
-    padding: 18px;
+/* Tarjeta Bancaria Realista y Creativa */
+.real-credit-card {
+    width: 100%;
+    height: 180px;
+    background: linear-gradient(135deg, #1a1a1a 0%, #333 100%);
+    border-radius: 20px;
+    padding: 25px;
     position: relative;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.transfer-card:hover {
-    background: rgba(255, 69, 0, 0.08);
-    border-color: #ff4500;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+.real-credit-card:hover {
+    transform: rotateY(5deg) rotateX(5deg) scale(1.02);
+    box-shadow: 0 25px 50px rgba(255, 69, 0, 0.2);
+    border-color: rgba(255, 69, 0, 0.5);
 }
 
-.transfer-card:active {
-    transform: scale(0.98);
+.card-glass-effect {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.05) 45%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.05) 55%,
+        transparent 100%
+    );
+    transform: rotate(25deg);
+    pointer-events: none;
+    transition: 0.6s;
 }
 
-.transfer-badge {
+.real-credit-card:hover .card-glass-effect {
+    left: 50%;
+}
+
+.card-chip {
+    width: 45px;
+    height: 35px;
+    background: linear-gradient(135deg, #ffd700 0%, #daa520 100%);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    position: relative;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+}
+
+.card-chip::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 70%;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+}
+
+.card-logo {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    color: #ff4500;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: 1px;
+    font-style: italic;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.card-number {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 20px;
+    color: #fff;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.card-holder {
+    font-size: 12px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+.card-expiry {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    font-size: 10px;
+    color: #888;
+    text-align: right;
+    line-height: 1.2;
+}
+
+.card-tap-hint {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 69, 0, 0.8);
+    color: #fff;
     font-size: 10px;
     font-weight: 700;
-    color: #ff4500;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    letter-spacing: 0.5px;
-}
-
-.transfer-number {
-    font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
-    font-size: 18px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 1px;
-    margin-bottom: 12px;
-}
-
-.transfer-copy {
+    padding: 4px;
+    text-align: center;
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: #888;
-    font-size: 11px;
-    font-weight: 500;
+    justify-content: center;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: all 0.3s ease;
 }
 
-.transfer-copy i {
-    font-size: 14px;
-    color: #ff4500;
+.real-credit-card:hover .card-tap-hint {
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.transfer-card:hover .transfer-copy {
-    color: #fff;
+.card-tap-hint i {
+    font-size: 12px;
 }
 
 #paypal-button-container-settings {
