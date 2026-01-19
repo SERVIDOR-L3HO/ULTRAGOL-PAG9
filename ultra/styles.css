@@ -421,33 +421,93 @@ body {
     font-weight: 700;
 }
 
-.transfer-details {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 12px;
-    border-radius: 10px;
-    border: 1px dashed rgba(255, 69, 0, 0.4);
+/* Estilos de Donación Profesional */
+.donation-section {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 20px !important;
+    background: linear-gradient(145deg, rgba(255, 69, 0, 0.1), rgba(0, 0, 0, 0.4)) !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255, 69, 0, 0.3) !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.donation-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-bottom: 10px;
-}
-
-.transfer-details:hover {
-    background: rgba(255, 69, 0, 0.1);
-    border-color: var(--primary);
-}
-
-.clabe-text {
-    font-family: 'JetBrains Mono', monospace;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: #ff4500;
+    font-weight: 800;
     font-size: 14px;
-    color: #fff;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-.transfer-details i {
-    color: var(--primary);
-    font-size: 16px;
+.donation-hint {
+    font-size: 12px;
+    color: #ccc;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+.transfer-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 18px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+}
+
+.transfer-card:hover {
+    background: rgba(255, 69, 0, 0.08);
+    border-color: #ff4500;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.transfer-card:active {
+    transform: scale(0.98);
+}
+
+.transfer-badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: #ff4500;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+
+.transfer-number {
+    font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.transfer-copy {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #888;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.transfer-copy i {
+    font-size: 14px;
+    color: #ff4500;
+}
+
+.transfer-card:hover .transfer-copy {
+    color: #fff;
 }
 
 #paypal-button-container-settings {
