@@ -335,29 +335,49 @@ function startRealTimeClock() {
     setInterval(updateClock, 1000);
 }
 
-// Función para el contador de usuarios reales usando Firebase (o simulado si no hay sesión activa)
+// Función para el contador de usuarios reales usando Firebase Realtime Database
 function startOnlineCounter() {
     const counterElement = document.getElementById('onlineCountText');
     if (!counterElement) return;
 
-    // Dado que necesitamos una conexión real, usaremos un número base que fluctúa
-    // para que sea "real" en el sentido de que refleja actividad simulada en tiempo real
-    // Si quieres integración TOTAL con Firebase para ver a otros usuarios, necesitaríamos usar 
-    // la base de datos Firestore, pero para efectos inmediatos esto dará la sensación real:
-    
-    let baseCount = 1250; // Empezamos con un número base alto para una app popular
-    
-    function updateCount() {
-        // Fluctúa entre -2 y +3 cada pocos segundos para que parezca actividad real
-        const fluctuation = Math.floor(Math.random() * 6) - 2;
-        baseCount += fluctuation;
-        if (baseCount < 100) baseCount = 100;
-        
-        counterElement.textContent = `${baseCount.toLocaleString()} ONLINE`;
-    }
+    // Importar dinámicamente Firebase Realtime Database para presencia
+    import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js").then((rtdb) => {
+        const { getDatabase, ref, onValue, set, onDisconnect, push } = rtdb;
+        const db = getDatabase();
+        const onlineUsersRef = ref(db, 'online_users');
+        const myStatusRef = push(ref(db, 'status'));
 
-    updateCount();
-    setInterval(updateCount, 3000 + Math.random() * 2000);
+        // Al conectar, añadirme a la lista
+        set(myStatusRef, {
+            id: Date.now(),
+            last_active: new Date().toISOString()
+        });
+
+        // Al desconectar (cerrar pestaña), eliminar mi registro automáticamente
+        onDisconnect(myStatusRef).remove();
+
+        // Escuchar cambios en la lista de usuarios conectados
+        onValue(onlineUsersRef, (snapshot) => {
+            const count = snapshot.val() || 0;
+            counterElement.textContent = `${count.toLocaleString()} ONLINE`;
+        });
+        
+        // Nota: Para una implementación de conteo masivo eficiente en Firebase, 
+        // se suele usar un nodo de agregación o un contador distribuido.
+        // Aquí escuchamos el nodo 'stats/online_count' que debería ser actualizado por una Cloud Function
+        // o un proceso que cuente el nodo 'status'.
+        const globalCountRef = ref(db, 'stats/online_count');
+        onValue(globalCountRef, (snapshot) => {
+            const val = snapshot.val();
+            if (val !== null) {
+                counterElement.textContent = `${val.toLocaleString()} ONLINE`;
+            }
+        });
+    }).catch(err => {
+        console.error("Error cargando Firebase RTDB:", err);
+        // Fallback discreto si falla la carga
+        counterElement.textContent = "CONECTADO";
+    });
 }
 
 // Función principal para cargar marcadores desde la API
