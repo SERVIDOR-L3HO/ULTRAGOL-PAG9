@@ -401,6 +401,105 @@ body {
     font-weight: 600;
 }
 
+/* Contador de Usuarios en Vivo */
+.online-counter {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    padding: 6px 12px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Luckiest Guy', cursive, system-ui;
+    font-size: 14px;
+    color: #4ade80;
+    text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+    cursor: default;
+    user-select: none;
+    transition: all 0.3s ease;
+}
+
+.online-dot-mini {
+    width: 6px;
+    height: 6px;
+    background: #4ade80;
+    border-radius: 50%;
+    animation: pulseOnline 2s infinite;
+    box-shadow: 0 0 8px #4ade80;
+}
+
+@keyframes pulseOnline {
+    0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7); }
+    70% { transform: scale(1.1); opacity: 0.8; box-shadow: 0 0 0 6px rgba(74, 222, 128, 0); }
+    100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
+/* Reloj Tipo Caricatura */
+.cartoon-clock {
+    font-family: 'Luckiest Guy', cursive, system-ui;
+    font-size: 18px;
+    color: #ffffff;
+    text-shadow: 
+        2px 2px 0px #FF4500,
+        -1px -1px 0px #000,  
+         1px -1px 0px #000,
+        -1px  1px 0px #000,
+         1px  1px 0px #000;
+    padding: 2px 8px;
+    display: inline-block;
+    letter-spacing: 1px;
+    transform: rotate(-2deg);
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    animation: clockWobble 3s ease-in-out infinite;
+    user-select: none;
+    background: transparent;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Ajuste para que el logo no empuje los botones */
+.app-logo {
+    height: 40px;
+    width: auto;
+    max-width: 100px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(255, 69, 0, 0.3));
+}
+
+/* Header más flexible */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: rgba(13, 13, 13, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    gap: 5px;
+}
+
+.header-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+}
+
+.header-left, .header-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+@keyframes clockWobble {
+    0%, 100% { transform: rotate(-2deg) scale(1); }
+    50% { transform: rotate(2deg) scale(1.05); }
+}
+
 /* Estilos de Donación Profesional */
 .donation-section {
     flex-direction: column !important;
