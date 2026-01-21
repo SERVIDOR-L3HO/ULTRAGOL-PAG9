@@ -289,6 +289,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('📱 ULTRAGOL iniciando... URL:', window.location.href);
     console.log('🔗 Query params:', window.location.search);
     
+    // Iniciar reloj en tiempo real
+    startRealTimeClock();
+    
     // Verificar inmediatamente si hay link compartido
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('ch')) {
@@ -309,6 +312,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         checkSharedStream();
     }
 });
+
+// Función para el reloj en tiempo real que se adapta al país del usuario
+function startRealTimeClock() {
+    const clockElement = document.getElementById('realTimeClock');
+    if (!clockElement) return;
+
+    function updateClock() {
+        const now = new Date();
+        const options = {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        };
+        clockElement.textContent = now.toLocaleTimeString(undefined, options);
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+}
 
 // Función principal para cargar marcadores desde la API
 async function loadMarcadores() {
