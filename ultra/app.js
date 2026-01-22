@@ -358,16 +358,19 @@ function startOnlineCounter() {
         onDisconnect(myStatusRef).remove();
 
         // Escuchar el nodo global de conteo
-        // Nota: Para que este número cambie, necesitas una Cloud Function que cuente los hijos de 'status'
-        // o actualizar 'stats/online_count' manualmente/via admin.
         const globalCountRef = ref(db, 'stats/online_count');
         onValue(globalCountRef, (snapshot) => {
             const val = snapshot.val();
             if (val !== null) {
                 counterElement.textContent = `${val.toLocaleString()} ONLINE`;
             } else {
-                // Si no hay conteo global, mostramos 1 como mínimo (el usuario actual)
-                counterElement.textContent = "1 ONLINE";
+                // Si no hay conteo global, mostramos un número real basado en la cantidad de conexiones
+                const statusRef = ref(db, 'status');
+                onValue(statusRef, (statusSnapshot) => {
+                    const connections = statusSnapshot.val();
+                    const count = connections ? Object.keys(connections).length : 1;
+                    counterElement.textContent = `${count.toLocaleString()} ONLINE`;
+                });
             }
         });
     }).catch(err => {

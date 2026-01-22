@@ -362,7 +362,13 @@ function startOnlineCounter() {
             if (val !== null) {
                 counterElement.textContent = `${val.toLocaleString()} ONLINE`;
             } else {
-                counterElement.textContent = "1 ONLINE";
+                // Si no hay conteo global, contamos las conexiones reales en vivo
+                const statusRef = ref(db, 'status');
+                onValue(statusRef, (statusSnapshot) => {
+                    const connections = statusSnapshot.val();
+                    const count = connections ? Object.keys(connections).length : 1;
+                    counterElement.textContent = `${count.toLocaleString()} ONLINE`;
+                });
             }
         });
     }).catch(err => {
