@@ -341,41 +341,37 @@ function startOnlineCounter() {
     if (!counterElement) return;
 
     // Importar dinámicamente Firebase Realtime Database para presencia
-    import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js").then((rtdb) => {
-        const { getDatabase, ref, onValue, set, onDisconnect, push } = rtdb;
+    import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js").then((rtdbModule) => {
+        const { getDatabase, ref, onValue, set, onDisconnect, push, serverTimestamp } = rtdbModule;
         const db = getDatabase();
-        const onlineUsersRef = ref(db, 'online_users');
+        
+        // Usar un ID único para esta sesión
         const myStatusRef = push(ref(db, 'status'));
 
         // Al conectar, añadirme a la lista
         set(myStatusRef, {
             id: Date.now(),
-            last_active: new Date().toISOString()
+            last_active: serverTimestamp()
         });
 
         // Al desconectar (cerrar pestaña), eliminar mi registro automáticamente
         onDisconnect(myStatusRef).remove();
 
-        // Escuchar cambios en la lista de usuarios conectados
-        onValue(onlineUsersRef, (snapshot) => {
-            const count = snapshot.val() || 0;
-            counterElement.textContent = `${count.toLocaleString()} ONLINE`;
-        });
-        
-        // Nota: Para una implementación de conteo masivo eficiente en Firebase, 
-        // se suele usar un nodo de agregación o un contador distribuido.
-        // Aquí escuchamos el nodo 'stats/online_count' que debería ser actualizado por una Cloud Function
-        // o un proceso que cuente el nodo 'status'.
+        // Escuchar el nodo global de conteo
+        // Nota: Para que este número cambie, necesitas una Cloud Function que cuente los hijos de 'status'
+        // o actualizar 'stats/online_count' manualmente/via admin.
         const globalCountRef = ref(db, 'stats/online_count');
         onValue(globalCountRef, (snapshot) => {
             const val = snapshot.val();
             if (val !== null) {
                 counterElement.textContent = `${val.toLocaleString()} ONLINE`;
+            } else {
+                // Si no hay conteo global, mostramos 1 como mínimo (el usuario actual)
+                counterElement.textContent = "1 ONLINE";
             }
         });
     }).catch(err => {
         console.error("Error cargando Firebase RTDB:", err);
-        // Fallback discreto si falla la carga
         counterElement.textContent = "CONECTADO";
     });
 }

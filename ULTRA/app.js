@@ -341,15 +341,15 @@ function startOnlineCounter() {
     if (!counterElement) return;
 
     // Importar dinámicamente Firebase Realtime Database para presencia
-    import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js").then((rtdb) => {
-        const { getDatabase, ref, onValue, set, onDisconnect, push } = rtdb;
+    import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js").then((rtdbModule) => {
+        const { getDatabase, ref, onValue, set, onDisconnect, push, serverTimestamp } = rtdbModule;
         const db = getDatabase();
         const myStatusRef = push(ref(db, 'status'));
 
         // Al conectar, añadirme a la lista
         set(myStatusRef, {
             id: Date.now(),
-            last_active: new Date().toISOString()
+            last_active: serverTimestamp()
         });
 
         // Al desconectar (cerrar pestaña), eliminar mi registro automáticamente
