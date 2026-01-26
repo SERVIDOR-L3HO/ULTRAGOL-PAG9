@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ULTRAGOL - Ahorro de Datos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .data-saver-mode {
+            --dark: #050505;
+            --card-bg: #111;
+        }
+        .data-saver-mode img {
+            display: none !important;
+        }
+        .data-saver-mode .featured-match-container,
+        .data-saver-mode .world-cup-banner {
+            display: none !important;
+        }
+        .data-saver-banner {
+            background: #ff4500;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .match-card-bg { display: none !important; }
+        .match-card { background: #1a1a1a !important; border: 1px solid #333 !important; }
+    </style>
+</head>
+<body class="data-saver-mode">
+    <div class="data-saver-banner">MODO AHORRO DE DATOS ACTIVO</div>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <button class="icon-btn back-btn" onclick="window.location.href='index.html'">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="cartoon-clock" id="realTimeClock">--:--</div>
+            </div>
+            <div class="header-right">
+                <div class="online-counter" id="userCount">
+                    <span class="online-dot-mini"></span>
+                    <span id="onlineCountText">...</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('live', this)">EN VIVO</button>
+                <button class="tab" onclick="switchTab('upcoming', this)">PROXIMOS</button>
+            </div>
+        </div>
+
+        <div class="content-container">
+            <div id="liveContent" class="tab-content active">
+                <div class="matches-grid" id="liveMatches">
+                    <!-- Contenido dinámico -->
+                </div>
+            </div>
+        </div>
+
+        <nav class="bottom-nav">
+            <button class="nav-btn active" onclick="window.location.href='index.html'">
+                <i class="fas fa-home"></i>
+                <span class="nav-label">Normal</span>
+            </button>
+        </nav>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
