@@ -358,11 +358,13 @@ function startOnlineCounter() {
         onDisconnect(myStatusRef).remove();
 
         // Escuchar el nodo global de conteo
-        const globalCountRef = ref(db, 'stats/online_count');
+        const globalCountRef = ref(db, 'stats/online_users');
         onValue(globalCountRef, (snapshot) => {
             const val = snapshot.val();
             if (val !== null) {
-                counterElement.textContent = `${val.toLocaleString()} ONLINE`;
+                // val podría ser el número directo o un objeto con un campo 'count'
+                const count = (typeof val === 'object') ? (val.count || 0) : val;
+                counterElement.textContent = `${count.toLocaleString()} ONLINE`;
             } else {
                 // Si no hay conteo global, mostramos un número real basado en la cantidad de conexiones
                 const statusRef = ref(db, 'status');
