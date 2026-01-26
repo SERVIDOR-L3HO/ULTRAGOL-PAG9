@@ -345,7 +345,7 @@ function startOnlineCounter() {
         const { getDatabase, ref, onValue, set, onDisconnect, push, serverTimestamp } = rtdbModule;
         const db = getDatabase();
         
-        // Usar un ID único para esta sesión
+        // Usar un ID único para esta sesión (esto funciona incluso sin login)
         const myStatusRef = push(ref(db, 'status'));
 
         // Al conectar, añadirme a la lista
@@ -366,7 +366,8 @@ function startOnlineCounter() {
                 const count = (typeof val === 'object') ? (val.count || 0) : val;
                 counterElement.textContent = `${count.toLocaleString()} ONLINE`;
             } else {
-                // Si no hay conteo global, mostramos un número real basado en la cantidad de conexiones
+                // Si no hay conteo global, mostramos un número basado en la cantidad de conexiones en 'status'
+                // Esto funciona para todos los visitantes (con o sin login)
                 const statusRef = ref(db, 'status');
                 onValue(statusRef, (statusSnapshot) => {
                     const connections = statusSnapshot.val();
