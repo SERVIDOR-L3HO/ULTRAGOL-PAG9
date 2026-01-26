@@ -361,20 +361,9 @@ function startOnlineCounter() {
         const globalCountRef = ref(db, 'stats/online_users');
         onValue(globalCountRef, (snapshot) => {
             const val = snapshot.val();
-            if (val !== null) {
-                // val podría ser el número directo o un objeto con un campo 'count'
-                const count = (typeof val === 'object') ? (val.count || 0) : val;
-                counterElement.textContent = `${count.toLocaleString()} ONLINE`;
-            } else {
-                // Si no hay conteo global, mostramos un número basado en la cantidad de conexiones en 'status'
-                // Esto funciona para todos los visitantes (con o sin login)
-                const statusRef = ref(db, 'status');
-                onValue(statusRef, (statusSnapshot) => {
-                    const connections = statusSnapshot.val();
-                    const count = connections ? Object.keys(connections).length : 1;
-                    counterElement.textContent = `${count.toLocaleString()} ONLINE`;
-                });
-            }
+            // Mostrar exactamente lo que diga Firebase, sin respaldos ni números generados
+            const count = (val !== null) ? ((typeof val === 'object') ? (val.count || 0) : val) : 0;
+            counterElement.textContent = `${count.toLocaleString()} ONLINE`;
         });
     }).catch(err => {
         console.error("Error cargando Firebase RTDB:", err);
