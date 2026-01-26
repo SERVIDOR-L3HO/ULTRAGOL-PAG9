@@ -376,8 +376,11 @@ function startOnlineCounter() {
                     // Mostrar exactamente lo que diga Firebase, sin respaldos ni números generados
                     const count = (val !== null) ? ((typeof val === 'object') ? (val.count || 0) : val) : 0;
                     counterElement.textContent = `${count.toLocaleString()} ONLINE`;
+                    console.log('📊 Contador actualizado (Firebase):', count);
                 }, (error) => {
                     console.error("Error leyendo online_users:", error);
+                    // Si hay error de permiso o no existe, mostramos 0
+                    counterElement.textContent = "0 ONLINE";
                 });
             }).catch(err => {
                 console.error("Error cargando Firebase RTDB module:", err);
