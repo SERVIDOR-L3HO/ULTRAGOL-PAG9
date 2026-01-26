@@ -702,25 +702,195 @@
             'servidorl3ho@gmail.com'
         ];
 
-        async function checkAdminRole(user) {
+        async function loadCodes() {
+            const codesList = document.getElementById('codesList');
+            codesList.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i></div>';
+            
             try {
-                // Verificar si el email está en la lista de admins
-                if (ADMIN_EMAILS.includes(user.email.toLowerCase())) {
-                    console.log('✅ Admin verificado por email:', user.email);
-                    return true;
+                console.log('🔄 Cargando códigos desde Firestore...');
+                const q = query(collection(db, 'promoCodes'), orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    codesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-ticket-alt"></i>
+                            <p>No hay códigos generados todavía</p>
+                        </div>
+                    `;
+                    return;
                 }
                 
-                // Fallback: buscar en Firestore por UID
-                const userDocByUid = await getDoc(doc(db, 'users', user.uid));
-                if (userDocByUid.exists()) {
-                    const userData = userDocByUid.data();
-                    if (userData.role === 'admin') return true;
-                }
+                codesList.innerHTML = '';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const codeItem = document.createElement('div');
+                    codeItem.className = 'code-item';
+                    
+                    const expiresAt = data.expiresAt ? data.expiresAt.toDate() : null;
+                    const isExpired = expiresAt && expiresAt < new Date();
+                    const isMaxed = data.maxUses > 0 && data.currentUses >= data.maxUses;
+                    
+                    let statusClass = 'active';
+                    let statusText = 'Activo';
+                    
+                    if (!data.isActive) {
+                        statusClass = 'expired';
+                        statusText = 'Desactivado';
+                    } else if (isExpired) {
+                        statusClass = 'expired';
+                        statusText = 'Expirado';
+                    } else if (isMaxed) {
+                        statusClass = 'maxed';
+                        statusText = 'Agotado';
+                    }
+
+                    codeItem.innerHTML = `
+                        <div class="code-info">
+                            <div class="code-name">${doc.id}</div>
+                            <div class="code-meta">
+                                ${data.durationDays} días • ${data.currentUses}/${data.maxUses === 0 ? '∞' : data.maxUses} usos
+                                <br>
+                                Vence: ${expiresAt ? expiresAt.toLocaleDateString() : 'Nunca'}
+                            </div>
+                        </div>
+                        <div class="code-status ${statusClass}">${statusText}</div>
+                        <div class="code-actions">
+                            <button class="code-action-btn" onclick="toggleCodeStatus('${doc.id}', ${data.isActive})" title="${data.isActive ? 'Desactivar' : 'Activar'}">
+                                <i class="fas fa-${data.isActive ? 'eye-slash' : 'eye'}"></i>
+                            </button>
+                            <button class="code-action-btn delete" onclick="deleteCode('${doc.id}')" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `;
+                    codesList.appendChild(codeItem);
+                });
+            } catch (error) {
+                console.error('Error loading codes:', error);
+                codesList.innerHTML = '<div class="empty-state"><p>Error al cargar los códigos</p></div>';
+            }
+        }
+
+        window.generateCode = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('generateBtn');
+            const customCode = document.getElementById('customCode').value.trim().toUpperCase();
+            const durationDays = parseInt(document.getElementById('durationDays').value);
+            const maxUses = parseInt(document.getElementById('maxUses').value);
+            const expiresAt = document.getElementById('expiresAt').value;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando...';
+            
+            try {
+                const code = customCode || 'ULTRA' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                const expiryDate = new Date(expiresAt);
+                expiryDate.setHours(23, 59, 59);
                 
-                // Fallback: buscar por email en todos los documentos
-                const usersSnapshot = await getDocs(collection(db, 'users'));
-                for (const userDoc of usersSnapshot.docs) {
-                    const userData = userDoc.data();
+                await setDoc(doc(db, 'promoCodes', code), {
+                    durationDays,
+                    maxUses,
+                    currentUses: 0,
+                    expiresAt: Timestamp.fromDate(expiryDate),
+                    isActive: true,
+                    createdAt: serverTimestamp(),
+                    createdBy: currentUser.uid
+                });
+                
+                document.getElementById('newCodeValue').textContent = code;
+                document.getElementById('generatedCode').classList.add('show');
+                document.getElementById('generateForm').reset();
+                setDefaultExpiry();
+                
+                showNotification('¡Código generado con éxito!', 'success');
+                loadCodes();
+            } catch (error) {
+                console.error('Error generating code:', error);
+                showNotification('Error al generar el código', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-magic"></i> Generar Código';
+            }
+        }
+
+        window.deleteCode = async function(codeId) {
+            if (!confirm(`¿Estás seguro de eliminar el código ${codeId}?`)) return;
+            
+            try {
+                await deleteDoc(doc(db, 'promoCodes', codeId));
+                showNotification('Código eliminado', 'success');
+                loadCodes();
+            } catch (error) {
+                console.error('Error deleting code:', error);
+                showNotification('Error al eliminar', 'error');
+            }
+        }
+
+        window.toggleCodeStatus = async function(codeId, currentStatus) {
+            try {
+                await updateDoc(doc(db, 'promoCodes', codeId), {
+                    isActive: !currentStatus
+                });
+                showNotification(currentStatus ? 'Código desactivado' : 'Código activado', 'success');
+                loadCodes();
+            } catch (error) {
+                console.error('Error toggling status:', error);
+                showNotification('Error al actualizar estado', 'error');
+            }
+        }
+
+        window.copyCode = function() {
+            const code = document.getElementById('newCodeValue').textContent;
+            navigator.clipboard.writeText(code);
+            showNotification('Código copiado al portapapeles', 'success');
+        }
+
+        function showNotification(message, type) {
+            const nav = document.createElement('div');
+            nav.className = `notification ${type} show`;
+            nav.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(nav);
+            setTimeout(() => {
+                nav.classList.remove('show');
+                setTimeout(() => nav.remove(), 300);
+            }, 3000);
+        }
+
+        window.signInWithGoogle = async function() {
+            try {
+                await signInWithPopup(auth, googleProvider);
+            } catch (error) {
+                console.error('Error signing in:', error);
+                showNotification('Error al iniciar sesión', 'error');
+            }
+        }
+
+        window.signOutUser = async function() {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error('Error signing out:', error);
+            }
+        }
+
+        function showSection(section) {
+            authSection.style.display = 'none';
+            loadingSection.style.display = 'none';
+            accessDenied.classList.remove('active');
+            adminPanel.classList.remove('active');
+            
+            if (section === 'auth') authSection.style.display = 'block';
+            if (section === 'loading') loadingSection.style.display = 'block';
+            if (section === 'denied') accessDenied.classList.add('active');
+            if (section === 'admin') adminPanel.classList.add('active');
+        }
+    </script>
+</body>
+</html>
                     if (userData.email === user.email && userData.role === 'admin') {
                         return true;
                     }

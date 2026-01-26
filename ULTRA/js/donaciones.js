@@ -35,7 +35,3 @@ function initPayPalSettings() {
     // PayPal deshabilitado por el usuario
     return;
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    // initPayPalSettings() ya no es necesario llamar si está deshabilitado
-});
