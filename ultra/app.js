@@ -340,35 +340,60 @@ function startOnlineCounter() {
     const counterElement = document.getElementById('onlineCountText');
     if (!counterElement) return;
 
-    // Importar dinámicamente Firebase Realtime Database para presencia
-    import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js").then((rtdbModule) => {
-        const { getDatabase, ref, onValue, set, onDisconnect, push, serverTimestamp } = rtdbModule;
-        const db = getDatabase();
-        
-        // Usar un ID único para esta sesión (esto funciona incluso sin login)
-        const myStatusRef = push(ref(db, 'status'));
+    // Firebase ya está disponible globalmente en window.rtdb desde firebase-config.js
+    // Pero como app.js se carga antes o de forma independiente, aseguramos acceso
+    
+    function initFirebaseCounter() {
+        try {
+            // Importar dinámicamente si no está disponible, o usar el global si existe
+            import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js").then((rtdbModule) => {
+                const { getDatabase, ref, onValue, set, onDisconnect, push, serverTimestamp } = rtdbModule;
+                
+                // Configuración de Firebase (debe coincidir con la de firebase-config.js)
+                const firebaseConfig = {
+                    databaseURL: "https://ligamx-daf3d-default-rtdb.firebaseio.com/"
+                };
+                
+                // Inicializar específicamente para el contador
+                const db = getDatabase();
+                
+                // Usar un ID único para esta sesión (esto funciona incluso sin login)
+                const myStatusRef = push(ref(db, 'status'));
 
-        // Al conectar, añadirme a la lista
-        set(myStatusRef, {
-            id: Date.now(),
-            last_active: serverTimestamp()
-        });
+                // Al conectar, añadirme a la lista
+                set(myStatusRef, {
+                    id: Date.now(),
+                    last_active: serverTimestamp()
+                });
 
-        // Al desconectar (cerrar pestaña), eliminar mi registro automáticamente
-        onDisconnect(myStatusRef).remove();
+                // Al desconectar (cerrar pestaña), eliminar mi registro automáticamente
+                onDisconnect(myStatusRef).remove();
 
-        // Escuchar el nodo global de conteo
-        const globalCountRef = ref(db, 'stats/online_users');
-        onValue(globalCountRef, (snapshot) => {
-            const val = snapshot.val();
-            // Mostrar exactamente lo que diga Firebase, sin respaldos ni números generados
-            const count = (val !== null) ? ((typeof val === 'object') ? (val.count || 0) : val) : 0;
-            counterElement.textContent = `${count.toLocaleString()} ONLINE`;
-        });
-    }).catch(err => {
-        console.error("Error cargando Firebase RTDB:", err);
-        counterElement.textContent = "CONECTADO";
-    });
+                // Escuchar el nodo global de conteo
+                const globalCountRef = ref(db, 'stats/online_users');
+                onValue(globalCountRef, (snapshot) => {
+                    const val = snapshot.val();
+                    // Mostrar exactamente lo que diga Firebase, sin respaldos ni números generados
+                    const count = (val !== null) ? ((typeof val === 'object') ? (val.count || 0) : val) : 0;
+                    counterElement.textContent = `${count.toLocaleString()} ONLINE`;
+                }, (error) => {
+                    console.error("Error leyendo online_users:", error);
+                });
+            }).catch(err => {
+                console.error("Error cargando Firebase RTDB module:", err);
+                counterElement.textContent = "CONECTADO";
+            });
+        } catch (e) {
+            console.error("Error general en contador:", e);
+        }
+    }
+
+    // Esperar un poco a que el DOM y otros scripts estén listos
+    if (document.readyState === 'complete') {
+        initFirebaseCounter();
+    } else {
+        window.addEventListener('load', initFirebaseCounter);
+    }
 }
 
 // Función principal para cargar marcadores desde la API
