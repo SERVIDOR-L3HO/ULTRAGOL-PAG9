@@ -4174,6 +4174,88 @@ function closeNewsModal() {
     modal.classList.remove('active');
 }
 
+function switchStandingsTab(tab, element) {
+    const tabs = document.querySelectorAll('.standings-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    element.classList.add('active');
+
+    const table = document.getElementById('standingsTable');
+    const results = document.getElementById('resultsContainer');
+
+    if (tab === 'table') {
+        table.style.display = 'block';
+        results.style.display = 'none';
+        loadStandings();
+    } else {
+        table.style.display = 'none';
+        results.style.display = 'block';
+        loadResults();
+    }
+}
+
+async function loadResults() {
+    const container = document.getElementById('resultsContainer');
+    container.innerHTML = '<div class="standings-loading">Cargando últimos resultados...</div>';
+
+    try {
+        const leagueConfig = leaguesConfig[currentLeague];
+        const endpoint = leagueConfig ? leagueConfig.marcadores : '/marcadores';
+        const response = await fetch(`${API_BASE}${endpoint}`);
+        const data = await response.json();
+
+        if (!data || !data.matches || data.matches.length === 0) {
+            container.innerHTML = '<div class="no-results">No hay resultados recientes.</div>';
+            return;
+        }
+
+        // Filtrar partidos finalizados o con marcador
+        const results = data.matches.filter(m => m.time === 'FT' || m.status === 'Finalizado' || (m.home_score !== undefined && m.away_score !== undefined));
+        
+        if (results.length === 0) {
+            displayResults(data.matches.slice(0, 8));
+        } else {
+            displayResults(results);
+        }
+    } catch (error) {
+        console.error('Error cargando resultados:', error);
+        container.innerHTML = '<div class="error-message">Error al cargar resultados.</div>';
+    }
+}
+
+function displayResults(results) {
+    const container = document.getElementById('resultsContainer');
+    container.innerHTML = '';
+
+    results.forEach(match => {
+        const card = document.createElement('div');
+        card.className = 'result-card';
+        
+        const homeLogo = match.home_logo || 'https://via.placeholder.com/35';
+        const awayLogo = match.away_logo || 'https://via.placeholder.com/35';
+        
+        card.innerHTML = `
+            <div class="result-header">
+                <span>${match.league || currentLeague}</span>
+                <span>${match.time || 'FINAL'}</span>
+            </div>
+            <div class="result-teams">
+                <div class="result-team">
+                    <img src="${homeLogo}" alt="${match.home_name}">
+                    <span>${match.home_name}</span>
+                </div>
+                <div class="result-score">
+                    ${match.home_score} - ${match.away_score}
+                </div>
+                <div class="result-team">
+                    <img src="${awayLogo}" alt="${match.away_name}">
+                    <span>${match.away_name}</span>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
 function selectLeague(leagueName, element) {
     document.querySelectorAll('.league-btn').forEach(btn => btn.classList.remove('active'));
     
@@ -4194,6 +4276,15 @@ function selectLeague(leagueName, element) {
     const standingsTitle = document.getElementById('standingsLeagueName');
     if (standingsTitle) {
         standingsTitle.textContent = `TABLA DE POSICIONES - ${leagueName}`;
+    }
+
+    // Reset tabs when switching leagues
+    const tabs = document.querySelectorAll('.standings-tab');
+    if (tabs.length > 0) {
+        tabs.forEach(t => t.classList.remove('active'));
+        tabs[0].classList.add('active');
+        document.getElementById('standingsTable').style.display = 'block';
+        document.getElementById('resultsContainer').style.display = 'none';
     }
     
     loadStandings();
