@@ -4206,14 +4206,16 @@ async function loadResults() {
             return;
         }
 
-        displayCategorizedResults(data.resultados);
+        // Si la liga actual es "Liga MX", "Premier League", etc., filtramos solo para esa liga.
+        // Si no hay filtro (Todas las Ligas), mostramos todo.
+        displayCategorizedResults(data.resultados, currentLeague);
     } catch (error) {
         console.error('Error cargando resultados:', error);
         container.innerHTML = '<div class="error-message">Error al cargar resultados globales.</div>';
     }
 }
 
-function displayCategorizedResults(resultadosPorFecha) {
+function displayCategorizedResults(resultadosPorFecha, leagueFilter) {
     const container = document.getElementById('resultsContainer');
     container.innerHTML = '';
 
@@ -4226,7 +4228,15 @@ function displayCategorizedResults(resultadosPorFecha) {
     dateHeader.innerHTML = `<span>Resultados del ${formatDateString(diaMasReciente.fecha)}</span>`;
     container.appendChild(dateHeader);
 
+    let hasData = false;
+
     diaMasReciente.ligas.forEach(ligaData => {
+        // Si hay un filtro de liga y no coincide, saltamos esta liga
+        // Excepto si el filtro es "Todas las Ligas" o similar
+        if (leagueFilter && leagueFilter !== 'Todas las Ligas' && ligaData.liga !== leagueFilter) {
+            return;
+        }
+
         // Combinar finalizados, en vivo y programados
         const allMatches = [
             ...(ligaData.en_vivo || []).map(m => ({ ...m, statusType: 'LIVE' })),
@@ -4235,10 +4245,15 @@ function displayCategorizedResults(resultadosPorFecha) {
         ];
 
         if (allMatches.length === 0) return;
+        hasData = true;
 
         const leagueSection = document.createElement('div');
         leagueSection.className = 'league-results-section';
-        leagueSection.innerHTML = `<h4 class="league-results-title">${ligaData.liga}</h4>`;
+        
+        // Solo mostrar el título de la liga si estamos viendo "Todas las Ligas"
+        if (!leagueFilter || leagueFilter === 'Todas las Ligas') {
+            leagueSection.innerHTML = `<h4 class="league-results-title">${ligaData.liga}</h4>`;
+        }
 
         allMatches.forEach(match => {
             const card = document.createElement('div');
@@ -4275,6 +4290,10 @@ function displayCategorizedResults(resultadosPorFecha) {
         });
         container.appendChild(leagueSection);
     });
+
+    if (!hasData) {
+        container.innerHTML += `<div class="no-results">No hay resultados disponibles para ${leagueFilter} en esta fecha.</div>`;
+    }
 }
 
 function formatDateString(dateStr) {
