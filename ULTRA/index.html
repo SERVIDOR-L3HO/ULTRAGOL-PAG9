@@ -285,8 +285,23 @@
             <div class="section-header">
                 <h3 id="standingsLeagueName">TABLA DE POSICIONES</h3>
             </div>
-            <div class="standings-table" id="standingsTable">
-                <div class="standings-loading">Cargando tabla...</div>
+            
+            <div class="standings-tabs">
+                <button class="standings-tab active" onclick="switchStandingsTab('table', this)">
+                    <i class="fas fa-list-ol"></i> Tabla
+                </button>
+                <button class="standings-tab" onclick="switchStandingsTab('results', this)">
+                    <i class="fas fa-history"></i> Resultados
+                </button>
+            </div>
+
+            <div class="standings-container">
+                <div class="standings-table" id="standingsTable">
+                    <div class="standings-loading">Cargando tabla...</div>
+                </div>
+                <div class="results-container" id="resultsContainer" style="display: none;">
+                    <div class="standings-loading">Cargando resultados...</div>
+                </div>
             </div>
         </section>
 

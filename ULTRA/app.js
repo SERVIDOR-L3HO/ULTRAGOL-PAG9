@@ -4174,6 +4174,141 @@ function closeNewsModal() {
     modal.classList.remove('active');
 }
 
+function switchStandingsTab(tab, element) {
+    const tabs = document.querySelectorAll('.standings-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    element.classList.add('active');
+
+    const table = document.getElementById('standingsTable');
+    const results = document.getElementById('resultsContainer');
+
+    if (tab === 'table') {
+        table.style.display = 'block';
+        results.style.display = 'none';
+        loadStandings();
+    } else {
+        table.style.display = 'none';
+        results.style.display = 'block';
+        loadResults();
+    }
+}
+
+async function loadResults() {
+    const container = document.getElementById('resultsContainer');
+    container.innerHTML = '<div class="standings-loading">Cargando últimos resultados...</div>';
+
+    try {
+        const response = await fetch(`${API_BASE}/resultados/todas-las-ligas`);
+        const data = await response.json();
+
+        if (!data || !data.success || !data.resultados || data.resultados.length === 0) {
+            container.innerHTML = '<div class="no-results">No hay resultados recientes.</div>';
+            return;
+        }
+
+        // Si la liga actual es "Liga MX", "Premier League", etc., filtramos solo para esa liga.
+        // Si no hay filtro (Todas las Ligas), mostramos todo.
+        displayCategorizedResults(data.resultados, currentLeague);
+    } catch (error) {
+        console.error('Error cargando resultados:', error);
+        container.innerHTML = '<div class="error-message">Error al cargar resultados globales.</div>';
+    }
+}
+
+function displayCategorizedResults(resultadosPorFecha, leagueFilter) {
+    const container = document.getElementById('resultsContainer');
+    container.innerHTML = '';
+
+    let totalMatchesFound = 0;
+
+    // Recorremos todas las fechas disponibles en la API
+    resultadosPorFecha.forEach((dia, index) => {
+        let hasMatchesThisDay = false;
+        const dateSection = document.createElement('div');
+        dateSection.className = 'results-date-group';
+        
+        const dateHeader = document.createElement('div');
+        dateHeader.className = 'results-date-header';
+        dateHeader.innerHTML = `<span>Resultados del ${formatDateString(dia.fecha)}</span>`;
+        dateSection.appendChild(dateHeader);
+
+        dia.ligas.forEach(ligaData => {
+            if (leagueFilter && leagueFilter !== 'Todas las Ligas' && ligaData.liga !== leagueFilter) {
+                return;
+            }
+
+            const allMatches = [
+                ...(ligaData.en_vivo || []).map(m => ({ ...m, statusType: 'LIVE' })),
+                ...(ligaData.finalizados || []).map(m => ({ ...m, statusType: 'FT' })),
+                ...(ligaData.programados || []).map(m => ({ ...m, statusType: 'SCHEDULED' }))
+            ];
+
+            if (allMatches.length === 0) return;
+            hasMatchesThisDay = true;
+            totalMatchesFound += allMatches.length;
+
+            const leagueSection = document.createElement('div');
+            leagueSection.className = 'league-results-section';
+            
+            if (!leagueFilter || leagueFilter === 'Todas las Ligas') {
+                leagueSection.innerHTML = `<h4 class="league-results-title">${ligaData.liga}</h4>`;
+            }
+
+            allMatches.forEach(match => {
+                const card = document.createElement('div');
+                card.className = `result-card ${match.statusType.toLowerCase()}`;
+                
+                const homeLogo = match.local.logo || 'https://via.placeholder.com/35';
+                const awayLogo = match.visitante.logo || 'https://via.placeholder.com/35';
+                
+                let statusBadge = match.reloj || match.estado.descripcion;
+                if (match.statusType === 'LIVE') {
+                    statusBadge = `<span class="live-dot"></span> ${match.reloj}`;
+                }
+
+                card.innerHTML = `
+                    <div class="result-header">
+                        <span>${match.detalles.estadio || ligaData.liga}</span>
+                        <span class="status-badge">${statusBadge}</span>
+                    </div>
+                    <div class="result-teams">
+                        <div class="result-team">
+                            <img src="${homeLogo}" alt="${match.local.nombre}">
+                            <span>${match.local.nombre}</span>
+                        </div>
+                        <div class="result-score">
+                            ${match.local.marcador} - ${match.visitante.marcador}
+                        </div>
+                        <div class="result-team">
+                            <img src="${awayLogo}" alt="${match.visitante.nombre}">
+                            <span>${match.visitante.nombre}</span>
+                        </div>
+                    </div>
+                `;
+                leagueSection.appendChild(card);
+            });
+            dateSection.appendChild(leagueSection);
+        });
+
+        if (hasMatchesThisDay) {
+            container.appendChild(dateSection);
+        }
+    });
+
+    if (totalMatchesFound === 0) {
+        container.innerHTML = `<div class="no-results">No hay resultados disponibles para ${leagueFilter || 'esta liga'} en los últimos días.</div>`;
+    }
+}
+
+function formatDateString(dateStr) {
+    // Formato YYYYMMDD a DD/MM/YYYY
+    if (!dateStr || dateStr.length !== 8) return dateStr;
+    const year = dateStr.substring(0, 4);
+    const month = dateStr.substring(4, 6);
+    const day = dateStr.substring(6, 8);
+    return `${day}/${month}/${year}`;
+}
+
 function selectLeague(leagueName, element) {
     document.querySelectorAll('.league-btn').forEach(btn => btn.classList.remove('active'));
     
@@ -4194,6 +4329,15 @@ function selectLeague(leagueName, element) {
     const standingsTitle = document.getElementById('standingsLeagueName');
     if (standingsTitle) {
         standingsTitle.textContent = `TABLA DE POSICIONES - ${leagueName}`;
+    }
+
+    // Reset tabs when switching leagues
+    const tabs = document.querySelectorAll('.standings-tab');
+    if (tabs.length > 0) {
+        tabs.forEach(t => t.classList.remove('active'));
+        tabs[0].classList.add('active');
+        document.getElementById('standingsTable').style.display = 'block';
+        document.getElementById('resultsContainer').style.display = 'none';
     }
     
     loadStandings();
