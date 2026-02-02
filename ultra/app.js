@@ -4219,80 +4219,84 @@ function displayCategorizedResults(resultadosPorFecha, leagueFilter) {
     const container = document.getElementById('resultsContainer');
     container.innerHTML = '';
 
-    // Solo mostrar los resultados más recientes (primera fecha del array)
-    const diaMasReciente = resultadosPorFecha[0];
-    
-    // Crear contenedor para la fecha
-    const dateHeader = document.createElement('div');
-    dateHeader.className = 'results-date-header';
-    dateHeader.innerHTML = `<span>Resultados del ${formatDateString(diaMasReciente.fecha)}</span>`;
-    container.appendChild(dateHeader);
+    let totalMatchesFound = 0;
 
-    let hasData = false;
-
-    diaMasReciente.ligas.forEach(ligaData => {
-        // Si hay un filtro de liga y no coincide, saltamos esta liga
-        // Excepto si el filtro es "Todas las Ligas" o similar
-        if (leagueFilter && leagueFilter !== 'Todas las Ligas' && ligaData.liga !== leagueFilter) {
-            return;
-        }
-
-        // Combinar finalizados, en vivo y programados
-        const allMatches = [
-            ...(ligaData.en_vivo || []).map(m => ({ ...m, statusType: 'LIVE' })),
-            ...(ligaData.finalizados || []).map(m => ({ ...m, statusType: 'FT' })),
-            ...(ligaData.programados || []).map(m => ({ ...m, statusType: 'SCHEDULED' }))
-        ];
-
-        if (allMatches.length === 0) return;
-        hasData = true;
-
-        const leagueSection = document.createElement('div');
-        leagueSection.className = 'league-results-section';
+    // Recorremos todas las fechas disponibles en la API
+    resultadosPorFecha.forEach((dia, index) => {
+        let hasMatchesThisDay = false;
+        const dateSection = document.createElement('div');
+        dateSection.className = 'results-date-group';
         
-        // Solo mostrar el título de la liga si estamos viendo "Todas las Ligas"
-        if (!leagueFilter || leagueFilter === 'Todas las Ligas') {
-            leagueSection.innerHTML = `<h4 class="league-results-title">${ligaData.liga}</h4>`;
-        }
+        const dateHeader = document.createElement('div');
+        dateHeader.className = 'results-date-header';
+        dateHeader.innerHTML = `<span>Resultados del ${formatDateString(dia.fecha)}</span>`;
+        dateSection.appendChild(dateHeader);
 
-        allMatches.forEach(match => {
-            const card = document.createElement('div');
-            card.className = `result-card ${match.statusType.toLowerCase()}`;
-            
-            const homeLogo = match.local.logo || 'https://via.placeholder.com/35';
-            const awayLogo = match.visitante.logo || 'https://via.placeholder.com/35';
-            
-            let statusBadge = match.reloj || match.estado.descripcion;
-            if (match.statusType === 'LIVE') {
-                statusBadge = `<span class="live-dot"></span> ${match.reloj}`;
+        dia.ligas.forEach(ligaData => {
+            if (leagueFilter && leagueFilter !== 'Todas las Ligas' && ligaData.liga !== leagueFilter) {
+                return;
             }
 
-            card.innerHTML = `
-                <div class="result-header">
-                    <span>${match.detalles.estadio || ligaData.liga}</span>
-                    <span class="status-badge">${statusBadge}</span>
-                </div>
-                <div class="result-teams">
-                    <div class="result-team">
-                        <img src="${homeLogo}" alt="${match.local.nombre}">
-                        <span>${match.local.nombre}</span>
+            const allMatches = [
+                ...(ligaData.en_vivo || []).map(m => ({ ...m, statusType: 'LIVE' })),
+                ...(ligaData.finalizados || []).map(m => ({ ...m, statusType: 'FT' })),
+                ...(ligaData.programados || []).map(m => ({ ...m, statusType: 'SCHEDULED' }))
+            ];
+
+            if (allMatches.length === 0) return;
+            hasMatchesThisDay = true;
+            totalMatchesFound += allMatches.length;
+
+            const leagueSection = document.createElement('div');
+            leagueSection.className = 'league-results-section';
+            
+            if (!leagueFilter || leagueFilter === 'Todas las Ligas') {
+                leagueSection.innerHTML = `<h4 class="league-results-title">${ligaData.liga}</h4>`;
+            }
+
+            allMatches.forEach(match => {
+                const card = document.createElement('div');
+                card.className = `result-card ${match.statusType.toLowerCase()}`;
+                
+                const homeLogo = match.local.logo || 'https://via.placeholder.com/35';
+                const awayLogo = match.visitante.logo || 'https://via.placeholder.com/35';
+                
+                let statusBadge = match.reloj || match.estado.descripcion;
+                if (match.statusType === 'LIVE') {
+                    statusBadge = `<span class="live-dot"></span> ${match.reloj}`;
+                }
+
+                card.innerHTML = `
+                    <div class="result-header">
+                        <span>${match.detalles.estadio || ligaData.liga}</span>
+                        <span class="status-badge">${statusBadge}</span>
                     </div>
-                    <div class="result-score">
-                        ${match.local.marcador} - ${match.visitante.marcador}
+                    <div class="result-teams">
+                        <div class="result-team">
+                            <img src="${homeLogo}" alt="${match.local.nombre}">
+                            <span>${match.local.nombre}</span>
+                        </div>
+                        <div class="result-score">
+                            ${match.local.marcador} - ${match.visitante.marcador}
+                        </div>
+                        <div class="result-team">
+                            <img src="${awayLogo}" alt="${match.visitante.nombre}">
+                            <span>${match.visitante.nombre}</span>
+                        </div>
                     </div>
-                    <div class="result-team">
-                        <img src="${awayLogo}" alt="${match.visitante.nombre}">
-                        <span>${match.visitante.nombre}</span>
-                    </div>
-                </div>
-            `;
-            leagueSection.appendChild(card);
+                `;
+                leagueSection.appendChild(card);
+            });
+            dateSection.appendChild(leagueSection);
         });
-        container.appendChild(leagueSection);
+
+        if (hasMatchesThisDay) {
+            container.appendChild(dateSection);
+        }
     });
 
-    if (!hasData) {
-        container.innerHTML += `<div class="no-results">No hay resultados disponibles para ${leagueFilter} en esta fecha.</div>`;
+    if (totalMatchesFound === 0) {
+        container.innerHTML = `<div class="no-results">No hay resultados disponibles para ${leagueFilter || 'esta liga'} en los últimos días.</div>`;
     }
 }
 
