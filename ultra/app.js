@@ -4198,62 +4198,92 @@ async function loadResults() {
     container.innerHTML = '<div class="standings-loading">Cargando últimos resultados...</div>';
 
     try {
-        const leagueConfig = leaguesConfig[currentLeague];
-        const endpoint = leagueConfig ? leagueConfig.marcadores : '/marcadores';
-        const response = await fetch(`${API_BASE}${endpoint}`);
+        const response = await fetch(`${API_BASE}/resultados/todas-las-ligas`);
         const data = await response.json();
 
-        if (!data || !data.matches || data.matches.length === 0) {
+        if (!data || !data.success || !data.resultados || data.resultados.length === 0) {
             container.innerHTML = '<div class="no-results">No hay resultados recientes.</div>';
             return;
         }
 
-        // Filtrar partidos finalizados o con marcador
-        const results = data.matches.filter(m => m.time === 'FT' || m.status === 'Finalizado' || (m.home_score !== undefined && m.away_score !== undefined));
-        
-        if (results.length === 0) {
-            displayResults(data.matches.slice(0, 8));
-        } else {
-            displayResults(results);
-        }
+        displayCategorizedResults(data.resultados);
     } catch (error) {
         console.error('Error cargando resultados:', error);
-        container.innerHTML = '<div class="error-message">Error al cargar resultados.</div>';
+        container.innerHTML = '<div class="error-message">Error al cargar resultados globales.</div>';
     }
 }
 
-function displayResults(results) {
+function displayCategorizedResults(resultadosPorFecha) {
     const container = document.getElementById('resultsContainer');
     container.innerHTML = '';
 
-    results.forEach(match => {
-        const card = document.createElement('div');
-        card.className = 'result-card';
-        
-        const homeLogo = match.home_logo || 'https://via.placeholder.com/35';
-        const awayLogo = match.away_logo || 'https://via.placeholder.com/35';
-        
-        card.innerHTML = `
-            <div class="result-header">
-                <span>${match.league || currentLeague}</span>
-                <span>${match.time || 'FINAL'}</span>
-            </div>
-            <div class="result-teams">
-                <div class="result-team">
-                    <img src="${homeLogo}" alt="${match.home_name}">
-                    <span>${match.home_name}</span>
+    // Solo mostrar los resultados más recientes (primera fecha del array)
+    const diaMasReciente = resultadosPorFecha[0];
+    
+    // Crear contenedor para la fecha
+    const dateHeader = document.createElement('div');
+    dateHeader.className = 'results-date-header';
+    dateHeader.innerHTML = `<span>Resultados del ${formatDateString(diaMasReciente.fecha)}</span>`;
+    container.appendChild(dateHeader);
+
+    diaMasReciente.ligas.forEach(ligaData => {
+        // Combinar finalizados, en vivo y programados
+        const allMatches = [
+            ...(ligaData.en_vivo || []).map(m => ({ ...m, statusType: 'LIVE' })),
+            ...(ligaData.finalizados || []).map(m => ({ ...m, statusType: 'FT' })),
+            ...(ligaData.programados || []).map(m => ({ ...m, statusType: 'SCHEDULED' }))
+        ];
+
+        if (allMatches.length === 0) return;
+
+        const leagueSection = document.createElement('div');
+        leagueSection.className = 'league-results-section';
+        leagueSection.innerHTML = `<h4 class="league-results-title">${ligaData.liga}</h4>`;
+
+        allMatches.forEach(match => {
+            const card = document.createElement('div');
+            card.className = `result-card ${match.statusType.toLowerCase()}`;
+            
+            const homeLogo = match.local.logo || 'https://via.placeholder.com/35';
+            const awayLogo = match.visitante.logo || 'https://via.placeholder.com/35';
+            
+            let statusBadge = match.reloj || match.estado.descripcion;
+            if (match.statusType === 'LIVE') {
+                statusBadge = `<span class="live-dot"></span> ${match.reloj}`;
+            }
+
+            card.innerHTML = `
+                <div class="result-header">
+                    <span>${match.detalles.estadio || ligaData.liga}</span>
+                    <span class="status-badge">${statusBadge}</span>
                 </div>
-                <div class="result-score">
-                    ${match.home_score} - ${match.away_score}
+                <div class="result-teams">
+                    <div class="result-team">
+                        <img src="${homeLogo}" alt="${match.local.nombre}">
+                        <span>${match.local.nombre}</span>
+                    </div>
+                    <div class="result-score">
+                        ${match.local.marcador} - ${match.visitante.marcador}
+                    </div>
+                    <div class="result-team">
+                        <img src="${awayLogo}" alt="${match.visitante.nombre}">
+                        <span>${match.visitante.nombre}</span>
+                    </div>
                 </div>
-                <div class="result-team">
-                    <img src="${awayLogo}" alt="${match.away_name}">
-                    <span>${match.away_name}</span>
-                </div>
-            </div>
-        `;
-        container.appendChild(card);
+            `;
+            leagueSection.appendChild(card);
+        });
+        container.appendChild(leagueSection);
     });
+}
+
+function formatDateString(dateStr) {
+    // Formato YYYYMMDD a DD/MM/YYYY
+    if (!dateStr || dateStr.length !== 8) return dateStr;
+    const year = dateStr.substring(0, 4);
+    const month = dateStr.substring(4, 6);
+    const day = dateStr.substring(6, 8);
+    return `${day}/${month}/${year}`;
 }
 
 function selectLeague(leagueName, element) {

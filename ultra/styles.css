@@ -472,6 +472,57 @@ body {
     text-align: center;
 }
 
+.results-date-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: rgba(255, 69, 0, 0.1);
+    border-radius: 10px;
+    border: 1px dashed var(--primary);
+}
+
+.results-date-header span {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+}
+
+.league-results-section {
+    margin-bottom: 25px;
+}
+
+.league-results-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 3px solid var(--primary);
+    text-transform: uppercase;
+}
+
+.result-card.live {
+    border-color: #4ade80;
+    background: rgba(74, 222, 128, 0.05);
+}
+
+.result-card.live .result-score {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+}
+
+.result-card.live .status-badge {
+    color: #4ade80;
+    font-weight: 800;
+}
+
+.result-card .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
 .app-container {
     max-width: 480px;
     margin: 0 auto;
