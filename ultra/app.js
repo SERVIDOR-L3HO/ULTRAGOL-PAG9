@@ -462,10 +462,10 @@ async function loadTransmisiones() {
                     console.warn('⚠️ Error cargando API 5 (donromans):', err);
                     return { matches: [] };
                 }),
-            fetch('/api/transmisiones6')
+            fetch('https://ultragol-api-3.vercel.app/transmisiones6')
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 6 (local):', err);
+                    console.warn('⚠️ Error cargando API 6 (external):', err);
                     return { transmisiones: [] };
                 })
         ]);
