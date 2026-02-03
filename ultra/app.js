@@ -1436,7 +1436,7 @@ function showChannelSelector(transmision, partidoNombre) {
             const apiType = canal.tipoAPI || 'DIRECT';
             const latency = Math.floor(Math.random() * 25) + 5;
             const quality = 'HD PREMIUM';
-            const enlace = canal.links ? (canal.links.hoca || canal.links.caster || canal.links.wigi) : (canal.enlaces ? canal.enlaces[0]?.url : '');
+            const enlace = canal.url || (canal.enlaces && canal.enlaces.length > 0 ? canal.enlaces[0].url : (canal.links ? (canal.links.hoca || canal.links.caster || canal.links.wigi) : ''));
             const canalNombre = canal.nombre || `Servidor #${serverNum}`;
             
             channelsHtml += `
