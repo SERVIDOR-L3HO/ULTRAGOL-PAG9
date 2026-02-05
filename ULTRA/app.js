@@ -1436,7 +1436,19 @@ function showChannelSelector(transmision, partidoNombre) {
             const apiType = canal.tipoAPI || 'DIRECT';
             const latency = Math.floor(Math.random() * 25) + 5;
             const quality = 'HD PREMIUM';
-            const enlace = canal.url || (canal.enlaces && canal.enlaces.length > 0 ? canal.enlaces[0].url : (canal.links ? (canal.links.hoca || canal.links.caster || canal.links.wigi) : ''));
+            
+            // Extracción de URL mejorada para manejar múltiples formatos de API
+            let enlace = '';
+            if (canal.url) {
+                enlace = canal.url;
+            } else if (canal.enlaces && canal.enlaces.length > 0) {
+                enlace = canal.enlaces[0].url || canal.enlaces[0];
+            } else if (canal.links) {
+                enlace = canal.links.hoca || canal.links.caster || canal.links.wigi || canal.links.url || '';
+            } else if (canal.link) {
+                enlace = canal.link;
+            }
+            
             const canalNombre = canal.nombre || `Servidor #${serverNum}`;
             
             channelsHtml += `
