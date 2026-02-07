@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Notificaciones - UltraGol</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 32px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .status {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+        .status-label {
+            font-weight: 600;
+            color: #555;
+        }
+        .status-value {
+            color: #333;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        .btn:active {
+            transform: translateY(0);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔔 Test de Notificaciones</h1>
+        <p>Prueba el sistema de notificaciones de UltraGol en tiempo real</p>
+        
+        <div class="status">
+            <div class="status-item">
+                <span class="status-label">Estado del navegador:</span>
+                <span class="status-value" id="browserStatus">Verificando...</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Permiso:</span>
+                <span class="status-value" id="permissionStatus">No solicitado</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Equipo favorito:</span>
+                <span class="status-value" id="teamStatus">No seleccionado</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">API Status:</span>
+                <span class="status-value" id="apiStatus">No verificado</span>
+            </div>
+        </div>
+
+        <button class="btn" onclick="requestPermission()">1. Solicitar Permiso de Notificaciones</button>
+        <button class="btn btn-secondary" onclick="testNotification()">2. Enviar Notificación de Prueba</button>
+        <button class="btn btn-success" onclick="testAPINotifications()">3. Obtener Notificaciones de la API</button>
+        <button class="btn" onclick="showTeamSelectorManually()">4. Mostrar Selector de Equipos</button>
+        <button class="btn btn-success" onclick="clearStorage()">🗑️ Limpiar LocalStorage y Reiniciar</button>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        const log = document.getElementById('log');
+        
+        function addLog(message) {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateStatus() {
+            const browserSupport = 'Notification' in window;
+            document.getElementById('browserStatus').textContent = browserSupport ? '✅ Soportado' : '❌ No soportado';
+            
+            if (browserSupport) {
+                document.getElementById('permissionStatus').textContent = Notification.permission === 'granted' ? '✅ Concedido' : 
+                    Notification.permission === 'denied' ? '❌ Denegado' : '⚠️ No solicitado';
+            }
+
+            const favoriteTeam = localStorage.getItem('selectedTeam');
+            document.getElementById('teamStatus').textContent = favoriteTeam || 'No seleccionado';
+        }
+
+        // Helper function to show notifications (compatible with Service Workers)
+        async function showNotification(title, options) {
+            try {
+                // IMPORTANTE: Si hay un Service Worker registrado, SIEMPRE debemos usarlo
+                // Los navegadores modernos no permiten new Notification() cuando hay SW
+                
+                if ('serviceWorker' in navigator) {
+                    addLog('🔍 Verificando Service Worker...');
+                    
+                    // Wait for Service Worker to be ready (with longer timeout for GitHub Pages)
+                    const registration = await Promise.race([
+                        navigator.serviceWorker.ready,
+                        new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Service Worker timeout after 10s')), 10000)
+                        )
+                    ]).catch(async (err) => {
+                        addLog(`⚠️ SW not ready via .ready: ${err.message}`);
+                        // Try to get existing registration as fallback
+                        const existingReg = await navigator.serviceWorker.getRegistration();
+                        if (existingReg) {
+                            addLog('✅ Found existing Service Worker registration');
+                            return existingReg;
+                        }
+                        addLog('⚠️ No Service Worker registration found');
+                        return null;
+                    });
+                    
+                    if (registration) {
+                        addLog('📱 Usando Service Worker para mostrar notificación');
+                        addLog(`SW state: ${registration.active ? 'active' : 'not active'}`);
+                        
+                        // Clean options - remove non-cloneable data (functions)
+                        const swOptions = {
+                            body: options.body,
+                            icon: options.icon,
+                            badge: options.badge,
+                            tag: options.tag,
+                            vibrate: options.vibrate,
+                            data: options.data || {}  // Only cloneable data
+                        };
+                        
+                        // Store URL in data for SW to handle clicks
+                        if (options.url) {
+                            swOptions.data.url = options.url;
+                        }
+                        
+                        await registration.showNotification(title, swOptions);
+                        addLog('✅ Notificación enviada via Service Worker');
+                        return true;
+                    }
+                }
+                
+                // Solo usar Notification API directa si NO hay Service Worker
+                addLog('🔔 No hay Service Worker, usando Notification API estándar');
+                const notification = new Notification(title, options);
+                
+                if (options.onclick) {
+                    notification.onclick = options.onclick;
+                }
+                
+                return true;
+            } catch (error) {
+                addLog(`❌ Error mostrando notificación: ${error.message}`);
+                console.error('Notification error details:', error);
+                return false;
+            }
+        }
+
+        async function requestPermission() {
+            if (!('Notification' in window)) {
+                addLog('❌ Este navegador no soporta notificaciones');
+                return;
+            }
+
+            try {
+                const permission = await Notification.requestPermission();
+                addLog(`✅ Permiso: ${permission}`);
+                updateStatus();
+                
+                if (permission === 'granted') {
+                    addLog('🎉 ¡Permiso concedido! Ahora puedes recibir notificaciones');
+                }
+            } catch (error) {
+                addLog(`❌ Error: ${error.message}`);
+            }
+        }
+
+        async function testNotification() {
+            if (Notification.permission !== 'granted') {
+                addLog('⚠️ Primero debes conceder permiso de notificaciones');
+                return;
+            }
+
+            const success = await showNotification('🎉 Prueba de UltraGol', {
+                body: '¡Las notificaciones están funcionando correctamente!',
+                icon: '/app-icon.png',
+                badge: '/favicon.png',
+                tag: 'test',
+                vibrate: [200, 100, 200],
+                url: '/',  // URL to open when clicked (handled by SW)
+                onclick: () => {
+                    addLog('🖱️ Notificación clickeada');
+                }
+            });
+
+            if (success) {
+                addLog('✅ Notificación de prueba enviada correctamente');
+            }
+        }
+
+        async function testAPINotifications() {
+            addLog('📡 Consultando API de notificaciones...');
+            document.getElementById('apiStatus').textContent = 'Consultando...';
+            
+            try {
+                const response = await fetch('https://ultragol-api-3.vercel.app/notificaciones/ligamx');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                addLog(`✅ API responde: ${data.total} notificaciones encontradas`);
+                document.getElementById('apiStatus').textContent = `✅ ${data.total} notificaciones`;
+                
+                if (data.notificaciones && data.notificaciones.length > 0) {
+                    data.notificaciones.forEach((notif, index) => {
+                        addLog(`   ${index + 1}. ${notif.tipo}: ${notif.titulo}`);
+                    });
+
+                    if (Notification.permission === 'granted' && data.notificaciones.length > 0) {
+                        const firstNotif = data.notificaciones[0];
+                        addLog('📤 Enviando primera notificación de la API...');
+                        
+                        const success = await showNotification(firstNotif.titulo || 'UltraGol', {
+                            body: firstNotif.mensaje || 'Nueva notificación',
+                            icon: firstNotif.icono || '/app-icon.png',
+                            badge: '/favicon.png',
+                            tag: firstNotif.id || 'api-notif',
+                            url: firstNotif.url || '/'
+                        });
+                        
+                        if (success) {
+                            addLog('🔔 Primera notificación de la API mostrada correctamente');
+                        }
+                    } else if (Notification.permission !== 'granted') {
+                        addLog('⚠️ Permiso de notificaciones no concedido');
+                    }
+                } else {
+                    addLog('⚠️ No hay notificaciones disponibles en este momento');
+                }
+            } catch (error) {
+                addLog(`❌ Error al consultar API: ${error.message}`);
+                console.error('API Error details:', error);
+                document.getElementById('apiStatus').textContent = '❌ Error';
+            }
+        }
+
+        function clearStorage() {
+            localStorage.removeItem('selectedTeam');
+            localStorage.removeItem('notificationPermission');
+            localStorage.removeItem('lastNotificationId');
+            localStorage.removeItem('notificationModalShown');
+            addLog('🗑️ LocalStorage limpiado');
+            addLog('🔄 Recargando página en 2 segundos...');
+            updateStatus();
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        }
+
+        async function showTeamSelectorManually() {
+            addLog('👥 Intentando mostrar selector de equipos...');
+            
+            // Load notifications.js if not already loaded
+            if (!window.NotificationManager) {
+                addLog('📦 Cargando NotificationManager...');
+                try {
+                    const script = document.createElement('script');
+                    script.src = '/js/notifications.js';
+                    script.onload = () => {
+                        addLog('✅ NotificationManager cargado');
+                        setTimeout(() => {
+                            if (window.notificationManager) {
+                                addLog('🎯 Mostrando selector de equipos...');
+                                window.notificationManager.showTeamSelector();
+                            } else {
+                                addLog('❌ Error: NotificationManager no se inicializó');
+                            }
+                        }, 500);
+                    };
+                    script.onerror = () => {
+                        addLog('❌ Error cargando notifications.js');
+                    };
+                    document.head.appendChild(script);
+                    
+                    // Also load CSS
+                    const cssLink = document.createElement('link');
+                    cssLink.rel = 'stylesheet';
+                    cssLink.href = '/css/notifications.css';
+                    document.head.appendChild(cssLink);
+                } catch (error) {
+                    addLog(`❌ Error: ${error.message}`);
+                }
+            } else if (window.notificationManager) {
+                addLog('🎯 Mostrando selector de equipos...');
+                try {
+                    await window.notificationManager.showTeamSelector();
+                    addLog('✅ Selector mostrado');
+                } catch (error) {
+                    addLog(`❌ Error mostrando selector: ${error.message}`);
+                }
+            } else {
+                addLog('❌ NotificationManager no está disponible');
+            }
+        }
+
+        updateStatus();
+        addLog('🚀 Panel de pruebas iniciado');
+        addLog('📍 Para probar las notificaciones:');
+        addLog('   1. Solicita permiso de notificaciones');
+        addLog('   2. Envía una notificación de prueba');
+        addLog('   3. Obtén notificaciones reales de la API');
+        addLog('   4. Prueba el selector de equipos');
+    </script>
+</body>
+</html>
