@@ -1383,7 +1383,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     }
     
     if (canalesCombinados.length === 0) {
-        showToast('No hay transmisión disponible para este partido');
+        showToast('Por favor espera 30 segundos mientras cargamos los links disponibles');
         console.log(`❌ No se encontró transmisión para: ${partido.local.nombre} vs ${partido.visitante.nombre}`);
         return;
     }
