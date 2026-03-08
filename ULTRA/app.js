@@ -25,6 +25,21 @@ let streakData = {
 
 const API_BASE = 'https://ultragol-api-3.vercel.app';
 
+// Función para hacer fetch con timeout
+async function fetchWithTimeout(url, timeout = 8000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        return response;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+}
+
 const leaguesConfig = {
     'Todas las Ligas': {
         apiPath: '/todo-todas-las-ligas',
@@ -430,42 +445,42 @@ async function loadMarcadores() {
 // Función para cargar transmisiones desde las 5 APIs
 async function loadTransmisiones() {
     try {
-        // Cargar las 6 APIs en paralelo con manejo individual de errores
+        // Cargar las 6 APIs en paralelo con manejo individual de errores y timeouts
         const [data1, data2, data3, data4, data5, data6] = await Promise.all([
-            fetch('https://ultragol-api-3.vercel.app/transmisiones')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 1 (rereyano):', err);
+                    console.warn('⚠️ Error cargando API 1 (rereyano):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetch('https://ultragol-api-3.vercel.app/transmisiones3')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones3', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 2 (e1link):', err);
+                    console.warn('⚠️ Error cargando API 2 (e1link):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetch('https://ultragol-api-3.vercel.app/transmisiones2')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones2', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 3 (voodc):', err);
+                    console.warn('⚠️ Error cargando API 3 (voodc):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetch('https://ultragol-api-3.vercel.app/transmisiones4')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones4', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 4 (transmisiones4):', err);
+                    console.warn('⚠️ Error cargando API 4 (transmisiones4):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetch('https://ultragol-api-3.vercel.app/transmisiones5')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones5', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 5 (donromans):', err);
+                    console.warn('⚠️ Error cargando API 5 (donromans):', err.message);
                     return { matches: [] };
                 }),
-            fetch('https://ultragol-api-3.vercel.app/transmisiones6')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones6', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 6 (external):', err);
+                    console.warn('⚠️ Error cargando API 6 (external):', err.message);
                     return { transmisiones: [] };
                 })
         ]);
@@ -4056,7 +4071,7 @@ async function loadStandings() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
         const endpoint = leagueConfig ? leagueConfig.tabla : '/tabla';
-        const response = await fetch(`https://ultragol-api-3.vercel.app${endpoint}`);
+        const response = await fetchWithTimeout(`https://ultragol-api-3.vercel.app${endpoint}`, 8000);
         const data = await response.json();
         
         const standingsTable = document.getElementById('standingsTable');
@@ -4129,7 +4144,7 @@ async function loadNews() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
         const endpoint = leagueConfig ? leagueConfig.noticias : '/noticias';
-        const response = await fetch(`https://ultragol-api-3.vercel.app${endpoint}`);
+        const response = await fetchWithTimeout(`https://ultragol-api-3.vercel.app${endpoint}`, 8000);
         const data = await response.json();
         
         const newsGrid = document.getElementById('newsGrid');
