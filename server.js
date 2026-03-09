@@ -323,6 +323,10 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+app.get('/cinenova', (req, res) => {
+    res.sendFile(path.join(__dirname, 'cinenova.html'));
+});
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 UltraGol server started on port ${PORT}`);
     console.log(`🌐 Server available at: http://0.0.0.0:${PORT}`);

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineNova - UltraGol</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            background: #050505;
+            font-family: 'Space Grotesk', sans-serif;
+            overflow: hidden;
+            color: white;
+        }
+
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 54px;
+            background: rgba(5, 5, 5, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.12);
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:hover {
+            color: white;
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.25);
+        }
+
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .page-title .cine-icon {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #e50914, #b20710);
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .page-title span {
+            background: linear-gradient(135deg, #ffffff, #e50914);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .ext-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .ext-btn:hover {
+            color: white;
+            background: rgba(229, 9, 20, 0.15);
+            border-color: rgba(229, 9, 20, 0.4);
+        }
+
+        .iframe-wrapper {
+            position: fixed;
+            top: 54px;
+            left: 0;
+            width: 100%;
+            height: calc(100% - 54px);
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: #050505;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 10;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-ring {
+            width: 56px;
+            height: 56px;
+            border: 3px solid rgba(229, 9, 20, 0.2);
+            border-top-color: #e50914;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+
+        .loading-text {
+            color: rgba(255,255,255,0.5);
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <a href="/" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Inicio
+            </a>
+            <div class="page-title">
+                <div class="cine-icon"><i class="fas fa-film"></i></div>
+                <span>CineNova</span>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <a href="https://cinenovaoficial.vercel.app/" target="_blank" class="ext-btn">
+                <i class="fas fa-external-link-alt"></i>
+                Abrir en nueva pestaña
+            </a>
+        </div>
+    </div>
+
+    <div class="iframe-wrapper">
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loader-ring"></div>
+            <p class="loading-text">Cargando CineNova...</p>
+        </div>
+        <iframe
+            src="https://cinenovaoficial.vercel.app/"
+            id="cinenovaFrame"
+            allowfullscreen
+            allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+            title="CineNova"
+        ></iframe>
+    </div>
+
+    <script>
+        const frame = document.getElementById('cinenovaFrame');
+        const overlay = document.getElementById('loadingOverlay');
+
+        frame.addEventListener('load', () => {
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 400);
+        });
+    </script>
+
+</body>
+</html>
