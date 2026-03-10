@@ -3238,14 +3238,15 @@ async function performSearch(query) {
         const nombreNormalizado = normalizarNombre(nombre);
         const aliasesNombre = obtenerAliases(nombreNormalizado);
         
-        // Verificar coincidencia directa
-        if (nombreNormalizado.includes(searchTerm)) return true;
+        // Verificar coincidencia directa (mínimo 3 chars para evitar falsos positivos)
+        if (searchTerm.length >= 3 && nombreNormalizado.includes(searchTerm)) return true;
+        if (searchTerm.length < 3 && nombreNormalizado === searchTerm) return true;
         
-        // Verificar coincidencia con aliases de la búsqueda
-        if (searchAliases.some(alias => nombreNormalizado.includes(alias))) return true;
+        // Verificar coincidencia con aliases de la búsqueda (mínimo 3 chars para evitar "ca" en "Newcastle")
+        if (searchAliases.some(alias => alias.length >= 3 && nombreNormalizado.includes(alias))) return true;
         
-        // Verificar coincidencia con aliases del nombre
-        if (aliasesNombre.some(alias => searchTerm.includes(alias) || alias.includes(searchTerm))) return true;
+        // Verificar coincidencia con aliases del nombre (mínimo 3 chars)
+        if (aliasesNombre.some(alias => alias.length >= 3 && (searchTerm.includes(alias) || alias.includes(searchTerm)))) return true;
         
         return false;
     };
@@ -3273,15 +3274,35 @@ async function performSearch(query) {
             const estado = normalizarNombre(transmision.estado || '');
             const evento = normalizarNombre(transmision.evento || '');
             const deporte = normalizarNombre(transmision.deporte || '');
+            const equipo1 = normalizarNombre(transmision.equipo1 || '');
+            const equipo2 = normalizarNombre(transmision.equipo2 || '');
 
             let matches = false;
-            if (titulo.includes(searchTerm) || evento.includes(searchTerm) || liga.includes(searchTerm) || deporte.includes(searchTerm)) matches = true;
+
+            // Verificar en título, evento, liga, deporte y equipos directamente
+            const camposTexto = [titulo, evento, equipo1, equipo2];
+            if (searchTerm.length >= 3) {
+                if (camposTexto.some(c => c.includes(searchTerm))) matches = true;
+                if (!matches && liga.includes(searchTerm)) matches = true;
+                if (!matches && deporte.includes(searchTerm)) matches = true;
+            }
+
+            // Verificar con aliases del término buscado
+            if (!matches) {
+                matches = camposTexto.some(c => c && coincideConBusqueda(c.split(/\s+vs?\.?\s+|\s+x\s+|\s+-\s+/i)[0]) ||
+                    coincideConBusqueda(c));
+            }
+
             if (!matches && (searchTerm === 'vivo' || searchTerm === 'en vivo') && (estado.includes('vivo') || estado.includes('live'))) matches = true;
             if (!matches && (searchTerm === 'programado' || searchTerm === 'proximo' || searchTerm === 'próximo') && (estado.includes('programado') || estado.includes('por comenzar'))) matches = true;
+
+            // Partir título/evento por separadores comunes (vs, x, -)
             if (!matches) {
-                const palabras = (titulo + ' ' + evento).split(/\s+vs?\.?\s+|\s+-\s+/i);
+                const textoCompleto = [titulo, evento].filter(Boolean).join(' ');
+                const palabras = textoCompleto.split(/\s+vs?\.?\s+|\s+x\s+|\s+-\s+/i);
                 for (const p of palabras) {
-                    if (p.length > 2 && coincideConBusqueda(p)) { matches = true; break; }
+                    const pt = p.trim();
+                    if (pt.length >= 3 && coincideConBusqueda(pt)) { matches = true; break; }
                 }
             }
             if (!matches) return;
