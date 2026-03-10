@@ -4005,6 +4005,54 @@ async function loadReplays() {
     }
 }
 
+const teamLogosMap = {
+    'américa': 'https://a.espncdn.com/i/teamlogos/soccer/500/227.png',
+    'america': 'https://a.espncdn.com/i/teamlogos/soccer/500/227.png',
+    'club américa': 'https://a.espncdn.com/i/teamlogos/soccer/500/227.png',
+    'atlas': 'https://a.espncdn.com/i/teamlogos/soccer/500/216.png',
+    'atlético de san luis': 'https://a.espncdn.com/i/teamlogos/soccer/500/15720.png',
+    'atletico de san luis': 'https://a.espncdn.com/i/teamlogos/soccer/500/15720.png',
+    'san luis': 'https://a.espncdn.com/i/teamlogos/soccer/500/15720.png',
+    'cruz azul': 'https://a.espncdn.com/i/teamlogos/soccer/500/218.png',
+    'fc juarez': 'https://a.espncdn.com/i/teamlogos/soccer/500/17851.png',
+    'juárez': 'https://a.espncdn.com/i/teamlogos/soccer/500/17851.png',
+    'juarez': 'https://a.espncdn.com/i/teamlogos/soccer/500/17851.png',
+    'guadalajara': 'https://a.espncdn.com/i/teamlogos/soccer/500/219.png',
+    'chivas': 'https://a.espncdn.com/i/teamlogos/soccer/500/219.png',
+    'león': 'https://a.espncdn.com/i/teamlogos/soccer/500/228.png',
+    'leon': 'https://a.espncdn.com/i/teamlogos/soccer/500/228.png',
+    'mazatlán': 'https://a.espncdn.com/i/teamlogos/soccer/500/20702.png',
+    'mazatlan': 'https://a.espncdn.com/i/teamlogos/soccer/500/20702.png',
+    'mazatlán fc': 'https://a.espncdn.com/i/teamlogos/soccer/500/20702.png',
+    'monterrey': 'https://a.espncdn.com/i/teamlogos/soccer/500/220.png',
+    'necaxa': 'https://a.espncdn.com/i/teamlogos/soccer/500/229.png',
+    'pachuca': 'https://a.espncdn.com/i/teamlogos/soccer/500/234.png',
+    'puebla': 'https://a.espncdn.com/i/teamlogos/soccer/500/231.png',
+    'pumas': 'https://a.espncdn.com/i/teamlogos/soccer/500/233.png',
+    'pumas unam': 'https://a.espncdn.com/i/teamlogos/soccer/500/233.png',
+    'querétaro': 'https://a.espncdn.com/i/teamlogos/soccer/500/222.png',
+    'queretaro': 'https://a.espncdn.com/i/teamlogos/soccer/500/222.png',
+    'santos': 'https://a.espncdn.com/i/teamlogos/soccer/500/225.png',
+    'santos laguna': 'https://a.espncdn.com/i/teamlogos/soccer/500/225.png',
+    'tigres': 'https://a.espncdn.com/i/teamlogos/soccer/500/232.png',
+    'tigres uanl': 'https://a.espncdn.com/i/teamlogos/soccer/500/232.png',
+    'tijuana': 'https://a.espncdn.com/i/teamlogos/soccer/500/10125.png',
+    'toluca': 'https://a.espncdn.com/i/teamlogos/soccer/500/223.png',
+    'necaxa': 'https://a.espncdn.com/i/teamlogos/soccer/500/229.png',
+};
+
+function getTeamLogo(nombre) {
+    if (!nombre) return '';
+    const key = nombre.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const normalized = nombre.toLowerCase().trim();
+    if (teamLogosMap[normalized]) return teamLogosMap[normalized];
+    if (teamLogosMap[key]) return teamLogosMap[key];
+    for (const [k, v] of Object.entries(teamLogosMap)) {
+        if (normalized.includes(k) || k.includes(normalized)) return v;
+    }
+    return '';
+}
+
 async function loadStandings() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
@@ -4049,6 +4097,8 @@ async function loadStandings() {
                         zoneClass = 'zona-descenso';
                     }
                     
+                    const logoUrl = equipo.logo || getTeamLogo(equipo.equipo);
+                    
                     return `
                     <div class="standings-row ${zoneClass}" data-position="${index + 1}">
                         <div class="position-indicator"></div>
@@ -4056,7 +4106,7 @@ async function loadStandings() {
                             <span class="pos-number">${equipo.posicion}</span>
                         </div>
                         <div class="team-cell">
-                            <img src="${equipo.logo || 'https://via.placeholder.com/30'}" alt="${equipo.equipo}" class="team-logo-small" onerror="this.src='https://via.placeholder.com/30'">
+                            ${logoUrl ? `<img src="${logoUrl}" alt="${equipo.equipo}" class="team-logo-small" onerror="this.style.display='none'">` : ''}
                             <span class="team-name-standings">${equipo.equipo}</span>
                         </div>
                         <div class="stat">${equipo.estadisticas?.pj || 0}</div>
