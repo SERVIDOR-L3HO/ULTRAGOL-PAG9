@@ -1,20 +1,17 @@
-const CACHE_NAME = 'ultragol-live-v4';
+const CACHE_NAME = 'ultragol-live-v6';
 const urlsToCache = [
-  '/ULTRA/',
-  '/ULTRA/styles.css',
-  '/ULTRA/trending-box.css',
-  '/ULTRA/pwa-install-banner.css',
-  '/ULTRA/favicon.png',
-  '/ULTRA/ultragol-logo.png',
-  '/ULTRA/offline-fallback.html'
+  '/',
+  '/styles.css',
+  '/favicon.png',
+  '/ultragol-logo.png'
 ];
 
 // URLs que NUNCA deben cachearse (siempre actualización en tiempo real)
 const NO_CACHE_URLS = [
-  '/ULTRA/app.js',
-  '/ULTRA/index.html',
-  '/ULTRA/goleadores.html',
-  '/ULTRA/noticias.html',
+  'app.js',
+  'index.html',
+  'goleadores.html',
+  'noticias.html',
   'marcadores',
   'transmisiones',
   'ultragol-api'
@@ -63,7 +60,7 @@ self.addEventListener('fetch', (event) => {
         }).catch(() => {
           // Si falla, servir la página de juego offline
           if (event.request.mode === 'navigate' || event.request.destination === 'document') {
-            return caches.match('/ULTRA/offline-fallback.html') 
+            return caches.match('/offline-fallback.html') 
               || new Response('Loading offline game...', { status: 200 });
           }
           return caches.match(event.request, { ignoreSearch: true });

@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                registrations.forEach(function(r) { r.unregister(); });
+            });
+            if ('caches' in window) {
+                caches.keys().then(function(keys) {
+                    keys.forEach(function(k) { caches.delete(k); });
+                });
+            }
+        }
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="copyright" content="© 2025 ULTRAGOL. Todos los derechos reservados. La copia, clonación y distribución no autorizada está prohibida.">
@@ -809,7 +821,7 @@
 
     <script type="module" src="auth.js?v=20251208"></script>
     <script type="module" src="promo-codes.js?v=20251208"></script>
-    <script src="app.js?v=20251119-api4fix"></script>
+    <script src="app.js?v=20260310"></script>
     <script>
         // Forzar recarga si hay nueva versión
         if ('serviceWorker' in navigator) {

@@ -257,9 +257,13 @@ const obtenerAliases = (nombre) => {
     const normalizado = normalizarNombre(nombre);
     
     for (const [clave, aliases] of Object.entries(aliasesEquipos)) {
-        if (normalizado.includes(clave) || aliases.some(alias => normalizado.includes(alias))) {
+        // Coincidencia exacta con la clave o con algún alias
+        if (normalizado === clave || aliases.includes(normalizado)) {
             return aliases;
         }
+        // Coincidencia parcial solo si la clave/alias tiene 5+ caracteres (evitar "ca","ame" en otras palabras)
+        if (clave.length >= 5 && normalizado.includes(clave)) return aliases;
+        if (aliases.some(alias => alias.length >= 5 && normalizado.includes(alias))) return aliases;
     }
     
     return [normalizado];
