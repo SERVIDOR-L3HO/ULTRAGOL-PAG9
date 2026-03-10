@@ -4527,52 +4527,53 @@ function renderImportantMatches() {
         const evento = t.evento || t.titulo || '';
         const eventoEscapado = evento.replace(/'/g, "\\'");
 
-        let timeLabel = '';
+        let metaTime = '';
         if (isLive) {
-            timeLabel = `<span class="rokc-live-badge" style="color:${accentColor};background:${iconBg};border-color:${accentColor}40;box-shadow:0 0 10px ${accentColor}30;"><span class="rokc-live-dot" style="background:${accentColor};box-shadow:0 0 6px ${accentColor};"></span> EN VIVO</span>`;
+            metaTime = `<span class="rokc-live-pill"><span class="rokc-live-dot"></span>EN VIVO</span>`;
         } else if (t.fecha) {
             try {
                 const d = new Date(t.fecha);
                 if (!isNaN(d)) {
-                    timeLabel = `<span class="rokc-time">${d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</span>`;
+                    metaTime = `<span class="rokc-meta-time"><i class="far fa-clock"></i> ${d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</span>`;
                 }
             } catch(e) {}
         }
 
+        const ligaMeta = liga ? `<span class="rokc-meta-league"><i class="fas ${sportIcon}"></i> ${liga.toUpperCase()}</span>` : '';
+
         return `
-            <div class="rokc-row ${isLive ? 'is-live' : ''}" style="${isLive ? `border-left:3px solid ${accentColor};background:${iconBg};` : ''}" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
-                <div class="rokc-icon" style="background:${iconBg};color:${accentColor};box-shadow:0 0 12px ${accentColor}40;">
-                    <i class="fas ${sportIcon}"></i>
+            <div class="rokc-row ${isLive ? 'is-live' : ''}" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
+                <div class="rokc-body">
+                    <span class="rokc-match">${evento.toUpperCase()}</span>
+                    <div class="rokc-meta">${metaTime}${ligaMeta}</div>
                 </div>
-                <div class="rokc-info">
-                    ${liga ? `<span class="rokc-league" style="color:${accentColor};">${liga.toUpperCase()}</span>` : ''}
-                    <span class="rokc-match">${evento}</span>
-                </div>
-                <div class="rokc-right">${timeLabel}<i class="fas fa-chevron-right rokc-chevron"></i></div>
+                <i class="fas fa-chevron-right rokc-chevron"></i>
             </div>
         `;
     }).join('') || `<div class="rokc-empty">No hay partidos en este momento</div>`;
 
     body.innerHTML = `
         <style>
-            .rokc-wrapper{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#080808;}
-            .rokc-list{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px;}
+            .rokc-wrapper{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#111;}
+            .rokc-list{flex:1;overflow-y:auto;padding:0;}
             .rokc-list::-webkit-scrollbar{width:3px;}
             .rokc-list::-webkit-scrollbar-track{background:transparent;}
             .rokc-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}
-            .rokc-row{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;border-radius:14px;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.07);transition:all 0.18s ease;position:relative;overflow:hidden;}
-            .rokc-row::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.02) 0%,transparent 60%);pointer-events:none;}
-            .rokc-row:active{transform:scale(0.98);opacity:0.85;}
-            .rokc-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;}
-            .rokc-info{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0;}
-            .rokc-league{font-size:10px;font-weight:700;letter-spacing:0.8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-            .rokc-match{font-size:15px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3;}
-            .rokc-right{flex-shrink:0;display:flex;align-items:center;gap:8px;}
-            .rokc-time{font-size:13px;font-weight:700;color:rgba(255,255,255,0.65);background:rgba(255,255,255,0.07);padding:5px 10px;border-radius:8px;white-space:nowrap;}
-            .rokc-live-badge{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;padding:6px 11px;border-radius:20px;border:1px solid;white-space:nowrap;letter-spacing:0.3px;}
-            .rokc-live-dot{width:6px;height:6px;border-radius:50%;animation:rokcPulse 1s ease-in-out infinite;flex-shrink:0;}
-            .rokc-chevron{font-size:10px;color:rgba(255,255,255,0.2);}
-            @keyframes rokcPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.6);}}
+            .rokc-row{display:flex;align-items:center;padding:16px 18px;cursor:pointer;background:#1c1c1c;border-bottom:1px solid rgba(255,255,255,0.07);transition:background 0.15s;}
+            .rokc-row:active{background:#252525;}
+            .rokc-row.is-live{background:#1c1c1c;}
+            .rokc-body{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;}
+            .rokc-match{font-size:18px;font-weight:800;color:#C8E600;letter-spacing:0.2px;line-height:1.25;word-break:break-word;}
+            .rokc-row.is-live .rokc-match{color:#C8E600;}
+            .rokc-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+            .rokc-meta-time{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.75);}
+            .rokc-meta-time i{font-size:12px;color:rgba(255,255,255,0.5);}
+            .rokc-meta-league{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.75);}
+            .rokc-meta-league i{font-size:12px;color:rgba(255,255,255,0.5);}
+            .rokc-live-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#ff3b3b;letter-spacing:0.5px;}
+            .rokc-live-dot{width:7px;height:7px;background:#ff3b3b;border-radius:50%;animation:rokcPulse 1s ease-in-out infinite;flex-shrink:0;box-shadow:0 0 6px #ff3b3b;}
+            .rokc-chevron{font-size:13px;color:rgba(255,255,255,0.35);flex-shrink:0;margin-left:12px;}
+            @keyframes rokcPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.3;transform:scale(0.6);}}
             .rokc-empty{text-align:center;color:rgba(255,255,255,0.35);padding:50px 20px;font-size:14px;line-height:1.6;}
         </style>
         <div class="rokc-wrapper">
