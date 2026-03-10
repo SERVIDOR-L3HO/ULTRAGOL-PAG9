@@ -3033,6 +3033,7 @@ function showSearchModal() {
     const modal = document.getElementById('searchModal');
     if (modal) {
         modal.classList.add('active');
+        showSearchWelcome();
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             setTimeout(() => searchInput.focus(), 300);
