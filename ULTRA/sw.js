@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ultragol-live-v3';
+const CACHE_NAME = 'ultragol-live-v4';
 const urlsToCache = [
   '/ULTRA/',
   '/ULTRA/styles.css',
