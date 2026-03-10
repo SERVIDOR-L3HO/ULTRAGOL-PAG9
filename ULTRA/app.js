@@ -4493,73 +4493,17 @@ function renderImportantMatches() {
         return;
     }
 
-    let transmisionesToRender = [...transmisionesData.transmisiones];
+    // Solo partidos del endpoint transmisiones5 (donromans)
+    let currentItems = transmisionesData.transmisiones.filter(t => t.tipoAPI === 'donromans');
 
     if (isLiveFilterActive) {
-        transmisionesToRender = transmisionesToRender.filter(t => {
-            const isDonRomans = t.tipoAPI === 'donromans';
+        currentItems = currentItems.filter(t => {
             const estadoAPI = (t.estado || '').toLowerCase().trim();
-            const isLive = estadoAPI.includes('vivo') || estadoAPI.includes('live') || estadoAPI === 'en vivo';
-            return isDonRomans && isLive;
+            return estadoAPI.includes('vivo') || estadoAPI.includes('live') || estadoAPI === 'en vivo';
         });
     }
 
-    // Group by date
-    const groups = {};
-    const groupOrder = [];
-
-    transmisionesToRender.forEach(t => {
-        let dateKey = 'sin-fecha';
-        let dateObj = null;
-        if (t.fecha) {
-            try {
-                dateObj = new Date(t.fecha);
-                if (!isNaN(dateObj)) {
-                    dateKey = dateObj.toDateString();
-                }
-            } catch(e) {}
-        }
-        if (!groups[dateKey]) {
-            groups[dateKey] = { date: dateObj, items: [] };
-            groupOrder.push(dateKey);
-        }
-        groups[dateKey].items.push(t);
-    });
-
-    groupOrder.sort((a, b) => {
-        const aDate = groups[a].date;
-        const bDate = groups[b].date;
-        if (!aDate && !bDate) return 0;
-        if (!aDate) return 1;
-        if (!bDate) return -1;
-        return aDate - bDate;
-    });
-
-    rokczoneDays = groupOrder;
-    if (selectedDayIndex >= groupOrder.length) selectedDayIndex = 0;
-
-    const tabsHTML = groupOrder.map((key, i) => {
-        const group = groups[key];
-        let label = '';
-        if (group.date && !isNaN(group.date)) {
-            const dayName = group.date.toLocaleDateString('es-MX', { weekday: 'short' }).toUpperCase();
-            const dayNum = group.date.getDate();
-            const month = group.date.toLocaleDateString('es-MX', { month: 'short' }).toLowerCase();
-            label = `<span class="rokc-tab-day">${dayName}</span><span class="rokc-tab-date">${dayNum} ${month}</span>`;
-        } else {
-            label = `<span class="rokc-tab-date">Sin fecha</span>`;
-        }
-        return `<button class="rokc-tab ${i === selectedDayIndex ? 'active' : ''}" onclick="rokcSelectDay(${i})">${label}</button>`;
-    }).join('');
-
-    const currentKey = groupOrder[selectedDayIndex] || groupOrder[0];
-    const currentItems = currentKey ? [...(groups[currentKey]?.items || [])] : [];
-
     currentItems.sort((a, b) => {
-        const aLive = a.tipoAPI === 'donromans' || (a.estado || '').toLowerCase().includes('vivo');
-        const bLive = b.tipoAPI === 'donromans' || (b.estado || '').toLowerCase().includes('vivo');
-        if (aLive && !bLive) return -1;
-        if (!aLive && bLive) return 1;
         const aDate = a.fecha ? new Date(a.fecha) : null;
         const bDate = b.fecha ? new Date(b.fecha) : null;
         if (aDate && bDate) return aDate - bDate;
@@ -4633,15 +4577,9 @@ function renderImportantMatches() {
             .rokc-empty{text-align:center;color:rgba(255,255,255,0.4);padding:40px 20px;font-size:14px;}
         </style>
         <div class="rokc-wrapper">
-            ${groupOrder.length > 1 ? `<div class="rokc-tabs">${tabsHTML}</div>` : ''}
             <div class="rokc-list">${rowsHTML}</div>
         </div>
     `;
-}
-
-function rokcSelectDay(index) {
-    selectedDayIndex = index;
-    renderImportantMatches();
 }
 
 function initCarouselEvents() {
