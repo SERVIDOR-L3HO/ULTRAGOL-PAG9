@@ -4516,12 +4516,28 @@ function renderImportantMatches() {
         const isLive = isDonRomans || estadoAPI.includes('vivo') || estadoAPI.includes('live');
 
         const deporte = (t.deporte || 'fútbol').toLowerCase();
+        const ligaRaw = (t.liga || t.deporte || '').toLowerCase();
+
         let sportIcon = 'fa-futbol';
-        if (deporte.includes('basket') || deporte.includes('nba')) sportIcon = 'fa-basketball-ball';
+        if (deporte.includes('basket') || deporte.includes('nba') || ligaRaw.includes('nba')) sportIcon = 'fa-basketball-ball';
         else if (deporte.includes('moto') || deporte.includes('f1') || deporte.includes('formula')) sportIcon = 'fa-flag-checkered';
         else if (deporte.includes('tenis') || deporte.includes('tennis')) sportIcon = 'fa-table-tennis';
         else if (deporte.includes('beisbol') || deporte.includes('baseball')) sportIcon = 'fa-baseball-ball';
-        else if (deporte.includes('box') || deporte.includes('ufc') || deporte.includes('mma')) sportIcon = 'fa-fist-raised';
+        else if (deporte.includes('box') || deporte.includes('ufc') || deporte.includes('mma') || ligaRaw.includes('wwe') || ligaRaw.includes('box')) sportIcon = 'fa-fist-raised';
+        else if (deporte.includes('futbol americano') || ligaRaw.includes('nfl')) sportIcon = 'fa-football-ball';
+
+        // Liga accent color
+        let accentColor = '#FF4500';
+        let iconBg = 'rgba(255,69,0,0.18)';
+        if (ligaRaw.includes('champions') || ligaRaw.includes('uefa')) { accentColor = '#1a78c2'; iconBg = 'rgba(26,120,194,0.2)'; }
+        else if (ligaRaw.includes('europa league') || ligaRaw.includes('euroliga') || ligaRaw.includes('euroleague')) { accentColor = '#f97316'; iconBg = 'rgba(249,115,22,0.2)'; }
+        else if (ligaRaw.includes('argentina')) { accentColor = '#74acdf'; iconBg = 'rgba(116,172,223,0.2)'; }
+        else if (ligaRaw.includes('colombia')) { accentColor = '#fcd116'; iconBg = 'rgba(252,209,22,0.2)'; }
+        else if (ligaRaw.includes('nba') || deporte.includes('basket')) { accentColor = '#c9082a'; iconBg = 'rgba(201,8,42,0.2)'; }
+        else if (ligaRaw.includes('wwe') || ligaRaw.includes('box') || deporte.includes('box') || deporte.includes('mma')) { accentColor = '#8b5cf6'; iconBg = 'rgba(139,92,246,0.2)'; }
+        else if (ligaRaw.includes('liga mx') || ligaRaw.includes('mexico') || ligaRaw.includes('mx')) { accentColor = '#22c55e'; iconBg = 'rgba(34,197,94,0.2)'; }
+        else if (ligaRaw.includes('premier') || ligaRaw.includes('england') || ligaRaw.includes('championship')) { accentColor = '#a855f7'; iconBg = 'rgba(168,85,247,0.2)'; }
+        else if (ligaRaw.includes('libertadores') || ligaRaw.includes('brasileirao') || ligaRaw.includes('brasil')) { accentColor = '#22d3ee'; iconBg = 'rgba(34,211,238,0.2)'; }
 
         const liga = t.liga || t.deporte || '';
         const evento = t.evento || t.titulo || '';
@@ -4529,7 +4545,7 @@ function renderImportantMatches() {
 
         let timeLabel = '';
         if (isLive) {
-            timeLabel = `<span class="rokc-live-badge"><span class="rokc-live-dot"></span> EN VIVO</span>`;
+            timeLabel = `<span class="rokc-live-badge" style="color:${accentColor};background:${iconBg};border-color:${accentColor}40;box-shadow:0 0 10px ${accentColor}30;"><span class="rokc-live-dot" style="background:${accentColor};box-shadow:0 0 6px ${accentColor};"></span> EN VIVO</span>`;
         } else if (t.fecha) {
             try {
                 const d = new Date(t.fecha);
@@ -4540,41 +4556,40 @@ function renderImportantMatches() {
         }
 
         return `
-            <div class="rokc-row ${isLive ? 'is-live' : ''}" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
-                <div class="rokc-icon"><i class="fas ${sportIcon}"></i></div>
+            <div class="rokc-row ${isLive ? 'is-live' : ''}" style="${isLive ? `border-left:3px solid ${accentColor};background:${iconBg};` : ''}" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
+                <div class="rokc-icon" style="background:${iconBg};color:${accentColor};box-shadow:0 0 12px ${accentColor}40;">
+                    <i class="fas ${sportIcon}"></i>
+                </div>
                 <div class="rokc-info">
-                    ${liga ? `<span class="rokc-league">${liga.toUpperCase()}</span>` : ''}
+                    ${liga ? `<span class="rokc-league" style="color:${accentColor};">${liga.toUpperCase()}</span>` : ''}
                     <span class="rokc-match">${evento}</span>
                 </div>
-                <div class="rokc-right">${timeLabel}</div>
+                <div class="rokc-right">${timeLabel}<i class="fas fa-chevron-right rokc-chevron"></i></div>
             </div>
         `;
-    }).join('') || `<div class="rokc-empty">No hay partidos para este día</div>`;
+    }).join('') || `<div class="rokc-empty">No hay partidos en este momento</div>`;
 
     body.innerHTML = `
         <style>
-            .rokc-wrapper{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#0a0a0a;}
-            .rokc-tabs{display:flex;gap:8px;padding:12px 16px;overflow-x:auto;scrollbar-width:none;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.5);}
-            .rokc-tabs::-webkit-scrollbar{display:none;}
-            .rokc-tab{display:flex;flex-direction:column;align-items:center;padding:10px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.6);cursor:pointer;white-space:nowrap;transition:all 0.2s;font-family:inherit;min-width:72px;}
-            .rokc-tab.active{background:#FFD700;border-color:#FFD700;color:#000;font-weight:700;}
-            .rokc-tab-day{font-size:10px;font-weight:600;letter-spacing:0.5px;}
-            .rokc-tab-date{font-size:14px;font-weight:700;}
-            .rokc-list{flex:1;overflow-y:auto;padding:4px 0;}
-            .rokc-row{display:flex;align-items:center;gap:14px;padding:13px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.15s;}
-            .rokc-row:active{background:rgba(255,255,255,0.06);}
-            .rokc-row.is-live{background:rgba(255,69,0,0.08);border-left:3px solid #FF4500;}
-            .rokc-icon{width:36px;height:36px;background:rgba(255,255,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:rgba(255,255,255,0.7);font-size:15px;}
-            .rokc-row.is-live .rokc-icon{background:rgba(255,69,0,0.2);color:#FF4500;}
-            .rokc-info{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;}
-            .rokc-league{font-size:10px;color:rgba(255,255,255,0.4);font-weight:600;letter-spacing:0.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-            .rokc-match{font-size:14px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-            .rokc-right{flex-shrink:0;}
-            .rokc-time{font-size:13px;font-weight:700;color:rgba(255,255,255,0.75);background:rgba(255,255,255,0.08);padding:5px 10px;border-radius:8px;white-space:nowrap;}
-            .rokc-live-badge{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:#FF4500;background:rgba(255,69,0,0.15);padding:5px 10px;border-radius:8px;border:1px solid rgba(255,69,0,0.3);white-space:nowrap;}
-            .rokc-live-dot{width:7px;height:7px;background:#FF4500;border-radius:50%;animation:rokcPulse 1.2s ease-in-out infinite;flex-shrink:0;}
-            @keyframes rokcPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.7);}}
-            .rokc-empty{text-align:center;color:rgba(255,255,255,0.4);padding:40px 20px;font-size:14px;}
+            .rokc-wrapper{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#080808;}
+            .rokc-list{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px;}
+            .rokc-list::-webkit-scrollbar{width:3px;}
+            .rokc-list::-webkit-scrollbar-track{background:transparent;}
+            .rokc-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}
+            .rokc-row{display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer;border-radius:14px;background:rgba(255,255,255,0.035);border:1px solid rgba(255,255,255,0.07);transition:all 0.18s ease;position:relative;overflow:hidden;}
+            .rokc-row::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.02) 0%,transparent 60%);pointer-events:none;}
+            .rokc-row:active{transform:scale(0.98);opacity:0.85;}
+            .rokc-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;transition:transform 0.2s;}
+            .rokc-info{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0;}
+            .rokc-league{font-size:10px;font-weight:700;letter-spacing:0.8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+            .rokc-match{font-size:15px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3;}
+            .rokc-right{flex-shrink:0;display:flex;align-items:center;gap:8px;}
+            .rokc-time{font-size:13px;font-weight:700;color:rgba(255,255,255,0.65);background:rgba(255,255,255,0.07);padding:5px 10px;border-radius:8px;white-space:nowrap;}
+            .rokc-live-badge{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;padding:6px 11px;border-radius:20px;border:1px solid;white-space:nowrap;letter-spacing:0.3px;}
+            .rokc-live-dot{width:6px;height:6px;border-radius:50%;animation:rokcPulse 1s ease-in-out infinite;flex-shrink:0;}
+            .rokc-chevron{font-size:10px;color:rgba(255,255,255,0.2);}
+            @keyframes rokcPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.6);}}
+            .rokc-empty{text-align:center;color:rgba(255,255,255,0.35);padding:50px 20px;font-size:14px;line-height:1.6;}
         </style>
         <div class="rokc-wrapper">
             <div class="rokc-list">${rowsHTML}</div>
