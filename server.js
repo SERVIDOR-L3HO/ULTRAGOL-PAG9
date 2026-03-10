@@ -311,7 +311,7 @@ if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {
     });
 }
 
-app.use(express.static(path.join(__dirname), {
+app.use(express.static(path.join(__dirname, 'ULTRA'), {
     setHeaders: (res, filepath) => {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
         res.setHeader('Pragma', 'no-cache');
@@ -320,7 +320,7 @@ app.use(express.static(path.join(__dirname), {
 }));
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'ULTRA', 'index.html'));
 });
 
 app.get('/cinenova', (req, res) => {
