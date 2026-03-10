@@ -3263,156 +3263,64 @@ async function performSearch(query) {
         results.liveMatches = results.matches.filter(p => p.estado?.enVivo);
     }
     
-    // Buscar en partidos importantes (transmisiones) y combinar canales de ambas APIs
+    // Buscar y deduplicar transmisiones de TODAS las APIs combinando canales
     if (transmisionesData && transmisionesData.transmisiones) {
-        const matchedTransmisiones = transmisionesData.transmisiones.filter(transmision => {
+        const uniqueEventsMap = new Map();
+
+        transmisionesData.transmisiones.forEach(transmision => {
             const titulo = normalizarNombre(transmision.titulo || '');
             const liga = normalizarNombre(transmision.liga || '');
             const estado = normalizarNombre(transmision.estado || '');
             const evento = normalizarNombre(transmision.evento || '');
-            
-            // Búsqueda directa
-            if (titulo.includes(searchTerm) || evento.includes(searchTerm) || liga.includes(searchTerm)) {
-                return true;
-            }
-            
-            // Búsqueda especial para "vivo" o "en vivo"
-            if ((searchTerm === 'vivo' || searchTerm === 'en vivo') && 
-                (estado.includes('vivo') || estado.includes('live'))) {
-                return true;
-            }
-            
-            // Búsqueda con abreviaciones en el título/evento
-            const palabrasTitulo = (titulo + ' ' + evento).split(/\s+vs?\s+|\s+-\s+/i);
-            for (const palabra of palabrasTitulo) {
-                if (coincideConBusqueda(palabra)) {
-                    return true;
+            const deporte = normalizarNombre(transmision.deporte || '');
+
+            let matches = false;
+            if (titulo.includes(searchTerm) || evento.includes(searchTerm) || liga.includes(searchTerm) || deporte.includes(searchTerm)) matches = true;
+            if (!matches && (searchTerm === 'vivo' || searchTerm === 'en vivo') && (estado.includes('vivo') || estado.includes('live'))) matches = true;
+            if (!matches && (searchTerm === 'programado' || searchTerm === 'proximo' || searchTerm === 'próximo') && (estado.includes('programado') || estado.includes('por comenzar'))) matches = true;
+            if (!matches) {
+                const palabras = (titulo + ' ' + evento).split(/\s+vs?\.?\s+|\s+-\s+/i);
+                for (const p of palabras) {
+                    if (p.length > 2 && coincideConBusqueda(p)) { matches = true; break; }
                 }
             }
-            
-            return false;
+            if (!matches) return;
+
+            const key = normalizarNombre(transmision.titulo || transmision.evento || '');
+            if (!key) return;
+
+            if (!uniqueEventsMap.has(key)) {
+                uniqueEventsMap.set(key, {
+                    ...transmision,
+                    titulo: transmision.titulo || transmision.evento || 'Partido',
+                    evento: transmision.titulo || transmision.evento || 'Partido',
+                    canales: [],
+                    logo1: transmision.logo1 || '',
+                    logo2: transmision.logo2 || '',
+                    equipo1: transmision.equipo1 || '',
+                    equipo2: transmision.equipo2 || '',
+                    deporte: transmision.deporte || 'Fútbol',
+                    hora: transmision.hora || '',
+                    estado: transmision.estado || '',
+                    liga: transmision.liga || '',
+                });
+            }
+
+            const existing = uniqueEventsMap.get(key);
+            if (transmision.canales && transmision.canales.length > 0) {
+                existing.canales = [...existing.canales, ...transmision.canales];
+            }
+            if (!existing.logo1 && transmision.logo1) existing.logo1 = transmision.logo1;
+            if (!existing.logo2 && transmision.logo2) existing.logo2 = transmision.logo2;
+            if (!existing.equipo1 && transmision.equipo1) existing.equipo1 = transmision.equipo1;
+            if (!existing.equipo2 && transmision.equipo2) existing.equipo2 = transmision.equipo2;
+            if (!existing.hora && transmision.hora) existing.hora = transmision.hora;
+            const estadoActual = (existing.estado || '').toLowerCase();
+            const estadoNuevo = (transmision.estado || '').toLowerCase();
+            if (!estadoActual.includes('vivo') && estadoNuevo.includes('vivo')) existing.estado = transmision.estado;
         });
-        
-        // Combinar canales de las 3 APIs para cada transmisión encontrada
-        const transmisionesConCanalesCombinados = matchedTransmisiones.map(transmision => {
-            const eventoNombre = (transmision.evento || transmision.titulo || '').toLowerCase();
-            let canalesCombinados = [];
-            let tituloDisplay = transmision.titulo || transmision.evento || 'Partido';
-            
-            // Buscar en API 1
-            if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
-                const transAPI1 = transmisionesAPI1.transmisiones.find(t => {
-                    const evento = (t.evento || t.titulo || '').toLowerCase();
-                    return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
-                });
-                
-                if (transAPI1) {
-                    // Actualizar título si es mejor que el actual
-                    if (transAPI1.titulo && !tituloDisplay) {
-                        tituloDisplay = transAPI1.titulo;
-                    }
-                    if (transAPI1.evento && !tituloDisplay) {
-                        tituloDisplay = transAPI1.evento;
-                    }
-                    
-                    if (transAPI1.canales) {
-                        const canalesAPI1 = transAPI1.canales.map(canal => ({
-                            ...canal,
-                            fuente: 'golazolvhd'
-                        }));
-                        canalesCombinados = [...canalesCombinados, ...canalesAPI1];
-                    }
-                }
-            }
-            
-            // Buscar en API 2
-            if (transmisionesAPI2 && transmisionesAPI2.transmisiones) {
-                const transAPI2 = transmisionesAPI2.transmisiones.find(t => {
-                    const evento = (t.evento || t.titulo || '').toLowerCase();
-                    return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
-                });
-                
-                if (transAPI2) {
-                    // Actualizar título si es mejor que el actual
-                    if (transAPI2.titulo && !tituloDisplay) {
-                        tituloDisplay = transAPI2.titulo;
-                    }
-                    if (transAPI2.evento && !tituloDisplay) {
-                        tituloDisplay = transAPI2.evento;
-                    }
-                    
-                    if (transAPI2.canales) {
-                        const canalesAPI2 = transAPI2.canales.map(canal => ({
-                            ...canal,
-                            fuente: 'ellink'
-                        }));
-                        canalesCombinados = [...canalesCombinados, ...canalesAPI2];
-                    }
-                }
-            }
-            
-            // Buscar en API 3
-            if (transmisionesAPI3 && transmisionesAPI3.transmisiones) {
-                const transAPI3 = transmisionesAPI3.transmisiones.find(t => {
-                    const evento = (t.evento || t.titulo || '').toLowerCase();
-                    return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
-                });
-                
-                if (transAPI3) {
-                    // Actualizar título si es mejor que el actual
-                    if (transAPI3.titulo && !tituloDisplay) {
-                        tituloDisplay = transAPI3.titulo;
-                    }
-                    if (transAPI3.evento && !tituloDisplay) {
-                        tituloDisplay = transAPI3.evento;
-                    }
-                    
-                    if (transAPI3.canales) {
-                        const canalesAPI3 = transAPI3.canales.map(canal => ({
-                            ...canal,
-                            fuente: 'voodc'
-                        }));
-                        canalesCombinados = [...canalesCombinados, ...canalesAPI3];
-                    }
-                }
-            }
-            
-            // Buscar en API 4 (transmisiones4 - ftvhd)
-            if (transmisionesAPI4 && transmisionesAPI4.transmisiones) {
-                const transAPI4 = transmisionesAPI4.transmisiones.find(t => {
-                    const evento = (t.evento || t.titulo || '').toLowerCase();
-                    return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
-                });
-                
-                if (transAPI4) {
-                    // Actualizar título si es mejor que el actual
-                    if (transAPI4.titulo && !tituloDisplay) {
-                        tituloDisplay = transAPI4.titulo;
-                    }
-                    if (transAPI4.evento && !tituloDisplay) {
-                        tituloDisplay = transAPI4.evento;
-                    }
-                    
-                    if (transAPI4.canales) {
-                        const canalesAPI4 = transAPI4.canales.map(canal => ({
-                            ...canal,
-                            fuente: 'ftvhd'
-                        }));
-                        canalesCombinados = [...canalesCombinados, ...canalesAPI4];
-                    }
-                }
-            }
-            
-            // Retornar transmisión con canales combinados y título garantizado
-            return {
-                ...transmision,
-                titulo: tituloDisplay,
-                evento: tituloDisplay,
-                canales: canalesCombinados
-            };
-        });
-        
-        results.importantMatches = transmisionesConCanalesCombinados.slice(0, 10);
+
+        results.importantMatches = Array.from(uniqueEventsMap.values()).slice(0, 30);
     }
     
     // Buscar equipos únicos (con abreviaciones)
@@ -3548,64 +3456,82 @@ function displaySearchResults(results, query) {
         html += `</div>`;
     }
     
-    // Mostrar partidos importantes/transmisiones
+    // Mostrar transmisiones encontradas (deduplicadas, con logos y servidores)
     if (results.importantMatches.length > 0) {
+        const deporteIconos = {
+            'fútbol': 'fas fa-futbol', 'futbol': 'fas fa-futbol',
+            'baloncesto': 'fas fa-basketball-ball', 'basketball': 'fas fa-basketball-ball',
+            'hockey': 'fas fa-hockey-puck',
+            'béisbol': 'fas fa-baseball-ball', 'beisbol': 'fas fa-baseball-ball',
+            'tenis': 'fas fa-table-tennis',
+        };
+
         html += `<div class="search-section">
             <div class="search-section-title">
                 <div class="search-section-icon">
-                    <i class="fas fa-star"></i>
+                    <i class="fas fa-broadcast-tower"></i>
                 </div>
-                <span>Partidos Importantes</span>
+                <span>Transmisiones</span>
                 <span class="search-section-badge">${results.importantMatches.length}</span>
             </div>`;
-        
-        results.importantMatches.forEach((transmision, index) => {
+
+        results.importantMatches.forEach((transmision) => {
             const estadoAPI = (transmision.estado || '').toLowerCase().trim();
-            const isLive = estadoAPI.includes('vivo') || estadoAPI.includes('live') || estadoAPI === 'en vivo';
-            const isUpcoming = estadoAPI.includes('próximo') || estadoAPI.includes('programado') || estadoAPI.includes('upcoming');
+            const isLive = estadoAPI.includes('vivo') || estadoAPI.includes('live');
+            const isPorComenzar = estadoAPI.includes('por comenzar') || estadoAPI.includes('comenzar');
             const canalesCount = transmision.canales?.length || 0;
-            const liga = transmision.liga || 'Liga MX';
             const hasChannels = canalesCount > 0;
-            
-            // Obtener el primer canal para mostrar
-            const firstChannel = hasChannels ? transmision.canales[0].nombre : '';
-            
-            let statusBadgeSearch = '';
+            const deporte = (transmision.deporte || 'Fútbol');
+            const deporteKey = deporte.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const deporteIcon = deporteIconos[deporteKey] || 'fas fa-trophy';
+            const liga = transmision.liga || deporte;
+            const hora = transmision.hora || '';
+            const eventName = transmision.evento || transmision.titulo || 'Partido';
+            const eq1 = transmision.equipo1 || '';
+            const eq2 = transmision.equipo2 || '';
+            const logo1 = transmision.logo1 || '';
+            const logo2 = transmision.logo2 || '';
+            const hasLogos = logo1 || logo2;
+            const safeEvent = eventName.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+            let statusBadge = '';
             if (isLive) {
-                statusBadgeSearch = '<span class="search-badge-live"><i class="fas fa-circle"></i> EN VIVO</span>';
-            } else if (isUpcoming) {
-                statusBadgeSearch = '<span class="search-badge-scheduled"><i class="far fa-clock"></i> PRÓXIMO</span>';
+                statusBadge = '<span class="smp-badge-live"><span class="smp-live-dot"></span> EN VIVO</span>';
+            } else if (isPorComenzar) {
+                statusBadge = '<span class="smp-badge-soon"><i class="fas fa-hourglass-half"></i> POR COMENZAR</span>';
             } else {
-                statusBadgeSearch = '<span class="search-badge-scheduled"><i class="far fa-clock"></i> PRÓXIMO</span>';
+                statusBadge = `<span class="smp-badge-scheduled"><i class="far fa-clock"></i> ${hora || 'PRÓXIMO'}</span>`;
             }
-            
+
             html += `
-                <div class="search-match-important-card">
-                    <div class="search-match-bg"></div>
-                    <div class="search-match-content">
-                        <div class="search-match-badges">
-                            <span class="search-badge-liga">${liga}</span>
-                            ${statusBadgeSearch}
+                <div class="smp-card ${isLive ? 'smp-card-live' : ''}" onclick='selectImportantMatchByName("${safeEvent}")'>
+                    <div class="smp-logos-col">
+                        ${hasLogos ? `
+                            <img class="smp-team-logo" src="${logo1}" alt="${eq1}" onerror="this.style.display='none'">
+                            <div class="smp-sport-icon"><i class="${deporteIcon}"></i></div>
+                            <img class="smp-team-logo" src="${logo2}" alt="${eq2}" onerror="this.style.display='none'">
+                        ` : `<div class="smp-sport-icon smp-sport-icon-only"><i class="${deporteIcon}"></i></div>`}
+                    </div>
+                    <div class="smp-info-col">
+                        <div class="smp-badges-row">
+                            <span class="smp-badge-liga">${liga}</span>
+                            ${statusBadge}
                         </div>
-                        <div class="search-match-title">${transmision.titulo}</div>
-                        ${hasChannels ? `
-                            <div class="search-match-info">
-                                <div class="search-match-channel">
-                                    <i class="fas fa-tv"></i> ${firstChannel}${canalesCount > 1 ? ` +${canalesCount - 1}` : ''}
-                                </div>
-                                <button class="search-match-btn" onclick='event.stopPropagation(); selectImportantMatchByName("${(transmision.evento || transmision.titulo || '').replace(/"/g, '&quot;')}")'>
-                                    <i class="fas fa-play"></i> Ver
-                                </button>
-                            </div>
-                        ` : `
-                            <div class="search-match-no-channels">
-                                Sin canales disponibles
-                            </div>
-                        `}
+                        ${eq1 && eq2 ? `<div class="smp-teams-row">${eq1} <span class="smp-vs">vs</span> ${eq2}</div>` : ''}
+                        <div class="smp-event-name">${eventName}</div>
+                        <div class="smp-footer-row">
+                            <span class="smp-servers-count ${!hasChannels ? 'smp-no-servers' : ''}">
+                                <i class="fas fa-server"></i>
+                                ${hasChannels ? `${canalesCount} servidor${canalesCount !== 1 ? 'es' : ''}` : 'Sin servidores'}
+                            </span>
+                            ${hasChannels ? `<button class="smp-play-btn" onclick='event.stopPropagation(); selectImportantMatchByName("${safeEvent}")'>
+                                <i class="fas fa-play"></i> Ver
+                            </button>` : ''}
+                        </div>
                     </div>
                 </div>`;
         });
-        
+
         html += `</div>`;
     }
     

@@ -103,6 +103,8 @@ body {
     margin-top: 2px;
 }
 
+/* Resto de estilos */
+/* ==================== SELECTOR DE SERVIDORES PROFESIONAL (MODAL) ==================== */
 /* Burbuja de Soporte Creativa */
 .support-bubble {
     position: fixed;
@@ -10983,4 +10985,188 @@ body.dark-mode .news-content p {
     color: rgba(255,255,255,0.4);
     padding: 40px 20px;
     font-size: 14px;
+}
+
+/* ===== SEARCH MATCH PRO CARDS (SMP) ===== */
+.smp-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+.smp-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: #FF4500;
+    border-radius: 3px 0 0 3px;
+}
+.smp-card-live::before {
+    background: #00e676;
+    box-shadow: 0 0 8px #00e676;
+}
+.smp-card:active {
+    transform: scale(0.98);
+    background: rgba(255,69,0,0.1);
+}
+.smp-logos-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 44px;
+}
+.smp-team-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+}
+.smp-sport-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.35);
+    font-size: 12px;
+}
+.smp-sport-icon-only {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+    color: rgba(255,255,255,0.2);
+}
+.smp-info-col {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.smp-badges-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.smp-badge-liga {
+    font-size: 10px;
+    font-weight: 700;
+    color: #FF4500;
+    background: rgba(255,69,0,0.12);
+    padding: 2px 7px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+.smp-badge-live {
+    font-size: 10px;
+    font-weight: 700;
+    color: #00e676;
+    background: rgba(0,230,118,0.12);
+    padding: 2px 7px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-transform: uppercase;
+}
+.smp-live-dot {
+    width: 6px;
+    height: 6px;
+    background: #00e676;
+    border-radius: 50%;
+    animation: smpLivePulse 1s ease-in-out infinite;
+    flex-shrink: 0;
+}
+@keyframes smpLivePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.6); }
+}
+.smp-badge-soon {
+    font-size: 10px;
+    font-weight: 700;
+    color: #ffab40;
+    background: rgba(255,171,64,0.12);
+    padding: 2px 7px;
+    border-radius: 20px;
+    text-transform: uppercase;
+}
+.smp-badge-scheduled {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.06);
+    padding: 2px 7px;
+    border-radius: 20px;
+}
+.smp-teams-row {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.smp-vs {
+    color: #FF4500;
+    font-weight: 800;
+    margin: 0 4px;
+}
+.smp-event-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.smp-footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 2px;
+}
+.smp-servers-count {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.smp-servers-count i {
+    color: #FF4500;
+    font-size: 10px;
+}
+.smp-no-servers i {
+    color: rgba(255,255,255,0.2);
+}
+.smp-play-btn {
+    background: #FF4500;
+    border: none;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.2s;
+}
+.smp-play-btn:active {
+    background: #e03d00;
 }
