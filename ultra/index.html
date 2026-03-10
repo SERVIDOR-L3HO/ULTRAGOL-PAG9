@@ -595,6 +595,16 @@
                     <button class="clear-search-btn" onclick="clearSearch()" style="display: none;">
                         <i class="fas fa-times-circle"></i>
                     </button>
+                    <button id="voiceSearchBtn" class="voice-search-btn" onclick="startVoiceSearch()" title="Buscar por voz">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+                <div class="search-sport-chips">
+                    <button class="sport-chip active" onclick="filterBySport('todos', this)">Todos</button>
+                    <button class="sport-chip" onclick="filterBySport('fútbol', this)"><i class="fas fa-futbol"></i> Fútbol</button>
+                    <button class="sport-chip" onclick="filterBySport('basket', this)"><i class="fas fa-basketball-ball"></i> NBA</button>
+                    <button class="sport-chip" onclick="filterBySport('box', this)"><i class="fas fa-fist-raised"></i> UFC/Box</button>
+                    <button class="sport-chip" onclick="filterBySport('americano', this)"><i class="fas fa-football-ball"></i> NFL</button>
                 </div>
             </div>
             <div class="search-modal-body" id="searchResults">

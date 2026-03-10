@@ -3068,108 +3068,119 @@ function quickSearch(term) {
 function showSearchWelcome() {
     const resultsContainer = document.getElementById('searchResults');
     const history = getSearchHistory();
-    
+
     let historyHtml = '';
     if (history.length > 0) {
         historyHtml = `
-            <div class="search-category-section">
-                <div class="search-history-header">
-                    <h4><i class="fas fa-clock"></i> Búsquedas Recientes</h4>
-                    <button class="clear-history-btn" onclick="clearSearchHistory()" title="Limpiar historial">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
+            <div class="sw-section">
+                <div class="sw-section-head">
+                    <span><i class="fas fa-history"></i> Recientes</span>
+                    <button class="sw-clear-btn" onclick="clearSearchHistory()">Borrar todo</button>
                 </div>
-                <div class="search-tags-grid">
-                    ${history.map(item => `
-                        <span class="search-tag-history" onclick="quickSearch('${item}')">
-                            <i class="fas fa-history"></i> ${item}
-                        </span>
-                    `).join('')}
+                <div class="sw-chips-scroll">
+                    ${history.map(item => `<span class="sw-chip sw-chip-history" onclick="quickSearch('${item.replace(/'/g,"\\'")}')"><i class="fas fa-clock"></i> ${item}</span>`).join('')}
                 </div>
             </div>
         `;
     }
-    
+
+    const leagues = [
+        { name: 'Liga MX', sub: 'México · Fútbol', icon: 'fa-futbol', color: '#22c55e' },
+        { name: 'Champions League', sub: 'Europa · Fútbol', icon: 'fa-futbol', color: '#1a78c2' },
+        { name: 'Premier League', sub: 'Inglaterra · Fútbol', icon: 'fa-crown', color: '#a855f7' },
+        { name: 'Libertadores', sub: 'Sudamérica · Fútbol', icon: 'fa-futbol', color: '#22d3ee' },
+        { name: 'NBA', sub: 'EEUU · Baloncesto', icon: 'fa-basketball-ball', color: '#c9082a' },
+        { name: 'UFC', sub: 'MMA · Artes Marciales', icon: 'fa-fist-raised', color: '#FF4500' },
+        { name: 'NFL', sub: 'EEUU · Fútbol Americano', icon: 'fa-football-ball', color: '#7c3aed' },
+    ];
+
+    const leagueRows = leagues.map(l => `
+        <div class="sw-row" onclick="quickSearch('${l.name}')">
+            <div class="sw-row-icon" style="background:${l.color}22;color:${l.color}"><i class="fas ${l.icon}"></i></div>
+            <div class="sw-row-body">
+                <span class="sw-row-title">${l.name}</span>
+                <span class="sw-row-sub">${l.sub}</span>
+            </div>
+            <i class="fas fa-chevron-right sw-row-chevron"></i>
+        </div>
+    `).join('');
+
+    const teams = [
+        { name: 'América', icon: 'fa-star', color: '#FFD700' },
+        { name: 'Chivas', icon: 'fa-heart', color: '#cc0000' },
+        { name: 'Cruz Azul', icon: 'fa-bolt', color: '#1d6fd8' },
+        { name: 'Tigres', icon: 'fa-paw', color: '#f5a623' },
+        { name: 'Pumas', icon: 'fa-cat', color: '#9fbd5c' },
+        { name: 'Monterrey', icon: 'fa-mountain', color: '#4287f5' },
+        { name: 'Real Madrid', icon: 'fa-chess-king', color: '#e8d99f' },
+        { name: 'Barcelona', icon: 'fa-shield-alt', color: '#a50044' },
+    ];
+
+    const teamChips = teams.map(t => `
+        <div class="sw-team-chip" onclick="quickSearch('${t.name}')">
+            <div class="sw-team-icon" style="background:${t.color}22;color:${t.color}"><i class="fas ${t.icon}"></i></div>
+            <span>${t.name.split(' ')[0]}</span>
+        </div>
+    `).join('');
+
     resultsContainer.innerHTML = `
-        <div class="search-welcome">
-            <div class="search-welcome-animation">
-                <div class="search-icon-animated">
-                    <i class="fas fa-search"></i>
-                </div>
-                <div class="search-waves">
-                    <span class="wave"></span>
-                    <span class="wave"></span>
-                    <span class="wave"></span>
+        <div class="sw-root">
+            ${historyHtml}
+            <div class="sw-section">
+                <div class="sw-section-head"><i class="fas fa-fire" style="color:#FF4500"></i> Tendencias</div>
+                <div class="sw-chips-scroll">
+                    <span class="sw-chip sw-chip-live" onclick="quickSearch('en vivo')"><span class="sw-live-dot"></span> En Vivo</span>
+                    <span class="sw-chip" onclick="quickSearch('Liga MX')">Liga MX</span>
+                    <span class="sw-chip" onclick="quickSearch('Champions')">Champions</span>
+                    <span class="sw-chip" onclick="quickSearch('Premier')">Premier</span>
+                    <span class="sw-chip" onclick="quickSearch('NBA')">NBA</span>
+                    <span class="sw-chip" onclick="quickSearch('UFC')">UFC</span>
+                    <span class="sw-chip" onclick="quickSearch('Copa MX')">Copa MX</span>
+                    <span class="sw-chip" onclick="quickSearch('NFL')">NFL</span>
                 </div>
             </div>
-            <h3 class="search-welcome-title">Descubre el Mundo del Deporte</h3>
-            <p class="search-welcome-subtitle">Busca entre cientos de partidos en vivo y próximos eventos</p>
-            
-            <div class="search-categories">
-                ${historyHtml}
-
-                <div class="search-category-section">
-                    <h4><i class="fas fa-fire"></i> Populares</h4>
-                    <div class="search-tags-grid">
-                        <span class="search-tag-pro" onclick="quickSearch('en vivo')">
-                            <i class="fas fa-circle live-dot-search"></i> En Vivo
-                        </span>
-                        <span class="search-tag-pro" onclick="quickSearch('Liga MX')">
-                            <i class="fas fa-futbol"></i> Liga MX
-                        </span>
-                        <span class="search-tag-pro" onclick="quickSearch('Premier League')">
-                            <i class="fas fa-crown"></i> Premier
-                        </span>
-                        <span class="search-tag-pro" onclick="quickSearch('Champions')">
-                            <i class="fas fa-star"></i> Champions
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="search-category-section">
-                    <h4><i class="fas fa-shield-alt"></i> Equipos Destacados</h4>
-                    <div class="search-tags-grid">
-                        <span class="search-tag-pro" onclick="quickSearch('América')">
-                            <i class="fas fa-eagle"></i> América
-                        </span>
-                        <span class="search-tag-pro" onclick="quickSearch('Chivas')">
-                            <i class="fas fa-heart"></i> Chivas
-                        </span>
-                        <span class="search-tag-pro" onclick="quickSearch('Tigres')">
-                            <i class="fas fa-paw"></i> Tigres
-                        </span>
-                        <span class="search-tag-pro" onclick="quickSearch('Pumas')">
-                            <i class="fas fa-cat"></i> Pumas
-                        </span>
-                        <span class="search-tag-pro" onclick="quickSearch('Cruz Azul')">
-                            <i class="fas fa-bolt"></i> Cruz Azul
-                        </span>
-                        <span class="search-tag-pro" onclick="quickSearch('Monterrey')">
-                            <i class="fas fa-mountain"></i> Monterrey
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="search-category-section">
-                    <h4><i class="fas fa-trophy"></i> Otros Deportes</h4>
-                    <div class="search-tags-grid">
-                        <span class="search-tag-pro" onclick="quickSearch('UFC')">
-                            <i class="fas fa-fist-raised"></i> UFC
-                        </span>
-                        <span class="search-tag-pro" onclick="quickSearch('NBA')">
-                            <i class="fas fa-basketball-ball"></i> NBA
-                        </span>
-                        <span class="search-tag-pro" onclick="quickSearch('NFL')">
-                            <i class="fas fa-football-ball"></i> NFL
-                        </span>
-                        <span class="search-tag-pro" onclick="quickSearch('Boxing')">
-                            <i class="fas fa-hand-rock"></i> Box
-                        </span>
-                    </div>
-                </div>
+            <div class="sw-section">
+                <div class="sw-section-head"><i class="fas fa-trophy" style="color:#FFD700"></i> Ligas</div>
+                <div class="sw-list">${leagueRows}</div>
+            </div>
+            <div class="sw-section">
+                <div class="sw-section-head"><i class="fas fa-shield-alt" style="color:#FF4500"></i> Equipos</div>
+                <div class="sw-teams-scroll">${teamChips}</div>
             </div>
         </div>
     `;
+}
+
+function startVoiceSearch() {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const btn = document.getElementById('voiceSearchBtn');
+    if (!SR) {
+        if (btn) { btn.style.opacity = '0.4'; setTimeout(() => btn.style.opacity = '', 1000); }
+        return;
+    }
+    const recognition = new SR();
+    recognition.lang = 'es-MX';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    if (btn) btn.classList.add('listening');
+    recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        quickSearch(transcript);
+    };
+    recognition.onend = () => { if (btn) btn.classList.remove('listening'); };
+    recognition.onerror = () => { if (btn) btn.classList.remove('listening'); };
+    recognition.start();
+}
+
+function filterBySport(sport, el) {
+    document.querySelectorAll('.sport-chip').forEach(c => c.classList.remove('active'));
+    if (el) el.classList.add('active');
+    const q = document.getElementById('searchInput');
+    if (q && q.value.trim()) {
+        performSearch(q.value.trim());
+    } else if (sport !== 'todos') {
+        quickSearch(sport === 'fútbol' ? 'fútbol' : sport === 'basket' ? 'NBA' : sport === 'box' ? 'UFC' : 'NFL');
+    }
 }
 
 // Variable global para guardar el filtro actual
