@@ -4460,24 +4460,27 @@ async function loadImportantMatches() {
     }
 }
 
-// Carousel state
+// Carousel state (kept for compatibility)
 let carouselCurrentIndex = 0;
 let carouselTotalItems = 0;
 let carouselTouchStartX = 0;
 let carouselTouchEndX = 0;
 
+// Rokc list state
+let selectedDayIndex = 0;
+let rokczoneDays = [];
+
 function renderImportantMatches() {
     const body = document.getElementById('importantMatchesBody');
-    
+
     if (!transmisionesData || !transmisionesData.transmisiones || transmisionesData.transmisiones.length === 0) {
         showNoMatchesMessage();
         return;
     }
-    
+
     let transmisionesToRender = [...transmisionesData.transmisiones];
 
     if (isLiveFilterActive) {
-        // Filtrar solo partidos de API 5 (donromans) que estén en vivo
         transmisionesToRender = transmisionesToRender.filter(t => {
             const isDonRomans = t.tipoAPI === 'donromans';
             const estadoAPI = (t.estado || '').toLowerCase().trim();
@@ -4485,152 +4488,121 @@ function renderImportantMatches() {
             return isDonRomans && isLive;
         });
     }
-    
-    const transmisionesSorted = transmisionesToRender.sort((a, b) => {
-        const aLive = a.estado?.toLowerCase().includes('vivo') || a.estado?.toLowerCase().includes('live');
-        const bLive = b.estado?.toLowerCase().includes('vivo') || b.estado?.toLowerCase().includes('live');
-        
+
+    // Group by date
+    const groups = {};
+    const groupOrder = [];
+
+    transmisionesToRender.forEach(t => {
+        let dateKey = 'sin-fecha';
+        let dateObj = null;
+        if (t.fecha) {
+            try {
+                dateObj = new Date(t.fecha);
+                if (!isNaN(dateObj)) {
+                    dateKey = dateObj.toDateString();
+                }
+            } catch(e) {}
+        }
+        if (!groups[dateKey]) {
+            groups[dateKey] = { date: dateObj, items: [] };
+            groupOrder.push(dateKey);
+        }
+        groups[dateKey].items.push(t);
+    });
+
+    groupOrder.sort((a, b) => {
+        const aDate = groups[a].date;
+        const bDate = groups[b].date;
+        if (!aDate && !bDate) return 0;
+        if (!aDate) return 1;
+        if (!bDate) return -1;
+        return aDate - bDate;
+    });
+
+    rokczoneDays = groupOrder;
+    if (selectedDayIndex >= groupOrder.length) selectedDayIndex = 0;
+
+    const tabsHTML = groupOrder.map((key, i) => {
+        const group = groups[key];
+        let label = '';
+        if (group.date && !isNaN(group.date)) {
+            const dayName = group.date.toLocaleDateString('es-MX', { weekday: 'short' }).toUpperCase();
+            const dayNum = group.date.getDate();
+            const month = group.date.toLocaleDateString('es-MX', { month: 'short' }).toLowerCase();
+            label = `<span class="rokc-tab-day">${dayName}</span><span class="rokc-tab-date">${dayNum} ${month}</span>`;
+        } else {
+            label = `<span class="rokc-tab-date">Sin fecha</span>`;
+        }
+        return `<button class="rokc-tab ${i === selectedDayIndex ? 'active' : ''}" onclick="rokcSelectDay(${i})">${label}</button>`;
+    }).join('');
+
+    const currentKey = groupOrder[selectedDayIndex] || groupOrder[0];
+    const currentItems = currentKey ? [...(groups[currentKey]?.items || [])] : [];
+
+    currentItems.sort((a, b) => {
+        const aLive = a.tipoAPI === 'donromans' || (a.estado || '').toLowerCase().includes('vivo');
+        const bLive = b.tipoAPI === 'donromans' || (b.estado || '').toLowerCase().includes('vivo');
         if (aLive && !bLive) return -1;
         if (!aLive && bLive) return 1;
-        
-        const aCanales = a.canales?.length || 0;
-        const bCanales = b.canales?.length || 0;
-        
-        return bCanales - aCanales;
+        const aDate = a.fecha ? new Date(a.fecha) : null;
+        const bDate = b.fecha ? new Date(b.fecha) : null;
+        if (aDate && bDate) return aDate - bDate;
+        return 0;
     });
-    
-    carouselTotalItems = transmisionesSorted.length;
-    carouselCurrentIndex = 0;
-    
-    const cardsHTML = transmisionesSorted.map((transmision, index) => {
-        const equipos = transmision.evento.split(' vs ');
-        const equipoLocal = equipos[0]?.trim() || 'Equipo 1';
-        const equipoVisitante = equipos[1]?.trim() || 'Equipo 2';
-        const canalesCount = transmision.canales?.length || 0;
-        
-        let totalLinks = 0;
-        if (transmision.canales && transmision.canales.length > 0) {
-            transmision.canales.forEach(canal => {
-                if (canal.links) {
-                    if (canal.links.hoca) totalLinks++;
-                    if (canal.links.caster) totalLinks++;
-                    if (canal.links.wigi) totalLinks++;
-                } else if (canal.enlaces && canal.enlaces.length > 0) {
-                    totalLinks += canal.enlaces.length;
-                }
-            });
-        }
-        
-        const estadoAPI = (transmision.estado || '').toLowerCase().trim();
-        // Forzar "EN VIVO" si es de la API donromans, ya que el usuario indica que ya lo están
-        const isDonRomans = transmision.tipoAPI === 'donromans';
-        const isLive = isDonRomans || estadoAPI.includes('vivo') || estadoAPI.includes('live') || estadoAPI === 'en vivo';
-        const isUpcoming = !isDonRomans && (estadoAPI.includes('próximo') || estadoAPI.includes('programado') || estadoAPI.includes('upcoming'));
-        const isFinished = !isDonRomans && (estadoAPI.includes('finalizado') || estadoAPI.includes('finished'));
-        
-        let statusBadge = '';
+
+    const rowsHTML = currentItems.map(t => {
+        const estadoAPI = (t.estado || '').toLowerCase().trim();
+        const isDonRomans = t.tipoAPI === 'donromans';
+        const isLive = isDonRomans || estadoAPI.includes('vivo') || estadoAPI.includes('live');
+
+        const deporte = (t.deporte || 'fútbol').toLowerCase();
+        let sportIcon = 'fa-futbol';
+        if (deporte.includes('basket') || deporte.includes('nba')) sportIcon = 'fa-basketball-ball';
+        else if (deporte.includes('moto') || deporte.includes('f1') || deporte.includes('formula')) sportIcon = 'fa-flag-checkered';
+        else if (deporte.includes('tenis') || deporte.includes('tennis')) sportIcon = 'fa-table-tennis';
+        else if (deporte.includes('beisbol') || deporte.includes('baseball')) sportIcon = 'fa-baseball-ball';
+        else if (deporte.includes('box') || deporte.includes('ufc') || deporte.includes('mma')) sportIcon = 'fa-fist-raised';
+
+        const liga = t.liga || t.deporte || '';
+        const evento = t.evento || t.titulo || '';
+        const eventoEscapado = evento.replace(/'/g, "\\'");
+
+        let timeLabel = '';
         if (isLive) {
-            statusBadge = `<span class="status-badge status-live"><span class="live-dot"></span> EN VIVO</span>`;
-        } else if (isFinished) {
-            statusBadge = `<span class="status-badge status-finished"><i class="fas fa-check-circle"></i> Finalizado</span>`;
-        } else if (isUpcoming) {
-            statusBadge = `<span class="status-badge status-upcoming">⏰ PRÓXIMO</span>`;
-        } else {
-            statusBadge = `<span class="status-badge status-upcoming">⏰ PRÓXIMO</span>`;
+            timeLabel = `<span class="rokc-live-badge"><span class="rokc-live-dot"></span> EN VIVO</span>`;
+        } else if (t.fecha) {
+            try {
+                const d = new Date(t.fecha);
+                if (!isNaN(d)) {
+                    timeLabel = `<span class="rokc-time">${d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</span>`;
+                }
+            } catch(e) {}
         }
-        
-        const deporte = transmision.deporte || 'Fútbol';
-        const liga = transmision.liga || '';
-        
-        let backgroundImage = 'futbol-bg.jpg';
-        if (deporte.toLowerCase().includes('basket') || deporte.toLowerCase().includes('nba')) {
-            backgroundImage = 'basquet-bg.jpg';
-        } else if (deporte.toLowerCase().includes('moto') || deporte.toLowerCase().includes('motogp')) {
-            backgroundImage = 'motos-bg.jpg';
-        }
-        
-        const fecha = transmision.fecha ? new Date(transmision.fecha).toLocaleDateString('es-MX', { 
-            day: 'numeric', 
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit'
-        }) : '';
-        
-        const eventoEscapado = (transmision.evento || transmision.titulo || '').replace(/'/g, "\\'");
-        
-        const activeClass = index === 0 ? 'active' : (index === 1 ? 'adjacent' : '');
-        
+
         return `
-            <div class="important-match-card-new ${activeClass}" data-index="${index}" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
-                <div class="match-image-container">
-                    <img src="${backgroundImage}" alt="${deporte}" class="match-bg-image">
-                    <div class="match-image-overlay"></div>
+            <div class="rokc-row ${isLive ? 'is-live' : ''}" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
+                <div class="rokc-icon"><i class="fas ${sportIcon}"></i></div>
+                <div class="rokc-info">
+                    ${liga ? `<span class="rokc-league">${liga.toUpperCase()}</span>` : ''}
+                    <span class="rokc-match">${evento}</span>
                 </div>
-                
-                <div class="match-info-container">
-                    <div class="match-badges">
-                        ${liga ? `<span class="league-badge">${liga.toUpperCase()}</span>` : ''}
-                        ${statusBadge}
-                    </div>
-                    
-                    <h3 class="match-title">${transmision.evento}</h3>
-                    
-                    ${fecha ? `
-                        <div class="match-date">
-                            <i class="far fa-clock"></i> ${fecha}
-                        </div>
-                    ` : ''}
-                    
-                    ${canalesCount > 0 ? `
-                        <div class="match-channel">
-                            <i class="fas fa-tv"></i> Canal ${transmision.canales[0]?.numero || transmision.canales[0]?.nombre || transmision.canales[0]?.nombre || ''}
-                        </div>
-                    ` : `
-                        <div class="match-channel">
-                            <i class="fas fa-list"></i> Opciones ${totalLinks > 0 ? `#${totalLinks} links` : 'disponibles'}
-                        </div>
-                    `}
-                    
-                    <div class="match-footer">
-                        <button class="btn-ver">
-                            <i class="fas fa-play"></i> Ver
-                        </button>
-                    </div>
-                </div>
+                <div class="rokc-right">${timeLabel}</div>
             </div>
         `;
-    }).join('');
-    
-    // Generate indicators (max 10 visible)
-    const maxIndicators = Math.min(carouselTotalItems, 10);
-    const indicatorsHTML = Array.from({ length: maxIndicators }, (_, i) => 
-        `<button class="carousel-indicator ${i === 0 ? 'active' : ''}" data-index="${i}" onclick="carouselGoTo(${i})"></button>`
-    ).join('');
-    
+    }).join('') || `<div class="rokc-empty">No hay partidos para este día</div>`;
+
     body.innerHTML = `
-        <div class="carousel-wrapper">
-            <button class="carousel-nav prev" onclick="carouselPrev()" ${carouselCurrentIndex === 0 ? 'disabled' : ''}>
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            
-            <div class="carousel-container" id="carouselContainer">
-                ${cardsHTML}
-            </div>
-            
-            <button class="carousel-nav next" onclick="carouselNext()" ${carouselCurrentIndex >= carouselTotalItems - 1 ? 'disabled' : ''}>
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            
-            <div class="carousel-counter">
-                <span>${carouselCurrentIndex + 1}</span> / ${carouselTotalItems}
-            </div>
-            
-            ${carouselTotalItems > 1 ? `<div class="carousel-indicators">${indicatorsHTML}</div>` : ''}
+        <div class="rokc-wrapper">
+            ${groupOrder.length > 1 ? `<div class="rokc-tabs">${tabsHTML}</div>` : ''}
+            <div class="rokc-list">${rowsHTML}</div>
         </div>
     `;
-    
-    // Initialize carousel after rendering
-    initCarouselEvents();
+}
+
+function rokcSelectDay(index) {
+    selectedDayIndex = index;
+    renderImportantMatches();
 }
 
 function initCarouselEvents() {
