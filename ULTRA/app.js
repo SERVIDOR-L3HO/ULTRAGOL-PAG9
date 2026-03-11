@@ -2899,6 +2899,50 @@ function openStream(url) {
 function toggleSettings() {
     const panel = document.getElementById('settingsPanel');
     panel.classList.toggle('active');
+    if (panel.classList.contains('active')) {
+        updateNotifButtonState();
+    }
+}
+
+function updateNotifButtonState() {
+    const btn = document.getElementById('notifToggleBtn');
+    const icon = document.getElementById('notifToggleIcon');
+    const text = document.getElementById('notifToggleText');
+    if (!btn || !icon || !text) return;
+
+    const perm = localStorage.getItem('notificationPermission');
+    const browserPerm = ('Notification' in window) ? Notification.permission : 'denied';
+    const active = perm === 'granted' && browserPerm === 'granted';
+
+    if (active) {
+        btn.style.background = '#e94560';
+        icon.className = 'fas fa-bell-slash';
+        text.textContent = 'Desactivar';
+    } else {
+        btn.style.background = 'var(--primary)';
+        icon.className = 'fas fa-bell';
+        text.textContent = 'Activar';
+    }
+}
+
+function toggleNotificationsFromSettings() {
+    const perm = localStorage.getItem('notificationPermission');
+    const browserPerm = ('Notification' in window) ? Notification.permission : 'denied';
+    const active = perm === 'granted' && browserPerm === 'granted';
+
+    if (active) {
+        if (window.notificationManager) window.notificationManager.disableNotifications();
+        else {
+            localStorage.setItem('notificationPermission', 'denied');
+        }
+        updateNotifButtonState();
+    } else {
+        if (window.notificationManager) {
+            window.notificationManager.showPermissionModal();
+        }
+        // Update button after a short delay (permission dialog takes time)
+        setTimeout(updateNotifButtonState, 2000);
+    }
 }
 
 // ==================== FUNCIONES DE ELIMINAR CACHÉ ====================
