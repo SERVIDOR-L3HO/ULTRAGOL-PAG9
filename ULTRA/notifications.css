@@ -260,50 +260,6 @@
     transform: translateY(-2px);
 }
 
-/* Team Selector Styles */
-.team-selector .notification-modal-body {
-    max-height: 500px;
-    overflow-y: auto;
-}
-
-.teams-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 15px;
-    margin-top: 20px;
-}
-
-.team-option {
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 15px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.team-option:hover {
-    background: rgba(255, 107, 53, 0.1);
-    border-color: #ff6b35;
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(255, 107, 53, 0.3);
-}
-
-.team-option img {
-    width: 60px;
-    height: 60px;
-    object-fit: contain;
-    margin-bottom: 10px;
-}
-
-.team-option span {
-    display: block;
-    color: #fff;
-    font-size: 13px;
-    font-weight: 500;
-}
-
 /* Toast Notifications */
 .notification-toast {
     position: fixed;
@@ -350,25 +306,6 @@
 
 .notification-toast.info i {
     color: #17a2b8;
-}
-
-/* Scrollbar Styles */
-.team-selector .notification-modal-body::-webkit-scrollbar {
-    width: 8px;
-}
-
-.team-selector .notification-modal-body::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
-}
-
-.team-selector .notification-modal-body::-webkit-scrollbar-thumb {
-    background: rgba(255, 107, 53, 0.5);
-    border-radius: 4px;
-}
-
-.team-selector .notification-modal-body::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 107, 53, 0.7);
 }
 
 /* Particle Background Effect */
@@ -423,24 +360,6 @@
     .notification-modal-body ul li {
         padding: 12px 14px;
         font-size: 14px;
-    }
-    
-    .teams-grid {
-        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-        gap: 10px;
-    }
-    
-    .team-option {
-        padding: 12px;
-    }
-    
-    .team-option img {
-        width: 50px;
-        height: 50px;
-    }
-    
-    .team-option span {
-        font-size: 11px;
     }
     
     .notification-modal-footer {
