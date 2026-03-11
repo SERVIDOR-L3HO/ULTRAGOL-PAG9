@@ -359,58 +359,48 @@ function startOnlineCounter() {
     const counterElement = document.getElementById('onlineCountText');
     if (!counterElement) return;
 
-    // Firebase ya está disponible globalmente en window.rtdb desde firebase-config.js
-    // Pero como app.js se carga antes o de forma independiente, aseguramos acceso
-    
     function initFirebaseCounter() {
         try {
-            // Importar dinámicamente si no está disponible, o usar el global si existe
             import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js").then((rtdbModule) => {
                 const { getDatabase, ref, onValue, set, onDisconnect, push, serverTimestamp } = rtdbModule;
-                
-                // Configuración de Firebase (debe coincidir con la de firebase-config.js)
-                const firebaseConfig = {
-                    databaseURL: "https://ligamx-daf3d-default-rtdb.firebaseio.com/"
-                };
-                
-                // Inicializar específicamente para el contador
+
                 const db = getDatabase();
-                
-                // Usar un ID único para esta sesión (esto funciona incluso sin login)
-                const myStatusRef = push(ref(db, 'status'));
 
-                // Al conectar, añadirme a la lista
-                set(myStatusRef, {
-                    id: Date.now(),
-                    last_active: serverTimestamp()
+                // Detectar conexión real con Firebase usando .info/connected
+                const connectedRef = ref(db, '.info/connected');
+                let myUserRef = null;
+
+                onValue(connectedRef, (snap) => {
+                    if (snap.val() === true) {
+                        // Conectado — registrar presencia en online_users/
+                        myUserRef = push(ref(db, 'online_users'));
+                        set(myUserRef, { ts: serverTimestamp() });
+                        // Al cerrar pestaña o perder conexión, se borra automáticamente
+                        onDisconnect(myUserRef).remove();
+                        console.log('🟢 Presencia registrada en Firebase');
+                    }
                 });
 
-                // Al desconectar (cerrar pestaña), eliminar mi registro automáticamente
-                onDisconnect(myStatusRef).remove();
-
-                // Escuchar el nodo global de conteo
-                const globalCountRef = ref(db, 'stats/online_users');
-                onValue(globalCountRef, (snapshot) => {
-                    const val = snapshot.val();
-                    // Mostrar exactamente lo que diga Firebase, sin respaldos ni números generados
-                    const count = (val !== null) ? ((typeof val === 'object') ? (val.count || 0) : val) : 0;
+                // Escuchar online_users/ y contar cuántos hijos hay
+                const onlineUsersRef = ref(db, 'online_users');
+                onValue(onlineUsersRef, (snapshot) => {
+                    const count = snapshot.size || 0;
                     counterElement.textContent = `${count.toLocaleString()} ONLINE`;
-                    console.log('📊 Contador actualizado (Firebase):', count);
+                    console.log('📊 Usuarios conectados (Firebase):', count);
                 }, (error) => {
-                    console.error("Error leyendo online_users:", error);
-                    // Si hay error de permiso o no existe, mostramos 0
-                    counterElement.textContent = "0 ONLINE";
+                    console.error('Error leyendo online_users:', error);
+                    counterElement.textContent = 'ONLINE';
                 });
+
             }).catch(err => {
-                console.error("Error cargando Firebase RTDB module:", err);
-                counterElement.textContent = "CONECTADO";
+                console.error('Error cargando Firebase RTDB module:', err);
+                counterElement.textContent = 'CONECTADO';
             });
         } catch (e) {
-            console.error("Error general en contador:", e);
+            console.error('Error general en contador:', e);
         }
     }
 
-    // Esperar un poco a que el DOM y otros scripts estén listos
     if (document.readyState === 'complete') {
         initFirebaseCounter();
     } else {
