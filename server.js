@@ -319,8 +319,18 @@ app.use(express.static(path.join(__dirname, 'ULTRA'), {
     }
 }));
 
+app.use('/assets', express.static(path.join(__dirname, 'assets'), {
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+    }
+}));
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'ULTRA', 'index.html'));
+});
+
+app.get('/welcome', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.get('/cinenova', (req, res) => {
