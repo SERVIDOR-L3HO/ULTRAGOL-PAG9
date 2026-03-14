@@ -71,6 +71,46 @@
             </div>
         </header>
 
+        <!-- LEAGUE SELECTOR BAR -->
+        <div class="league-bar">
+            <button class="lbar-btn active" onclick="selectLeague('Liga MX', this)">
+                <div class="lbar-logo liga-mx">
+                    <img src="../attached_assets/974px-MX_logo_1763574296284.png" alt="Liga MX">
+                </div>
+                <span>Liga MX</span>
+            </button>
+            <button class="lbar-btn" onclick="selectLeague('Premier League', this)">
+                <div class="lbar-logo premier">
+                    <img src="../attached_assets/logo-Premier-League_1763574296251.png" alt="Premier League">
+                </div>
+                <span>Premier</span>
+            </button>
+            <button class="lbar-btn" onclick="selectLeague('La Liga', this)">
+                <div class="lbar-logo laliga">
+                    <img src="../attached_assets/Spanish-La-Liga-logo_1763574296217.png" alt="La Liga">
+                </div>
+                <span>La Liga</span>
+            </button>
+            <button class="lbar-btn" onclick="selectLeague('Serie A', this)">
+                <div class="lbar-logo serie-a">
+                    <img src="../attached_assets/1001854184-removebg-preview_1763574296178.png" alt="Serie A">
+                </div>
+                <span>Serie A</span>
+            </button>
+            <button class="lbar-btn" onclick="selectLeague('Bundesliga', this)">
+                <div class="lbar-logo bundesliga">
+                    <img src="../attached_assets/1001854185-removebg-preview_1763574296058.png" alt="Bundesliga">
+                </div>
+                <span>Bundesliga</span>
+            </button>
+            <button class="lbar-btn" onclick="selectLeague('Ligue 1', this)">
+                <div class="lbar-logo ligue1">
+                    <img src="../attached_assets/1001854186-removebg-preview_1763574296139.png" alt="Ligue 1">
+                </div>
+                <span>Ligue 1</span>
+            </button>
+        </div>
+
         <div class="featured-match-container">
             <!-- Botón navegación izquierda -->
             <button class="carousel-nav carousel-prev" onclick="prevFeaturedMatch()" style="display: none;">
@@ -234,52 +274,6 @@
             </div>
         </div>
 
-        <section class="leagues-section">
-            <div class="section-header">
-                <h3>PRINCIPALES LIGAS</h3>
-                <button class="crown-btn">
-                    <i class="fas fa-crown"></i>
-                </button>
-            </div>
-            <div class="leagues-container">
-                <button class="league-btn active" onclick="selectLeague('Liga MX', this)">
-                    <div class="league-icon liga-mx">
-                        <img src="../attached_assets/974px-MX_logo_1763574296284.png" alt="Liga MX">
-                    </div>
-                    <span>Liga MX</span>
-                </button>
-                <button class="league-btn" onclick="selectLeague('Premier League', this)">
-                    <div class="league-icon premier">
-                        <img src="../attached_assets/logo-Premier-League_1763574296251.png" alt="Premier League">
-                    </div>
-                    <span>Premier League</span>
-                </button>
-                <button class="league-btn" onclick="selectLeague('La Liga', this)">
-                    <div class="league-icon laliga">
-                        <img src="../attached_assets/Spanish-La-Liga-logo_1763574296217.png" alt="La Liga">
-                    </div>
-                    <span>La Liga</span>
-                </button>
-                <button class="league-btn" onclick="selectLeague('Serie A', this)">
-                    <div class="league-icon serie-a">
-                        <img src="../attached_assets/1001854184-removebg-preview_1763574296178.png" alt="Serie A">
-                    </div>
-                    <span>Serie A</span>
-                </button>
-                <button class="league-btn" onclick="selectLeague('Bundesliga', this)">
-                    <div class="league-icon bundesliga">
-                        <img src="../attached_assets/1001854185-removebg-preview_1763574296058.png" alt="Bundesliga">
-                    </div>
-                    <span>Bundesliga</span>
-                </button>
-                <button class="league-btn" onclick="selectLeague('Ligue 1', this)">
-                    <div class="league-icon ligue1">
-                        <img src="../attached_assets/1001854186-removebg-preview_1763574296139.png" alt="Ligue 1">
-                    </div>
-                    <span>Ligue 1</span>
-                </button>
-            </div>
-        </section>
 
         <section class="standings-section">
             <div class="section-header">

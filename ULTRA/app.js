@@ -4532,15 +4532,14 @@ function formatDateString(dateStr) {
 }
 
 function selectLeague(leagueName, element) {
-    document.querySelectorAll('.league-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.league-btn, .lbar-btn').forEach(btn => btn.classList.remove('active'));
     
     if (element) {
         element.classList.add('active');
     } else {
-        const leagueButtons = document.querySelectorAll('.league-btn');
-        leagueButtons.forEach(btn => {
+        document.querySelectorAll('.league-btn, .lbar-btn').forEach(btn => {
             const btnText = btn.querySelector('span')?.textContent || '';
-            if (btnText === leagueName) {
+            if (btnText === leagueName || btnText.includes(leagueName.split(' ')[0])) {
                 btn.classList.add('active');
             }
         });
