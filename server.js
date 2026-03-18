@@ -337,6 +337,10 @@ app.get('/cinenova', (req, res) => {
     res.sendFile(path.join(__dirname, 'cinenova.html'));
 });
 
+app.get('/knexo', (req, res) => {
+    res.sendFile(path.join(__dirname, 'knexo.html'));
+});
+
 app.get('/ultracanales', (req, res) => {
     res.sendFile(path.join(__dirname, 'ULTRACANALES', 'index.html'));
 });
