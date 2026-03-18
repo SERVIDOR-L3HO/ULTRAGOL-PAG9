@@ -319,6 +319,13 @@ app.use(express.static(path.join(__dirname, 'ULTRA'), {
     }
 }));
 
+app.use(express.static(path.join(__dirname), {
+    index: false,
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+}));
+
 app.use('/assets', express.static(path.join(__dirname, 'assets'), {
     setHeaders: (res) => {
         res.setHeader('Cache-Control', 'public, max-age=86400');
