@@ -337,6 +337,16 @@ app.get('/cinenova', (req, res) => {
     res.sendFile(path.join(__dirname, 'cinenova.html'));
 });
 
+app.get('/ultracanales', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ULTRACANALES', 'index.html'));
+});
+
+app.use('/ultracanales', express.static(path.join(__dirname, 'ULTRACANALES'), {
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+}));
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 UltraGol server started on port ${PORT}`);
     console.log(`🌐 Server available at: http://0.0.0.0:${PORT}`);
