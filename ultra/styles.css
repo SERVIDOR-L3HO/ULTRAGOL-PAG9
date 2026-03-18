@@ -2295,19 +2295,29 @@ body {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 300px;
+    width: 320px;
     height: 100vh;
-    background: var(--secondary);
     z-index: 2000;
-    transition: right 0.3s ease;
-    box-shadow: -5px 0 20px rgba(0,0,0,0.5);
+    transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .settings-panel.active {
     right: 0;
 }
 
+.settings-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 20, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: -8px 0 40px rgba(0, 0, 0, 0.6), inset 1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
 .settings-content {
+    position: relative;
+    z-index: 1;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -2317,30 +2327,267 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid var(--border);
+    padding: 22px 20px 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(135deg, rgba(255, 69, 0, 0.12), rgba(255, 100, 20, 0.06));
 }
 
-.settings-header button {
-    background: transparent;
-    border: none;
+.settings-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.settings-header-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--primary), #ff7a30);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 69, 0, 0.4);
+}
+
+.settings-header h3 {
+    font-size: 17px;
+    font-weight: 700;
     color: var(--text);
-    font-size: 20px;
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+.settings-subtitle {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.45);
+    display: block;
+    margin-top: 1px;
+}
+
+.settings-close-btn {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 14px;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.settings-close-btn:hover {
+    background: rgba(255, 69, 0, 0.3);
+    border-color: var(--primary);
 }
 
 .settings-body {
     flex: 1;
-    padding: 20px;
+    padding: 16px;
     overflow-y: auto;
+}
+
+.settings-body::-webkit-scrollbar {
+    width: 3px;
+}
+
+.settings-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.settings-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 69, 0, 0.4);
+    border-radius: 2px;
+}
+
+.settings-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.35);
+    padding: 14px 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.settings-section-label i {
+    color: var(--primary);
+    font-size: 11px;
+}
+
+.settings-channels-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.settings-channel-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.settings-channel-card:hover {
+    background: rgba(255, 69, 0, 0.12);
+    border-color: rgba(255, 69, 0, 0.35);
+    transform: translateX(-2px);
+}
+
+.settings-channel-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--primary), #ff7a30);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(255, 69, 0, 0.3);
+}
+
+.settings-channel-icon.cinenova {
+    background: linear-gradient(135deg, #6a11cb, #a855f7);
+    box-shadow: 0 4px 12px rgba(106, 17, 203, 0.4);
+}
+
+.settings-channel-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.settings-channel-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.settings-channel-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.settings-channel-badge.live {
+    color: #22c55e;
+}
+
+.settings-channel-badge.cinenova-badge {
+    color: #a855f7;
+}
+
+.settings-channel-arrow {
+    color: rgba(255, 255, 255, 0.25);
+    font-size: 11px;
+    flex-shrink: 0;
 }
 
 .setting-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid var(--border);
+    padding: 11px 14px;
+    margin-bottom: 6px;
+    border-bottom: none;
+    border-radius: 12px;
+}
+
+.glass-item {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    transition: background 0.2s ease;
+}
+
+.glass-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.setting-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.setting-item-icon {
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 69, 0, 0.15);
+    border: 1px solid rgba(255, 69, 0, 0.25);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.glass-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, var(--primary), #ff7a30);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(255, 69, 0, 0.35);
+}
+
+.glass-action-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(255, 69, 0, 0.5);
+}
+
+.glass-donation {
+    background: rgba(255, 69, 0, 0.06);
+    border: 1px solid rgba(255, 69, 0, 0.18);
+    border-radius: 14px;
+    padding: 14px;
+    margin-bottom: 4px;
+}
+
+.glass-danger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 20px;
+    background: rgba(220, 53, 69, 0.15);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    border-radius: 10px;
+    color: #ff6b78;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.glass-danger-btn:hover {
+    background: rgba(220, 53, 69, 0.3);
+    border-color: rgba(220, 53, 69, 0.6);
 }
 
 .setting-select {
@@ -5231,15 +5478,46 @@ body.light-mode .nav-btn span {
 }
 
 body.light-mode .settings-panel {
-    background: rgba(255, 255, 255, 0.98);
+    background: transparent;
+}
+
+body.light-mode .settings-backdrop {
+    background: rgba(240, 240, 248, 0.92);
     border-left: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 body.light-mode .settings-header {
     border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    background: linear-gradient(135deg, rgba(255, 69, 0, 0.08), rgba(255, 100, 20, 0.04));
 }
 
-body.light-mode .settings-header h2 {
+body.light-mode .settings-header h3 {
+    color: #1a1a1a;
+}
+
+body.light-mode .settings-subtitle {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+body.light-mode .settings-section-label {
+    color: rgba(0, 0, 0, 0.35);
+}
+
+body.light-mode .settings-channel-card {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .settings-channel-name {
+    color: #1a1a1a;
+}
+
+body.light-mode .glass-item {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.07);
+}
+
+body.light-mode .glass-item span {
     color: #1a1a1a;
 }
 
@@ -5587,8 +5865,12 @@ body.dark-mode .news-card:hover {
 }
 
 body.dark-mode .settings-panel {
-    background: rgba(10, 10, 10, 0.98);
-    border-left: 1px solid var(--border);
+    background: transparent;
+}
+
+body.dark-mode .settings-backdrop {
+    background: rgba(5, 5, 15, 0.9);
+    border-left: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 body.dark-mode .settings-option {

@@ -300,29 +300,6 @@
         </section>
 
 
-        <div class="streaming-section">
-            <h3 class="section-title">Canales de Transmisión</h3>
-            <div class="channels-grid">
-                <div class="channel-card-mini" onclick="openStream('/ULTRACANALES/index.html')">
-                    <div class="channel-icon-mini">
-                        <i class="fas fa-satellite-dish"></i>
-                    </div>
-                    <h4>CANALES DE TELEVISIÓN EN VIVO</h4>
-                    <span class="status-live-mini">
-                        <span class="dot"></span>EN VIVO
-                    </span>
-                </div>
-                <div class="channel-card-mini" onclick="window.location.href='/cinenova'">
-                    <div class="channel-icon-mini">
-                        <i class="fas fa-film"></i>
-                    </div>
-                    <h4>PELÍCULAS Y SERIES</h4>
-                    <span class="status-live-mini">
-                        <span class="dot"></span>CineNova
-                    </span>
-                </div>
-            </div>
-        </div>
 
         <nav class="bottom-nav">
             <button class="nav-btn active" onclick="navTo('home', this)">
@@ -423,29 +400,87 @@
     </div>
 
     <div id="settingsPanel" class="settings-panel">
+        <div class="settings-backdrop"></div>
         <div class="settings-content">
             <div class="settings-header">
-                <h3>Configuración</h3>
-                <button onclick="toggleSettings()">
+                <div class="settings-header-left">
+                    <div class="settings-header-icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <div>
+                        <h3>Configuración</h3>
+                        <span class="settings-subtitle">Personaliza tu experiencia</span>
+                    </div>
+                </div>
+                <button class="settings-close-btn" onclick="toggleSettings()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="settings-body">
-                <div class="setting-item">
-                    <span>Calidad de video</span>
-                    <select class="setting-select">
-                        <option>Auto</option>
-                        <option>HD</option>
-                        <option>SD</option>
-                    </select>
+
+                <!-- SECCIÓN: Canales -->
+                <div class="settings-section-label">
+                    <i class="fas fa-play-circle"></i> Transmisión
                 </div>
-                <div class="setting-item donation-section">
+                <div class="settings-channels-grid">
+                    <div class="settings-channel-card" onclick="window.location.href='../knexo.html'">
+                        <div class="settings-channel-icon" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); box-shadow: 0 4px 12px rgba(99,102,241,0.4);">
+                            <i class="fas fa-infinity"></i>
+                        </div>
+                        <div class="settings-channel-info">
+                            <span class="settings-channel-name">Doramas</span>
+                            <span class="settings-channel-badge" style="color: #818cf8;">K-Nexo</span>
+                        </div>
+                        <i class="fas fa-chevron-right settings-channel-arrow"></i>
+                    </div>
+                    <div class="settings-channel-card" onclick="window.location.href='../ULTRACANALES/index.html'">
+                        <div class="settings-channel-icon">
+                            <i class="fas fa-satellite-dish"></i>
+                        </div>
+                        <div class="settings-channel-info">
+                            <span class="settings-channel-name">TV en Vivo</span>
+                            <span class="settings-channel-badge live">● EN VIVO</span>
+                        </div>
+                        <i class="fas fa-chevron-right settings-channel-arrow"></i>
+                    </div>
+                    <div class="settings-channel-card" onclick="window.location.href='../cinenova.html'">
+                        <div class="settings-channel-icon cinenova">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <div class="settings-channel-info">
+                            <span class="settings-channel-name">Pelis y Series</span>
+                            <span class="settings-channel-badge cinenova-badge">CineNova</span>
+                        </div>
+                        <i class="fas fa-chevron-right settings-channel-arrow"></i>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: Reproducción -->
+                <div class="settings-section-label">
+                    <i class="fas fa-video"></i> Reproducción
+                </div>
+                <div class="setting-item glass-item">
+                    <div class="setting-item-left">
+                        <div class="setting-item-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <span>Ahorro de datos</span>
+                    </div>
+                    <button class="glass-action-btn" onclick="window.location.href='ahorro.html'">
+                        <i class="fas fa-leaf"></i> Activar
+                    </button>
+                </div>
+
+                <!-- SECCIÓN: Apoyar -->
+                <div class="settings-section-label">
+                    <i class="fas fa-heart"></i> Apoyar
+                </div>
+                <div class="donation-section glass-donation">
                     <div class="donation-header">
                         <i class="fas fa-university"></i>
                         <span>APOYAR PROYECTO</span>
                     </div>
-                    <p class="donation-hint">Tu apoyo nos ayuda a mantener los servidores activos y mejorar la calidad de las transmisiones.</p>
-                    
+                    <p class="donation-hint">Tu apoyo mantiene los servidores activos y mejora la calidad de las transmisiones.</p>
                     <div class="real-credit-card" onclick="copyToClipboard('5101258429877328')">
                         <div class="card-glass-effect"></div>
                         <div class="card-chip"></div>
@@ -459,19 +494,18 @@
                         </div>
                     </div>
                 </div>
-                <div class="setting-item">
-                    <span>Ahorro de datos</span>
-                    <button class="clear-cache-btn" onclick="window.location.href='ahorro.html'" style="background: var(--primary); width: auto; padding: 5px 15px;">
-                        <i class="fas fa-leaf"></i>
-                        <span>Activar</span>
-                    </button>
+
+                <!-- SECCIÓN: Sistema -->
+                <div class="settings-section-label">
+                    <i class="fas fa-cog"></i> Sistema
                 </div>
-                <div class="setting-item setting-item-btn">
-                    <button class="clear-cache-btn" onclick="showClearCacheConfirmation()">
+                <div class="setting-item glass-item setting-item-btn">
+                    <button class="glass-danger-btn" onclick="showClearCacheConfirmation()">
                         <i class="fas fa-trash-alt"></i>
                         <span>Eliminar caché</span>
                     </button>
                 </div>
+
             </div>
         </div>
     </div>
