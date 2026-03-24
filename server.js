@@ -358,6 +358,17 @@ app.use('/ultracanales', express.static(path.join(__dirname, 'ULTRACANALES'), {
     }
 }));
 
+// Same routes with uppercase for production compatibility
+app.get('/ULTRACANALES', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ULTRACANALES', 'index.html'));
+});
+
+app.use('/ULTRACANALES', express.static(path.join(__dirname, 'ULTRACANALES'), {
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+}));
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 UltraGol server started on port ${PORT}`);
     console.log(`🌐 Server available at: http://0.0.0.0:${PORT}`);
