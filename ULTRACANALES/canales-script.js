@@ -127,8 +127,8 @@ function createChannelCard(channel) {
                 <div class="channel-card-name">${channel.name}</div>
                 <div class="channel-card-category">${channel.categoryName}</div>
             </div>
-            <div>
-                ${channel.live ? '<span class="channel-card-badge">EN VIVO</span>' : ''}
+            <div class="channel-card-footer">
+                ${channel.live ? '<span class="channel-card-badge">EN VIVO</span>' : '<span></span>'}
                 <div class="channel-sources">${channel.sources.length} fuente${channel.sources.length > 1 ? 's' : ''}</div>
             </div>
         </div>
