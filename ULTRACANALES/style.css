@@ -827,6 +827,39 @@ body {
 
 .channel-item:hover::after { color:var(--orange); }
 
+/* ── ONLINE COUNTER ──────────────────────────────────── */
+.online-counter {
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(74,222,128,0.35);
+    padding: 5px 12px;
+    border-radius: var(--r-xl);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #4ade80;
+    user-select: none;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.online-dot-mini {
+    width: 6px; height: 6px;
+    background: #4ade80;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #4ade80;
+    animation: pulseOnline 2s infinite;
+    flex-shrink: 0;
+}
+
+@keyframes pulseOnline {
+    0%   { transform:scale(1);   box-shadow:0 0 0 0 rgba(74,222,128,.7); }
+    70%  { transform:scale(1.1); box-shadow:0 0 0 6px rgba(74,222,128,0); }
+    100% { transform:scale(1);   box-shadow:0 0 0 0 rgba(74,222,128,0); }
+}
+
 /* ── FOOTER ───────────────────────────────────────────── */
 .footer {
     border-top:1px solid var(--border);

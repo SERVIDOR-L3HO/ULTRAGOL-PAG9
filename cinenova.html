@@ -65,6 +65,34 @@
             border-color: rgba(255,255,255,0.25);
         }
 
+        .online-counter {
+            background: rgba(0,0,0,0.55);
+            border: 1px solid rgba(74,222,128,0.35);
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #4ade80;
+            user-select: none;
+            letter-spacing: 0.3px;
+        }
+        .online-dot-mini {
+            width: 6px; height: 6px;
+            background: #4ade80;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #4ade80;
+            animation: pulseOnline 2s infinite;
+            flex-shrink: 0;
+        }
+        @keyframes pulseOnline {
+            0%   { transform:scale(1);   box-shadow:0 0 0 0 rgba(74,222,128,.7); }
+            70%  { transform:scale(1.1); box-shadow:0 0 0 6px rgba(74,222,128,0); }
+            100% { transform:scale(1);   box-shadow:0 0 0 0 rgba(74,222,128,0); }
+        }
+
         .iframe-wrapper {
             position: fixed;
             top: 54px;
@@ -126,6 +154,10 @@
                 <i class="fas fa-arrow-left"></i>
             </a>
         </div>
+        <div class="online-counter" id="userCount">
+            <span class="online-dot-mini"></span>
+            <span id="onlineCountText">...</span>
+        </div>
     </div>
 
     <div class="iframe-wrapper">
@@ -150,6 +182,39 @@
             setTimeout(() => {
                 overlay.classList.add('hidden');
             }, 400);
+        });
+    </script>
+
+    <script type="module">
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, set, onDisconnect, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAneyRjnZzvhIFLzykATmW4ShN3IVuf5E0",
+            authDomain: "ligamx-daf3d.firebaseapp.com",
+            projectId: "ligamx-daf3d",
+            storageBucket: "ligamx-daf3d.appspot.com",
+            messagingSenderId: "437421248316",
+            appId: "1:437421248316:web:38e9f436a57389d2c49839",
+            databaseURL: "https://ligamx-daf3d-default-rtdb.firebaseio.com/"
+        };
+
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+        const db = getDatabase(app);
+        const counterEl = document.getElementById('onlineCountText');
+
+        const connectedRef = ref(db, '.info/connected');
+        onValue(connectedRef, (snap) => {
+            if (snap.val() === true) {
+                const myRef = push(ref(db, 'online_users'));
+                set(myRef, { ts: serverTimestamp() });
+                onDisconnect(myRef).remove();
+            }
+        });
+
+        onValue(ref(db, 'online_users'), (snapshot) => {
+            const count = snapshot.size || 0;
+            if (counterEl) counterEl.textContent = `${count.toLocaleString()} ONLINE`;
         });
     </script>
 

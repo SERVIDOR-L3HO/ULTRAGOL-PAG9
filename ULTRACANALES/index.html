@@ -50,6 +50,10 @@
                     <span class="live-dot-sm"></span>
                     <span id="liveCounter">Canales en vivo</span>
                 </div>
+                <div class="online-counter" id="userCount">
+                    <span class="online-dot-mini"></span>
+                    <span id="onlineCountText">...</span>
+                </div>
                 <button class="login-btn" id="loginBtn">
                     <span class="login-avatar">G</span>
                     <span class="login-text">Iniciar Sesión</span>
@@ -139,5 +143,37 @@
 
     <script type="module" src="./firebase-config.js?v=20260325"></script>
     <script type="module" src="./script.js?v=20260325"></script>
+    <script type="module">
+        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, set, onDisconnect, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAneyRjnZzvhIFLzykATmW4ShN3IVuf5E0",
+            authDomain: "ligamx-daf3d.firebaseapp.com",
+            projectId: "ligamx-daf3d",
+            storageBucket: "ligamx-daf3d.appspot.com",
+            messagingSenderId: "437421248316",
+            appId: "1:437421248316:web:38e9f436a57389d2c49839",
+            databaseURL: "https://ligamx-daf3d-default-rtdb.firebaseio.com/"
+        };
+
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+        const db = getDatabase(app);
+        const counterEl = document.getElementById('onlineCountText');
+
+        const connectedRef = ref(db, '.info/connected');
+        onValue(connectedRef, (snap) => {
+            if (snap.val() === true) {
+                const myRef = push(ref(db, 'online_users'));
+                set(myRef, { ts: serverTimestamp() });
+                onDisconnect(myRef).remove();
+            }
+        });
+
+        onValue(ref(db, 'online_users'), (snapshot) => {
+            const count = snapshot.size || 0;
+            if (counterEl) counterEl.textContent = `${count.toLocaleString()} ONLINE`;
+        });
+    </script>
 </body>
 </html>
