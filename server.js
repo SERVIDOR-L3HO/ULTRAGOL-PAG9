@@ -348,26 +348,27 @@ app.get('/knexo', (req, res) => {
     res.sendFile(path.join(__dirname, 'knexo.html'));
 });
 
-app.get('/ultracanales', (req, res) => {
+// ULTRACANALES — use regex to match ONLY without trailing slash to avoid redirect loops
+app.get(/^\/ultracanales$/, (req, res) => {
+    res.redirect(301, '/ultracanales/');
+});
+
+app.get(/^\/ULTRACANALES\/?$/, (req, res) => {
+    res.redirect(301, '/ultracanales/');
+});
+
+app.get('/ultracanales/', (req, res) => {
     res.sendFile(path.join(__dirname, 'ULTRACANALES', 'index.html'));
 });
 
-app.use('/ultracanales', express.static(path.join(__dirname, 'ULTRACANALES'), {
+const staticOpts = {
     setHeaders: (res) => {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     }
-}));
+};
 
-// Same routes with uppercase for production compatibility
-app.get('/ULTRACANALES', (req, res) => {
-    res.sendFile(path.join(__dirname, 'ULTRACANALES', 'index.html'));
-});
-
-app.use('/ULTRACANALES', express.static(path.join(__dirname, 'ULTRACANALES'), {
-    setHeaders: (res) => {
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    }
-}));
+app.use('/ultracanales', express.static(path.join(__dirname, 'ULTRACANALES'), staticOpts));
+app.use('/ULTRACANALES', express.static(path.join(__dirname, 'ULTRACANALES'), staticOpts));
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 UltraGol server started on port ${PORT}`);
