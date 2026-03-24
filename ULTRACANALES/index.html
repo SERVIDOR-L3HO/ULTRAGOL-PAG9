@@ -3,75 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ULTRACANALES - Streaming Deportivo</title>
+    <title>ULTRACANALES — Televisión Deportiva en Vivo</title>
     <base href="/ultracanales/">
-    <link href="style.css?v=20260324" rel="stylesheet" type="text/css" />
+    <meta name="theme-color" content="#ff8c00">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="style.css?v=20260325" rel="stylesheet">
 </head>
 <body>
+
+    <!-- LIVE TICKER -->
+    <div class="live-ticker">
+        <div class="ticker-badge">
+            <span class="ticker-dot"></span>
+            EN VIVO
+        </div>
+        <div class="ticker-track">
+            <div class="ticker-content">
+                ⚽ Liga MX — Jornada en progreso &nbsp;·&nbsp; 🏆 Premier League — En vivo &nbsp;·&nbsp; 🎯 ESPN — Transmisión activa &nbsp;·&nbsp; 📺 Fox Sports HD — En aire &nbsp;·&nbsp; ⚡ TUDN — Cobertura en vivo &nbsp;·&nbsp; 🔴 TNT Sports — En directo &nbsp;·&nbsp; ⚽ Liga MX — Jornada en progreso &nbsp;·&nbsp; 🏆 Premier League — En vivo &nbsp;·&nbsp; 🎯 ESPN — Transmisión activa &nbsp;·&nbsp; 📺 Fox Sports HD — En aire &nbsp;·&nbsp;
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER -->
     <header class="header">
-        <div class="header-content">
+        <div class="header-inner">
             <div class="header-left">
-                <div class="logo">
-                    <img src="attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="logo-image">
+                <a href="/" class="brand">
+                    <img src="attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="brand-logo">
+                </a>
+                <nav class="header-nav">
+                    <a href="/" class="nav-link active">Inicio</a>
+                    <a href="canales.html" class="nav-link">Todos los Canales</a>
+                </nav>
+            </div>
+
+            <div class="header-center">
+                <div class="search-wrap">
+                    <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar canal, deporte, liga...">
                 </div>
             </div>
+
             <div class="header-right">
+                <div class="live-count">
+                    <span class="live-dot-sm"></span>
+                    <span id="liveCounter">Canales en vivo</span>
+                </div>
                 <button class="login-btn" id="loginBtn">
-                    <span class="login-icon">G</span>
+                    <span class="login-avatar">G</span>
                     <span class="login-text">Iniciar Sesión</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <div class="search-bar-section">
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="Buscar canales, equipos o ligas...">
-            <button class="search-icon-btn">🔍</button>
+    <!-- HERO BANNER -->
+    <div id="hero-banner" class="hero-banner">
+        <div class="hero-overlay"></div>
+        <img src="attached_assets/1760230812607~2_1760232142546.jpg" alt="El Fútbol Respira Aquí" class="hero-banner-image">
+        <div class="hero-content">
+            <div class="hero-badge-pill">
+                <span class="hero-live-dot"></span>
+                TRANSMISIÓN EN VIVO
+            </div>
+            <h1 class="hero-title">El Fútbol<br>Respira Aquí</h1>
+            <p class="hero-sub">Todos los canales deportivos. Sin interrupciones.</p>
         </div>
     </div>
 
-    <div id="hero-banner" class="hero-banner">
-        <img src="attached_assets/1760230812607~2_1760232142546.jpg" alt="El Fútbol Respira Aquí" class="hero-banner-image">
-    </div>
-
+    <!-- PLAYER SECTION -->
     <div id="player-section" class="player-section hidden">
-        <div class="player-container">
-            <button class="close-player" onclick="closePlayer()">✕</button>
-            <div class="player-wrapper">
-                <iframe id="player" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-            </div>
-            <div class="player-info">
-                <h2 id="current-channel-name">Canal</h2>
-                <div class="player-actions">
-                    <button class="action-btn">📤 Compartir</button>
-                    <button class="action-btn">❤️ <span id="likes">7.2K</span></button>
+        <div class="player-stage">
+            <div class="player-screen">
+                <button class="close-player" onclick="closePlayer()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+                <div class="player-wrapper">
+                    <iframe id="player" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
                 </div>
             </div>
-            <div class="source-selector">
+            <div class="player-sidebar">
+                <div class="now-playing-label">REPRODUCIENDO</div>
+                <h2 id="current-channel-name" class="now-channel-name">Canal</h2>
+                <div class="now-live-badge">
+                    <span class="nlb-dot"></span>
+                    EN VIVO
+                </div>
+                <div class="player-actions">
+                    <button class="action-btn share-action">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                        Compartir
+                    </button>
+                    <button class="action-btn like-action">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span id="likes">7.2K</span>
+                    </button>
+                </div>
+                <div class="source-label">SEÑALES DISPONIBLES</div>
                 <div id="source-buttons" class="source-buttons"></div>
             </div>
         </div>
     </div>
 
+    <!-- MAIN GUIDE -->
     <main class="main-content">
-        <div class="filter-tabs">
-            <button class="filter-tab active">⚽ Todos los canales</button>
-            <a href="canales.html" class="filter-tab mas-canales-btn">🌟 MÁS CANALES</a>
-            <button class="filter-tab">⚡ TNT Sports</button>
+        <!-- Network filter bar -->
+        <div class="guide-header">
+            <div class="guide-title-area">
+                <h2 class="guide-title">Guía de Canales</h2>
+                <div class="guide-live-pill">
+                    <span class="glp-dot"></span>
+                    <span id="livePillCount">EN VIVO</span>
+                </div>
+            </div>
+            <div class="filter-tabs">
+                <button class="filter-tab active">Todos</button>
+                <a href="canales.html" class="filter-tab mas-btn">Ver todos los canales →</a>
+                <button class="filter-tab">TNT Sports</button>
+            </div>
         </div>
 
         <div class="channels-section">
-            <div class="section-header">
-                <h2>Canales</h2>
-                <button class="siguiente-btn">Siguiente</button>
-            </div>
             <div id="channels-list" class="channels-list"></div>
         </div>
-
     </main>
 
-    <script type="module" src="firebase-config.js?v=20260324"></script>
-    <script type="module" src="script.js?v=20260324"></script>
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <img src="attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="footer-logo">
+            <p class="footer-copy">&copy; 2025 ULTRACANALES · L3HO Interactive · Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <script type="module" src="firebase-config.js?v=20260325"></script>
+    <script type="module" src="script.js?v=20260325"></script>
 </body>
 </html>
