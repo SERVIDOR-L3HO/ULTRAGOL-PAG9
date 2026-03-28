@@ -285,6 +285,28 @@ app.get('/api/ultragol/transmisiones3', async (req, res) => {
     }
 });
 
+app.get('/api/ultragol/transmisiones6', async (req, res) => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/transmisiones6`);
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.warn('⚠️ API externa transmisiones6 no disponible, usando JSON local:', error.message);
+        try {
+            const fs = require('fs');
+            const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'ULTRA', 'transmisiones6.json'), 'utf8'));
+            res.json(data);
+        } catch (localError) {
+            console.error('Error al leer transmisiones6.json local:', localError);
+            res.status(500).json({ error: 'Error al obtener transmisiones6' });
+        }
+    }
+});
+
+app.get('/transmisiones6', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ULTRA', 'index.html'));
+});
+
 console.log('✅ UltraGol API proxy enabled');
 
 if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {
