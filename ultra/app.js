@@ -4736,9 +4736,21 @@ function renderImportantMatches() {
             .rokc-chevron{font-size:13px;color:rgba(255,255,255,0.35);flex-shrink:0;margin-left:12px;}
             @keyframes rokcPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.3;transform:scale(0.6);}}
             .rokc-empty{text-align:center;color:rgba(255,255,255,0.35);padding:50px 20px;font-size:14px;line-height:1.6;}
+            .rokc-footer{padding:16px 18px;background:#111;border-top:1px solid rgba(255,255,255,0.07);flex-shrink:0;}
+            .rokc-footer-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid rgba(200,230,0,0.3);background:rgba(200,230,0,0.07);color:#C8E600;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;}
+            .rokc-footer-btn:active{background:rgba(200,230,0,0.15);transform:scale(0.98);}
+            .rokc-footer-btn i{font-size:16px;}
+            .rokc-footer-hint{text-align:center;margin-top:10px;font-size:12px;color:rgba(255,255,255,0.3);line-height:1.5;}
         </style>
         <div class="rokc-wrapper">
             <div class="rokc-list">${rowsHTML}</div>
+            <div class="rokc-footer">
+                <button class="rokc-footer-btn" onclick="closeImportantMatchesModal(); setTimeout(showSearchModal, 250);">
+                    <i class="fas fa-search"></i>
+                    ¿No encuentras tu partido? Búscalo aquí
+                </button>
+                <p class="rokc-footer-hint">El buscador tiene más de 400 transmisiones en vivo y programadas</p>
+            </div>
         </div>
     `;
 }
