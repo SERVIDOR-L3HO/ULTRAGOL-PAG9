@@ -596,15 +596,29 @@ async function loadTransmisiones() {
             }))
         }));
         
-        // Marcar transmisiones API 6 con su tipo
-        const transmisionesAPI6Marcadas = (data6.transmisiones || []).map(t => ({
-            ...t,
-            tipoAPI: 'transmisiones6',
-            canales: (t.canales || []).map(c => ({
-                ...c,
-                tipoAPI: 'transmisiones6'
-            }))
-        }));
+        // Normalizar transmisiones API 6 (streamed.pk usa "fuentes", JSON local usa "canales")
+        const transmisionesAPI6Marcadas = (data6.transmisiones || []).map(t => {
+            let canalesNormalizados = [];
+
+            if (t.canales && t.canales.length > 0) {
+                // Formato JSON local: ya tiene canales
+                canalesNormalizados = t.canales.map(c => ({ ...c, tipoAPI: 'transmisiones6' }));
+            } else if (t.fuentes && t.fuentes.length > 0) {
+                // Formato API externa (streamed.pk): usa "fuentes" → convertir a canales
+                canalesNormalizados = t.fuentes.map(f => ({
+                    numero: '',
+                    nombre: f.fuente || 'Canal',
+                    enlaces: f.url ? [{ url: f.url, calidad: 'HD' }] : [],
+                    tipoAPI: 'transmisiones6'
+                }));
+            }
+
+            return {
+                ...t,
+                tipoAPI: 'transmisiones6',
+                canales: canalesNormalizados
+            };
+        });
         
         // Guardar datos separados de cada API
         transmisionesAPI1 = {
