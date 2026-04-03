@@ -1448,7 +1448,7 @@ function showChannelSelector(transmision, partidoNombre) {
             } else if (canal.enlaces && canal.enlaces.length > 0) {
                 enlace = canal.enlaces[0].url || canal.enlaces[0];
             } else if (canal.links) {
-                enlace = canal.links.hoca || canal.links.caster || canal.links.wigi || canal.links.url || '';
+                enlace = canal.links.principal || canal.links.backup || canal.links.hoca || canal.links.caster || canal.links.wigi || canal.links.url || '';
             } else if (canal.link) {
                 enlace = canal.link;
             }
@@ -5601,7 +5601,7 @@ async function shareChannelModal() {
             if (canal.enlaces && canal.enlaces.length > 0) {
                 url = canal.enlaces[0].url || canal.enlaces[0];
             } else if (canal.links) {
-                url = canal.links.hoca || canal.links.caster || canal.links.wigi || '';
+                url = canal.links.principal || canal.links.backup || canal.links.hoca || canal.links.caster || canal.links.wigi || '';
             }
             return [canal.nombre || 'Canal', url, canal.tipoAPI || ''];
         }).filter(c => c[1]);
