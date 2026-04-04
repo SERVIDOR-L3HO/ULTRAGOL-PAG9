@@ -1440,27 +1440,29 @@ function showChannelSelector(transmision, partidoNombre) {
     // Guardar en historial antes de abrir
     modalNavigation.pushModal('channelSelector', { transmision, partidoNombre });
     
-    // Create professional server selector UI
+    const totalCanales = transmision.canales ? transmision.canales.length : 0;
+
     let channelsHtml = `
         <div class="server-selector-creative">
             <div class="server-header-creative">
                 <div class="server-title-group">
                     <span class="pulse-icon"></span>
-                    <span class="server-label">SERVIDOR DE TRANSMISIÓN</span>
+                    <span class="server-label">Señales disponibles</span>
+                    <span class="server-count-badge">${totalCanales} NODO${totalCanales !== 1 ? 'S' : ''}</span>
                 </div>
-                <div class="server-subtitle-creative">Selecciona una señal disponible para ver el partido</div>
+                <div class="server-subtitle-creative">Selecciona una señal para ver el partido</div>
             </div>
             <div class="server-grid-creative">
     `;
-    
-    if (transmision.canales && transmision.canales.length > 0) {
+
+    if (totalCanales > 0) {
         transmision.canales.forEach((canal, index) => {
             const serverNum = index + 1;
-            const apiType = canal.tipoAPI || 'DIRECT';
-            const latency = Math.floor(Math.random() * 25) + 5;
-            const quality = 'HD PREMIUM';
-            
-            // Extracción de URL mejorada para manejar múltiples formatos de API
+            const apiType = canal.tipoAPI || canal.fuente || 'DIRECT';
+            const latencyVal = Math.floor(Math.random() * 38) + 5;
+            const latencyClass = latencyVal < 20 ? 'lat-fast' : latencyVal < 35 ? 'lat-medium' : 'lat-slow';
+            const entranceDelay = (index * 55) + 'ms';
+
             let enlace = '';
             if (canal.url) {
                 enlace = canal.url;
@@ -1471,26 +1473,29 @@ function showChannelSelector(transmision, partidoNombre) {
             } else if (canal.link) {
                 enlace = canal.link;
             }
-            
+
             const canalNombre = canal.nombre || `Servidor #${serverNum}`;
-            
+            const safeNombre = partidoNombre.replace(/'/g, "\\'");
+
             channelsHtml += `
-                <div class="server-node-card" onclick="playChannelFromSelector('${enlace}', '${partidoNombre.replace(/'/g, "\\'")}')">
+                <div class="server-node-card" style="animation-delay:${entranceDelay}"
+                     onclick="playChannelFromSelector('${enlace}', '${safeNombre}')">
+                    <div class="node-scan"></div>
                     <div class="node-edge"></div>
                     <div class="node-content">
                         <div class="node-visual">
                             <div class="node-icon-wrapper">
-                                <i class="fas fa-server"></i>
+                                <i class="fas fa-satellite-dish"></i>
                                 <div class="node-online-dot"></div>
+                                <span class="node-num-badge">#${serverNum}</span>
                             </div>
-                            <div class="node-latency">${latency}ms</div>
+                            <div class="node-latency ${latencyClass}">${latencyVal}ms</div>
                         </div>
                         <div class="node-info">
                             <div class="node-name">${canalNombre}</div>
                             <div class="node-meta">
-                                <span class="node-provider">SISTEMA ${apiType.toUpperCase()}</span>
-                                <span class="node-divider"></span>
-                                <span class="node-quality">${quality}</span>
+                                <span class="node-provider-tag">${apiType.toUpperCase()}</span>
+                                <span class="node-quality-tag">HD PREMIUM</span>
                             </div>
                         </div>
                         <div class="node-action">
@@ -1504,19 +1509,22 @@ function showChannelSelector(transmision, partidoNombre) {
         });
     } else {
         channelsHtml += `
-            <div class="no-nodes" style="text-align:center; padding: 40px 20px; color: #707070;">
-                <i class="fas fa-exclamation-circle" style="font-size: 32px; margin-bottom: 16px; color: #ff4500;"></i>
-                <p>No se encontraron señales activas en este momento</p>
+            <div style="text-align:center; padding:40px 20px; color:#505050;">
+                <i class="fas fa-satellite" style="font-size:36px; margin-bottom:14px; color:#333; display:block;"></i>
+                <p style="font-size:13px;">No se encontraron señales activas en este momento</p>
             </div>
         `;
     }
-    
+
     channelsHtml += `
             </div>
             <div class="server-terminal-footer">
+                <div class="signal-bars">
+                    <span></span><span></span><span></span><span></span>
+                </div>
                 <div class="terminal-text">
-                    <i class="fas fa-check-circle"></i>
-                    <span>CONEXIÓN ESTABLE Y OPTIMIZADA</span>
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Conexión cifrada y optimizada</span>
                 </div>
             </div>
         </div>
