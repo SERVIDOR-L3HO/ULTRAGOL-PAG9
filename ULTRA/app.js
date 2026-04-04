@@ -3891,75 +3891,56 @@ function selectImportantMatchByName(eventoNombre) {
     let canalesCombinados = [];
     let tituloMostrar = transmision.titulo || transmision.evento;
     
+    const matchName = (evento) => {
+        const e = (evento || '').toLowerCase().trim();
+        return e === nombreBuscar || e.includes(nombreBuscar) || nombreBuscar.includes(e);
+    };
+
     if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
-        const transAPI1 = transmisionesAPI1.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
-        
+        const transAPI1 = transmisionesAPI1.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI1 && transAPI1.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI1.canales];
+            canalesCombinados = [...canalesCombinados, ...transAPI1.canales.map(c => ({ ...c, fuente: 'rereyano' }))];
             console.log(`✅ Encontrados ${transAPI1.canales.length} canales en API 1 (rereyano)`);
         }
     }
-    
+
     if (transmisionesAPI2 && transmisionesAPI2.transmisiones) {
-        const transAPI2 = transmisionesAPI2.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
-        
+        const transAPI2 = transmisionesAPI2.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI2 && transAPI2.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI2.canales];
+            canalesCombinados = [...canalesCombinados, ...transAPI2.canales.map(c => ({ ...c, fuente: 'e1link' }))];
             console.log(`✅ Encontrados ${transAPI2.canales.length} canales en API 2 (e1link)`);
         }
     }
-    
+
     if (transmisionesAPI3 && transmisionesAPI3.transmisiones) {
-        const transAPI3 = transmisionesAPI3.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
-        
+        const transAPI3 = transmisionesAPI3.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI3 && transAPI3.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI3.canales];
+            canalesCombinados = [...canalesCombinados, ...transAPI3.canales.map(c => ({ ...c, fuente: 'voodc' }))];
             console.log(`✅ Encontrados ${transAPI3.canales.length} canales en API 3 (voodc)`);
         }
     }
-    
+
     if (transmisionesAPI4 && transmisionesAPI4.transmisiones) {
-        const transAPI4 = transmisionesAPI4.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
-        
+        const transAPI4 = transmisionesAPI4.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI4 && transAPI4.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI4.canales];
+            canalesCombinados = [...canalesCombinados, ...transAPI4.canales.map(c => ({ ...c, fuente: 'transmisiones4' }))];
             console.log(`✅ Encontrados ${transAPI4.canales.length} canales en API 4 (transmisiones4)`);
         }
     }
-    
+
     if (transmisionesAPI5 && transmisionesAPI5.transmisiones) {
-        const transAPI5 = transmisionesAPI5.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
-        
+        const transAPI5 = transmisionesAPI5.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI5 && transAPI5.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI5.canales];
+            canalesCombinados = [...canalesCombinados, ...transAPI5.canales.map(c => ({ ...c, fuente: 'donromans' }))];
             console.log(`✅ Encontrados ${transAPI5.canales.length} canales en API 5 (donromans)`);
         }
     }
-    
+
     if (transmisionesAPI6 && transmisionesAPI6.transmisiones) {
-        const transAPI6 = transmisionesAPI6.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
-        
+        const transAPI6 = transmisionesAPI6.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI6 && transAPI6.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI6.canales];
-            console.log(`✅ Encontrados ${transAPI6.canales.length} canales en API 6 (local)`);
+            canalesCombinados = [...canalesCombinados, ...transAPI6.canales.map(c => ({ ...c, fuente: 'transmisiones6' }))];
+            console.log(`✅ Encontrados ${transAPI6.canales.length} canales en API 6 (transmisiones6)`);
         }
     }
     
@@ -5060,58 +5041,59 @@ function selectImportantMatchByTransmision(eventoNombre) {
     let canalesCombinados = [];
     let tituloMostrar = transmision.titulo || transmision.evento;
     
-    // Buscar en API 1 (rereyano)
+    const matchNameT = (evento) => {
+        const e = (evento || '').toLowerCase().trim();
+        return e === nombreBuscar || e.includes(nombreBuscar) || nombreBuscar.includes(e);
+    };
+
     if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
-        const transAPI1 = transmisionesAPI1.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase().trim();
-            return evento === nombreBuscar;
-        });
-        
+        const transAPI1 = transmisionesAPI1.transmisiones.find(t => matchNameT(t.evento || t.titulo));
         if (transAPI1 && transAPI1.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI1.canales];
+            canalesCombinados = [...canalesCombinados, ...transAPI1.canales.map(c => ({ ...c, fuente: 'rereyano' }))];
             console.log(`✅ Encontrados ${transAPI1.canales.length} canales en API 1 (rereyano) para "${tituloMostrar}"`);
         }
     }
-    
-    // Buscar en API 2 (e1link)
+
     if (transmisionesAPI2 && transmisionesAPI2.transmisiones) {
-        const transAPI2 = transmisionesAPI2.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase().trim();
-            return evento === nombreBuscar;
-        });
-        
+        const transAPI2 = transmisionesAPI2.transmisiones.find(t => matchNameT(t.evento || t.titulo));
         if (transAPI2 && transAPI2.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI2.canales];
+            canalesCombinados = [...canalesCombinados, ...transAPI2.canales.map(c => ({ ...c, fuente: 'e1link' }))];
             console.log(`✅ Encontrados ${transAPI2.canales.length} canales en API 2 (e1link) para "${tituloMostrar}"`);
         }
     }
-    
-    // Buscar en API 3 (voodc)
+
     if (transmisionesAPI3 && transmisionesAPI3.transmisiones) {
-        const transAPI3 = transmisionesAPI3.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase().trim();
-            return evento === nombreBuscar;
-        });
-        
+        const transAPI3 = transmisionesAPI3.transmisiones.find(t => matchNameT(t.evento || t.titulo));
         if (transAPI3 && transAPI3.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI3.canales];
+            canalesCombinados = [...canalesCombinados, ...transAPI3.canales.map(c => ({ ...c, fuente: 'voodc' }))];
             console.log(`✅ Encontrados ${transAPI3.canales.length} canales en API 3 (voodc) para "${tituloMostrar}"`);
         }
     }
-    
-    // Buscar en API 4 (transmisiones4 - ftvhd)
+
     if (transmisionesAPI4 && transmisionesAPI4.transmisiones) {
-        const transAPI4 = transmisionesAPI4.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase().trim();
-            return evento === nombreBuscar;
-        });
-        
+        const transAPI4 = transmisionesAPI4.transmisiones.find(t => matchNameT(t.evento || t.titulo));
         if (transAPI4 && transAPI4.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI4.canales];
+            canalesCombinados = [...canalesCombinados, ...transAPI4.canales.map(c => ({ ...c, fuente: 'transmisiones4' }))];
             console.log(`✅ Encontrados ${transAPI4.canales.length} canales en API 4 (ftvhd) para "${tituloMostrar}"`);
         }
     }
-    
+
+    if (transmisionesAPI5 && transmisionesAPI5.transmisiones) {
+        const transAPI5 = transmisionesAPI5.transmisiones.find(t => matchNameT(t.evento || t.titulo));
+        if (transAPI5 && transAPI5.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI5.canales.map(c => ({ ...c, fuente: 'donromans' }))];
+            console.log(`✅ Encontrados ${transAPI5.canales.length} canales en API 5 (donromans) para "${tituloMostrar}"`);
+        }
+    }
+
+    if (transmisionesAPI6 && transmisionesAPI6.transmisiones) {
+        const transAPI6 = transmisionesAPI6.transmisiones.find(t => matchNameT(t.evento || t.titulo));
+        if (transAPI6 && transAPI6.canales) {
+            canalesCombinados = [...canalesCombinados, ...transAPI6.canales.map(c => ({ ...c, fuente: 'transmisiones6' }))];
+            console.log(`✅ Encontrados ${transAPI6.canales.length} canales en API 6 (transmisiones6) para "${tituloMostrar}"`);
+        }
+    }
+
     if (canalesCombinados.length > 0) {
         const transmisionCombinada = {
             evento: tituloMostrar,
