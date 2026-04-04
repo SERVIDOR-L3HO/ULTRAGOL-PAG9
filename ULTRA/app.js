@@ -1455,10 +1455,23 @@ function showChannelSelector(transmision, partidoNombre) {
             <div class="server-grid-creative">
     `;
 
+    const servidorMap = {
+        'rereyano':       'SERVIDOR 1',
+        'golazolvhd':     'SERVIDOR 1',
+        'e1link':         'SERVIDOR 2',
+        'ellink':         'SERVIDOR 2',
+        'transmisiones4': 'SERVIDOR 3',
+        'voodc':          'SERVIDOR 3',
+        'ftvhd':          'SERVIDOR 4',
+        'donromans':      'SERVIDOR 5',
+        'transmisiones6': 'SERVIDOR 6',
+    };
+
     if (totalCanales > 0) {
         transmision.canales.forEach((canal, index) => {
             const serverNum = index + 1;
-            const apiType = canal.tipoAPI || canal.fuente || 'DIRECT';
+            const rawType = (canal.tipoAPI || canal.fuente || '').toLowerCase();
+            const apiType = servidorMap[rawType] || `SERVIDOR ${serverNum}`;
             const latencyVal = Math.floor(Math.random() * 38) + 5;
             const latencyClass = latencyVal < 20 ? 'lat-fast' : latencyVal < 35 ? 'lat-medium' : 'lat-slow';
             const entranceDelay = (index * 55) + 'ms';
