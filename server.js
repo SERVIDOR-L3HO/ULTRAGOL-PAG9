@@ -510,6 +510,58 @@ async function fetchAllPartidos() {
     return partidos;
 }
 
+// ─── ROBOTS.TXT — must be BEFORE static middlewares so ULTRA/robots.txt doesn't win ──
+app.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.send(`User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /ultra/
+Disallow: /ultracanales/
+
+Sitemap: https://ultragol-l3ho.com.mx/sitemap.xml
+`);
+});
+
+// ─── SITEMAP.XML dinámico ─────────────────────────────────────────────────────
+app.get('/sitemap.xml', async (req, res) => {
+    const BASE = 'https://ultragol-l3ho.com.mx';
+    const today = new Date().toISOString().split('T')[0];
+
+    const staticPages = [
+        { url: '/',   priority: '1.0', changefreq: 'daily' },
+        { url: '/mx', priority: '0.9', changefreq: 'hourly' },
+    ];
+
+    let matchPages = [];
+    try {
+        const partidos = await fetchAllPartidos();
+        matchPages = [...partidos.values()].map(p => ({
+            url: `/mx/${p.slug}`,
+            priority: p.estado === 'EN VIVO' ? '0.9' : '0.7',
+            changefreq: p.estado === 'EN VIVO' ? 'always' : 'hourly',
+            lastmod: today,
+        }));
+    } catch (e) {
+        console.error('Sitemap: error fetching partidos', e.message);
+    }
+
+    const allPages = [...staticPages, ...matchPages];
+    const urls = allPages.map(p => `
+  <url>
+    <loc>${BASE}${p.url}</loc>
+    ${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}
+    <changefreq>${p.changefreq}</changefreq>
+    <priority>${p.priority}</priority>
+  </url>`).join('');
+
+    res.type('application/xml');
+    res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls}
+</urlset>`);
+});
+
 // Serve static assets from mx/ folder before route handlers
 app.use('/mx', express.static(path.join(__dirname, 'mx'), { index: false }));
 
