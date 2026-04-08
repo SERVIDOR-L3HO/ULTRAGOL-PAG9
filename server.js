@@ -4,6 +4,23 @@ const path = require('path');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const fs = require('fs');
+const webpush = require('web-push');
+
+// ── VAPID keys for Web Push ───────────────────────────────────────────────────
+const VAPID_PUBLIC  = process.env.VAPID_PUBLIC_KEY  || 'BNM5t2bsIMpDNEhPTtz3IvUjejXTs5x6NmpuT0C2xomXTuxBhlqlU_gSdGXf-66tv2VMiyg1e_w33oJXBjC7mKs';
+const VAPID_PRIVATE = process.env.VAPID_PRIVATE_KEY || 'QEDtfLL6iA2dh_jF2Pkoi1wVsDE6HR5eT8MrvDMOP8Y';
+webpush.setVapidDetails('mailto:admin@ultragol-l3ho.com.mx', VAPID_PUBLIC, VAPID_PRIVATE);
+
+// ── Push subscription store (file-backed) ─────────────────────────────────────
+const SUBS_FILE = path.join(__dirname, 'push-subscriptions.json');
+function loadSubscriptions() {
+    try { return JSON.parse(fs.readFileSync(SUBS_FILE, 'utf8')); } catch (_) { return {}; }
+}
+function saveSubscriptions(subs) {
+    try { fs.writeFileSync(SUBS_FILE, JSON.stringify(subs, null, 2)); } catch (_) {}
+}
+let pushSubscriptions = loadSubscriptions(); // { endpoint: subscriptionObject }
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -334,8 +351,61 @@ function pushToSSEClients(notif) {
     });
 }
 
+// GET /api/vapid-key — public VAPID key for the browser to subscribe
+app.get('/api/vapid-key', (req, res) => {
+    res.json({ publicKey: VAPID_PUBLIC });
+});
+
+// POST /api/subscribe — save a new push subscription
+app.post('/api/subscribe', (req, res) => {
+    const sub = req.body;
+    if (!sub || !sub.endpoint) return res.status(400).json({ error: 'Suscripción inválida' });
+    pushSubscriptions[sub.endpoint] = sub;
+    saveSubscriptions(pushSubscriptions);
+    const total = Object.keys(pushSubscriptions).length;
+    console.log(`📲 Nueva suscripción push. Total: ${total}`);
+    res.json({ success: true, total });
+});
+
+// DELETE /api/subscribe — remove a push subscription
+app.delete('/api/subscribe', (req, res) => {
+    const { endpoint } = req.body || {};
+    if (endpoint && pushSubscriptions[endpoint]) {
+        delete pushSubscriptions[endpoint];
+        saveSubscriptions(pushSubscriptions);
+    }
+    res.json({ success: true });
+});
+
+// GET /api/subscribe/count — total stored push subscriptions
+app.get('/api/subscribe/count', (req, res) => {
+    res.json({ total: Object.keys(pushSubscriptions).length });
+});
+
+// Helper: send Web Push to all stored subscriptions
+async function sendWebPushToAll(payload) {
+    const subs = Object.values(pushSubscriptions);
+    let sent = 0, failed = 0, expired = [];
+    await Promise.allSettled(subs.map(async (sub) => {
+        try {
+            await webpush.sendNotification(sub, JSON.stringify(payload));
+            sent++;
+        } catch (err) {
+            failed++;
+            // 410 Gone = subscription expired/unsubscribed — remove it
+            if (err.statusCode === 410 || err.statusCode === 404) {
+                expired.push(sub.endpoint);
+            }
+        }
+    }));
+    // Clean expired subscriptions
+    expired.forEach(ep => delete pushSubscriptions[ep]);
+    if (expired.length) saveSubscriptions(pushSubscriptions);
+    return { sent, failed, expired: expired.length };
+}
+
 // POST /api/admin/broadcast — send a custom notification to all users
-app.post('/api/admin/broadcast', (req, res) => {
+app.post('/api/admin/broadcast', async (req, res) => {
     const { titulo, mensaje, icono, url, liga } = req.body || {};
     if (!titulo || !mensaje) {
         return res.status(400).json({ success: false, error: 'titulo y mensaje son requeridos' });
@@ -353,11 +423,28 @@ app.post('/api/admin/broadcast', (req, res) => {
     };
     broadcastQueue.push(notif);
 
-    // Push immediately to all connected SSE clients (real-time delivery)
+    // 1. Push immediately to all connected SSE clients (app open right now)
     pushToSSEClients(notif);
 
-    console.log(`📣 Broadcast enviado a ${sseClients.size} cliente(s): "${titulo}"`);
-    res.json({ success: true, id: notif.id, ts: notif.ts, clientesConectados: sseClients.size });
+    // 2. Send Web Push to ALL stored subscriptions (app closed too)
+    const pushPayload = {
+        title: notif.titulo,
+        body: notif.mensaje,
+        icon: notif.icono,
+        url: notif.url,
+        tag: notif.id
+    };
+    const pushResult = await sendWebPushToAll(pushPayload);
+    const totalSubs = Object.keys(pushSubscriptions).length;
+
+    console.log(`📣 Broadcast: SSE=${sseClients.size} WebPush enviados=${pushResult.sent}/${totalSubs} fallidos=${pushResult.failed}`);
+    res.json({
+        success: true,
+        id: notif.id,
+        ts: notif.ts,
+        clientesConectados: sseClients.size,
+        webPush: { enviados: pushResult.sent, total: totalSubs, fallidos: pushResult.failed }
+    });
 });
 
 async function fetchLigaMatches(liga) {

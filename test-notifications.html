@@ -157,9 +157,15 @@
     <div class="card full">
         <h2>📣 Notificación personalizada para todos</h2>
 
-        <div class="live-users">
-            <span class="live-dot"></span>
-            <span id="liveCount">… usuarios</span> con app abierta ahora
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+            <div class="live-users">
+                <span class="live-dot"></span>
+                <span id="liveCount">…</span> con app abierta ahora (SSE)
+            </div>
+            <div class="live-users" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.25);color:var(--blue)">
+                <span class="live-dot" style="background:var(--blue)"></span>
+                <span id="pushCount">…</span> suscritos (app abierta o cerrada)
+            </div>
         </div>
 
         <!-- Preview -->
@@ -304,9 +310,12 @@
     // ── Live users counter ───────────────────────────────────────────────────
     async function actualizarConectados() {
         try {
-            const r = await fetch('/api/notifications/stream/count');
-            const d = await r.json();
-            $('liveCount').textContent = `${d.count} usuario${d.count !== 1 ? 's' : ''}`;
+            const [sse, push] = await Promise.all([
+                fetch('/api/notifications/stream/count').then(r => r.json()),
+                fetch('/api/subscribe/count').then(r => r.json())
+            ]);
+            $('liveCount').textContent = `${sse.count} usuario${sse.count !== 1 ? 's' : ''}`;
+            $('pushCount').textContent = `${push.total} suscrito${push.total !== 1 ? 's' : ''}`;
         } catch (_) {}
     }
 
@@ -474,10 +483,12 @@
             });
             const d = await r.json();
             if (d.success) {
-                log(`✅ Enviado a ${d.clientesConectados} usuario(s) en tiempo real (ID: ${d.id})`, 'ok');
-                log('   También en cola para usuarios que abran el app después.', 'gray');
+                const wp = d.webPush || {};
+                log(`✅ SSE (app abierta): ${d.clientesConectados} usuario(s)`, 'ok');
+                log(`✅ Web Push (todos): ${wp.enviados || 0}/${wp.total || 0} suscritos · ${wp.fallidos || 0} fallidos`, 'ok');
+                log('   Los usuarios sin app abierta lo recibirán vía Web Push.', 'gray');
                 $('broadcastResult').innerHTML =
-                    `<div class="result-badge ok">✅ Enviado a ${d.clientesConectados} usuario(s) · ID: <code>${d.id}</code></div>`;
+                    `<div class="result-badge ok">✅ SSE: ${d.clientesConectados} · Web Push: ${wp.enviados || 0}/${wp.total || 0} · ID: <code>${d.id}</code></div>`;
                 if (Notification.permission === 'granted') {
                     await mostrarNotif(titulo, { body: mensaje, icon: '/app-icon.png',
                         badge: '/favicon.png', tag: d.id, data: { url } });

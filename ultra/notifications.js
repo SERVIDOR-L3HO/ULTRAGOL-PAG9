@@ -93,6 +93,7 @@ class NotificationManager {
             if (result === 'granted') {
                 this.showMessage('¡Notificaciones activadas! ✅', 'success');
                 this.startPolling();
+                await this._subscribePush();
                 // Send a welcome notification
                 setTimeout(() => this._fire('¡Bienvenido a UltraGol! ⚽', {
                     body: 'Recibirás alertas de partidos en vivo y resultados',
@@ -109,6 +110,41 @@ class NotificationManager {
         }
     }
 
+    async _subscribePush() {
+        if (!('PushManager' in window)) return;
+        try {
+            const reg = await navigator.serviceWorker.ready;
+            // Check if already subscribed
+            const existing = await reg.pushManager.getSubscription();
+            if (existing) {
+                console.log('📲 Ya suscrito a Web Push');
+                return;
+            }
+            // Get public VAPID key from server
+            const { publicKey } = await fetch('/api/vapid-key').then(r => r.json());
+            const sub = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: this._urlBase64ToUint8Array(publicKey)
+            });
+            // Send subscription to server
+            await fetch('/api/subscribe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(sub)
+            });
+            console.log('✅ Suscripción Web Push guardada en servidor');
+        } catch (err) {
+            console.warn('⚠️ Web Push no disponible:', err.message);
+        }
+    }
+
+    _urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+        const raw = atob(base64);
+        return new Uint8Array([...raw].map(c => c.charCodeAt(0)));
+    }
+
     closeModal(modal) {
         if (!modal) return;
         const content = modal.querySelector('.notification-modal-content');
@@ -122,6 +158,8 @@ class NotificationManager {
         this._check();
         this.checkInterval = setInterval(() => this._check(), 60000);
         this._connectSSE();
+        // Ensure push subscription is active (re-subscribes if needed)
+        this._subscribePush().catch(() => {});
     }
 
     stopPolling() {
