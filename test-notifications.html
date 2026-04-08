@@ -320,12 +320,33 @@
     }
 
     async function mostrarNotif(titulo, opts) {
+        if (!('Notification' in window) || Notification.permission !== 'granted') return false;
         if ('serviceWorker' in navigator) {
-            const reg = await navigator.serviceWorker.getRegistration().catch(() => null);
-            if (reg) { await reg.showNotification(titulo, opts); return true; }
+            // Try any registered SW for this origin (including the main app's SW)
+            const reg = await Promise.race([
+                navigator.serviceWorker.ready,
+                new Promise(resolve => setTimeout(() => resolve(null), 3000))
+            ]).catch(() => null);
+            if (reg) {
+                await reg.showNotification(titulo, opts);
+                return true;
+            }
+            // Fallback: try getRegistration
+            const existing = await navigator.serviceWorker.getRegistration('/').catch(() => null);
+            if (existing) {
+                await existing.showNotification(titulo, opts);
+                return true;
+            }
         }
-        new Notification(titulo, opts);
-        return true;
+        // Direct Notification only if no SW (desktop browsers without SW)
+        try {
+            new Notification(titulo, opts);
+            return true;
+        } catch (_) {
+            // Mobile Chrome requires SW — skip local preview, broadcast already sent via SSE
+            log('ℹ️ Notif. local no disponible en este navegador (sin SW). El broadcast ya fue enviado a todos.', 'warn');
+            return false;
+        }
     }
 
     async function testLocal() {
@@ -490,9 +511,31 @@
         setTimeout(() => location.reload(), 1400);
     }
 
+    // ── Service Worker registration (required for mobile Chrome notifications) ──
+    async function registrarSW() {
+        if (!('serviceWorker' in navigator)) return;
+        try {
+            const existing = await navigator.serviceWorker.getRegistration('/');
+            if (existing?.active) {
+                set('sSW', '✅ Activo', 'var(--green)');
+                log('✅ Service Worker ya activo', 'ok');
+                return;
+            }
+            // Register the main app's SW so notifications work on mobile
+            const reg = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
+            await navigator.serviceWorker.ready;
+            set('sSW', '✅ Activo', 'var(--green)');
+            log('✅ Service Worker registrado correctamente', 'ok');
+        } catch (e) {
+            set('sSW', '⚠️ Error SW', 'var(--yellow)');
+            log(`⚠️ SW: ${e.message}`, 'warn');
+        }
+    }
+
     // ── Init ──────────────────────────────────────────────────────────────────
     actualizarEstado();
     actualizarPreview();
+    registrarSW();
     conectarSSE();
     actualizarConectados();
     setInterval(actualizarConectados, 8000);
