@@ -2,183 +2,170 @@ let currentLeague = 'Liga MX';
 const API_BASE = 'https://ultragol-api-3.vercel.app';
 
 const leaguesConfig = {
-    'Liga MX': {
-        noticias: '/noticias'
-    },
-    'Premier League': {
-        noticias: '/premier/noticias'
-    },
-    'La Liga': {
-        noticias: '/laliga/noticias'
-    },
-    'Serie A': {
-        noticias: '/seriea/noticias'
-    },
-    'Bundesliga': {
-        noticias: '/bundesliga/noticias'
-    },
-    'Ligue 1': {
-        noticias: '/ligue1/noticias'
-    }
+    'Liga MX':       { noticias: '/noticias' },
+    'Premier League':{ noticias: '/premier/noticias' },
+    'La Liga':       { noticias: '/laliga/noticias' },
+    'Serie A':       { noticias: '/seriea/noticias' },
+    'Bundesliga':    { noticias: '/bundesliga/noticias' },
+    'Ligue 1':       { noticias: '/ligue1/noticias' }
 };
 
-function selectLeague(leagueName, element) {
-    document.querySelectorAll('.league-btn').forEach(btn => btn.classList.remove('active'));
-    
-    if (element) {
-        element.classList.add('active');
-    }
-    
+function selectLeague(leagueName, el) {
+    document.querySelectorAll('.nt-chip').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
     currentLeague = leagueName;
-    
-    const newsTitle = document.getElementById('newsLeagueName');
-    if (newsTitle) {
-        newsTitle.textContent = `NOTICIAS Y RESÚMENES - ${leagueName}`;
-    }
-    
     loadNews();
-    showToast(`Mostrando noticias de ${leagueName}`);
+    showToast(leagueName);
+}
+
+function relativeTime(dateStr) {
+    if (!dateStr) return '';
+    try {
+        const d = new Date(dateStr);
+        if (isNaN(d)) return dateStr;
+        const diff = (Date.now() - d) / 1000;
+        if (diff < 60) return 'Ahora';
+        if (diff < 3600) return `Hace ${Math.floor(diff/60)}min`;
+        if (diff < 86400) return `Hace ${Math.floor(diff/3600)}h`;
+        if (diff < 172800) return 'Ayer';
+        return d.toLocaleDateString('es-MX', { day:'numeric', month:'short' });
+    } catch(e) { return dateStr; }
+}
+
+function escJson(obj) {
+    return JSON.stringify(obj).replace(/'/g, "\\'").replace(/\n/g, '\\n');
+}
+
+function fallbackImg(e) {
+    e.target.style.background = '#1a1a1a';
+    e.target.style.opacity = '0.3';
 }
 
 async function loadNews() {
-    const newsGrid = document.getElementById('newsGrid');
-    const featuredSection = document.getElementById('featuredNews');
-    
-    if (newsGrid) {
-        newsGrid.innerHTML = '<div class="news-loading"><i class="fas fa-spinner fa-spin"></i> Cargando noticias...</div>';
-    }
-    if (featuredSection) {
-        featuredSection.innerHTML = '';
-    }
-    
+    const grid = document.getElementById('newsGrid');
+    const featured = document.getElementById('featuredNews');
+    if (grid) grid.innerHTML = '<div class="nt-loading"><i class="fas fa-circle-notch fa-spin"></i><span>Cargando noticias...</span></div>';
+    if (featured) featured.innerHTML = '';
+
     try {
-        const leagueConfig = leaguesConfig[currentLeague];
-        const endpoint = leagueConfig ? leagueConfig.noticias : '/noticias';
-        const response = await fetch(`${API_BASE}${endpoint}`);
-        const data = await response.json();
-        
-        if (!newsGrid) return;
-        
+        const endpoint = (leaguesConfig[currentLeague] || leaguesConfig['Liga MX']).noticias;
+        const resp = await fetch(`${API_BASE}${endpoint}`);
+        const data = await resp.json();
+
         if (!data.noticias || data.noticias.length === 0) {
-            newsGrid.innerHTML = '<div class="news-loading"><i class="fas fa-newspaper"></i> No hay noticias disponibles</div>';
+            if (grid) grid.innerHTML = '<div class="nt-loading"><i class="fas fa-newspaper"></i><span>No hay noticias disponibles</span></div>';
             return;
         }
-        
-        const featuredNews = data.noticias[0];
-        const otherNews = data.noticias.slice(1);
-        
-        if (featuredSection && featuredNews) {
-            featuredSection.innerHTML = `
-                <div class="featured-card" onclick='openNewsModal(${JSON.stringify({
-                    titulo: featuredNews.titulo,
-                    descripcion: featuredNews.descripcion || '',
-                    resumen: featuredNews.resumen || '',
-                    contenido: featuredNews.contenido || featuredNews.descripcion || '',
-                    imagen: featuredNews.imagen || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800',
-                    fecha: featuredNews.fecha || '',
-                    hora: featuredNews.hora || '',
-                    fuente: featuredNews.fuente || '',
-                    url: featuredNews.url || ''
-                }).replace(/'/g, "\\'").replace(/\n/g, "\\n")})'> 
-                    <div class="featured-image">
-                        <img src="${featuredNews.imagen || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800'}" alt="${featuredNews.titulo}">
-                        <div class="featured-badge">
-                            <i class="fas fa-fire"></i> DESTACADO
+
+        const [hero, big, ...rest] = data.noticias;
+        const defaultImg = 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800';
+
+        // ── HERO ──
+        if (featured && hero) {
+            const hImg = hero.imagen || defaultImg;
+            const hTime = relativeTime(hero.fecha);
+            featured.innerHTML = `
+                <div class="nt-hero" onclick='openNewsModal(${escJson({
+                    titulo: hero.titulo, descripcion: hero.descripcion||'',
+                    resumen: hero.resumen||'', contenido: hero.contenido||hero.descripcion||'',
+                    imagen: hImg, fecha: hero.fecha||'', hora: hero.hora||'',
+                    fuente: hero.fuente||'', url: hero.url||''
+                })})'>
+                    <img class="nt-hero-img" src="${hImg}" alt="${hero.titulo}" onerror="this.style.opacity='0.1'">
+                    <div class="nt-hero-overlay"></div>
+                    <div class="nt-hero-top">
+                        <span class="nt-hero-badge"><i class="fas fa-fire"></i> DESTACADO</span>
+                    </div>
+                    <div class="nt-hero-content">
+                        ${hero.fuente ? `<span class="nt-hero-source">${hero.fuente}</span>` : ''}
+                        <h2 class="nt-hero-title">${hero.titulo}</h2>
+                        <div class="nt-hero-meta">
+                            ${hTime ? `<span class="nt-hero-time"><i class="far fa-clock"></i> ${hTime}</span>` : ''}
+                            <span class="nt-hero-read"><i class="fas fa-arrow-right"></i> Leer</span>
                         </div>
                     </div>
-                    <div class="featured-content">
-                        <div class="featured-meta">
-                            <span class="featured-source"><i class="fas fa-newspaper"></i> ${featuredNews.fuente || 'Fuente'}</span>
-                            <span class="featured-date"><i class="far fa-clock"></i> ${featuredNews.fecha || ''} ${featuredNews.hora || ''}</span>
-                        </div>
-                        <h2>${featuredNews.titulo}</h2>
-                        <p class="featured-desc">${featuredNews.descripcion || featuredNews.resumen || ''}</p>
-                        <button class="read-more-btn"><i class="fas fa-arrow-right"></i> Leer más</button>
+                </div>`;
+        }
+
+        // ── SECTION LABEL + BIG CARD + LIST ──
+        if (!grid) return;
+
+        let html = '<div class="nt-section-label"><span class="nt-section-label-text">Más noticias</span><div class="nt-section-label-line"></div></div>';
+
+        // Second article — big horizontal card
+        if (big) {
+            const bImg = big.imagen || defaultImg;
+            html += `
+                <div class="nt-card-big" onclick='openNewsModal(${escJson({
+                    titulo: big.titulo, descripcion: big.descripcion||'',
+                    resumen: big.resumen||'', contenido: big.contenido||big.descripcion||'',
+                    imagen: bImg, fecha: big.fecha||'', hora: big.hora||'',
+                    fuente: big.fuente||'', url: big.url||''
+                })})'>
+                    <img class="nt-card-big-img" src="${bImg}" alt="${big.titulo}" onerror="fallbackImg(event)">
+                    <div class="nt-card-big-body">
+                        ${big.fuente ? `<span class="nt-card-big-source">${big.fuente}</span>` : ''}
+                        <h3 class="nt-card-big-title">${big.titulo}</h3>
+                        <span class="nt-card-big-time"><i class="far fa-clock"></i> ${relativeTime(big.fecha)}</span>
                     </div>
                 </div>
-            `;
+                <div class="nt-divider"></div>`;
         }
-        
-        newsGrid.innerHTML = otherNews.map((noticia, index) => `
-            <div class="news-card" onclick='openNewsModal(${JSON.stringify({
-                titulo: noticia.titulo,
-                descripcion: noticia.descripcion || '',
-                resumen: noticia.resumen || '',
-                contenido: noticia.contenido || noticia.descripcion || '',
-                imagen: noticia.imagen || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600',
-                fecha: noticia.fecha || '',
-                hora: noticia.hora || '',
-                fuente: noticia.fuente || '',
-                url: noticia.url || ''
-            }).replace(/'/g, "\\'").replace(/\n/g, "\\n")})'> 
-                <div class="news-image">
-                    <img src="${noticia.imagen || 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600'}" alt="${noticia.titulo}" loading="lazy">
-                    ${noticia.fuente ? `<span class="news-source-badge">${noticia.fuente}</span>` : ''}
-                </div>
-                <div class="news-content">
-                    <div class="news-meta">
-                        <span><i class="far fa-clock"></i> ${noticia.fecha || ''}</span>
+
+        // Rest — compact cards
+        rest.forEach(n => {
+            const nImg = n.imagen || defaultImg;
+            html += `
+                <div class="nt-card" onclick='openNewsModal(${escJson({
+                    titulo: n.titulo, descripcion: n.descripcion||'',
+                    resumen: n.resumen||'', contenido: n.contenido||n.descripcion||'',
+                    imagen: nImg, fecha: n.fecha||'', hora: n.hora||'',
+                    fuente: n.fuente||'', url: n.url||''
+                })})'>
+                    <div class="nt-card-body">
+                        ${n.fuente ? `<span class="nt-card-source">${n.fuente}</span>` : ''}
+                        <h4 class="nt-card-title">${n.titulo}</h4>
+                        <span class="nt-card-time"><i class="far fa-clock"></i> ${relativeTime(n.fecha)}</span>
                     </div>
-                    <h4>${noticia.titulo}</h4>
-                    <p>${(noticia.descripcion || noticia.resumen || '').substring(0, 120)}...</p>
-                </div>
-            </div>
-        `).join('');
-        
-        const updateInfo = document.getElementById('updateInfo');
-        if (updateInfo && data.actualizado) {
-            updateInfo.innerHTML = `<i class="fas fa-sync-alt"></i> Actualizado: ${data.actualizado}`;
-        }
-        
-    } catch (error) {
-        console.error('Error loading news:', error);
-        if (newsGrid) {
-            newsGrid.innerHTML = '<div class="news-loading"><i class="fas fa-exclamation-triangle"></i> Error al cargar noticias. Intenta de nuevo.</div>';
-        }
+                    <img class="nt-card-img" src="${nImg}" alt="${n.titulo}" loading="lazy" onerror="fallbackImg(event)">
+                </div>`;
+        });
+
+        grid.innerHTML = html;
+
+    } catch(err) {
+        console.error('Error loading news:', err);
+        if (grid) grid.innerHTML = '<div class="nt-loading"><i class="fas fa-exclamation-triangle"></i><span>Error al cargar. Intenta de nuevo.</span></div>';
     }
 }
 
 function openNewsModal(noticia) {
-    const modal = document.getElementById('newsModal');
-    const title = document.getElementById('newsModalTitle');
-    const image = document.getElementById('newsModalImage');
-    const text = document.getElementById('newsModalText');
-    const source = document.getElementById('newsModalSource');
-    const date = document.getElementById('newsModalDate');
-    const originalLink = document.getElementById('newsOriginalLink');
-    
+    const modal   = document.getElementById('newsModal');
+    const title   = document.getElementById('newsModalTitle');
+    const image   = document.getElementById('newsModalImage');
+    const text    = document.getElementById('newsModalText');
+    const source  = document.getElementById('newsModalSource');
+    const date    = document.getElementById('newsModalDate');
+    const link    = document.getElementById('newsOriginalLink');
+
     if (title) title.textContent = noticia.titulo;
-    if (image) image.src = noticia.imagen;
-    
-    if (source) {
-        source.innerHTML = `<i class="fas fa-newspaper"></i> ${noticia.fuente || 'Fuente'}`;
+    if (image) { image.src = noticia.imagen; image.alt = noticia.titulo; }
+    if (source) source.textContent = noticia.fuente || '';
+    if (date) date.textContent = noticia.fecha ? `${noticia.fecha} ${noticia.hora || ''}`.trim() : '';
+    if (link) {
+        if (noticia.url) { link.href = noticia.url; link.style.display = 'inline-flex'; }
+        else link.style.display = 'none';
     }
-    
-    if (date) {
-        date.innerHTML = `<i class="far fa-calendar-alt"></i> ${noticia.fecha || ''} ${noticia.hora || ''}`;
-    }
-    
-    if (originalLink && noticia.url) {
-        originalLink.href = noticia.url;
-        originalLink.style.display = 'inline-flex';
-    } else if (originalLink) {
-        originalLink.style.display = 'none';
-    }
-    
-    if (text) {
-        const contenido = noticia.contenido || noticia.descripcion || '';
-        const formattedContent = formatArticleContent(contenido);
-        text.innerHTML = formattedContent;
-    }
-    
+    if (text) text.innerHTML = formatArticleContent(noticia.contenido || noticia.descripcion || '');
+
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+    modal.scrollTop = 0;
 }
 
 function formatArticleContent(content) {
     if (!content) return '';
-    
-    let formatted = content
+    return content
         .split('\n\n')
         .filter(p => p.trim())
         .map(p => {
@@ -188,70 +175,29 @@ function formatArticleContent(content) {
             return `<p>${p}</p>`;
         })
         .join('');
-    
-    return formatted;
 }
 
 function closeNewsModal() {
-    const modal = document.getElementById('newsModal');
-    modal.classList.remove('active');
+    document.getElementById('newsModal')?.classList.remove('active');
     document.body.style.overflow = '';
 }
 
+function showToast(msg) {
+    const t = document.getElementById('ntToast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
 function shareApp() {
-    if (navigator.share) {
-        navigator.share({
-            title: 'ULTRAGOL - Noticias',
-            text: 'Las mejores noticias de fútbol en ULTRAGOL',
-            url: window.location.href
-        }).catch(err => console.log('Error sharing:', err));
-    } else {
-        navigator.clipboard.writeText(window.location.href).then(() => {
-            showToast('Enlace copiado al portapapeles');
-        });
-    }
+    const data = { title: 'ULTRAGOL — Noticias', url: location.href };
+    if (navigator.share) navigator.share(data).catch(() => {});
+    else navigator.clipboard?.writeText(location.href).then(() => showToast('Enlace copiado'));
 }
 
-function shareNews(noticia) {
-    if (navigator.share) {
-        navigator.share({
-            title: noticia.titulo,
-            text: noticia.descripcion,
-            url: noticia.url || window.location.href
-        }).catch(err => console.log('Error sharing:', err));
-    }
-}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNewsModal(); });
+document.getElementById('newsModal')?.addEventListener('click', e => { if (e.target.id === 'newsModal') closeNewsModal(); });
 
-function showToast(message) {
-    const existingToast = document.querySelector('.toast-notification');
-    if (existingToast) {
-        existingToast.remove();
-    }
-    
-    const toast = document.createElement('div');
-    toast.className = 'toast-notification';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    setTimeout(() => toast.classList.add('show'), 10);
-    setTimeout(() => {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
-}
-
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeNewsModal();
-    }
-});
-
-document.getElementById('newsModal')?.addEventListener('click', (e) => {
-    if (e.target.id === 'newsModal') {
-        closeNewsModal();
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadNews();
-});
+document.addEventListener('DOMContentLoaded', loadNews);

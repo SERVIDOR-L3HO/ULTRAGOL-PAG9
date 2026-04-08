@@ -862,6 +862,13 @@ app.get('/ultra', (req, res) => {
     res.sendFile(path.join(__dirname, 'ULTRA', 'index.html'));
 });
 
+app.use('/ultra', express.static(path.join(__dirname, 'ULTRA'), {
+    index: false,
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+}));
+
 app.get('/cinenova', (req, res) => {
     res.sendFile(path.join(__dirname, 'cinenova.html'));
 });
