@@ -1156,10 +1156,12 @@ body {
 
 .carousel-prev {
     left: 12px;
+    top: 65%;
 }
 
 .carousel-next {
     right: 12px;
+    top: 65%;
 }
 
 .carousel-nav i {
