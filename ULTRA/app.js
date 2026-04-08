@@ -747,7 +747,7 @@ function updateFeaturedMatch(data) {
         return `
             <div class="featured-match ${isActive}" data-index="${index}">
                 <div class="match-overlay"></div>
-                <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800" alt="Stadium" class="match-bg">
+                <img src="soccer-fire-bg.jpg" alt="Stadium" class="match-bg">
 
                 <div class="match-score">
                     <div class="team-logo">
