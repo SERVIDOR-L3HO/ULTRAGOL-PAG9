@@ -69,36 +69,34 @@
     }
 
     function renderCard(match) {
-        const { local, visitante, estado, detalles } = match;
-        const slug = matchSlug(local.nombre, visitante.nombre);
+        const { slug, equipo1, equipo2, logo1, logo2, estado, liga, deporte, hora, marcadorLocal, marcadorVisitante, nombreCortoLocal, nombreCortoVisitante } = match;
         const sc = statusClass(estado);
         const sl = statusLabel(estado);
         const isLive = estado && estado.enVivo;
-        const liga = (detalles && detalles.nombrePartido) ? (match.liga || 'Liga MX') : (match.liga || 'Liga MX');
+        const scoreL = (marcadorLocal !== null && marcadorLocal !== undefined && marcadorLocal !== '') ? marcadorLocal : '-';
+        const scoreV = (marcadorVisitante !== null && marcadorVisitante !== undefined && marcadorVisitante !== '') ? marcadorVisitante : '-';
 
         return `
-        <a href="/mx/${slug}" class="match-card${isLive ? ' live' : ''}" data-deporte="${match.deporte || 'FOOTBALL'}">
+        <a href="/mx/${slug}" class="match-card${isLive ? ' live' : ''}" data-deporte="${deporte || 'Fútbol'}">
             <div class="team">
-                ${renderTeamLogo(local.nombre, local.logo)}
+                ${renderTeamLogo(equipo1, logo1)}
                 <div>
-                    <div class="team-name">${local.nombre}</div>
-                    <div class="team-abbr">${local.nombreCorto || ''}</div>
+                    <div class="team-name">${equipo1}</div>
+                    <div class="team-abbr">${nombreCortoLocal || ''}</div>
                 </div>
             </div>
             <div class="match-center">
                 <div class="score">
-                    ${local.marcador !== undefined && local.marcador !== '' ? local.marcador : '-'}
-                    <span class="score-sep">:</span>
-                    ${visitante.marcador !== undefined && visitante.marcador !== '' ? visitante.marcador : '-'}
+                    ${scoreL}<span class="score-sep">:</span>${scoreV}
                 </div>
                 <div class="status-badge ${sc}">${sl}</div>
-                <div class="match-liga">${liga}</div>
+                <div class="match-liga">${liga || ''}</div>
             </div>
             <div class="team away">
-                ${renderTeamLogo(visitante.nombre, visitante.logo)}
+                ${renderTeamLogo(equipo2, logo2)}
                 <div>
-                    <div class="team-name">${visitante.nombre}</div>
-                    <div class="team-abbr">${visitante.nombreCorto || ''}</div>
+                    <div class="team-name">${equipo2}</div>
+                    <div class="team-abbr">${nombreCortoVisitante || ''}</div>
                 </div>
             </div>
             <div class="match-arrow">→</div>
@@ -128,7 +126,7 @@
     }
 
     function applyFilter() {
-        const filtered = currentFilter === 'all' ? allMatches : allMatches.filter(m => (m.deporte || 'FOOTBALL') === currentFilter);
+        const filtered = allMatches.filter(matchesFilter);
         document.getElementById('matches-container').innerHTML = groupAndRender(filtered);
     }
 
@@ -147,6 +145,15 @@
                     <p>No se pudieron cargar los partidos. Intenta recargar la página.</p>
                 </div>`;
         }
+    }
+
+    function matchesFilter(match) {
+        if (currentFilter === 'all') return true;
+        const d = (match.deporte || '').toLowerCase();
+        if (currentFilter === 'futbol') return d.includes('fútbol') || d.includes('futbol') || d.includes('football') || d.includes('soccer');
+        if (currentFilter === 'basket') return d.includes('balonc') || d.includes('basketball') || d.includes('nba');
+        if (currentFilter === 'otros') return !d.includes('fútbol') && !d.includes('futbol') && !d.includes('football') && !d.includes('balonc') && !d.includes('basketball');
+        return true;
     }
 
     document.querySelectorAll('.filter-btn').forEach(btn => {

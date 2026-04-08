@@ -348,27 +348,140 @@ function matchSlug(local, visitante) {
     return `${slugify(local)}-vs-${slugify(visitante)}`;
 }
 
-async function fetchMarcadores() {
-    const res = await fetch(`${API_BASE_URL}/marcadores`);
-    return res.json();
+async function safeFetch(url) {
+    try {
+        const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+        const text = await res.text();
+        return JSON.parse(text);
+    } catch { return null; }
 }
 
-async function fetchTransmisiones() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/transmisiones3`);
-        return res.json();
-    } catch { return { transmisiones: [] }; }
+// Normalize any transmission item into a common match object
+function normalizeTransmision(item, fuente) {
+    const equipo1 = item.equipo1 || item.local || '';
+    const equipo2 = item.equipo2 || item.visitante || '';
+    const titulo = item.titulo || item.evento || `${equipo1} vs ${equipo2}`;
+    const slug = matchSlug(equipo1, equipo2);
+
+    let transmisionUrl = null;
+    if (item.url) transmisionUrl = item.url;
+    else if (item.enlaces && item.enlaces[0]) transmisionUrl = item.enlaces[0];
+    else if (item.canales && item.canales[0]) transmisionUrl = item.canales[0].url;
+    else if (item.fuentes && item.fuentes[0]) transmisionUrl = item.fuentes[0].url;
+
+    const estadoRaw = (item.estado || '').toLowerCase();
+    const enVivo = estadoRaw.includes('vivo') || estadoRaw.includes('live');
+    const finalizado = estadoRaw.includes('finaliz') || estadoRaw.includes('terminado') || estadoRaw.includes('full');
+
+    return {
+        slug,
+        titulo,
+        equipo1,
+        equipo2,
+        logo1: item.logo1 || null,
+        logo2: item.logo2 || null,
+        hora: item.hora || '',
+        fecha: item.fecha || item.fechaISO || '',
+        liga: item.liga || item.info || item.pais || item.categoria || '',
+        deporte: item.deporte || item.categoria || 'Fútbol',
+        estado: {
+            enVivo,
+            finalizado,
+            programado: !enVivo && !finalizado,
+            descripcion: item.estado || (enVivo ? 'En Vivo' : finalizado ? 'Terminado' : 'Próximo'),
+        },
+        transmisionUrl,
+        fuente,
+        marcadorLocal: null,
+        marcadorVisitante: null,
+        goles: [],
+        detalles: {},
+    };
+}
+
+// Fetch and merge all transmission sources + marcadores
+async function fetchAllPartidos() {
+    const [marc, t2, t3, t4, t6] = await Promise.all([
+        safeFetch(`${API_BASE_URL}/marcadores`),
+        safeFetch(`${API_BASE_URL}/transmisiones2`),
+        safeFetch(`${API_BASE_URL}/transmisiones3`),
+        safeFetch(`${API_BASE_URL}/transmisiones4`),
+        safeFetch(`${API_BASE_URL}/transmisiones6`),
+    ]);
+
+    const map = new Map();
+
+    const sources = [
+        { data: t2, key: 'transmisiones2' },
+        { data: t3, key: 'transmisiones3' },
+        { data: t4, key: 'transmisiones4' },
+        { data: t6, key: 'transmisiones6' },
+    ];
+
+    for (const { data, key } of sources) {
+        if (!data) continue;
+        const items = data.transmisiones || data.partidos || data.eventos || [];
+        for (const item of items) {
+            const norm = normalizeTransmision(item, key);
+            if (!norm.slug || norm.slug === '-vs-') continue;
+            if (!map.has(norm.slug)) {
+                map.set(norm.slug, norm);
+            } else {
+                const existing = map.get(norm.slug);
+                if (!existing.transmisionUrl && norm.transmisionUrl) existing.transmisionUrl = norm.transmisionUrl;
+                if (key === 'transmisiones6') { existing.estado = norm.estado; existing.fuente = key; }
+                if (!existing.logo1 && norm.logo1) existing.logo1 = norm.logo1;
+                if (!existing.logo2 && norm.logo2) existing.logo2 = norm.logo2;
+            }
+        }
+    }
+
+    // Enrich with marcadores (real scores, goals, stadium)
+    if (marc && marc.partidos) {
+        for (const p of marc.partidos) {
+            const s = matchSlug(p.local.nombre, p.visitante.nombre);
+            const prev = map.get(s);
+            map.set(s, {
+                slug: s,
+                titulo: `${p.local.nombre} vs ${p.visitante.nombre}`,
+                equipo1: p.local.nombre,
+                equipo2: p.visitante.nombre,
+                logo1: p.local.logo || (prev && prev.logo1) || null,
+                logo2: p.visitante.logo || (prev && prev.logo2) || null,
+                hora: p.fecha || '',
+                liga: marc.liga || 'Liga MX',
+                deporte: 'Fútbol',
+                estado: p.estado,
+                marcadorLocal: p.local.marcador,
+                marcadorVisitante: p.visitante.marcador,
+                goles: p.goles || [],
+                detalles: p.detalles || {},
+                transmisionUrl: (prev && prev.transmisionUrl) || null,
+                fuente: 'marcadores',
+                nombreCortoLocal: p.local.nombreCorto,
+                nombreCortoVisitante: p.visitante.nombreCorto,
+            });
+        }
+    }
+
+    const partidos = Array.from(map.values());
+    partidos.sort((a, b) => {
+        const score = p => p.estado && p.estado.enVivo ? 0 : p.estado && p.estado.programado ? 1 : 2;
+        return score(a) - score(b);
+    });
+    return partidos;
 }
 
 // Serve static assets from mx/ folder before route handlers
 app.use('/mx', express.static(path.join(__dirname, 'mx'), { index: false }));
 
-// API: today's matches (used by the client-side index page)
+// API: all matches from all sources
 app.get('/api/mx/partidos', async (req, res) => {
     try {
-        const data = await fetchMarcadores();
-        res.json(data);
+        const partidos = await fetchAllPartidos();
+        res.json({ total: partidos.length, partidos });
     } catch (err) {
+        console.error('Error en /api/mx/partidos:', err);
         res.status(500).json({ error: 'No se pudieron obtener los partidos' });
     }
 });
@@ -384,59 +497,40 @@ app.get('/partidos-hoy', (req, res) => {
 // SSR: individual match page — full HTML generated with SEO meta tags
 app.get('/mx/:slug', async (req, res) => {
     const slug = req.params.slug;
-
     let matchData = null;
-    let transmisionUrl = null;
 
     try {
-        const [marcData, transData] = await Promise.all([fetchMarcadores(), fetchTransmisiones()]);
-        const partidos = marcData.partidos || [];
-
-        matchData = partidos.find(p => {
-            const s = matchSlug(p.local.nombre, p.visitante.nombre);
-            return s === slug;
-        });
-
-        if (matchData && transData.transmisiones) {
-            const localSlug = slugify(matchData.local.nombre);
-            const visSlug = slugify(matchData.visitante.nombre);
-            const found = transData.transmisiones.find(t => {
-                const e = slugify(t.evento || t.titulo || '');
-                return e.includes(localSlug) || e.includes(visSlug);
-            });
-            if (found) transmisionUrl = found.url || (found.enlaces && found.enlaces[0]);
-        }
+        const partidos = await fetchAllPartidos();
+        matchData = partidos.find(p => p.slug === slug);
     } catch (e) {
         // continue with no data
     }
 
     if (!matchData) {
-        // Build a generic SEO page from the slug
         const parts = slug.split('-vs-');
         const t1 = (parts[0] || '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        const t2 = (parts[1] || '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        const t2 = ((parts[1] || '') + (parts.slice(2).join('-') ? '-' + parts.slice(2).join('-') : '')).replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
         const title = `${t1} vs ${t2} EN VIVO | UltraGol`;
         const desc = `Sigue el partido ${t1} vs ${t2} en vivo con marcador en tiempo real, goles y transmisiones en UltraGol.`;
-        return res.send(buildMatchPage({ slug, title, desc, local: { nombre: t1 }, visitante: { nombre: t2 }, estado: null, goles: [], detalles: {}, transmisionUrl }));
+        return res.send(buildMatchPage({ slug, title, desc, equipo1: t1, equipo2: t2, logo1: null, logo2: null, estado: null, goles: [], detalles: {}, transmisionUrl: null, liga: '', hora: '' }));
     }
 
-    const { local, visitante, estado, goles, detalles } = matchData;
-    const teamTitle = `${local.nombre} vs ${visitante.nombre}`;
-    const scoreStr = (estado && !estado.programado)
-        ? ` ${local.marcador}-${visitante.marcador}`
-        : '';
+    const { equipo1, equipo2, logo1, logo2, estado, marcadorLocal, marcadorVisitante, goles, detalles, transmisionUrl, liga, hora, nombreCortoLocal, nombreCortoVisitante } = matchData;
+    const teamTitle = `${equipo1} vs ${equipo2}`;
+    const hasScore = marcadorLocal !== null && marcadorLocal !== undefined && marcadorLocal !== '';
+    const scoreStr = hasScore && estado && !estado.programado ? ` ${marcadorLocal}-${marcadorVisitante}` : '';
     const statusStr = estado && estado.enVivo ? ' EN VIVO' : (estado && estado.finalizado ? ' - Resultado Final' : '');
     const title = `${teamTitle}${scoreStr}${statusStr} | UltraGol`;
     const desc = `${teamTitle}${scoreStr}. Sigue el partido en vivo con marcador, goles y transmisión gratis en UltraGol.`;
 
-    res.send(buildMatchPage({ slug, title, desc, local, visitante, estado, goles: goles || [], detalles: detalles || {}, transmisionUrl }));
+    res.send(buildMatchPage({ slug, title, desc, equipo1, equipo2, logo1, logo2, estado, goles: goles || [], detalles: detalles || {}, transmisionUrl, liga, hora, nombreCortoLocal, nombreCortoVisitante, marcadorLocal, marcadorVisitante }));
 });
 
-function buildMatchPage({ slug, title, desc, local, visitante, estado, goles, detalles, transmisionUrl }) {
+function buildMatchPage({ slug, title, desc, equipo1, equipo2, logo1, logo2, estado, goles, detalles, transmisionUrl, liga, hora, nombreCortoLocal, nombreCortoVisitante, marcadorLocal, marcadorVisitante }) {
     const isLive = estado && estado.enVivo;
     const isFinished = estado && estado.finalizado;
     const isUpcoming = !isLive && !isFinished;
-    const statusLabel = isLive ? (estado.reloj || 'En Vivo') : isFinished ? 'Terminado' : (estado ? (estado.descripcion || 'Próximo') : 'Próximo');
+    const statusLabel = isLive ? (estado.reloj || estado.descripcion || 'En Vivo') : isFinished ? 'Terminado' : (estado ? (estado.descripcion || 'Próximo') : 'Próximo');
     const statusClass = isLive ? 'status-live' : isFinished ? 'status-finished' : 'status-upcoming';
 
     const golesHtml = goles.length
@@ -451,27 +545,27 @@ function buildMatchPage({ slug, title, desc, local, visitante, estado, goles, de
             </div>`).join('')
         : `<div class="no-goals">${isUpcoming ? 'El partido aún no ha comenzado' : 'Sin goles registrados'}</div>`;
 
-    const localLogoHtml = local.logo
-        ? `<img src="${local.logo}" alt="${local.nombre}" onerror="this.src='/assets/logos/ultragol-logo.png'">`
-        : `<img src="/assets/logos/ultragol-logo.png" alt="${local.nombre}">`;
-    const visitanteLogoHtml = visitante.logo
-        ? `<img src="${visitante.logo}" alt="${visitante.nombre}" onerror="this.src='/assets/logos/ultragol-logo.png'">`
-        : `<img src="/assets/logos/ultragol-logo.png" alt="${visitante.nombre}">`;
+    const localLogoHtml = logo1
+        ? `<img src="${logo1}" alt="${equipo1}" onerror="this.src='/assets/logos/ultragol-logo.png'">`
+        : `<img src="/assets/logos/ultragol-logo.png" alt="${equipo1}">`;
+    const visitanteLogoHtml = logo2
+        ? `<img src="${logo2}" alt="${equipo2}" onerror="this.src='/assets/logos/ultragol-logo.png'">`
+        : `<img src="/assets/logos/ultragol-logo.png" alt="${equipo2}">`;
 
-    const scoreLocal = (local.marcador !== undefined && local.marcador !== '') ? local.marcador : '-';
-    const scoreVisitante = (visitante.marcador !== undefined && visitante.marcador !== '') ? visitante.marcador : '-';
+    const scoreLocal = (marcadorLocal !== null && marcadorLocal !== undefined && marcadorLocal !== '') ? marcadorLocal : '-';
+    const scoreVisitante = (marcadorVisitante !== null && marcadorVisitante !== undefined && marcadorVisitante !== '') ? marcadorVisitante : '-';
 
     const canonicalUrl = `https://ultragol-l3ho.com.mx/mx/${slug}`;
 
     const jsonLd = {
         '@context': 'https://schema.org',
         '@type': 'SportsEvent',
-        'name': `${local.nombre} vs ${visitante.nombre}`,
+        'name': `${equipo1} vs ${equipo2}`,
         'description': desc,
         'url': canonicalUrl,
         'sport': 'Soccer',
-        'homeTeam': { '@type': 'SportsTeam', 'name': local.nombre },
-        'awayTeam': { '@type': 'SportsTeam', 'name': visitante.nombre },
+        'homeTeam': { '@type': 'SportsTeam', 'name': equipo1 },
+        'awayTeam': { '@type': 'SportsTeam', 'name': equipo2 },
         'location': detalles.estadio ? { '@type': 'Place', 'name': detalles.estadio, 'address': detalles.ciudad || '' } : undefined,
         'organizer': { '@type': 'Organization', 'name': 'UltraGol', 'url': 'https://ultragol-l3ho.com.mx' }
     };
@@ -524,25 +618,27 @@ function buildMatchPage({ slug, title, desc, local, visitante, estado, goles, de
 <div class="match-hero">
     <div class="match-hero-inner">
         <div class="breadcrumb">
-            <a href="/">UltraGol</a> › <a href="/mx">Partidos de Hoy</a> › ${local.nombre} vs ${visitante.nombre}
+            <a href="/">UltraGol</a> › <a href="/mx">Partidos de Hoy</a> › ${equipo1} vs ${equipo2}
         </div>
         <div class="match-scorecard">
             <div class="scorecard-team">
                 ${localLogoHtml}
-                <h2>${local.nombre}</h2>
-                ${local.nombreCorto ? `<div style="color:var(--text-muted);font-size:.8rem">${local.nombreCorto}</div>` : ''}
+                <h2>${equipo1}</h2>
+                ${nombreCortoLocal ? `<div style="color:var(--text-muted);font-size:.8rem">${nombreCortoLocal}</div>` : ''}
             </div>
             <div class="scorecard-center">
                 <div class="scorecard-score">${scoreLocal}<span>:</span>${scoreVisitante}</div>
                 <div class="scorecard-meta">
                     <div class="status-badge ${statusClass}">${isLive ? '🔴 ' : ''}${statusLabel}</div>
                     ${detalles.estadio ? `<div style="color:var(--text-muted);font-size:.8rem;text-align:center">🏟 ${detalles.estadio}</div>` : ''}
+                    ${liga ? `<div style="color:var(--text-muted);font-size:.75rem;margin-top:4px">${liga}</div>` : ''}
+                    ${hora ? `<div style="color:var(--text-muted);font-size:.75rem">${hora}</div>` : ''}
                 </div>
             </div>
             <div class="scorecard-team">
                 ${visitanteLogoHtml}
-                <h2>${visitante.nombre}</h2>
-                ${visitante.nombreCorto ? `<div style="color:var(--text-muted);font-size:.8rem">${visitante.nombreCorto}</div>` : ''}
+                <h2>${equipo2}</h2>
+                ${nombreCortoVisitante ? `<div style="color:var(--text-muted);font-size:.8rem">${nombreCortoVisitante}</div>` : ''}
             </div>
         </div>
     </div>
