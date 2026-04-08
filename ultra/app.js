@@ -757,7 +757,9 @@ function updateFeaturedMatch(data) {
                         <span class="carousel-team-name">${partido.local.nombreCorto}</span>
                     </div>
                     <div class="score-display">
-                        <span class="score">${partido.local.marcador} - ${partido.visitante.marcador}</span>
+                        <span class="score-num">${partido.local.marcador}</span>
+                        <div class="score-sep"><span>:</span></div>
+                        <span class="score-num">${partido.visitante.marcador}</span>
                     </div>
                     <div class="carousel-team">
                         <div class="team-logo">
