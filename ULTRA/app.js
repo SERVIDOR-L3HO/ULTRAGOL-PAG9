@@ -750,19 +750,24 @@ function updateFeaturedMatch(data) {
                 <img src="soccer-fire-bg.jpg" alt="Stadium" class="match-bg">
 
                 <div class="match-score">
-                    <div class="team-logo">
-                        <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
+                    <div class="carousel-team">
+                        <div class="team-logo">
+                            <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
+                        </div>
+                        <span class="carousel-team-name">${partido.local.nombreCorto}</span>
                     </div>
                     <div class="score-display">
                         <span class="score">${partido.local.marcador} - ${partido.visitante.marcador}</span>
                     </div>
-                    <div class="team-logo">
-                        <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
+                    <div class="carousel-team">
+                        <div class="team-logo">
+                            <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
+                        </div>
+                        <span class="carousel-team-name">${partido.visitante.nombreCorto}</span>
                     </div>
                 </div>
 
                 <div class="match-info">
-                    <h2 class="match-title">${partido.local.nombreCorto} vs. ${partido.visitante.nombreCorto}</h2>
                     <div class="match-badges">
                         <span class="badge-icon" title="Marcador"><i class="fas fa-circle"></i></span>
                         <span class="badge-icon play-badge-icon" title="Ver partido en vivo" onclick="watchMatch('${partido.id}')"><i class="fas fa-play"></i></span>
