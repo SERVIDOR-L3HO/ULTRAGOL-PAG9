@@ -1176,6 +1176,13 @@ app.use('/ultra', express.static(path.join(__dirname, 'ULTRA'), {
     }
 }));
 
+app.get('/test-notifications', (req, res) => {
+    res.sendFile(path.join(__dirname, 'test-notifications.html'));
+});
+app.get('/test-notifications.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'test-notifications.html'));
+});
+
 app.get('/cinenova', (req, res) => {
     res.sendFile(path.join(__dirname, 'cinenova.html'));
 });
