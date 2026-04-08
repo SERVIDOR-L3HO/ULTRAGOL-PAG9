@@ -121,12 +121,53 @@ class NotificationManager {
         console.log('🔔 Starting notifications polling...');
         this._check();
         this.checkInterval = setInterval(() => this._check(), 60000);
+        this._connectSSE();
     }
 
     stopPolling() {
         if (this.checkInterval) {
             clearInterval(this.checkInterval);
             this.checkInterval = null;
+        }
+        if (this.sse) {
+            this.sse.close();
+            this.sse = null;
+        }
+    }
+
+    _connectSSE() {
+        if (!('EventSource' in window)) return;
+        if (this.sse) return; // already connected
+        try {
+            this.sse = new EventSource('/api/notifications/stream');
+            this.sse.onmessage = (e) => {
+                try {
+                    const n = JSON.parse(e.data);
+                    if (n.type === 'connected') {
+                        console.log('📡 SSE canal en tiempo real conectado');
+                        return;
+                    }
+                    if (n.id && !this.shownIds.has(n.id) && this.permission === 'granted') {
+                        this._fire(n.titulo || 'UltraGol', {
+                            body: n.mensaje || '',
+                            icon: n.icono || '/app-icon.png',
+                            badge: '/favicon.png',
+                            tag: n.id,
+                            data: { url: n.url || '/' },
+                            vibrate: [200, 100, 200]
+                        });
+                        this.shownIds.add(n.id);
+                        localStorage.setItem('shownNotifIds', JSON.stringify([...this.shownIds]));
+                        console.log(`📣 Notificación en tiempo real: "${n.titulo}"`);
+                    }
+                } catch (_) {}
+            };
+            this.sse.onerror = () => {
+                // EventSource auto-reconnects on error — no action needed
+                console.warn('📡 SSE reconectando…');
+            };
+        } catch (err) {
+            console.warn('📡 SSE no disponible:', err.message);
         }
     }
 

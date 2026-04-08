@@ -9,341 +9,179 @@
         :root {
             --orange: #FF6600;
             --orange-dark: #cc4f00;
-            --orange-light: #ff8533;
             --bg: #0d0d0d;
             --surface: #1a1a1a;
             --surface2: #242424;
-            --border: #333;
+            --border: #2e2e2e;
             --text: #f0f0f0;
-            --muted: #888;
+            --muted: #777;
             --green: #22c55e;
             --red: #ef4444;
             --blue: #3b82f6;
+            --yellow: #fbbf24;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 20px; }
 
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 16px 0 24px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 28px;
-        }
-
-        header .logo {
-            font-size: 22px;
-            font-weight: 800;
-            color: var(--orange);
-            letter-spacing: -0.5px;
-        }
-
-        header .badge {
-            background: var(--orange);
-            color: #fff;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 20px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-        }
-
-        header a {
-            margin-left: auto;
-            color: var(--muted);
-            text-decoration: none;
-            font-size: 13px;
-        }
-
+        header { display: flex; align-items: center; gap: 12px; padding: 14px 0 22px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+        .logo  { font-size: 21px; font-weight: 800; color: var(--orange); }
+        .logo span { color: #fff; }
+        .badge { background: var(--orange); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; letter-spacing: 1px; }
+        header a { margin-left: auto; color: var(--muted); text-decoration: none; font-size: 13px; }
         header a:hover { color: var(--text); }
 
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; max-width: 1020px; margin: 0 auto; }
         @media (max-width: 680px) { .grid { grid-template-columns: 1fr; } }
+        .full { grid-column: 1 / -1; }
 
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-        }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+        .card h2 { font-size: 13px; font-weight: 700; color: var(--orange); text-transform: uppercase; letter-spacing: 0.9px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 
-        .card.full { grid-column: 1 / -1; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 13px; }
+        .stat-box .lbl { font-size: 11px; color: var(--muted); margin-bottom: 3px; }
+        .stat-box .val { font-size: 15px; font-weight: 700; }
 
-        .card h2 {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--orange);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Status grid */
-        .status-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .stat-box {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 14px;
-        }
-
-        .stat-box .label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
-        .stat-box .value { font-size: 15px; font-weight: 700; }
-
-        /* Buttons */
-        .btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 18px;
-            border-radius: 10px;
-            border: none;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 10px;
-            transition: opacity 0.15s, transform 0.1s;
-        }
-
+        .btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 18px; border-radius: 10px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 10px; transition: opacity .15s, transform .1s; }
         .btn:last-child { margin-bottom: 0; }
-        .btn:hover { opacity: 0.88; }
-        .btn:active { transform: scale(0.98); }
-        .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
+        .btn:hover:not(:disabled) { opacity: .85; }
+        .btn:active:not(:disabled) { transform: scale(.98); }
+        .btn:disabled { opacity: .38; cursor: not-allowed; }
         .btn-orange { background: var(--orange); color: #fff; }
         .btn-green  { background: var(--green);  color: #fff; }
         .btn-red    { background: var(--red);    color: #fff; }
         .btn-dark   { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
 
-        /* Form */
-        label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--muted);
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text);
-            font-size: 14px;
-            padding: 11px 14px;
-            margin-bottom: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        input:focus, textarea:focus, select:focus {
-            border-color: var(--orange);
-        }
-
-        textarea { resize: vertical; min-height: 80px; font-family: inherit; }
-
+        label { display: block; font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .5px; }
+        input, textarea, select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-size: 14px; padding: 11px 14px; margin-bottom: 14px; outline: none; transition: border-color .2s; font-family: inherit; }
+        input:focus, textarea:focus, select:focus { border-color: var(--orange); }
+        textarea { resize: vertical; min-height: 78px; }
         select option { background: var(--surface2); }
 
-        .preview-box {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 14px 16px;
-            display: flex;
+        .preview-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 13px 15px; display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .preview-icon { width: 40px; height: 40px; border-radius: 9px; object-fit: cover; flex-shrink: 0; }
+        .p-title { font-size: 13px; font-weight: 700; }
+        .p-body  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+        .char-count { font-size: 11px; color: var(--muted); text-align: right; margin-top: -11px; margin-bottom: 14px; }
+
+        hr.sep { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+
+        /* Delay selector */
+        .delay-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .delay-chip { flex: 1; min-width: 60px; padding: 9px 6px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; text-align: center; transition: all .2s; }
+        .delay-chip:hover { border-color: var(--orange); color: var(--text); }
+        .delay-chip.active { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+        /* Countdown ring */
+        .countdown-wrap {
+            display: none;
+            flex-direction: column;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            padding: 24px 0 16px;
+            gap: 16px;
         }
-
-        .preview-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 10px;
-            object-fit: cover;
-            flex-shrink: 0;
+        .countdown-wrap.visible { display: flex; }
+        .ring-svg { transform: rotate(-90deg); }
+        .ring-bg   { fill: none; stroke: #333; stroke-width: 6; }
+        .ring-fill { fill: none; stroke: var(--orange); stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset .9s linear; }
+        .countdown-num {
+            position: absolute;
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--orange);
         }
+        .ring-container { position: relative; display: flex; align-items: center; justify-content: center; }
+        .countdown-msg { font-size: 13px; color: var(--muted); text-align: center; }
+        .countdown-msg strong { color: var(--text); }
 
-        .preview-text .p-title { font-size: 13px; font-weight: 700; color: var(--text); }
-        .preview-text .p-body  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+        /* Live users pill */
+        .live-users { display: inline-flex; align-items: center; gap: 6px; background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.25); border-radius: 20px; padding: 4px 11px; font-size: 12px; color: var(--green); margin-bottom: 14px; }
+        .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); animation: pulse 1.4s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.75)} }
+
+        /* Liga pills */
+        .liga-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .liga-pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; font-size: 12px; padding: 4px 12px; display: flex; align-items: center; gap: 5px; }
+        .liga-pill .cnt { background: var(--orange); color: #fff; font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 6px; }
 
         /* Log */
-        .log {
-            background: #0a0a0a;
-            border: 1px solid #222;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            max-height: 260px;
-            overflow-y: auto;
-            padding: 14px;
-        }
+        .log { background: #080808; border: 1px solid #1c1c1c; border-radius: 10px; font-family: 'Courier New', monospace; font-size: 12px; max-height: 240px; overflow-y: auto; padding: 13px; }
+        .le { margin-bottom: 4px; line-height: 1.5; }
+        .le.ok   { color: #4ade80; }
+        .le.err  { color: #f87171; }
+        .le.warn { color: #fbbf24; }
+        .le.info { color: #60a5fa; }
+        .le.gray { color: #555; }
 
-        .log-entry { margin-bottom: 4px; line-height: 1.5; }
-        .log-entry.ok   { color: #4ade80; }
-        .log-entry.err  { color: #f87171; }
-        .log-entry.warn { color: #fbbf24; }
-        .log-entry.info { color: #60a5fa; }
-        .log-entry.gray { color: #666; }
-
-        /* League pills */
-        .liga-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .liga-pill {
-            background: var(--surface2);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            font-size: 12px;
-            padding: 4px 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .liga-pill .count {
-            background: var(--orange);
-            color: #fff;
-            font-size: 10px;
-            font-weight: 700;
-            border-radius: 10px;
-            padding: 1px 6px;
-        }
-
-        .char-count {
-            font-size: 11px;
-            color: var(--muted);
-            text-align: right;
-            margin-top: -10px;
-            margin-bottom: 14px;
-        }
-
-        .separator {
-            border: none;
-            border-top: 1px solid var(--border);
-            margin: 16px 0;
-        }
-
-        .sent-badge {
-            display: inline-block;
-            background: rgba(34,197,94,0.15);
-            color: var(--green);
-            border: 1px solid rgba(34,197,94,0.3);
-            border-radius: 6px;
-            font-size: 12px;
-            padding: 4px 10px;
-            margin-top: 8px;
-        }
+        .result-badge { display: inline-block; border-radius: 7px; font-size: 12px; padding: 5px 12px; margin-top: 8px; }
+        .result-badge.ok  { background: rgba(34,197,94,.12); color: var(--green); border: 1px solid rgba(34,197,94,.3); }
+        .result-badge.err { background: rgba(239,68,68,.12); color: var(--red);   border: 1px solid rgba(239,68,68,.3); }
     </style>
 </head>
 <body>
 
 <header>
-    <span class="logo">Ultra<span style="color:#fff">Gol</span></span>
-    <span class="badge">Admin</span>
+    <span class="logo">Ultra<span>Gol</span></span>
+    <span class="badge">ADMIN</span>
     <a href="/">← Volver al app</a>
 </header>
 
 <div class="grid">
 
-    <!-- Estado del sistema -->
+    <!-- Estado -->
     <div class="card">
         <h2>🟢 Estado del sistema</h2>
-        <div class="status-grid">
-            <div class="stat-box">
-                <div class="label">Navegador</div>
-                <div class="value" id="sBrowser">—</div>
-            </div>
-            <div class="stat-box">
-                <div class="label">Permiso</div>
-                <div class="value" id="sPermiso">—</div>
-            </div>
-            <div class="stat-box">
-                <div class="label">Service Worker</div>
-                <div class="value" id="sSW">—</div>
-            </div>
-            <div class="stat-box">
-                <div class="label">API Notif.</div>
-                <div class="value" id="sAPI">—</div>
-            </div>
+        <div class="stat-grid">
+            <div class="stat-box"><div class="lbl">Navegador</div><div class="val" id="sBrowser">—</div></div>
+            <div class="stat-box"><div class="lbl">Permiso</div><div class="val" id="sPermiso">—</div></div>
+            <div class="stat-box"><div class="lbl">Service Worker</div><div class="val" id="sSW">—</div></div>
+            <div class="stat-box"><div class="lbl">Canal tiempo real</div><div class="val" id="sSSE">—</div></div>
         </div>
-
-        <hr class="separator">
-
+        <hr class="sep">
         <button class="btn btn-orange" onclick="solicitarPermiso()">🔔 Solicitar permiso</button>
         <button class="btn btn-dark"   onclick="testLocal()">⚡ Notif. de prueba local</button>
         <button class="btn btn-dark"   onclick="limpiarStorage()">🗑️ Limpiar localStorage</button>
     </div>
 
-    <!-- Notificaciones de las 6 ligas -->
+    <!-- Ligas en tiempo real -->
     <div class="card">
-        <h2>⚽ Notif. en tiempo real (6 ligas)</h2>
+        <h2>⚽ Partidos hoy (6 ligas)</h2>
         <button class="btn btn-green" onclick="cargarAPI()">📡 Consultar API ahora</button>
-
         <div class="liga-list" id="ligaList">
-            <span style="color:var(--muted);font-size:13px">Presiona el botón para cargar los partidos de hoy</span>
+            <span style="color:var(--muted);font-size:13px">Presiona para cargar</span>
         </div>
     </div>
 
-    <!-- Notificación personalizada (broadcast) -->
+    <!-- Broadcast -->
     <div class="card full">
         <h2>📣 Notificación personalizada para todos</h2>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">
-            Escribe el mensaje y se enviará a todos los usuarios que tengan las notificaciones activadas en su próxima revisión automática.
-        </p>
 
-        <!-- Vista previa -->
+        <div class="live-users">
+            <span class="live-dot"></span>
+            <span id="liveCount">… usuarios</span> con app abierta ahora
+        </div>
+
+        <!-- Preview -->
         <label>Vista previa</label>
         <div class="preview-box">
             <img class="preview-icon" src="/app-icon.png" id="prevIcon" onerror="this.src='/favicon.png'">
-            <div class="preview-text">
+            <div>
                 <div class="p-title" id="prevTitulo">Título de la notificación</div>
                 <div class="p-body"  id="prevMensaje">Aquí aparecerá tu mensaje…</div>
             </div>
         </div>
 
+        <!-- Form -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
             <div>
                 <label for="bTitulo">Título *</label>
-                <input id="bTitulo" type="text" maxlength="60" placeholder="Ej: 🔥 Oferta especial UltraGol" oninput="actualizarPreview()">
+                <input id="bTitulo" type="text" maxlength="60" placeholder="Ej: 🔥 Noticia importante" oninput="actualizarPreview()">
                 <div class="char-count"><span id="cTitulo">0</span>/60</div>
             </div>
             <div>
-                <label for="bLiga">Liga / Categoría</label>
-                <select id="bLiga" oninput="actualizarPreview()">
+                <label for="bLiga">Liga / categoría</label>
+                <select id="bLiga">
                     <option value="">— General —</option>
                     <option value="Liga MX">🇲🇽 Liga MX</option>
                     <option value="Premier League">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</option>
@@ -360,16 +198,39 @@
         <div class="char-count"><span id="cMensaje">0</span>/140</div>
 
         <label for="bUrl">URL destino (opcional)</label>
-        <input id="bUrl" type="url" placeholder="https://ultragol-l3ho.com.mx/" value="/">
+        <input id="bUrl" type="url" placeholder="/" value="/">
 
-        <button class="btn btn-orange" onclick="enviarBroadcast()" id="btnBroadcast">
-            📣 Enviar a todos los usuarios
-        </button>
+        <!-- Delay chips -->
+        <label>¿Cuándo enviar?</label>
+        <div class="delay-row">
+            <div class="delay-chip active" data-delay="0"  onclick="selectDelay(this)">Ahora</div>
+            <div class="delay-chip"        data-delay="5"  onclick="selectDelay(this)">5 s</div>
+            <div class="delay-chip"        data-delay="10" onclick="selectDelay(this)">10 s</div>
+            <div class="delay-chip"        data-delay="30" onclick="selectDelay(this)">30 s</div>
+            <div class="delay-chip"        data-delay="60" onclick="selectDelay(this)">1 min</div>
+        </div>
 
+        <!-- Countdown ring (hidden until started) -->
+        <div class="countdown-wrap" id="cdWrap">
+            <div class="ring-container">
+                <svg class="ring-svg" width="110" height="110" viewBox="0 0 110 110">
+                    <circle class="ring-bg"   cx="55" cy="55" r="46"/>
+                    <circle class="ring-fill" id="ringFill" cx="55" cy="55" r="46"/>
+                </svg>
+                <div class="countdown-num" id="cdNum">–</div>
+            </div>
+            <div class="countdown-msg">
+                Enviando "<strong id="cdTitulo">…</strong>"<br>
+                a todos los usuarios conectados
+            </div>
+            <button class="btn btn-red" style="max-width:200px" onclick="cancelarContador()">✕ Cancelar</button>
+        </div>
+
+        <button class="btn btn-orange" onclick="iniciarEnvio()" id="btnBroadcast">📣 Enviar a todos</button>
         <div id="broadcastResult"></div>
     </div>
 
-    <!-- Log de actividad -->
+    <!-- Log -->
     <div class="card full">
         <h2>📋 Log de actividad</h2>
         <div class="log" id="log"></div>
@@ -380,145 +241,209 @@
 <script>
     const $ = id => document.getElementById(id);
 
+    // ── Log helper ──────────────────────────────────────────────────────────
     function log(msg, type = 'info') {
         const el = $('log');
         const div = document.createElement('div');
-        div.className = `log-entry ${type}`;
+        div.className = `le ${type}`;
         div.textContent = `[${new Date().toLocaleTimeString('es-MX')}] ${msg}`;
         el.appendChild(div);
         el.scrollTop = el.scrollHeight;
     }
 
+    // ── Status ───────────────────────────────────────────────────────────────
     async function actualizarEstado() {
-        const soportado = 'Notification' in window;
-        $('sBrowser').textContent = soportado ? '✅ OK' : '❌ No soportado';
-        $('sBrowser').style.color = soportado ? 'var(--green)' : 'var(--red)';
+        const sop = 'Notification' in window;
+        set('sBrowser', sop ? '✅ OK' : '❌ No soportado', sop ? 'var(--green)' : 'var(--red)');
 
-        if (soportado) {
+        if (sop) {
             const p = Notification.permission;
-            $('sPermiso').textContent = p === 'granted' ? '✅ Concedido' : p === 'denied' ? '❌ Bloqueado' : '⚠️ Pendiente';
-            $('sPermiso').style.color = p === 'granted' ? 'var(--green)' : p === 'denied' ? 'var(--red)' : '#fbbf24';
+            set('sPermiso',
+                p === 'granted' ? '✅ Concedido' : p === 'denied' ? '❌ Bloqueado' : '⚠️ Pendiente',
+                p === 'granted' ? 'var(--green)' : p === 'denied' ? 'var(--red)' : 'var(--yellow)'
+            );
         }
 
         if ('serviceWorker' in navigator) {
             const reg = await navigator.serviceWorker.getRegistration().catch(() => null);
-            $('sSW').textContent = reg ? (reg.active ? '✅ Activo' : '⚠️ Instalando') : '❌ Sin SW';
-            $('sSW').style.color = reg?.active ? 'var(--green)' : 'var(--red)';
+            set('sSW', reg?.active ? '✅ Activo' : reg ? '⚠️ Instalando' : '❌ Sin SW',
+                reg?.active ? 'var(--green)' : 'var(--red)');
         } else {
-            $('sSW').textContent = '❌ No disponible';
+            set('sSW', '❌ No disponible', 'var(--red)');
         }
     }
 
+    function set(id, text, color) {
+        const el = $(id);
+        el.textContent = text;
+        if (color) el.style.color = color;
+    }
+
+    // ── SSE connection (for the admin page itself) ───────────────────────────
+    let sseAdmin = null;
+    function conectarSSE() {
+        if (!('EventSource' in window)) { set('sSSE', '❌ No disponible', 'var(--red)'); return; }
+        sseAdmin = new EventSource('/api/notifications/stream');
+        sseAdmin.onopen = () => {
+            set('sSSE', '✅ Conectado', 'var(--green)');
+            log('📡 Canal en tiempo real conectado', 'ok');
+        };
+        sseAdmin.onmessage = (e) => {
+            try {
+                const n = JSON.parse(e.data);
+                if (n.type !== 'connected') {
+                    log(`📣 SSE recibido: "${n.titulo}" — ${n.mensaje}`, 'ok');
+                }
+            } catch (_) {}
+        };
+        sseAdmin.onerror = () => {
+            set('sSSE', '⚠️ Reconectando…', 'var(--yellow)');
+        };
+    }
+
+    // ── Live users counter ───────────────────────────────────────────────────
+    async function actualizarConectados() {
+        try {
+            const r = await fetch('/api/notifications/stream/count');
+            const d = await r.json();
+            $('liveCount').textContent = `${d.count} usuario${d.count !== 1 ? 's' : ''}`;
+        } catch (_) {}
+    }
+
+    // ── Permission ───────────────────────────────────────────────────────────
     async function solicitarPermiso() {
-        if (!('Notification' in window)) { log('❌ Navegador sin soporte de notificaciones', 'err'); return; }
+        if (!('Notification' in window)) { log('❌ Sin soporte', 'err'); return; }
         log('Solicitando permiso…', 'info');
         const p = await Notification.requestPermission();
         log(`Respuesta: ${p}`, p === 'granted' ? 'ok' : 'err');
         actualizarEstado();
     }
 
-    async function mostrarNotif(titulo, opciones) {
+    async function mostrarNotif(titulo, opts) {
         if ('serviceWorker' in navigator) {
             const reg = await navigator.serviceWorker.getRegistration().catch(() => null);
-            if (reg) {
-                await reg.showNotification(titulo, opciones);
-                return true;
-            }
+            if (reg) { await reg.showNotification(titulo, opts); return true; }
         }
-        new Notification(titulo, opciones);
+        new Notification(titulo, opts);
         return true;
     }
 
     async function testLocal() {
         if (Notification.permission !== 'granted') { log('⚠️ Primero concede el permiso', 'warn'); return; }
-        log('Enviando notificación local de prueba…', 'info');
-        const ok = await mostrarNotif('🎉 UltraGol funciona!', {
+        log('Enviando notificación local…', 'info');
+        await mostrarNotif('🎉 UltraGol funciona!', {
             body: 'Las notificaciones están activas en este dispositivo.',
-            icon: '/app-icon.png',
-            badge: '/favicon.png',
-            tag: 'local-test',
-            vibrate: [200, 100, 200],
-            data: { url: '/' }
-        }).catch(e => { log(`❌ ${e.message}`, 'err'); return false; });
-        if (ok) log('✅ Notificación de prueba enviada', 'ok');
+            icon: '/app-icon.png', badge: '/favicon.png', tag: 'local-test',
+            vibrate: [200, 100, 200], data: { url: '/' }
+        });
+        log('✅ Notificación local enviada', 'ok');
     }
 
+    // ── API query ─────────────────────────────────────────────────────────────
     async function cargarAPI() {
         log('📡 Consultando /api/notifications…', 'info');
-        $('sAPI').textContent = '…';
         try {
-            const r = await fetch('/api/notifications');
-            const d = await r.json();
-            const total = d.total || 0;
-            $('sAPI').textContent = `✅ ${total} notif.`;
-            $('sAPI').style.color = 'var(--green)';
-            log(`API respondió: ${total} notificaciones (${d.actualizado})`, 'ok');
-
-            // Count by league
+            const d = await fetch('/api/notifications').then(r => r.json());
+            log(`API: ${d.total} notificaciones (${d.actualizado})`, 'ok');
             const byLiga = {};
             (d.notificaciones || []).forEach(n => {
-                const k = n.liga || 'General';
-                byLiga[k] = (byLiga[k] || 0) + 1;
+                const k = n.liga || 'General'; byLiga[k] = (byLiga[k] || 0) + 1;
                 log(`  · [${n.tipo}] ${n.titulo} | ${n.mensaje}`, 'gray');
             });
-
-            const ligaList = $('ligaList');
-            ligaList.innerHTML = '';
-            if (Object.keys(byLiga).length === 0) {
-                ligaList.innerHTML = '<span style="color:var(--muted);font-size:13px">Sin partidos activos en este momento</span>';
+            const ll = $('ligaList'); ll.innerHTML = '';
+            if (!Object.keys(byLiga).length) {
+                ll.innerHTML = '<span style="color:var(--muted);font-size:13px">Sin partidos activos</span>';
             } else {
                 Object.entries(byLiga).forEach(([liga, cnt]) => {
-                    const pill = document.createElement('div');
-                    pill.className = 'liga-pill';
-                    pill.innerHTML = `${liga} <span class="count">${cnt}</span>`;
-                    ligaList.appendChild(pill);
+                    const p = document.createElement('div');
+                    p.className = 'liga-pill';
+                    p.innerHTML = `${liga} <span class="cnt">${cnt}</span>`;
+                    ll.appendChild(p);
                 });
             }
-
-            // Send first notification if granted
-            if (Notification.permission === 'granted' && d.notificaciones?.length > 0) {
+            if (Notification.permission === 'granted' && d.notificaciones?.length) {
                 const n = d.notificaciones[0];
-                await mostrarNotif(n.titulo, {
-                    body: n.mensaje,
-                    icon: n.icono || '/app-icon.png',
-                    badge: '/favicon.png',
-                    tag: n.id,
-                    data: { url: n.url || '/' }
-                });
-                log(`📲 Notificación mostrada: "${n.titulo}"`, 'ok');
+                await mostrarNotif(n.titulo, { body: n.mensaje, icon: n.icono || '/app-icon.png',
+                    badge: '/favicon.png', tag: n.id, data: { url: n.url || '/' } });
+                log(`📲 Mostrada: "${n.titulo}"`, 'ok');
             }
-        } catch (e) {
-            $('sAPI').textContent = '❌ Error';
-            $('sAPI').style.color = 'var(--red)';
-            log(`❌ Error al consultar API: ${e.message}`, 'err');
-        }
+        } catch (e) { log(`❌ ${e.message}`, 'err'); }
     }
 
+    // ── Preview ───────────────────────────────────────────────────────────────
     function actualizarPreview() {
-        const titulo  = $('bTitulo').value.trim() || 'Título de la notificación';
-        const mensaje = $('bMensaje').value.trim() || 'Aquí aparecerá tu mensaje…';
-        $('prevTitulo').textContent = titulo;
-        $('prevMensaje').textContent = mensaje;
+        $('prevTitulo').textContent = $('bTitulo').value.trim() || 'Título de la notificación';
+        $('prevMensaje').textContent = $('bMensaje').value.trim() || 'Aquí aparecerá tu mensaje…';
         $('cTitulo').textContent  = $('bTitulo').value.length;
         $('cMensaje').textContent = $('bMensaje').value.length;
     }
 
+    // ── Delay chips ───────────────────────────────────────────────────────────
+    let selectedDelay = 0;
+    function selectDelay(el) {
+        document.querySelectorAll('.delay-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        selectedDelay = parseInt(el.dataset.delay);
+    }
+
+    // ── Countdown ─────────────────────────────────────────────────────────────
+    let countdownTimer = null;
+
+    const CIRCUM = 2 * Math.PI * 46; // 46 = radius of ring
+
+    function iniciarContador(segundos, onComplete) {
+        const wrap = $('cdWrap');
+        const numEl = $('cdNum');
+        const ring  = $('ringFill');
+        const titulo = $('bTitulo').value.trim() || '…';
+        $('cdTitulo').textContent = titulo;
+
+        ring.style.strokeDasharray  = CIRCUM;
+        ring.style.strokeDashoffset = 0;
+
+        wrap.classList.add('visible');
+        $('btnBroadcast').disabled = true;
+
+        let remaining = segundos;
+        numEl.textContent = remaining;
+
+        // Start offset after a tiny frame so CSS transition plays
+        requestAnimationFrame(() => {
+            ring.style.strokeDashoffset = CIRCUM * (1 - remaining / segundos);
+        });
+
+        countdownTimer = setInterval(() => {
+            remaining--;
+            numEl.textContent = remaining;
+            ring.style.strokeDashoffset = CIRCUM * (1 - remaining / segundos);
+            if (remaining <= 0) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+                wrap.classList.remove('visible');
+                $('btnBroadcast').disabled = false;
+                onComplete();
+            }
+        }, 1000);
+    }
+
+    function cancelarContador() {
+        if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+        $('cdWrap').classList.remove('visible');
+        $('btnBroadcast').disabled = false;
+        log('⛔ Envío cancelado', 'warn');
+    }
+
+    // ── Send broadcast ────────────────────────────────────────────────────────
     async function enviarBroadcast() {
         const titulo  = $('bTitulo').value.trim();
         const mensaje = $('bMensaje').value.trim();
         const liga    = $('bLiga').value;
         const url     = $('bUrl').value.trim() || '/';
 
-        if (!titulo || !mensaje) {
-            log('⚠️ El título y el mensaje son obligatorios', 'warn');
-            return;
-        }
+        if (!titulo || !mensaje) { log('⚠️ Título y mensaje son obligatorios', 'warn'); return; }
 
-        const btn = $('btnBroadcast');
-        btn.disabled = true;
-        btn.textContent = '⏳ Enviando…';
         $('broadcastResult').innerHTML = '';
-        log(`📣 Enviando broadcast: "${titulo}"…`, 'info');
+        log(`📣 Enviando broadcast: "${titulo}"`, 'info');
 
         try {
             const r = await fetch('/api/admin/broadcast', {
@@ -527,47 +452,54 @@
                 body: JSON.stringify({ titulo, mensaje, liga, url })
             });
             const d = await r.json();
-
             if (d.success) {
-                log(`✅ Broadcast enviado (ID: ${d.id})`, 'ok');
-                log('   Todos los usuarios con notificaciones activas lo recibirán en su próximo polling automático.', 'gray');
-                $('broadcastResult').innerHTML = `<div class="sent-badge">✅ Notificación en cola — ID: <code>${d.id}</code></div>`;
-
-                // Also show it locally if permitted
+                log(`✅ Enviado a ${d.clientesConectados} usuario(s) en tiempo real (ID: ${d.id})`, 'ok');
+                log('   También en cola para usuarios que abran el app después.', 'gray');
+                $('broadcastResult').innerHTML =
+                    `<div class="result-badge ok">✅ Enviado a ${d.clientesConectados} usuario(s) · ID: <code>${d.id}</code></div>`;
                 if (Notification.permission === 'granted') {
-                    await mostrarNotif(titulo, {
-                        body: mensaje,
-                        icon: '/app-icon.png',
-                        badge: '/favicon.png',
-                        tag: d.id,
-                        data: { url }
-                    });
-                    log('📲 Notificación mostrada también localmente', 'ok');
+                    await mostrarNotif(titulo, { body: mensaje, icon: '/app-icon.png',
+                        badge: '/favicon.png', tag: d.id, data: { url } });
+                    log('📲 También mostrada localmente', 'ok');
                 }
+                actualizarConectados();
             } else {
-                log(`❌ Error del servidor: ${d.error}`, 'err');
+                log(`❌ Error: ${d.error}`, 'err');
+                $('broadcastResult').innerHTML = `<div class="result-badge err">❌ ${d.error}</div>`;
             }
         } catch (e) {
-            log(`❌ Error al enviar: ${e.message}`, 'err');
-        } finally {
-            btn.disabled = false;
-            btn.textContent = '📣 Enviar a todos los usuarios';
+            log(`❌ ${e.message}`, 'err');
+            $('broadcastResult').innerHTML = `<div class="result-badge err">❌ ${e.message}</div>`;
         }
     }
 
-    function limpiarStorage() {
-        ['selectedTeam','notificationPermission','lastNotificationId',
-         'notificationModalShown','shownNotifIds'].forEach(k => localStorage.removeItem(k));
-        log('🗑️ LocalStorage limpiado — recargando…', 'warn');
-        setTimeout(() => location.reload(), 1500);
+    function iniciarEnvio() {
+        if (selectedDelay === 0) {
+            enviarBroadcast();
+        } else {
+            log(`⏳ Iniciando contador de ${selectedDelay}s…`, 'info');
+            iniciarContador(selectedDelay, enviarBroadcast);
+        }
     }
 
-    // Init
+    // ── Utils ─────────────────────────────────────────────────────────────────
+    function limpiarStorage() {
+        ['selectedTeam','notificationPermission','lastNotificationId',
+         'notificationModalShown','shownNotifIds','notifLastChecked'].forEach(k => localStorage.removeItem(k));
+        log('🗑️ localStorage limpiado — recargando…', 'warn');
+        setTimeout(() => location.reload(), 1400);
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
     actualizarEstado();
     actualizarPreview();
-    log('🚀 Panel de administración iniciado', 'ok');
-    log('Ligas disponibles: Liga MX · Premier · La Liga · Serie A · Bundesliga · Ligue 1', 'gray');
-</script>
+    conectarSSE();
+    actualizarConectados();
+    setInterval(actualizarConectados, 8000);
 
+    log('🚀 Panel de administración listo', 'ok');
+    log('6 ligas: Liga MX · Premier · La Liga · Serie A · Bundesliga · Ligue 1', 'gray');
+    log('Selecciona un contador para programar el envío con anticipación.', 'gray');
+</script>
 </body>
 </html>

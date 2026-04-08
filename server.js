@@ -293,6 +293,47 @@ function cleanBroadcasts() {
     while (broadcastQueue.length && broadcastQueue[0].ts < cutoff) broadcastQueue.shift();
 }
 
+// SSE client registry — one entry per connected browser tab
+const sseClients = new Set();
+
+// GET /api/notifications/stream — Server-Sent Events for real-time delivery
+app.get('/api/notifications/stream', (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.flushHeaders();
+
+    // Send initial connection confirmation
+    res.write(`data: ${JSON.stringify({ type: 'connected', ts: Date.now() })}\n\n`);
+
+    sseClients.add(res);
+    console.log(`📡 SSE client connected (total: ${sseClients.size})`);
+
+    // Heartbeat every 25s to keep the connection alive through proxies
+    const heartbeat = setInterval(() => {
+        try { res.write(':ping\n\n'); } catch (_) {}
+    }, 25000);
+
+    req.on('close', () => {
+        clearInterval(heartbeat);
+        sseClients.delete(res);
+        console.log(`📡 SSE client disconnected (total: ${sseClients.size})`);
+    });
+});
+
+// GET /api/notifications/stream/count — how many clients are connected right now
+app.get('/api/notifications/stream/count', (req, res) => {
+    res.json({ count: sseClients.size });
+});
+
+function pushToSSEClients(notif) {
+    const payload = `data: ${JSON.stringify(notif)}\n\n`;
+    sseClients.forEach(client => {
+        try { client.write(payload); } catch (_) { sseClients.delete(client); }
+    });
+}
+
 // POST /api/admin/broadcast — send a custom notification to all users
 app.post('/api/admin/broadcast', (req, res) => {
     const { titulo, mensaje, icono, url, liga } = req.body || {};
@@ -311,8 +352,12 @@ app.post('/api/admin/broadcast', (req, res) => {
         liga: liga || ''
     };
     broadcastQueue.push(notif);
-    console.log(`📣 Broadcast enviado: "${titulo}" — "${mensaje}"`);
-    res.json({ success: true, id: notif.id, ts: notif.ts });
+
+    // Push immediately to all connected SSE clients (real-time delivery)
+    pushToSSEClients(notif);
+
+    console.log(`📣 Broadcast enviado a ${sseClients.size} cliente(s): "${titulo}"`);
+    res.json({ success: true, id: notif.id, ts: notif.ts, clientesConectados: sseClients.size });
 });
 
 async function fetchLigaMatches(liga) {
