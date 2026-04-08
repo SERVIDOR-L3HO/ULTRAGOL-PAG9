@@ -356,6 +356,37 @@ async function safeFetch(url) {
     } catch { return null; }
 }
 
+// Map team name → local logo file (overrides API logos which can be swapped)
+const LOCAL_LOGO_MAP = {
+    'america': 'america', 'club america': 'america', 'club américa': 'america',
+    'chivas': 'chivas', 'guadalajara': 'chivas', 'cd guadalajara': 'chivas', 'chivas de guadalajara': 'chivas',
+    'cruz azul': 'cruz-azul',
+    'toluca': 'toluca', 'deportivo toluca': 'toluca',
+    'pachuca': 'pachuca', 'cf pachuca': 'pachuca', 'tuzos': 'pachuca',
+    'pumas': 'pumas', 'pumas unam': 'pumas',
+    'atlas': 'atlas', 'atlas fc': 'atlas',
+    'tigres': 'tigres', 'tigres uanl': 'tigres',
+    'necaxa': 'necaxa', 'club necaxa': 'necaxa',
+    'juarez': 'fc-juarez', 'fc juarez': 'fc-juarez', 'fc juárez': 'fc-juarez',
+    'leon': 'leon', 'club leon': 'leon', 'club león': 'leon',
+    'tijuana': 'tijuana', 'xolos': 'tijuana', 'club tijuana': 'tijuana',
+    'monterrey': 'monterrey', 'cf monterrey': 'monterrey', 'rayados': 'monterrey',
+    'san luis': 'atletico-san-luis', 'atletico san luis': 'atletico-san-luis',
+    'atlético de san luis': 'atletico-san-luis', 'atletico de san luis': 'atletico-san-luis',
+    'puebla': 'puebla', 'club puebla': 'puebla',
+    'queretaro': 'queretaro', 'querétaro': 'queretaro', 'gallos blancos': 'queretaro',
+    'mazatlan': 'mazatlan', 'mazatlán': 'mazatlan', 'mazatlan fc': 'mazatlan',
+    'santos': 'santos', 'santos laguna': 'santos',
+};
+
+function getLocalLogo(teamName) {
+    const key = (teamName || '').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s]/g, '').trim();
+    const file = LOCAL_LOGO_MAP[key];
+    return file ? `/assets/logos/${file}.png` : null;
+}
+
 // Normalize any transmission item into a common match object
 function normalizeTransmision(item, fuente) {
     const equipo1 = item.equipo1 || item.local || '';
@@ -373,13 +404,20 @@ function normalizeTransmision(item, fuente) {
     const enVivo = estadoRaw.includes('vivo') || estadoRaw.includes('live');
     const finalizado = estadoRaw.includes('finaliz') || estadoRaw.includes('terminado') || estadoRaw.includes('full');
 
+    // Prefer local logos (always correct) over API logos (can be swapped).
+    // When at least one team has a local logo, avoid using API logos for the other
+    // team (API may have logos in the wrong order for that match).
+    const localLogo1 = getLocalLogo(equipo1);
+    const localLogo2 = getLocalLogo(equipo2);
+    const eitherLocal = localLogo1 || localLogo2;
+
     return {
         slug,
         titulo,
         equipo1,
         equipo2,
-        logo1: item.logo1 || null,
-        logo2: item.logo2 || null,
+        logo1: localLogo1 || (eitherLocal ? null : item.logo1) || null,
+        logo2: localLogo2 || (eitherLocal ? null : item.logo2) || null,
         hora: item.hora || '',
         fecha: item.fecha || item.fechaISO || '',
         liga: item.liga || item.info || item.pais || item.categoria || '',
@@ -446,8 +484,8 @@ async function fetchAllPartidos() {
                 titulo: `${p.local.nombre} vs ${p.visitante.nombre}`,
                 equipo1: p.local.nombre,
                 equipo2: p.visitante.nombre,
-                logo1: p.local.logo || (prev && prev.logo1) || null,
-                logo2: p.visitante.logo || (prev && prev.logo2) || null,
+                logo1: getLocalLogo(p.local.nombre) || p.local.logo || null,
+                logo2: getLocalLogo(p.visitante.nombre) || p.visitante.logo || null,
                 hora: p.fecha || '',
                 liga: marc.liga || 'Liga MX',
                 deporte: 'Fútbol',
