@@ -284,6 +284,37 @@ const LIGAS_CONFIG = [
     { nombre: 'Ligue 1',        emoji: '🇫🇷', endpoint: '/ligue1/marcadores' },
 ];
 
+// In-memory broadcast queue — admin can push custom notifications to all users
+const broadcastQueue = [];
+const BROADCAST_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+function cleanBroadcasts() {
+    const cutoff = Date.now() - BROADCAST_TTL_MS;
+    while (broadcastQueue.length && broadcastQueue[0].ts < cutoff) broadcastQueue.shift();
+}
+
+// POST /api/admin/broadcast — send a custom notification to all users
+app.post('/api/admin/broadcast', (req, res) => {
+    const { titulo, mensaje, icono, url, liga } = req.body || {};
+    if (!titulo || !mensaje) {
+        return res.status(400).json({ success: false, error: 'titulo y mensaje son requeridos' });
+    }
+    cleanBroadcasts();
+    const notif = {
+        id: `broadcast-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        titulo: titulo.trim(),
+        mensaje: mensaje.trim(),
+        icono: icono || '/app-icon.png',
+        url: url || '/',
+        ts: Date.now(),
+        tipo: 'broadcast',
+        liga: liga || ''
+    };
+    broadcastQueue.push(notif);
+    console.log(`📣 Broadcast enviado: "${titulo}" — "${mensaje}"`);
+    res.json({ success: true, id: notif.id, ts: notif.ts });
+});
+
 async function fetchLigaMatches(liga) {
     try {
         const r = await fetch(`${API_BASE_URL}${liga.endpoint}`, { signal: AbortSignal.timeout(6000) });
@@ -357,6 +388,10 @@ app.get('/api/notifications', async (req, res) => {
                 });
             }
         });
+
+        // Include any broadcast messages from the admin
+        cleanBroadcasts();
+        broadcastQueue.forEach(b => notifications.push(b));
 
         // Filter to only newer than `since`
         const filtered = since > 0
