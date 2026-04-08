@@ -3059,6 +3059,9 @@ function navTo(section, element) {
     
     const button = element.closest('.nav-btn') || element;
     button.classList.add('active');
+
+    // Bounce animation
+    if (typeof navBounce === 'function') navBounce(button);
     
     if (section === 'search') {
         showSearchModal();

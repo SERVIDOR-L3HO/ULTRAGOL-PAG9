@@ -733,6 +733,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
+    padding-top: max(15px, calc(15px + env(safe-area-inset-top)));
     background: rgba(13, 13, 13, 0.95);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border);
@@ -826,6 +827,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px 12px; /* Padding más reducido */
+    padding-top: max(10px, calc(10px + env(safe-area-inset-top)));
     background: rgba(13, 13, 13, 0.95);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border);
@@ -1785,6 +1787,7 @@ body {
     animation: blink 1s infinite;
 }
 
+/* ── BOTTOM NAV — Floating Capsule Design ── */
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -1792,45 +1795,163 @@ body {
     transform: translateX(-50%);
     max-width: 480px;
     width: 100%;
-    background: rgba(13, 13, 13, 0.98);
-    backdrop-filter: blur(20px);
+    background: rgba(8, 8, 8, 0.97);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
     display: flex;
     justify-content: space-around;
-    padding: 12px 20px;
-    border-top: 1px solid var(--border);
+    align-items: center;
+    padding: 10px 16px;
+    padding-bottom: max(14px, calc(14px + env(safe-area-inset-bottom)));
+    border-top: 1px solid rgba(255,255,255,0.06);
+    box-shadow:
+        0 -1px 0 rgba(255,102,0,0.12),
+        0 -20px 60px rgba(0,0,0,0.7),
+        inset 0 1px 0 rgba(255,255,255,0.04);
     z-index: 1000;
 }
 
 .nav-btn {
+    position: relative;
     background: transparent;
-    border: none;
-    color: var(--text-muted);
-    font-size: 22px;
+    border: 1.5px solid transparent;
     cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 8px 12px;
-    border-radius: 12px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 4px;
+    justify-content: center;
+    gap: 0px;
+    padding: 9px 12px;
+    border-radius: 50px;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    transition:
+        background 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-color 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        padding 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.35s ease,
+        gap 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 44px;
+    min-height: 44px;
+    flex-shrink: 0;
+    will-change: transform;
 }
 
-.nav-btn:hover, .nav-btn.active {
-    color: var(--primary);
-    background: rgba(255, 69, 0, 0.1);
+.nav-btn.active {
+    background: rgba(255, 102, 0, 0.12);
+    border-color: rgba(255, 102, 0, 0.22);
+    padding: 9px 18px;
+    gap: 8px;
+    box-shadow:
+        0 0 20px rgba(255,102,0,0.12),
+        inset 0 1px 0 rgba(255,102,0,0.1);
 }
 
+/* Icon wrapper */
+.nav-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+}
+
+.nav-icon-wrap i {
+    font-size: 18px;
+    color: rgba(255,255,255,0.28);
+    transition:
+        color 0.3s ease,
+        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        filter 0.3s ease;
+    display: block;
+    will-change: transform;
+}
+
+.nav-btn.active .nav-icon-wrap i {
+    color: #FF6600;
+    transform: scale(1.18);
+    filter: drop-shadow(0 0 6px rgba(255,102,0,0.6));
+}
+
+/* Glow dot indicator under active icon */
+.nav-btn.active .nav-icon-wrap::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%) scaleX(1);
+    width: 16px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #FF6600, transparent);
+    border-radius: 2px;
+    opacity: 0.7;
+    animation: navBarPulse 2s ease-in-out infinite;
+}
+
+@keyframes navBarPulse {
+    0%, 100% { opacity: 0.5; width: 12px; }
+    50% { opacity: 1; width: 20px; }
+}
+
+/* Label — hidden by default, expands on active */
 .nav-label {
-    font-size: 10px;
-    font-weight: 500;
-    margin-top: 2px;
-    text-transform: capitalize;
+    font-size: 13px;
+    font-weight: 800;
+    color: #FF6600;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 0;
+    opacity: 0;
+    letter-spacing: -0.2px;
+    transition:
+        max-width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.25s ease;
+    pointer-events: none;
 }
 
-.search-icon {
-    color: #22c55e !important;
+.nav-btn.active .nav-label {
+    max-width: 90px;
+    opacity: 1;
 }
+
+/* Tap ripple animation */
+.nav-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50px;
+    background: rgba(255,102,0,0.15);
+    transform: scale(0);
+    opacity: 0;
+    transition: none;
+}
+
+.nav-btn.nav-tap::before {
+    animation: navRipple 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes navRipple {
+    0% { transform: scale(0); opacity: 0.8; }
+    100% { transform: scale(2.5); opacity: 0; }
+}
+
+/* Bounce keyframe on tap */
+@keyframes navBounce {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(0.87); }
+    60%  { transform: scale(1.12); }
+    80%  { transform: scale(0.96); }
+    100% { transform: scale(1); }
+}
+
+.nav-btn.is-bouncing {
+    animation: navBounce 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* Keep search-icon override compatible */
+.search-icon { color: inherit !important; }
 
 /* ============================================
    REPRODUCTOR FULLSCREEN - DISEÑO INMERSIVO
@@ -2565,6 +2686,7 @@ body {
     font-size: 11px;
 }
 
+/* Tarjetas de canales en settings */
 .settings-channels-grid {
     display: flex;
     flex-direction: column;
@@ -2642,6 +2764,7 @@ body {
     flex-shrink: 0;
 }
 
+/* Items glass */
 .setting-item {
     display: flex;
     justify-content: space-between;
@@ -9417,12 +9540,8 @@ body.dark-mode .news-content p {
     }
     
     .bottom-nav {
-        padding: 14px 25px;
-    }
-    
-    .nav-btn {
-        font-size: 24px;
-        padding: 10px 18px;
+        padding: 12px 20px;
+        padding-bottom: max(12px, calc(12px + env(safe-area-inset-bottom)));
     }
     
     .important-matches-btn-container {
@@ -9719,12 +9838,8 @@ body.dark-mode .news-content p {
     }
     
     .bottom-nav {
-        padding: 16px 30px;
-    }
-    
-    .nav-btn {
-        font-size: 26px;
-        padding: 12px 20px;
+        padding: 14px 24px;
+        padding-bottom: max(14px, calc(14px + env(safe-area-inset-bottom)));
     }
     
     .important-matches-btn-container {
@@ -9796,12 +9911,16 @@ body.dark-mode .news-content p {
     }
     
     .bottom-nav {
-        padding: 8px 15px;
-    }
-    
-    .nav-btn {
-        font-size: 18px;
         padding: 6px 12px;
+        padding-bottom: max(6px, calc(6px + env(safe-area-inset-bottom)));
+    }
+
+    .nav-btn {
+        padding: 7px 10px;
+    }
+
+    .nav-btn.active {
+        padding: 7px 14px;
     }
 }
 
@@ -11678,4 +11797,14 @@ body.dark-mode .news-content p {
 }
 .smp-play-btn:active {
     background: #e03d00;
+}
+
+/* ===== iPhone Safe Area (notch / home indicator) ===== */
+@supports (padding: env(safe-area-inset-top)) {
+    .app-header {
+        padding-top: max(10px, calc(10px + env(safe-area-inset-top))) !important;
+    }
+    .bottom-nav {
+        padding-bottom: max(12px, calc(12px + env(safe-area-inset-bottom))) !important;
+    }
 }

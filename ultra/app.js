@@ -25,6 +25,21 @@ let streakData = {
 
 const API_BASE = 'https://ultragol-api-3.vercel.app';
 
+// Función para hacer fetch con timeout
+async function fetchWithTimeout(url, timeout = 8000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        return response;
+    } catch (error) {
+        clearTimeout(timeoutId);
+        throw error;
+    }
+}
+
 const leaguesConfig = {
     'Todas las Ligas': {
         apiPath: '/todo-todas-las-ligas',
@@ -344,58 +359,48 @@ function startOnlineCounter() {
     const counterElement = document.getElementById('onlineCountText');
     if (!counterElement) return;
 
-    // Firebase ya está disponible globalmente en window.rtdb desde firebase-config.js
-    // Pero como app.js se carga antes o de forma independiente, aseguramos acceso
-    
     function initFirebaseCounter() {
         try {
-            // Importar dinámicamente si no está disponible, o usar el global si existe
             import("https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js").then((rtdbModule) => {
                 const { getDatabase, ref, onValue, set, onDisconnect, push, serverTimestamp } = rtdbModule;
-                
-                // Configuración de Firebase (debe coincidir con la de firebase-config.js)
-                const firebaseConfig = {
-                    databaseURL: "https://ligamx-daf3d-default-rtdb.firebaseio.com/"
-                };
-                
-                // Inicializar específicamente para el contador
+
                 const db = getDatabase();
-                
-                // Usar un ID único para esta sesión (esto funciona incluso sin login)
-                const myStatusRef = push(ref(db, 'status'));
 
-                // Al conectar, añadirme a la lista
-                set(myStatusRef, {
-                    id: Date.now(),
-                    last_active: serverTimestamp()
+                // Detectar conexión real con Firebase usando .info/connected
+                const connectedRef = ref(db, '.info/connected');
+                let myUserRef = null;
+
+                onValue(connectedRef, (snap) => {
+                    if (snap.val() === true) {
+                        // Conectado — registrar presencia en online_users/
+                        myUserRef = push(ref(db, 'online_users'));
+                        set(myUserRef, { ts: serverTimestamp() });
+                        // Al cerrar pestaña o perder conexión, se borra automáticamente
+                        onDisconnect(myUserRef).remove();
+                        console.log('🟢 Presencia registrada en Firebase');
+                    }
                 });
 
-                // Al desconectar (cerrar pestaña), eliminar mi registro automáticamente
-                onDisconnect(myStatusRef).remove();
-
-                // Escuchar el nodo global de conteo
-                const globalCountRef = ref(db, 'stats/online_users');
-                onValue(globalCountRef, (snapshot) => {
-                    const val = snapshot.val();
-                    // Mostrar exactamente lo que diga Firebase, sin respaldos ni números generados
-                    const count = (val !== null) ? ((typeof val === 'object') ? (val.count || 0) : val) : 0;
+                // Escuchar online_users/ y contar cuántos hijos hay
+                const onlineUsersRef = ref(db, 'online_users');
+                onValue(onlineUsersRef, (snapshot) => {
+                    const count = snapshot.size || 0;
                     counterElement.textContent = `${count.toLocaleString()} ONLINE`;
-                    console.log('📊 Contador actualizado (Firebase):', count);
+                    console.log('📊 Usuarios conectados (Firebase):', count);
                 }, (error) => {
-                    console.error("Error leyendo online_users:", error);
-                    // Si hay error de permiso o no existe, mostramos 0
-                    counterElement.textContent = "0 ONLINE";
+                    console.error('Error leyendo online_users:', error);
+                    counterElement.textContent = 'ONLINE';
                 });
+
             }).catch(err => {
-                console.error("Error cargando Firebase RTDB module:", err);
-                counterElement.textContent = "CONECTADO";
+                console.error('Error cargando Firebase RTDB module:', err);
+                counterElement.textContent = 'CONECTADO';
             });
         } catch (e) {
-            console.error("Error general en contador:", e);
+            console.error('Error general en contador:', e);
         }
     }
 
-    // Esperar un poco a que el DOM y otros scripts estén listos
     if (document.readyState === 'complete') {
         initFirebaseCounter();
     } else {
@@ -434,42 +439,42 @@ async function loadMarcadores() {
 // Función para cargar transmisiones desde las 5 APIs
 async function loadTransmisiones() {
     try {
-        // Cargar las 6 APIs en paralelo con manejo individual de errores
+        // Cargar las 6 APIs en paralelo con manejo individual de errores y timeouts
         const [data1, data2, data3, data4, data5, data6] = await Promise.all([
-            fetch('https://ultragol-api-3.vercel.app/transmisiones')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 1 (rereyano):', err);
+                    console.warn('⚠️ Error cargando API 1 (rereyano):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetch('https://ultragol-api-3.vercel.app/transmisiones3')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones3', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 2 (e1link):', err);
+                    console.warn('⚠️ Error cargando API 2 (e1link):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetch('https://ultragol-api-3.vercel.app/transmisiones2')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones2', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 3 (voodc):', err);
+                    console.warn('⚠️ Error cargando API 3 (voodc):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetch('https://ultragol-api-3.vercel.app/transmisiones4')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones4', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 4 (transmisiones4):', err);
+                    console.warn('⚠️ Error cargando API 4 (transmisiones4):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetch('https://ultragol-api-3.vercel.app/transmisiones5')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones5', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 5 (donromans):', err);
+                    console.warn('⚠️ Error cargando API 5 (donromans):', err.message);
                     return { matches: [] };
                 }),
-            fetch('https://ultragol-api-3.vercel.app/transmisiones6')
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones6', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 6 (external):', err);
+                    console.warn('⚠️ Error cargando API 6 (external):', err.message);
                     return { transmisiones: [] };
                 })
         ]);
@@ -591,15 +596,29 @@ async function loadTransmisiones() {
             }))
         }));
         
-        // Marcar transmisiones API 6 con su tipo
-        const transmisionesAPI6Marcadas = (data6.transmisiones || []).map(t => ({
-            ...t,
-            tipoAPI: 'transmisiones6',
-            canales: (t.canales || []).map(c => ({
-                ...c,
-                tipoAPI: 'transmisiones6'
-            }))
-        }));
+        // Normalizar transmisiones API 6 (streamed.pk usa "fuentes", JSON local usa "canales")
+        const transmisionesAPI6Marcadas = (data6.transmisiones || []).map(t => {
+            let canalesNormalizados = [];
+
+            if (t.canales && t.canales.length > 0) {
+                // Formato JSON local: ya tiene canales
+                canalesNormalizados = t.canales.map(c => ({ ...c, tipoAPI: 'transmisiones6' }));
+            } else if (t.fuentes && t.fuentes.length > 0) {
+                // Formato API externa (streamed.pk): usa "fuentes" → convertir a canales
+                canalesNormalizados = t.fuentes.map(f => ({
+                    numero: '',
+                    nombre: f.fuente || 'Canal',
+                    enlaces: f.url ? [{ url: f.url, calidad: 'HD' }] : [],
+                    tipoAPI: 'transmisiones6'
+                }));
+            }
+
+            return {
+                ...t,
+                tipoAPI: 'transmisiones6',
+                canales: canalesNormalizados
+            };
+        });
         
         // Guardar datos separados de cada API
         transmisionesAPI1 = {
@@ -1387,7 +1406,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     }
     
     if (canalesCombinados.length === 0) {
-        showToast('No hay transmisión disponible para este partido');
+        showToast('Por favor espera 30 segundos mientras cargamos los links disponibles');
         console.log(`❌ No se encontró transmisión para: ${partido.local.nombre} vs ${partido.visitante.nombre}`);
         return;
     }
@@ -2915,6 +2934,50 @@ function openStream(url) {
 function toggleSettings() {
     const panel = document.getElementById('settingsPanel');
     panel.classList.toggle('active');
+    if (panel.classList.contains('active')) {
+        updateNotifButtonState();
+    }
+}
+
+function updateNotifButtonState() {
+    const btn = document.getElementById('notifToggleBtn');
+    const icon = document.getElementById('notifToggleIcon');
+    const text = document.getElementById('notifToggleText');
+    if (!btn || !icon || !text) return;
+
+    const perm = localStorage.getItem('notificationPermission');
+    const browserPerm = ('Notification' in window) ? Notification.permission : 'denied';
+    const active = perm === 'granted' && browserPerm === 'granted';
+
+    if (active) {
+        btn.style.background = '#e94560';
+        icon.className = 'fas fa-bell-slash';
+        text.textContent = 'Desactivar';
+    } else {
+        btn.style.background = 'var(--primary)';
+        icon.className = 'fas fa-bell';
+        text.textContent = 'Activar';
+    }
+}
+
+function toggleNotificationsFromSettings() {
+    const perm = localStorage.getItem('notificationPermission');
+    const browserPerm = ('Notification' in window) ? Notification.permission : 'denied';
+    const active = perm === 'granted' && browserPerm === 'granted';
+
+    if (active) {
+        if (window.notificationManager) window.notificationManager.disableNotifications();
+        else {
+            localStorage.setItem('notificationPermission', 'denied');
+        }
+        updateNotifButtonState();
+    } else {
+        if (window.notificationManager) {
+            window.notificationManager.showPermissionModal();
+        }
+        // Update button after a short delay (permission dialog takes time)
+        setTimeout(updateNotifButtonState, 2000);
+    }
 }
 
 // ==================== FUNCIONES DE ELIMINAR CACHÉ ====================
@@ -2996,6 +3059,9 @@ function navTo(section, element) {
     
     const button = element.closest('.nav-btn') || element;
     button.classList.add('active');
+
+    // Bounce animation
+    if (typeof navBounce === 'function') navBounce(button);
     
     if (section === 'search') {
         showSearchModal();
@@ -3710,56 +3776,81 @@ function selectImportantMatch(index) {
     let canalesCombinados = [];
     let tituloMostrar = transmision.titulo || transmision.evento;
     
-    const matchEv = (ev) => {
-        const e = (ev || '').toLowerCase().trim();
-        return e === eventoNombre || e.includes(eventoNombre) || eventoNombre.includes(e);
-    };
-
+    // Buscar en API 1
     if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
-        const transAPI1 = transmisionesAPI1.transmisiones.find(t => matchEv(t.evento || t.titulo));
+        const transAPI1 = transmisionesAPI1.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
         if (transAPI1 && transAPI1.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI1.canales.map(c => ({ ...c, fuente: 'rereyano' }))];
+            canalesCombinados = [...canalesCombinados, ...transAPI1.canales];
             console.log(`✅ Encontrados ${transAPI1.canales.length} canales en API 1 (rereyano)`);
         }
     }
-
+    
+    // Buscar en API 2
     if (transmisionesAPI2 && transmisionesAPI2.transmisiones) {
-        const transAPI2 = transmisionesAPI2.transmisiones.find(t => matchEv(t.evento || t.titulo));
+        const transAPI2 = transmisionesAPI2.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
         if (transAPI2 && transAPI2.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI2.canales.map(c => ({ ...c, fuente: 'e1link' }))];
+            canalesCombinados = [...canalesCombinados, ...transAPI2.canales];
             console.log(`✅ Encontrados ${transAPI2.canales.length} canales en API 2 (e1link)`);
         }
     }
-
+    
+    // Buscar en API 3
     if (transmisionesAPI3 && transmisionesAPI3.transmisiones) {
-        const transAPI3 = transmisionesAPI3.transmisiones.find(t => matchEv(t.evento || t.titulo));
+        const transAPI3 = transmisionesAPI3.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
         if (transAPI3 && transAPI3.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI3.canales.map(c => ({ ...c, fuente: 'voodc' }))];
+            canalesCombinados = [...canalesCombinados, ...transAPI3.canales];
             console.log(`✅ Encontrados ${transAPI3.canales.length} canales en API 3 (voodc)`);
         }
     }
-
+    
+    // Buscar en API 4
     if (transmisionesAPI4 && transmisionesAPI4.transmisiones) {
-        const transAPI4 = transmisionesAPI4.transmisiones.find(t => matchEv(t.evento || t.titulo));
+        const transAPI4 = transmisionesAPI4.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
         if (transAPI4 && transAPI4.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI4.canales.map(c => ({ ...c, fuente: 'transmisiones4' }))];
+            canalesCombinados = [...canalesCombinados, ...transAPI4.canales];
             console.log(`✅ Encontrados ${transAPI4.canales.length} canales en API 4 (transmisiones4)`);
         }
     }
-
+    
+    // Buscar en API 5
     if (transmisionesAPI5 && transmisionesAPI5.transmisiones) {
-        const transAPI5 = transmisionesAPI5.transmisiones.find(t => matchEv(t.evento || t.titulo));
+        const transAPI5 = transmisionesAPI5.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
         if (transAPI5 && transAPI5.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI5.canales.map(c => ({ ...c, fuente: 'donromans' }))];
+            canalesCombinados = [...canalesCombinados, ...transAPI5.canales];
             console.log(`✅ Encontrados ${transAPI5.canales.length} canales en API 5 (donromans)`);
         }
     }
 
+    // Buscar en API 6
     if (transmisionesAPI6 && transmisionesAPI6.transmisiones) {
-        const transAPI6 = transmisionesAPI6.transmisiones.find(t => matchEv(t.evento || t.titulo));
+        const transAPI6 = transmisionesAPI6.transmisiones.find(t => {
+            const evento = (t.evento || t.titulo || '').toLowerCase();
+            return evento === eventoNombre || evento.includes(eventoNombre) || eventoNombre.includes(evento);
+        });
+        
         if (transAPI6 && transAPI6.canales) {
-            canalesCombinados = [...canalesCombinados, ...transAPI6.canales.map(c => ({ ...c, fuente: 'transmisiones6' }))];
-            console.log(`✅ Encontrados ${transAPI6.canales.length} canales en API 6 (transmisiones6)`);
+            canalesCombinados = [...canalesCombinados, ...transAPI6.canales];
+            console.log(`✅ Encontrados ${transAPI6.canales.length} canales en API 6 (local)`);
         }
     }
     
@@ -3803,12 +3894,13 @@ function selectImportantMatchByName(eventoNombre) {
     let canalesCombinados = [];
     let tituloMostrar = transmision.titulo || transmision.evento;
     
+    const matchName = (evento) => {
+        const e = (evento || '').toLowerCase().trim();
+        return e === nombreBuscar || e.includes(nombreBuscar) || nombreBuscar.includes(e);
+    };
+
     if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
-        const transAPI1 = transmisionesAPI1.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
-        
+        const transAPI1 = transmisionesAPI1.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI1 && transAPI1.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI1.canales.map(c => ({ ...c, fuente: 'rereyano' }))];
             console.log(`✅ Encontrados ${transAPI1.canales.length} canales en API 1 (rereyano)`);
@@ -3816,10 +3908,7 @@ function selectImportantMatchByName(eventoNombre) {
     }
 
     if (transmisionesAPI2 && transmisionesAPI2.transmisiones) {
-        const transAPI2 = transmisionesAPI2.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
+        const transAPI2 = transmisionesAPI2.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI2 && transAPI2.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI2.canales.map(c => ({ ...c, fuente: 'e1link' }))];
             console.log(`✅ Encontrados ${transAPI2.canales.length} canales en API 2 (e1link)`);
@@ -3827,10 +3916,7 @@ function selectImportantMatchByName(eventoNombre) {
     }
 
     if (transmisionesAPI3 && transmisionesAPI3.transmisiones) {
-        const transAPI3 = transmisionesAPI3.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
+        const transAPI3 = transmisionesAPI3.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI3 && transAPI3.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI3.canales.map(c => ({ ...c, fuente: 'voodc' }))];
             console.log(`✅ Encontrados ${transAPI3.canales.length} canales en API 3 (voodc)`);
@@ -3838,10 +3924,7 @@ function selectImportantMatchByName(eventoNombre) {
     }
 
     if (transmisionesAPI4 && transmisionesAPI4.transmisiones) {
-        const transAPI4 = transmisionesAPI4.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
+        const transAPI4 = transmisionesAPI4.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI4 && transAPI4.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI4.canales.map(c => ({ ...c, fuente: 'transmisiones4' }))];
             console.log(`✅ Encontrados ${transAPI4.canales.length} canales en API 4 (transmisiones4)`);
@@ -3849,10 +3932,7 @@ function selectImportantMatchByName(eventoNombre) {
     }
 
     if (transmisionesAPI5 && transmisionesAPI5.transmisiones) {
-        const transAPI5 = transmisionesAPI5.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
+        const transAPI5 = transmisionesAPI5.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI5 && transAPI5.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI5.canales.map(c => ({ ...c, fuente: 'donromans' }))];
             console.log(`✅ Encontrados ${transAPI5.canales.length} canales en API 5 (donromans)`);
@@ -3860,10 +3940,7 @@ function selectImportantMatchByName(eventoNombre) {
     }
 
     if (transmisionesAPI6 && transmisionesAPI6.transmisiones) {
-        const transAPI6 = transmisionesAPI6.transmisiones.find(t => {
-            const evento = (t.evento || t.titulo || '').toLowerCase();
-            return evento === nombreBuscar || evento.includes(nombreBuscar) || nombreBuscar.includes(evento);
-        });
+        const transAPI6 = transmisionesAPI6.transmisiones.find(t => matchName(t.evento || t.titulo));
         if (transAPI6 && transAPI6.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI6.canales.map(c => ({ ...c, fuente: 'transmisiones6' }))];
             console.log(`✅ Encontrados ${transAPI6.canales.length} canales en API 6 (transmisiones6)`);
@@ -4192,8 +4269,8 @@ const teamLogosMap = {
 
 function getTeamLogo(nombre) {
     if (!nombre) return '';
+    const key = nombre.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     const normalized = nombre.toLowerCase().trim();
-    const key = normalized.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     if (teamLogosMap[normalized]) return teamLogosMap[normalized];
     if (teamLogosMap[key]) return teamLogosMap[key];
     for (const [k, v] of Object.entries(teamLogosMap)) {
@@ -4206,7 +4283,7 @@ async function loadStandings() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
         const endpoint = leagueConfig ? leagueConfig.tabla : '/tabla';
-        const response = await fetch(`https://ultragol-api-3.vercel.app${endpoint}`);
+        const response = await fetchWithTimeout(`https://ultragol-api-3.vercel.app${endpoint}`, 8000);
         const data = await response.json();
         
         const standingsTable = document.getElementById('standingsTable');
@@ -4281,7 +4358,7 @@ async function loadNews() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
         const endpoint = leagueConfig ? leagueConfig.noticias : '/noticias';
-        const response = await fetch(`https://ultragol-api-3.vercel.app${endpoint}`);
+        const response = await fetchWithTimeout(`https://ultragol-api-3.vercel.app${endpoint}`, 8000);
         const data = await response.json();
         
         const newsGrid = document.getElementById('newsGrid');
@@ -4474,15 +4551,14 @@ function formatDateString(dateStr) {
 }
 
 function selectLeague(leagueName, element) {
-    document.querySelectorAll('.league-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.league-btn, .lbar-btn').forEach(btn => btn.classList.remove('active'));
     
     if (element) {
         element.classList.add('active');
     } else {
-        const leagueButtons = document.querySelectorAll('.league-btn');
-        leagueButtons.forEach(btn => {
+        document.querySelectorAll('.league-btn, .lbar-btn').forEach(btn => {
             const btnText = btn.querySelector('span')?.textContent || '';
-            if (btnText === leagueName) {
+            if (btnText === leagueName || btnText.includes(leagueName.split(' ')[0])) {
                 btn.classList.add('active');
             }
         });
@@ -5013,13 +5089,13 @@ function selectImportantMatchByTransmision(eventoNombre) {
     let canalesCombinados = [];
     let tituloMostrar = transmision.titulo || transmision.evento;
     
-    const matchNameTU = (ev) => {
-        const e = (ev || '').toLowerCase().trim();
+    const matchNameT = (evento) => {
+        const e = (evento || '').toLowerCase().trim();
         return e === nombreBuscar || e.includes(nombreBuscar) || nombreBuscar.includes(e);
     };
 
     if (transmisionesAPI1 && transmisionesAPI1.transmisiones) {
-        const transAPI1 = transmisionesAPI1.transmisiones.find(t => matchNameTU(t.evento || t.titulo));
+        const transAPI1 = transmisionesAPI1.transmisiones.find(t => matchNameT(t.evento || t.titulo));
         if (transAPI1 && transAPI1.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI1.canales.map(c => ({ ...c, fuente: 'rereyano' }))];
             console.log(`✅ Encontrados ${transAPI1.canales.length} canales en API 1 (rereyano) para "${tituloMostrar}"`);
@@ -5027,7 +5103,7 @@ function selectImportantMatchByTransmision(eventoNombre) {
     }
 
     if (transmisionesAPI2 && transmisionesAPI2.transmisiones) {
-        const transAPI2 = transmisionesAPI2.transmisiones.find(t => matchNameTU(t.evento || t.titulo));
+        const transAPI2 = transmisionesAPI2.transmisiones.find(t => matchNameT(t.evento || t.titulo));
         if (transAPI2 && transAPI2.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI2.canales.map(c => ({ ...c, fuente: 'e1link' }))];
             console.log(`✅ Encontrados ${transAPI2.canales.length} canales en API 2 (e1link) para "${tituloMostrar}"`);
@@ -5035,7 +5111,7 @@ function selectImportantMatchByTransmision(eventoNombre) {
     }
 
     if (transmisionesAPI3 && transmisionesAPI3.transmisiones) {
-        const transAPI3 = transmisionesAPI3.transmisiones.find(t => matchNameTU(t.evento || t.titulo));
+        const transAPI3 = transmisionesAPI3.transmisiones.find(t => matchNameT(t.evento || t.titulo));
         if (transAPI3 && transAPI3.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI3.canales.map(c => ({ ...c, fuente: 'voodc' }))];
             console.log(`✅ Encontrados ${transAPI3.canales.length} canales en API 3 (voodc) para "${tituloMostrar}"`);
@@ -5043,7 +5119,7 @@ function selectImportantMatchByTransmision(eventoNombre) {
     }
 
     if (transmisionesAPI4 && transmisionesAPI4.transmisiones) {
-        const transAPI4 = transmisionesAPI4.transmisiones.find(t => matchNameTU(t.evento || t.titulo));
+        const transAPI4 = transmisionesAPI4.transmisiones.find(t => matchNameT(t.evento || t.titulo));
         if (transAPI4 && transAPI4.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI4.canales.map(c => ({ ...c, fuente: 'transmisiones4' }))];
             console.log(`✅ Encontrados ${transAPI4.canales.length} canales en API 4 (ftvhd) para "${tituloMostrar}"`);
@@ -5051,7 +5127,7 @@ function selectImportantMatchByTransmision(eventoNombre) {
     }
 
     if (transmisionesAPI5 && transmisionesAPI5.transmisiones) {
-        const transAPI5 = transmisionesAPI5.transmisiones.find(t => matchNameTU(t.evento || t.titulo));
+        const transAPI5 = transmisionesAPI5.transmisiones.find(t => matchNameT(t.evento || t.titulo));
         if (transAPI5 && transAPI5.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI5.canales.map(c => ({ ...c, fuente: 'donromans' }))];
             console.log(`✅ Encontrados ${transAPI5.canales.length} canales en API 5 (donromans) para "${tituloMostrar}"`);
@@ -5059,7 +5135,7 @@ function selectImportantMatchByTransmision(eventoNombre) {
     }
 
     if (transmisionesAPI6 && transmisionesAPI6.transmisiones) {
-        const transAPI6 = transmisionesAPI6.transmisiones.find(t => matchNameTU(t.evento || t.titulo));
+        const transAPI6 = transmisionesAPI6.transmisiones.find(t => matchNameT(t.evento || t.titulo));
         if (transAPI6 && transAPI6.canales) {
             canalesCombinados = [...canalesCombinados, ...transAPI6.canales.map(c => ({ ...c, fuente: 'transmisiones6' }))];
             console.log(`✅ Encontrados ${transAPI6.canales.length} canales en API 6 (transmisiones6) para "${tituloMostrar}"`);
@@ -5072,6 +5148,7 @@ function selectImportantMatchByTransmision(eventoNombre) {
             titulo: tituloMostrar,
             canales: canalesCombinados
         };
+        
         closeImportantMatchesModal();
         showChannelSelector(transmisionCombinada, tituloMostrar);
     } else {

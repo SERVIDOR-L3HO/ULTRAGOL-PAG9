@@ -1,8 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                registrations.forEach(function(r) { r.unregister(); });
+            });
+            if ('caches' in window) {
+                caches.keys().then(function(keys) {
+                    keys.forEach(function(k) { caches.delete(k); });
+                });
+            }
+        }
+    </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="copyright" content="© 2025 ULTRAGOL. Todos los derechos reservados. La copia, clonación y distribución no autorizada está prohibida.">
     <meta name="author" content="ULTRAGOL">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -10,7 +22,7 @@
     <title>ULTRAGOL - Live Streaming</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20251109c?v=20251109c">
+    <link rel="stylesheet" href="styles.css?v=20260408nav">
     <link rel="stylesheet" href="pwa-install-banner.css">
     <link rel="stylesheet" href="notifications.css?v=20251109c">
     <link rel="stylesheet" href="tv-styles.css?v=20251109c">
@@ -27,6 +39,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="UltraGol LIVE">
+    <link rel="apple-touch-icon" sizes="180x180" href="app-icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="app-icon.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="app-icon.png">
     
     <!-- Verificar codigo promocional antes de cargar anuncios -->
     <script>
@@ -302,21 +317,21 @@
 
 
 
-        <nav class="bottom-nav">
-            <button class="nav-btn active" onclick="navTo('home', this)">
-                <i class="fas fa-home"></i>
+        <nav class="bottom-nav" id="bottomNav">
+            <button class="nav-btn active" data-nav="home" onclick="navTo('home', this)">
+                <div class="nav-icon-wrap"><i class="fas fa-house"></i></div>
                 <span class="nav-label">Inicio</span>
             </button>
-            <button class="nav-btn" onclick="navTo('search', this)">
-                <i class="fas fa-search search-icon"></i>
+            <button class="nav-btn" data-nav="search" onclick="navTo('search', this)">
+                <div class="nav-icon-wrap"><i class="fas fa-magnifying-glass"></i></div>
                 <span class="nav-label">Buscar</span>
             </button>
-            <button class="nav-btn" onclick="window.location.href='noticias.html'">
-                <i class="fas fa-newspaper"></i>
+            <button class="nav-btn" data-nav="noticias" onclick="navBounce(this); window.location.href='noticias.html'">
+                <div class="nav-icon-wrap"><i class="fas fa-newspaper"></i></div>
                 <span class="nav-label">Noticias</span>
             </button>
-            <button class="nav-btn" onclick="window.location.href='goleadores.html'">
-                <i class="fas fa-trophy"></i>
+            <button class="nav-btn" data-nav="goleadores" onclick="navBounce(this); window.location.href='goleadores.html'">
+                <div class="nav-icon-wrap"><i class="fas fa-ranking-star"></i></div>
                 <span class="nav-label">Goleadores</span>
             </button>
         </nav>
@@ -469,6 +484,18 @@
                     </div>
                     <button class="glass-action-btn" onclick="window.location.href='ahorro.html'">
                         <i class="fas fa-leaf"></i> Activar
+                    </button>
+                </div>
+                <div class="setting-item glass-item">
+                    <div class="setting-item-left">
+                        <div class="setting-item-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <span>Notificaciones</span>
+                    </div>
+                    <button class="glass-action-btn" id="notifToggleBtn" onclick="toggleNotificationsFromSettings()">
+                        <i class="fas fa-bell" id="notifToggleIcon"></i>
+                        <span id="notifToggleText">Activar</span>
                     </button>
                 </div>
 
@@ -985,6 +1012,28 @@
     </script>
     <script src="https://www.paypal.com/sdk/js?client-id=YOUR_LIVE_CLIENT_ID_HERE&currency=USD"></script>
     <script src="js/donaciones.js"></script>
+
+    <!-- Bottom Nav Animations -->
+    <script>
+    function navBounce(el) {
+        el.classList.remove('is-bouncing');
+        void el.offsetWidth;
+        el.classList.add('is-bouncing');
+        el.classList.remove('nav-tap');
+        void el.offsetWidth;
+        el.classList.add('nav-tap');
+        el.addEventListener('animationend', () => el.classList.remove('is-bouncing'), { once: true });
+        setTimeout(() => el.classList.remove('nav-tap'), 450);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('pointerdown', function() {
+                navBounce(this);
+            });
+        });
+    });
+    </script>
 
     <!-- Burbuja de Soporte Creativa -->
     <a href="https://ultragol-l3ho.com.mx/index2.html" class="support-bubble" title="Soporte Técnico" target="_blank">
