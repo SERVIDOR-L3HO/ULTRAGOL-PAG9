@@ -4703,7 +4703,6 @@ function renderImportantMatches() {
         return;
     }
 
-    // Solo partidos del endpoint transmisiones5 (donromans)
     let currentItems = transmisionesData.transmisiones.filter(t => t.tipoAPI === 'donromans');
 
     if (isLiveFilterActive) {
@@ -4720,7 +4719,7 @@ function renderImportantMatches() {
         return 0;
     });
 
-    const rowsHTML = currentItems.map(t => {
+    const rowsHTML = currentItems.map((t, idx) => {
         const estadoAPI = (t.estado || '').toLowerCase().trim();
         const isDonRomans = t.tipoAPI === 'donromans';
         const isLive = isDonRomans || estadoAPI.includes('vivo') || estadoAPI.includes('live');
@@ -4736,22 +4735,13 @@ function renderImportantMatches() {
         else if (deporte.includes('box') || deporte.includes('ufc') || deporte.includes('mma') || ligaRaw.includes('wwe') || ligaRaw.includes('box')) sportIcon = 'fa-fist-raised';
         else if (deporte.includes('futbol americano') || ligaRaw.includes('nfl')) sportIcon = 'fa-football-ball';
 
-        // Liga accent color
-        let accentColor = '#FF4500';
-        let iconBg = 'rgba(255,69,0,0.18)';
-        if (ligaRaw.includes('champions') || ligaRaw.includes('uefa')) { accentColor = '#1a78c2'; iconBg = 'rgba(26,120,194,0.2)'; }
-        else if (ligaRaw.includes('europa league') || ligaRaw.includes('euroliga') || ligaRaw.includes('euroleague')) { accentColor = '#f97316'; iconBg = 'rgba(249,115,22,0.2)'; }
-        else if (ligaRaw.includes('argentina')) { accentColor = '#74acdf'; iconBg = 'rgba(116,172,223,0.2)'; }
-        else if (ligaRaw.includes('colombia')) { accentColor = '#fcd116'; iconBg = 'rgba(252,209,22,0.2)'; }
-        else if (ligaRaw.includes('nba') || deporte.includes('basket')) { accentColor = '#c9082a'; iconBg = 'rgba(201,8,42,0.2)'; }
-        else if (ligaRaw.includes('wwe') || ligaRaw.includes('box') || deporte.includes('box') || deporte.includes('mma')) { accentColor = '#8b5cf6'; iconBg = 'rgba(139,92,246,0.2)'; }
-        else if (ligaRaw.includes('liga mx') || ligaRaw.includes('mexico') || ligaRaw.includes('mx')) { accentColor = '#22c55e'; iconBg = 'rgba(34,197,94,0.2)'; }
-        else if (ligaRaw.includes('premier') || ligaRaw.includes('england') || ligaRaw.includes('championship')) { accentColor = '#a855f7'; iconBg = 'rgba(168,85,247,0.2)'; }
-        else if (ligaRaw.includes('libertadores') || ligaRaw.includes('brasileirao') || ligaRaw.includes('brasil')) { accentColor = '#22d3ee'; iconBg = 'rgba(34,211,238,0.2)'; }
-
         const liga = t.liga || t.deporte || '';
         const evento = t.evento || t.titulo || '';
         const eventoEscapado = evento.replace(/'/g, "\\'");
+
+        const vsSplit = evento.split(/\s+vs\.?\s+/i);
+        const equipo1 = (vsSplit[0] || '').trim();
+        const equipo2 = (vsSplit[1] || '').trim();
 
         let metaTime = '';
         if (isLive) {
@@ -4769,6 +4759,10 @@ function renderImportantMatches() {
 
         return `
             <div class="rokc-row ${isLive ? 'is-live' : ''}" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
+                <div class="rokc-logos">
+                    <img id="rim-logo-${idx}-1" class="rokc-team-logo" src="/ULTRA/favicon.png" alt="${equipo1}" data-team="${encodeURIComponent(equipo1)}">
+                    <img id="rim-logo-${idx}-2" class="rokc-team-logo" src="/ULTRA/favicon.png" alt="${equipo2}" data-team="${encodeURIComponent(equipo2)}">
+                </div>
                 <div class="rokc-body">
                     <span class="rokc-match">${evento.toUpperCase()}</span>
                     <div class="rokc-meta">${metaTime}${ligaMeta}</div>
@@ -4780,32 +4774,34 @@ function renderImportantMatches() {
 
     body.innerHTML = `
         <style>
-            .rokc-wrapper{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#111;}
+            .rokc-wrapper{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#0a0a0a;}
             .rokc-list{flex:1;overflow-y:auto;padding:0;}
             .rokc-list::-webkit-scrollbar{width:3px;}
             .rokc-list::-webkit-scrollbar-track{background:transparent;}
-            .rokc-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px;}
-            .rokc-row{display:flex;align-items:center;padding:16px 18px;cursor:pointer;background:#1c1c1c;border-bottom:1px solid rgba(255,255,255,0.07);transition:background 0.15s;}
-            .rokc-row:active{background:#252525;}
-            .rokc-row.is-live{background:#1c1c1c;}
-            .rokc-body{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0;}
-            .rokc-match{font-size:18px;font-weight:800;color:#C8E600;letter-spacing:0.2px;line-height:1.25;word-break:break-word;}
-            .rokc-row.is-live .rokc-match{color:#C8E600;}
-            .rokc-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-            .rokc-meta-time{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.75);}
-            .rokc-meta-time i{font-size:12px;color:rgba(255,255,255,0.5);}
-            .rokc-meta-league{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.75);}
-            .rokc-meta-league i{font-size:12px;color:rgba(255,255,255,0.5);}
-            .rokc-live-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:#ff3b3b;letter-spacing:0.5px;}
-            .rokc-live-dot{width:7px;height:7px;background:#ff3b3b;border-radius:50%;animation:rokcPulse 1s ease-in-out infinite;flex-shrink:0;box-shadow:0 0 6px #ff3b3b;}
-            .rokc-chevron{font-size:13px;color:rgba(255,255,255,0.35);flex-shrink:0;margin-left:12px;}
+            .rokc-list::-webkit-scrollbar-thumb{background:rgba(255,102,0,0.3);border-radius:3px;}
+            .rokc-row{display:flex;align-items:center;padding:14px 16px;cursor:pointer;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,102,0,0.08);border-left:3px solid transparent;transition:all 0.15s;backdrop-filter:blur(8px);}
+            .rokc-row:active{background:rgba(255,102,0,0.12);}
+            .rokc-row.is-live{border-left-color:#FF6600;background:rgba(255,102,0,0.07);}
+            .rokc-logos{display:flex;align-items:center;gap:3px;margin-right:12px;flex-shrink:0;}
+            .rokc-team-logo{width:32px;height:32px;object-fit:contain;border-radius:6px;background:rgba(255,255,255,0.05);opacity:0.5;transition:opacity 0.4s;}
+            .rokc-team-logo.loaded{opacity:1;}
+            .rokc-body{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0;}
+            .rokc-match{font-size:15px;font-weight:800;color:#FF6600;letter-spacing:0.3px;line-height:1.3;word-break:break-word;}
+            .rokc-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+            .rokc-meta-time{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.55);}
+            .rokc-meta-time i{font-size:11px;color:rgba(255,255,255,0.35);}
+            .rokc-meta-league{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.55);}
+            .rokc-meta-league i{font-size:11px;color:rgba(255,255,255,0.35);}
+            .rokc-live-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#ff4444;letter-spacing:0.5px;}
+            .rokc-live-dot{width:6px;height:6px;background:#ff4444;border-radius:50%;animation:rokcPulse 1s ease-in-out infinite;flex-shrink:0;box-shadow:0 0 5px #ff4444;}
+            .rokc-chevron{font-size:12px;color:rgba(255,102,0,0.45);flex-shrink:0;margin-left:10px;}
             @keyframes rokcPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.3;transform:scale(0.6);}}
             .rokc-empty{text-align:center;color:rgba(255,255,255,0.35);padding:50px 20px;font-size:14px;line-height:1.6;}
-            .rokc-footer{padding:16px 18px;background:#111;border-top:1px solid rgba(255,255,255,0.07);flex-shrink:0;}
-            .rokc-footer-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px 16px;border-radius:12px;border:1.5px solid rgba(200,230,0,0.3);background:rgba(200,230,0,0.07);color:#C8E600;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;}
-            .rokc-footer-btn:active{background:rgba(200,230,0,0.15);transform:scale(0.98);}
-            .rokc-footer-btn i{font-size:16px;}
-            .rokc-footer-hint{text-align:center;margin-top:10px;font-size:12px;color:rgba(255,255,255,0.3);line-height:1.5;}
+            .rokc-footer{padding:14px 16px;background:#0a0a0a;border-top:1px solid rgba(255,102,0,0.15);flex-shrink:0;}
+            .rokc-footer-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid rgba(255,102,0,0.45);background:rgba(255,102,0,0.1);color:#FF6600;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;}
+            .rokc-footer-btn:active{background:rgba(255,102,0,0.2);transform:scale(0.98);}
+            .rokc-footer-btn i{font-size:15px;}
+            .rokc-footer-hint{text-align:center;margin-top:8px;font-size:11px;color:rgba(255,255,255,0.25);line-height:1.5;}
         </style>
         <div class="rokc-wrapper">
             <div class="rokc-list">${rowsHTML}</div>
@@ -4818,6 +4814,31 @@ function renderImportantMatches() {
             </div>
         </div>
     `;
+
+    loadRokcLogos();
+}
+
+async function loadRokcLogos() {
+    const imgs = document.querySelectorAll('.rokc-team-logo[data-team]');
+    const seen = new Map();
+
+    for (const img of imgs) {
+        const raw = decodeURIComponent(img.dataset.team || '');
+        if (!raw) { img.classList.add('loaded'); continue; }
+        const key = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
+        if (!key) { img.classList.add('loaded'); continue; }
+
+        if (!seen.has(key)) {
+            seen.set(key, fetch(`/api/team-logo?team=${encodeURIComponent(raw)}`)
+                .then(r => r.json()).then(d => d.url || null).catch(() => null));
+        }
+
+        seen.get(key).then(url => {
+            if (!img.isConnected) return;
+            if (url) { img.src = url; }
+            img.classList.add('loaded');
+        });
+    }
 }
 
 function initCarouselEvents() {

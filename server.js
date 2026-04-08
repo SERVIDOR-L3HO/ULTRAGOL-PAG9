@@ -510,6 +510,53 @@ async function fetchAllPartidos() {
     return partidos;
 }
 
+// ─── LOGO LOOKUP (scrape ESPN por nombre de equipo, con caché 30 min) ─────────
+const logoCache = new Map();
+app.get('/api/team-logo', async (req, res) => {
+    const team = (req.query.team || '').trim();
+    if (!team) return res.json({ url: null });
+
+    const key = team.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+
+    const local = getLocalLogo(key);
+    if (local) return res.json({ url: local });
+
+    const cached = logoCache.get(key);
+    if (cached && Date.now() - cached.ts < 1_800_000) return res.json({ url: cached.url });
+
+    const endpoints = [
+        'https://site.api.espn.com/apis/site/v2/sports/soccer/all/teams?limit=700',
+        'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams?limit=60',
+        'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams?limit=60',
+        'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams?limit=60',
+        'https://site.api.espn.com/apis/site/v2/sports/football/nfl/teams?limit=60',
+    ];
+
+    for (const url of endpoints) {
+        try {
+            const r = await fetch(url, { signal: AbortSignal.timeout(4000) });
+            const data = await r.json();
+            const teams = (data?.sports?.[0]?.leagues || []).flatMap(l => l.teams || [])
+                .concat(data?.teams || []);
+            const found = teams.find(({ team: t }) => {
+                const d = (t?.displayName || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
+                const s = (t?.shortDisplayName || '').toLowerCase();
+                return d.includes(key) || key.includes(d) || s.includes(key) || key.includes(s);
+            });
+            if (found?.team?.logos?.[0]?.href) {
+                const logoUrl = found.team.logos[0].href;
+                logoCache.set(key, { url: logoUrl, ts: Date.now() });
+                return res.json({ url: logoUrl });
+            }
+        } catch (_) {}
+    }
+
+    logoCache.set(key, { url: null, ts: Date.now() });
+    res.json({ url: null });
+});
+
 // ─── ROBOTS.TXT — must be BEFORE static middlewares so ULTRA/robots.txt doesn't win ──
 app.get('/robots.txt', (req, res) => {
     res.type('text/plain');
