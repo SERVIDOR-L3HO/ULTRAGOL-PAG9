@@ -4740,68 +4740,92 @@ function renderImportantMatches() {
         const eventoEscapado = evento.replace(/'/g, "\\'");
 
         const vsSplit = evento.split(/\s+vs\.?\s+/i);
-        const equipo1 = (vsSplit[0] || '').trim();
+        const equipo1 = (vsSplit[0] || evento).trim();
         const equipo2 = (vsSplit[1] || '').trim();
 
-        let metaTime = '';
-        if (isLive) {
-            metaTime = `<span class="rokc-live-pill"><span class="rokc-live-dot"></span>EN VIVO</span>`;
-        } else if (t.fecha) {
-            try {
-                const d = new Date(t.fecha);
-                if (!isNaN(d)) {
-                    metaTime = `<span class="rokc-meta-time"><i class="far fa-clock"></i> ${d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}</span>`;
-                }
-            } catch(e) {}
-        }
+        const statusBadge = isLive
+            ? `<span class="rim-live"><span class="rim-dot"></span>EN VIVO</span>`
+            : t.fecha ? (() => { try { const d = new Date(t.fecha); return isNaN(d) ? '' : `<span class="rim-time"><i class="far fa-clock"></i> ${d.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})}</span>`; } catch(e){ return ''; } })() : '';
 
-        const ligaMeta = liga ? `<span class="rokc-meta-league"><i class="fas ${sportIcon}"></i> ${liga.toUpperCase()}</span>` : '';
+        const ligaBadge = liga ? `<span class="rim-liga"><i class="fas ${sportIcon}"></i> ${liga.toUpperCase()}</span>` : '';
 
         return `
-            <div class="rokc-row ${isLive ? 'is-live' : ''}" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
-                <div class="rokc-logos">
-                    <img id="rim-logo-${idx}-1" class="rokc-team-logo" src="/ULTRA/favicon.png" alt="${equipo1}" data-team="${encodeURIComponent(equipo1)}">
-                    <img id="rim-logo-${idx}-2" class="rokc-team-logo" src="/ULTRA/favicon.png" alt="${equipo2}" data-team="${encodeURIComponent(equipo2)}">
+            <div class="rim-card ${isLive ? 'live' : ''}" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
+                <div class="rim-teams">
+                    <div class="rim-team">
+                        <img class="rim-logo" src="/ULTRA/favicon.png" alt="${equipo1}" data-team="${encodeURIComponent(equipo1)}">
+                        <span class="rim-name">${equipo1.toUpperCase()}</span>
+                    </div>
+                    <span class="rim-vs">VS</span>
+                    <div class="rim-team rim-team-right">
+                        <span class="rim-name">${equipo2.toUpperCase()}</span>
+                        <img class="rim-logo" src="/ULTRA/favicon.png" alt="${equipo2}" data-team="${encodeURIComponent(equipo2)}">
+                    </div>
                 </div>
-                <div class="rokc-body">
-                    <span class="rokc-match">${evento.toUpperCase()}</span>
-                    <div class="rokc-meta">${metaTime}${ligaMeta}</div>
+                <div class="rim-footer-row">
+                    <div class="rim-badges">${statusBadge}${ligaBadge}</div>
+                    <i class="fas fa-chevron-right rim-chevron"></i>
                 </div>
-                <i class="fas fa-chevron-right rokc-chevron"></i>
             </div>
         `;
-    }).join('') || `<div class="rokc-empty">No hay partidos en este momento</div>`;
+    }).join('') || `<div class="rim-empty">No hay partidos en este momento</div>`;
 
     body.innerHTML = `
         <style>
-            .rokc-wrapper{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#0a0a0a;}
-            .rokc-list{flex:1;overflow-y:auto;padding:0;}
-            .rokc-list::-webkit-scrollbar{width:3px;}
-            .rokc-list::-webkit-scrollbar-track{background:transparent;}
-            .rokc-list::-webkit-scrollbar-thumb{background:rgba(255,102,0,0.3);border-radius:3px;}
-            .rokc-row{display:flex;align-items:center;padding:14px 16px;cursor:pointer;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,102,0,0.08);border-left:3px solid transparent;transition:all 0.15s;backdrop-filter:blur(8px);}
-            .rokc-row:active{background:rgba(255,102,0,0.12);}
-            .rokc-row.is-live{border-left-color:#FF6600;background:rgba(255,102,0,0.07);}
-            .rokc-logos{display:flex;align-items:center;gap:3px;margin-right:12px;flex-shrink:0;}
-            .rokc-team-logo{width:32px;height:32px;object-fit:contain;border-radius:6px;background:rgba(255,255,255,0.05);opacity:0.5;transition:opacity 0.4s;}
-            .rokc-team-logo.loaded{opacity:1;}
-            .rokc-body{flex:1;display:flex;flex-direction:column;gap:5px;min-width:0;}
-            .rokc-match{font-size:15px;font-weight:800;color:#FF6600;letter-spacing:0.3px;line-height:1.3;word-break:break-word;}
-            .rokc-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-            .rokc-meta-time{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.55);}
-            .rokc-meta-time i{font-size:11px;color:rgba(255,255,255,0.35);}
-            .rokc-meta-league{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.55);}
-            .rokc-meta-league i{font-size:11px;color:rgba(255,255,255,0.35);}
-            .rokc-live-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#ff4444;letter-spacing:0.5px;}
-            .rokc-live-dot{width:6px;height:6px;background:#ff4444;border-radius:50%;animation:rokcPulse 1s ease-in-out infinite;flex-shrink:0;box-shadow:0 0 5px #ff4444;}
-            .rokc-chevron{font-size:12px;color:rgba(255,102,0,0.45);flex-shrink:0;margin-left:10px;}
-            @keyframes rokcPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.3;transform:scale(0.6);}}
-            .rokc-empty{text-align:center;color:rgba(255,255,255,0.35);padding:50px 20px;font-size:14px;line-height:1.6;}
-            .rokc-footer{padding:14px 16px;background:#0a0a0a;border-top:1px solid rgba(255,102,0,0.15);flex-shrink:0;}
-            .rokc-footer-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid rgba(255,102,0,0.45);background:rgba(255,102,0,0.1);color:#FF6600;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;}
+            .rokc-wrapper{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#080808;}
+            .rokc-list{flex:1;overflow-y:auto;padding:10px 10px 0;}
+            .rokc-list::-webkit-scrollbar{width:2px;}
+            .rokc-list::-webkit-scrollbar-thumb{background:rgba(255,102,0,0.25);border-radius:2px;}
+
+            .rim-card{
+                background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%);
+                border:1px solid rgba(255,102,0,0.12);
+                border-radius:16px;
+                padding:14px 14px 10px;
+                margin-bottom:8px;
+                cursor:pointer;
+                backdrop-filter:blur(24px);
+                -webkit-backdrop-filter:blur(24px);
+                transition:all 0.18s ease;
+                position:relative;
+                overflow:hidden;
+            }
+            .rim-card::before{
+                content:'';position:absolute;top:0;left:0;right:0;height:1px;
+                background:linear-gradient(90deg,transparent,rgba(255,102,0,0.25),transparent);
+            }
+            .rim-card.live{
+                border-color:rgba(255,102,0,0.3);
+                background:linear-gradient(135deg,rgba(255,102,0,0.1) 0%,rgba(255,50,0,0.04) 100%);
+                box-shadow:0 0 20px rgba(255,102,0,0.08),inset 0 1px 0 rgba(255,102,0,0.15);
+            }
+            .rim-card:active{transform:scale(0.98);opacity:0.85;}
+
+            .rim-teams{display:flex;align-items:center;gap:6px;margin-bottom:10px;}
+            .rim-team{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+            .rim-team-right{justify-content:flex-end;}
+            .rim-logo{width:30px;height:30px;object-fit:contain;border-radius:6px;flex-shrink:0;opacity:0.4;transition:opacity 0.35s ease;}
+            .rim-logo.loaded{opacity:1;}
+            .rim-name{font-size:12px;font-weight:800;color:#fff;letter-spacing:0.4px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+            .rim-team.rim-team-right .rim-name{text-align:right;}
+            .rim-vs{font-size:10px;font-weight:900;color:rgba(255,102,0,0.6);letter-spacing:1px;flex-shrink:0;padding:2px 4px;background:rgba(255,102,0,0.08);border-radius:4px;}
+
+            .rim-footer-row{display:flex;align-items:center;justify-content:space-between;}
+            .rim-badges{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+            .rim-live{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;color:#ff4040;letter-spacing:0.6px;text-transform:uppercase;}
+            .rim-dot{width:5px;height:5px;background:#ff4040;border-radius:50%;animation:rimPulse 1s ease-in-out infinite;box-shadow:0 0 4px #ff4040;}
+            .rim-time{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.45);}
+            .rim-liga{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:rgba(255,102,0,0.7);letter-spacing:0.3px;}
+            .rim-liga i{font-size:9px;}
+            .rim-chevron{font-size:11px;color:rgba(255,102,0,0.4);flex-shrink:0;}
+            .rim-empty{text-align:center;color:rgba(255,255,255,0.3);padding:60px 20px;font-size:14px;}
+            @keyframes rimPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.25;transform:scale(0.5);}}
+
+            .rokc-footer{padding:12px 10px;background:#080808;border-top:1px solid rgba(255,102,0,0.12);flex-shrink:0;}
+            .rokc-footer-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;border-radius:14px;border:1.5px solid rgba(255,102,0,0.4);background:linear-gradient(135deg,rgba(255,102,0,0.12),rgba(255,60,0,0.06));color:#FF6600;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;backdrop-filter:blur(12px);}
             .rokc-footer-btn:active{background:rgba(255,102,0,0.2);transform:scale(0.98);}
-            .rokc-footer-btn i{font-size:15px;}
-            .rokc-footer-hint{text-align:center;margin-top:8px;font-size:11px;color:rgba(255,255,255,0.25);line-height:1.5;}
+            .rokc-footer-btn i{font-size:14px;}
+            .rokc-footer-hint{text-align:center;margin-top:7px;font-size:10px;color:rgba(255,255,255,0.2);line-height:1.5;}
         </style>
         <div class="rokc-wrapper">
             <div class="rokc-list">${rowsHTML}</div>
@@ -4819,7 +4843,7 @@ function renderImportantMatches() {
 }
 
 async function loadRokcLogos() {
-    const imgs = document.querySelectorAll('.rokc-team-logo[data-team]');
+    const imgs = document.querySelectorAll('.rim-logo[data-team]');
     const seen = new Map();
 
     for (const img of imgs) {

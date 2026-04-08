@@ -526,8 +526,31 @@ app.get('/api/team-logo', async (req, res) => {
     const cached = logoCache.get(key);
     if (cached && Date.now() - cached.ts < 1_800_000) return res.json({ url: cached.url });
 
+    // 1. Try ESPN text search first (fastest, covers most teams)
+    try {
+        const searchUrl = `https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(key)}&limit=5&type=team&lang=es`;
+        const r = await fetch(searchUrl, { signal: AbortSignal.timeout(4000) });
+        const data = await r.json();
+        const teamSection = (data?.results || []).find(s => s.type === 'team');
+        const contents = teamSection?.contents || [];
+        for (const item of contents) {
+            const logo = item?.image?.default || item?.image?.href;
+            if (logo) {
+                logoCache.set(key, { url: logo, ts: Date.now() });
+                return res.json({ url: logo });
+            }
+        }
+    } catch (_) {}
+
+    // 2. Fallback: iterate known ESPN league endpoints
     const endpoints = [
+        'https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.libertadores/teams?limit=100',
+        'https://site.api.espn.com/apis/site/v2/sports/soccer/conmebol.sudamericana/teams?limit=100',
         'https://site.api.espn.com/apis/site/v2/sports/soccer/all/teams?limit=700',
+        'https://site.api.espn.com/apis/site/v2/sports/soccer/col.1/teams?limit=40',
+        'https://site.api.espn.com/apis/site/v2/sports/soccer/pe.1/teams?limit=40',
+        'https://site.api.espn.com/apis/site/v2/sports/soccer/uru.1/teams?limit=40',
+        'https://site.api.espn.com/apis/site/v2/sports/soccer/ven.1/teams?limit=40',
         'https://site.api.espn.com/apis/site/v2/sports/basketball/nba/teams?limit=60',
         'https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/teams?limit=60',
         'https://site.api.espn.com/apis/site/v2/sports/hockey/nhl/teams?limit=60',
@@ -542,7 +565,7 @@ app.get('/api/team-logo', async (req, res) => {
                 .concat(data?.teams || []);
             const found = teams.find(({ team: t }) => {
                 const d = (t?.displayName || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
-                const s = (t?.shortDisplayName || '').toLowerCase();
+                const s = (t?.shortDisplayName || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
                 return d.includes(key) || key.includes(d) || s.includes(key) || key.includes(s);
             });
             if (found?.team?.logos?.[0]?.href) {
