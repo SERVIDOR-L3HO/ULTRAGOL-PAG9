@@ -725,7 +725,7 @@ body {
     margin: 0 auto;
     background: var(--gradient);
     min-height: 100vh;
-    padding-bottom: 70px;
+    padding-bottom: 92px;
 }
 
 .app-header {
@@ -1787,67 +1787,126 @@ body {
     animation: blink 1s infinite;
 }
 
-/* ── BOTTOM NAV — Floating Capsule Design ── */
+/* ── BOTTOM NAV — Premium Glass Island ── */
 .bottom-nav {
     position: fixed;
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    max-width: 480px;
-    width: 100%;
-    background: rgba(8, 8, 8, 0.97);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    max-width: 430px;
+    width: calc(100% - 24px);
+
+    /* Floating glass island */
+    background: rgba(16, 16, 20, 0.65);
+    backdrop-filter: blur(48px) saturate(180%) brightness(1.08);
+    -webkit-backdrop-filter: blur(48px) saturate(180%) brightness(1.08);
+
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-    padding: 10px 16px;
-    padding-bottom: max(14px, calc(14px + env(safe-area-inset-bottom)));
-    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 8px 10px;
+
+    /* Float above bottom edge */
+    margin-bottom: calc(12px + env(safe-area-inset-bottom));
+    border-radius: 26px;
+
+    /* Glass border system */
+    border: 1px solid rgba(255, 255, 255, 0.10);
+
+    /* Layered depth shadows */
     box-shadow:
-        0 -1px 0 rgba(255,102,0,0.12),
-        0 -20px 60px rgba(0,0,0,0.7),
-        inset 0 1px 0 rgba(255,255,255,0.04);
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.12),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+        inset 1px 0 0 rgba(255, 255, 255, 0.04),
+        inset -1px 0 0 rgba(255, 255, 255, 0.04),
+        0 4px 24px rgba(0, 0, 0, 0.55),
+        0 16px 48px rgba(0, 0, 0, 0.35),
+        0 0 0 1px rgba(255, 102, 0, 0.06);
+
     z-index: 1000;
 }
 
+/* Frosted glass shimmer top line */
+.bottom-nav::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255,255,255,0.20) 30%,
+        rgba(255,255,255,0.32) 50%,
+        rgba(255,255,255,0.20) 70%,
+        transparent
+    );
+    border-radius: 1px;
+    pointer-events: none;
+}
+
+/* Orange ambient glow that reacts to active state */
+.bottom-nav::after {
+    content: '';
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 40px;
+    background: radial-gradient(ellipse, rgba(255,102,0,0.18) 0%, transparent 70%);
+    pointer-events: none;
+    border-radius: 50%;
+    animation: navAmbient 3s ease-in-out infinite;
+}
+
+@keyframes navAmbient {
+    0%, 100% { opacity: 0.6; transform: translateX(-50%) scaleX(0.9); }
+    50% { opacity: 1; transform: translateX(-50%) scaleX(1.1); }
+}
+
+/* ── NAV BUTTONS ── */
 .nav-btn {
     position: relative;
     background: transparent;
-    border: 1.5px solid transparent;
+    border: 1px solid transparent;
     cursor: pointer;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: 0px;
-    padding: 9px 12px;
-    border-radius: 50px;
+    padding: 10px 13px;
+    border-radius: 18px;
     -webkit-tap-highlight-color: transparent;
     outline: none;
-    transition:
-        background 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-        border-color 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-        padding 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-        box-shadow 0.35s ease,
-        gap 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    min-width: 44px;
-    min-height: 44px;
     flex-shrink: 0;
     will-change: transform;
+    overflow: hidden;
+    transition:
+        background 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        border-color 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        box-shadow 0.4s ease,
+        gap 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        padding 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .nav-btn.active {
-    background: rgba(255, 102, 0, 0.12);
-    border-color: rgba(255, 102, 0, 0.22);
-    padding: 9px 18px;
+    background: linear-gradient(145deg,
+        rgba(255, 102, 0, 0.22) 0%,
+        rgba(255, 80, 0, 0.12) 100%
+    );
+    border-color: rgba(255, 102, 0, 0.28);
+    padding: 10px 18px;
     gap: 8px;
     box-shadow:
-        0 0 20px rgba(255,102,0,0.12),
-        inset 0 1px 0 rgba(255,102,0,0.1);
+        inset 0 1px 0 rgba(255, 130, 40, 0.20),
+        inset 0 -1px 0 rgba(0,0,0,0.15),
+        0 0 16px rgba(255, 102, 0, 0.18),
+        0 2px 8px rgba(255, 102, 0, 0.10);
 }
 
-/* Icon wrapper */
+/* ── ICON WRAPPER ── */
 .nav-icon-wrap {
     position: relative;
     display: flex;
@@ -1860,54 +1919,36 @@ body {
 
 .nav-icon-wrap i {
     font-size: 18px;
-    color: rgba(255,255,255,0.28);
+    color: rgba(255, 255, 255, 0.35);
     transition:
         color 0.3s ease,
-        transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
         filter 0.3s ease;
     display: block;
-    will-change: transform;
+    will-change: transform, filter;
 }
 
 .nav-btn.active .nav-icon-wrap i {
-    color: #FF6600;
-    transform: scale(1.18);
-    filter: drop-shadow(0 0 6px rgba(255,102,0,0.6));
+    color: #FF6B1A;
+    transform: scale(1.15);
+    filter:
+        drop-shadow(0 0 5px rgba(255, 102, 0, 0.55))
+        drop-shadow(0 0 12px rgba(255, 102, 0, 0.25));
 }
 
-/* Glow dot indicator under active icon */
-.nav-btn.active .nav-icon-wrap::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%) scaleX(1);
-    width: 16px;
-    height: 3px;
-    background: linear-gradient(90deg, transparent, #FF6600, transparent);
-    border-radius: 2px;
-    opacity: 0.7;
-    animation: navBarPulse 2s ease-in-out infinite;
-}
-
-@keyframes navBarPulse {
-    0%, 100% { opacity: 0.5; width: 12px; }
-    50% { opacity: 1; width: 20px; }
-}
-
-/* Label — hidden by default, expands on active */
+/* ── LABEL ── */
 .nav-label {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 800;
-    color: #FF6600;
+    color: #FF7722;
     white-space: nowrap;
     overflow: hidden;
     max-width: 0;
     opacity: 0;
-    letter-spacing: -0.2px;
+    letter-spacing: 0.1px;
     transition:
-        max-width 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
-        opacity 0.25s ease;
+        max-width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+        opacity 0.28s ease;
     pointer-events: none;
 }
 
@@ -1916,41 +1957,42 @@ body {
     opacity: 1;
 }
 
-/* Tap ripple animation */
-.nav-btn::before {
+/* ── RIPPLE on tap ── */
+.nav-btn::after {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: 50px;
-    background: rgba(255,102,0,0.15);
+    border-radius: 18px;
+    background: rgba(255, 102, 0, 0.18);
     transform: scale(0);
     opacity: 0;
+    pointer-events: none;
     transition: none;
 }
 
-.nav-btn.nav-tap::before {
-    animation: navRipple 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+.nav-btn.nav-tap::after {
+    animation: navRipple 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 @keyframes navRipple {
-    0% { transform: scale(0); opacity: 0.8; }
-    100% { transform: scale(2.5); opacity: 0; }
+    0% { transform: scale(0.5); opacity: 0.7; }
+    100% { transform: scale(2.2); opacity: 0; }
 }
 
-/* Bounce keyframe on tap */
+/* ── BOUNCE on tap ── */
 @keyframes navBounce {
     0%   { transform: scale(1); }
-    30%  { transform: scale(0.87); }
-    60%  { transform: scale(1.12); }
-    80%  { transform: scale(0.96); }
+    25%  { transform: scale(0.88); }
+    55%  { transform: scale(1.10); }
+    75%  { transform: scale(0.97); }
     100% { transform: scale(1); }
 }
 
 .nav-btn.is-bouncing {
-    animation: navBounce 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+    animation: navBounce 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97);
 }
 
-/* Keep search-icon override compatible */
+/* search-icon color override */
 .search-icon { color: inherit !important; }
 
 /* ============================================
