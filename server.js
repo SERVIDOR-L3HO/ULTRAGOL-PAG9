@@ -510,6 +510,105 @@ async function fetchAllPartidos() {
     return partidos;
 }
 
+// ─── PLAYER PHOTO + INFO (TheSportsDB + ESPN, caché 60 min) ──────────────────
+const playerCache = new Map();
+
+app.get('/api/player-photo', async (req, res) => {
+    const name = (req.query.name || '').trim();
+    if (!name) return res.json({ url: null });
+
+    const key = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
+    const cached = playerCache.get('photo:' + key);
+    if (cached && Date.now() - cached.ts < 3_600_000) return res.json({ url: cached.url });
+
+    try {
+        const r = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`, { signal: AbortSignal.timeout(5000) });
+        const d = await r.json();
+        const players = (d.player || []).filter(p => p.strSport === 'Soccer' || p.strSport === 'Football');
+        const p = players[0] || (d.player || [])[0];
+        const url = p?.strCutout || p?.strThumb || null;
+        playerCache.set('photo:' + key, { url, ts: Date.now() });
+        return res.json({ url });
+    } catch(_) {
+        playerCache.set('photo:' + key, { url: null, ts: Date.now() });
+        return res.json({ url: null });
+    }
+});
+
+app.get('/api/player-info', async (req, res) => {
+    const name = (req.query.name || '').trim();
+    if (!name) return res.json({ error: 'name required' });
+
+    const key = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
+    const cached = playerCache.get('info:' + key);
+    if (cached && Date.now() - cached.ts < 3_600_000) return res.json(cached.data);
+
+    const result = { name, photo: null, cutout: null, nationality: null, position: null, age: null, born: null, team: null, teamLogo: null, height: null, weight: null, goals: null, assists: null, shots: null, appearances: null, espnUrl: null };
+
+    // 1. TheSportsDB — photo, nationality, position, DOB
+    try {
+        const r = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`, { signal: AbortSignal.timeout(5000) });
+        const d = await r.json();
+        const players = (d.player || []).filter(p => p.strSport === 'Soccer' || p.strSport === 'Football');
+        const p = players[0] || (d.player || [])[0];
+        if (p) {
+            result.name = p.strPlayer || name;
+            result.photo = p.strThumb || null;
+            result.cutout = p.strCutout || null;
+            result.nationality = p.strNationality || null;
+            result.position = p.strPosition || null;
+            result.born = p.dateBorn || null;
+            if (result.born) {
+                const age = Math.floor((Date.now() - new Date(result.born)) / (365.25 * 86400000));
+                result.age = age;
+            }
+        }
+    } catch(_) {}
+
+    // 2. ESPN search — get athlete ID → stats
+    try {
+        const r = await fetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(name)}&limit=5&lang=es`, { signal: AbortSignal.timeout(4000) });
+        const d = await r.json();
+        const section = (d.results || []).find(s => s.type === 'player');
+        const p = (section?.contents || [])[0];
+        if (p?.uid) {
+            const match = p.uid.match(/~a:(\d+)/);
+            const athleteId = match?.[1];
+            if (athleteId) {
+                result.espnUrl = p.link?.web || null;
+                // Fetch stats
+                try {
+                    const sr = await fetch(`https://site.api.espn.com/apis/common/v3/sports/soccer/athletes/${athleteId}`, { signal: AbortSignal.timeout(4000) });
+                    const sd = await sr.json();
+                    const athlete = sd.athlete || {};
+                    if (athlete.displayName) result.name = athlete.displayName;
+                    result.height = athlete.displayHeight || null;
+                    result.weight = athlete.displayWeight || null;
+                    if (athlete.displayDOB) result.born = athlete.displayDOB;
+                    if (athlete.age) result.age = athlete.age;
+                    const team = athlete.team;
+                    if (team) {
+                        result.team = team.displayName || null;
+                        result.teamLogo = team.logos?.[0]?.href || null;
+                    }
+                    if (!result.position && athlete.position?.displayName) result.position = athlete.position.displayName;
+                    const stats = athlete.statsSummary?.statistics || [];
+                    for (const s of stats) {
+                        if (s.name === 'totalGoals') result.goals = s.displayValue;
+                        if (s.name === 'goalAssists') result.assists = s.displayValue;
+                        if (s.name === 'totalShots') result.shots = s.displayValue;
+                        if (s.name === 'gamesPlayed') result.appearances = s.displayValue;
+                        if (s.name === 'starts-subIns') result.appearances = s.displayValue;
+                    }
+                } catch(_) {}
+            }
+        }
+    } catch(_) {}
+
+    playerCache.set('info:' + key, { data: result, ts: Date.now() });
+    res.json(result);
+});
+
 // ─── LOGO LOOKUP (scrape ESPN por nombre de equipo, con caché 30 min) ─────────
 const logoCache = new Map();
 app.get('/api/team-logo', async (req, res) => {
