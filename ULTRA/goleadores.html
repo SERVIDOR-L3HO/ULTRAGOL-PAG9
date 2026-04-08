@@ -320,12 +320,14 @@ async function loadPlayerPhotos(players) {
         if (!img) continue;
 
         try {
-            const r = await fetch(`/api/player-photo?name=${encodeURIComponent(g.jugador)}`);
+            const params = new URLSearchParams({ name: g.jugador });
+            if (g.equipo) params.set('team', g.equipo);
+            const r = await fetch(`/api/player-photo?${params}`);
             const d = await r.json();
             if (d.url && img.isConnected) {
                 img.src = d.url;
                 img.onload = () => { img.style.display = 'block'; img.classList.add('loaded'); if(ph) ph.style.display = 'none'; };
-                img.onerror = () => {}; // keep placeholder
+                img.onerror = () => {};
             }
         } catch(_) {}
     }
@@ -379,7 +381,9 @@ async function openPlayerModal(idx) {
 
     // Fetch full info
     try {
-        const r = await fetch(`/api/player-info?name=${encodeURIComponent(g.jugador)}`);
+        const infoParams = new URLSearchParams({ name: g.jugador });
+        if (g.equipo) infoParams.set('team', g.equipo);
+        const r = await fetch(`/api/player-info?${infoParams}`);
         const info = await r.json();
 
         // Photo

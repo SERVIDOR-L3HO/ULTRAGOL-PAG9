@@ -515,17 +515,26 @@ const playerCache = new Map();
 
 app.get('/api/player-photo', async (req, res) => {
     const name = (req.query.name || '').trim();
+    const teamHint = (req.query.team || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
     if (!name) return res.json({ url: null });
 
-    const key = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
+    const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
+    const key = norm(name) + (teamHint ? ':' + teamHint : '');
     const cached = playerCache.get('photo:' + key);
     if (cached && Date.now() - cached.ts < 3_600_000) return res.json({ url: cached.url });
 
     try {
         const r = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`, { signal: AbortSignal.timeout(5000) });
         const d = await r.json();
-        const players = (d.player || []).filter(p => p.strSport === 'Soccer' || p.strSport === 'Football');
-        const p = players[0] || (d.player || [])[0];
+        const allPlayers = d.player || [];
+        const soccerPlayers = allPlayers.filter(p => p.strSport === 'Soccer' || p.strSport === 'Football');
+
+        let p = null;
+        if (teamHint && soccerPlayers.length > 1) {
+            p = soccerPlayers.find(pl => norm(pl.strTeam).includes(teamHint) || teamHint.includes(norm(pl.strTeam)));
+        }
+        p = p || soccerPlayers[0] || allPlayers[0];
+
         const url = p?.strCutout || p?.strThumb || null;
         playerCache.set('photo:' + key, { url, ts: Date.now() });
         return res.json({ url });
@@ -537,20 +546,32 @@ app.get('/api/player-photo', async (req, res) => {
 
 app.get('/api/player-info', async (req, res) => {
     const name = (req.query.name || '').trim();
+    const teamHint = (req.query.team || '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
     if (!name) return res.json({ error: 'name required' });
 
-    const key = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
+    const key = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim() + (teamHint ? ':' + teamHint : '');
     const cached = playerCache.get('info:' + key);
     if (cached && Date.now() - cached.ts < 3_600_000) return res.json(cached.data);
 
     const result = { name, photo: null, cutout: null, nationality: null, position: null, age: null, born: null, team: null, teamLogo: null, height: null, weight: null, goals: null, assists: null, shots: null, appearances: null, espnUrl: null };
 
-    // 1. TheSportsDB — photo, nationality, position, DOB
+    // Helper: normalize string for comparison
+    const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').trim();
+
+    // 1. TheSportsDB — photo, nationality, position, DOB (prefer team match)
     try {
         const r = await fetch(`https://www.thesportsdb.com/api/v1/json/3/searchplayers.php?p=${encodeURIComponent(name)}`, { signal: AbortSignal.timeout(5000) });
         const d = await r.json();
-        const players = (d.player || []).filter(p => p.strSport === 'Soccer' || p.strSport === 'Football');
-        const p = players[0] || (d.player || [])[0];
+        const allPlayers = (d.player || []);
+        const soccerPlayers = allPlayers.filter(p => p.strSport === 'Soccer' || p.strSport === 'Football');
+
+        // Try to pick the best match using team hint
+        let p = null;
+        if (teamHint && soccerPlayers.length > 1) {
+            p = soccerPlayers.find(pl => norm(pl.strTeam).includes(teamHint) || teamHint.includes(norm(pl.strTeam)));
+        }
+        p = p || soccerPlayers[0] || allPlayers[0];
+
         if (p) {
             result.name = p.strPlayer || name;
             result.photo = p.strThumb || null;
@@ -565,23 +586,29 @@ app.get('/api/player-info', async (req, res) => {
         }
     } catch(_) {}
 
-    // 2. ESPN search — get athlete ID → stats
+    // 2. ESPN search — get athlete ID → stats (prefer team match)
     try {
-        const r = await fetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(name)}&limit=5&lang=es`, { signal: AbortSignal.timeout(4000) });
+        const r = await fetch(`https://site.api.espn.com/apis/search/v2?query=${encodeURIComponent(name)}&limit=10&lang=es`, { signal: AbortSignal.timeout(4000) });
         const d = await r.json();
         const section = (d.results || []).find(s => s.type === 'player');
-        const p = (section?.contents || [])[0];
+        const candidates = section?.contents || [];
+
+        // Pick best match: prefer if subtitle (team) matches teamHint
+        let p = null;
+        if (teamHint && candidates.length > 1) {
+            p = candidates.find(c => norm(c.subtitle).includes(teamHint) || teamHint.includes(norm(c.subtitle)));
+        }
+        p = p || candidates[0];
+
         if (p?.uid) {
             const match = p.uid.match(/~a:(\d+)/);
             const athleteId = match?.[1];
             if (athleteId) {
                 result.espnUrl = p.link?.web || null;
-                // Fetch stats
                 try {
                     const sr = await fetch(`https://site.api.espn.com/apis/common/v3/sports/soccer/athletes/${athleteId}`, { signal: AbortSignal.timeout(4000) });
                     const sd = await sr.json();
                     const athlete = sd.athlete || {};
-                    if (athlete.displayName) result.name = athlete.displayName;
                     result.height = athlete.displayHeight || null;
                     result.weight = athlete.displayWeight || null;
                     if (athlete.displayDOB) result.born = athlete.displayDOB;
