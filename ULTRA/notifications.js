@@ -1,25 +1,37 @@
 // UltraGol Notifications System
 class NotificationManager {
     constructor() {
-        this.notificationPermission = localStorage.getItem('notificationPermission') || 'default';
-        this.lastNotificationId = localStorage.getItem('lastNotificationId') || null;
         this.checkInterval = null;
-        this.modalShown = localStorage.getItem('notificationModalShown') === 'true';
+        this.shownIds = new Set(
+            JSON.parse(localStorage.getItem('shownNotifIds') || '[]')
+        );
+        this.lastChecked = parseInt(localStorage.getItem('notifLastChecked') || '0');
+    }
+
+    get permission() {
+        // Always read the real browser state, never stale localStorage
+        if (!('Notification' in window)) return 'unsupported';
+        return Notification.permission;
     }
 
     async init() {
         console.log('🔔 Initializing Notification System...');
 
-        if (!this.modalShown) {
+        const modalShown = localStorage.getItem('notificationModalShown') === 'true';
+
+        if (this.permission === 'granted') {
+            this.startPolling();
+        } else if (this.permission === 'default' && !modalShown) {
             setTimeout(() => this.showPermissionModal(), 3000);
-        } else if (this.notificationPermission === 'granted') {
-            this.startNotificationPolling();
         }
+        // If denied: do nothing (respect user choice)
     }
 
     showPermissionModal() {
+        // Don't stack modals
+        if (document.querySelector('.notification-permission-modal')) return;
+
         localStorage.setItem('notificationModalShown', 'true');
-        this.modalShown = true;
 
         const modal = document.createElement('div');
         modal.className = 'notification-permission-modal';
@@ -52,247 +64,210 @@ class NotificationManager {
         `;
 
         document.body.appendChild(modal);
-
         setTimeout(() => {
             modal.querySelector('.notification-modal-content').classList.add('show');
         }, 100);
 
         document.getElementById('notificationDeny').addEventListener('click', () => {
-            this.denyNotifications(modal);
+            this.closeModal(modal);
+            this.showMessage('Puedes activarlas más tarde desde la configuración', 'info');
         });
 
         document.getElementById('notificationAllow').addEventListener('click', () => {
-            this.requestNotificationPermission(modal);
+            this.requestPermission(modal);
         });
     }
 
-    async requestNotificationPermission(modal) {
+    async requestPermission(modal) {
         if (!('Notification' in window)) {
-            alert('Tu navegador no soporta notificaciones');
+            this.showMessage('Tu navegador no soporta notificaciones', 'error');
             this.closeModal(modal);
             return;
         }
 
         try {
-            const permission = await Notification.requestPermission();
+            const result = await Notification.requestPermission();
 
-            if (permission === 'granted') {
-                this.notificationPermission = 'granted';
-                localStorage.setItem('notificationPermission', 'granted');
-                this.closeModal(modal);
-                this.showMessage('¡Notificaciones activadas!', 'success');
-                this.startNotificationPolling();
-                this.sendWelcomeNotification();
+            this.closeModal(modal);
+
+            if (result === 'granted') {
+                this.showMessage('¡Notificaciones activadas! ✅', 'success');
+                this.startPolling();
+                // Send a welcome notification
+                setTimeout(() => this._fire('¡Bienvenido a UltraGol! ⚽', {
+                    body: 'Recibirás alertas de partidos en vivo y resultados',
+                    tag: 'welcome',
+                    icon: '/app-icon.png',
+                    badge: '/favicon.png'
+                }), 1000);
             } else {
-                this.notificationPermission = 'denied';
-                localStorage.setItem('notificationPermission', 'denied');
-                this.closeModal(modal);
                 this.showMessage('Notificaciones desactivadas', 'info');
             }
-        } catch (error) {
-            console.error('❌ Error requesting notification permission:', error);
-            this.closeModal(modal);
+        } catch (err) {
+            console.error('❌ Error requesting permission:', err);
+            if (modal) this.closeModal(modal);
         }
-    }
-
-    denyNotifications(modal) {
-        this.notificationPermission = 'denied';
-        localStorage.setItem('notificationPermission', 'denied');
-        this.closeModal(modal);
-        this.showMessage('Puedes activar las notificaciones más tarde desde la configuración', 'info');
     }
 
     closeModal(modal) {
-        modal.querySelector('.notification-modal-content').classList.remove('show');
-        setTimeout(() => modal.remove(), 300);
+        if (!modal) return;
+        const content = modal.querySelector('.notification-modal-content');
+        if (content) content.classList.remove('show');
+        setTimeout(() => { if (modal.parentNode) modal.remove(); }, 300);
     }
 
-    async sendWelcomeNotification() {
-        if (this.notificationPermission === 'granted') {
-            await this.showNotificationSafe('¡Bienvenido a UltraGol!', {
-                body: 'Recibirás notificaciones de partidos y eventos en vivo',
-                icon: '/app-icon.png',
-                badge: '/favicon.png',
-                tag: 'welcome'
-            });
-        }
+    startPolling() {
+        if (this.checkInterval) return; // already running
+        console.log('🔔 Starting notifications polling...');
+        this._check();
+        this.checkInterval = setInterval(() => this._check(), 60000);
     }
 
-    async startNotificationPolling() {
-        if (this.notificationPermission !== 'granted') return;
-
-        console.log('🔔 Starting general notifications polling...');
-        this.checkForNotifications();
-        this.checkInterval = setInterval(() => this.checkForNotifications(), 60000);
-    }
-
-    async checkForNotifications() {
-        try {
-            const response = await fetch('https://ultragol-api-3.vercel.app/notificaciones/ligamx');
-
-            if (!response.ok) {
-                const fallback = await fetch('https://ultragol-api-3.vercel.app/notificaciones');
-                if (!fallback.ok) return;
-                const data = await fallback.json();
-                this.processNotifications(data.notificaciones || []);
-                return;
-            }
-
-            const data = await response.json();
-            console.log('✅ Notifications loaded:', data.total);
-            this.processNotifications(data.notificaciones || []);
-        } catch (error) {
-            console.error('❌ Error checking notifications:', error);
-        }
-    }
-
-    processNotifications(notifications) {
-        notifications.forEach(notif => {
-            if (notif.id && notif.id !== this.lastNotificationId) {
-                this.showNotification(notif);
-                this.lastNotificationId = notif.id;
-                localStorage.setItem('lastNotificationId', notif.id);
-            }
-        });
-    }
-
-    async showNotificationSafe(title, options) {
-        try {
-            if ('serviceWorker' in navigator) {
-                const registration = await Promise.race([
-                    navigator.serviceWorker.ready,
-                    new Promise((_, reject) =>
-                        setTimeout(() => reject(new Error('SW timeout')), 10000)
-                    )
-                ]).catch(async () => {
-                    return await navigator.serviceWorker.getRegistration() || null;
-                });
-
-                if (registration) {
-                    await registration.showNotification(title, {
-                        body: options.body,
-                        icon: options.icon,
-                        badge: options.badge,
-                        tag: options.tag,
-                        vibrate: options.vibrate,
-                        requireInteraction: options.requireInteraction,
-                        data: options.data || {}
-                    });
-                    return true;
-                }
-            }
-
-            const notification = new Notification(title, options);
-            if (options.data && options.data.url) {
-                notification.onclick = (e) => {
-                    e.preventDefault();
-                    window.focus();
-                    window.location.href = options.data.url;
-                    notification.close();
-                };
-            }
-            return true;
-        } catch (error) {
-            console.error('❌ Error showing notification:', error);
-            return false;
-        }
-    }
-
-    async showNotification(notificationData) {
-        if (this.notificationPermission !== 'granted') return;
-
-        await this.showNotificationSafe(
-            notificationData.titulo || 'UltraGol',
-            {
-                body: notificationData.mensaje || notificationData.body || 'Nueva actualización',
-                icon: notificationData.icono || notificationData.icon || '/app-icon.png',
-                badge: '/favicon.png',
-                tag: notificationData.id || `notif-${Date.now()}`,
-                data: { url: notificationData.url || '/', ...notificationData },
-                requireInteraction: false,
-                vibrate: [200, 100, 200]
-            }
-        );
-    }
-
-    showMessage(message, type = 'info') {
-        try {
-            if (!document.body) return;
-
-            const toast = document.createElement('div');
-            toast.className = `notification-toast ${type}`;
-            toast.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
-            `;
-
-            document.body.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 100);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300);
-            }, 3000);
-        } catch (error) {
-            console.error('❌ Error showing message:', error);
-        }
-    }
-
-    stopNotificationPolling() {
+    stopPolling() {
         if (this.checkInterval) {
             clearInterval(this.checkInterval);
             this.checkInterval = null;
         }
     }
 
-    enableNotifications() {
-        if (!this.modalShown) {
-            this.showPermissionModal();
-        } else if (this.notificationPermission === 'denied') {
-            alert('Las notificaciones están bloqueadas. Por favor, actívalas desde la configuración de tu navegador.');
-        } else if (this.notificationPermission === 'granted') {
-            this.showMessage('Las notificaciones ya están activas', 'info');
+    async _check() {
+        if (this.permission !== 'granted') {
+            this.stopPolling();
+            return;
+        }
+
+        try {
+            const url = `/api/notifications?since=${this.lastChecked}`;
+            const res = await fetch(url);
+            if (!res.ok) return;
+
+            const data = await res.json();
+            const list = data.notificaciones || [];
+
+            console.log(`🔔 Notifications check: ${list.length} new`);
+
+            list.forEach(n => {
+                if (!this.shownIds.has(n.id)) {
+                    this._fire(n.titulo || 'UltraGol', {
+                        body: n.mensaje || '',
+                        icon: n.icono || '/app-icon.png',
+                        badge: '/favicon.png',
+                        tag: n.id,
+                        data: { url: n.url || '/' },
+                        vibrate: [150, 80, 150]
+                    });
+                    this.shownIds.add(n.id);
+                    // Cap stored IDs at 100
+                    if (this.shownIds.size > 100) {
+                        this.shownIds.delete(this.shownIds.values().next().value);
+                    }
+                }
+            });
+
+            // Persist shown IDs
+            localStorage.setItem('shownNotifIds', JSON.stringify([...this.shownIds]));
+            this.lastChecked = Date.now();
+            localStorage.setItem('notifLastChecked', this.lastChecked);
+        } catch (err) {
+            console.error('❌ Notification check error:', err);
         }
     }
 
-    disableNotifications() {
-        this.stopNotificationPolling();
-        this.notificationPermission = 'denied';
-        localStorage.setItem('notificationPermission', 'denied');
+    async _fire(title, options = {}) {
+        try {
+            if ('serviceWorker' in navigator) {
+                const reg = await Promise.race([
+                    navigator.serviceWorker.ready,
+                    new Promise((_, rej) => setTimeout(() => rej(), 5000))
+                ]).catch(() => navigator.serviceWorker.getRegistration());
+
+                if (reg) {
+                    await reg.showNotification(title, options);
+                    return;
+                }
+            }
+            // Fallback to direct Notification
+            const n = new Notification(title, options);
+            if (options.data?.url) {
+                n.onclick = (e) => {
+                    e.preventDefault();
+                    window.focus();
+                    window.location.href = options.data.url;
+                    n.close();
+                };
+            }
+        } catch (err) {
+            console.error('❌ Error firing notification:', err);
+        }
+    }
+
+    showMessage(message, type = 'info') {
+        try {
+            if (!document.body) return;
+            const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+            const toast = document.createElement('div');
+            toast.className = `notification-toast ${type}`;
+            toast.innerHTML = `<i class="fas fa-${icon}"></i><span>${message}</span>`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 50);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => { if (toast.parentNode) toast.remove(); }, 300);
+            }, 3500);
+        } catch (_) {}
+    }
+
+    // Public helpers for manual control
+    enable() {
+        if (this.permission === 'granted') {
+            this.showMessage('Las notificaciones ya están activas ✅', 'info');
+            if (!this.checkInterval) this.startPolling();
+        } else if (this.permission === 'denied') {
+            this.showMessage('Notificaciones bloqueadas. Actívalas desde la configuración del navegador (ícono 🔒 en la barra de dirección)', 'error');
+        } else {
+            localStorage.removeItem('notificationModalShown');
+            this.showPermissionModal();
+        }
+    }
+
+    disable() {
+        this.stopPolling();
         this.showMessage('Notificaciones desactivadas', 'info');
+    }
+
+    status() {
+        console.log('📊 Estado notificaciones:');
+        console.log('  Permiso real:', this.permission);
+        console.log('  Polling activo:', !!this.checkInterval);
+        console.log('  IDs mostrados:', this.shownIds.size);
+        console.log('  Último chequeo:', this.lastChecked ? new Date(this.lastChecked).toLocaleString('es-MX') : 'Nunca');
+        console.log('\n💡 Comandos: activarNotificaciones() | desactivarNotificaciones() | estadoNotificaciones()');
     }
 }
 
 if (typeof window !== 'undefined') {
     window.notificationManager = new NotificationManager();
 
-    window.activarNotificaciones = function() {
-        window.notificationManager.showPermissionModal();
-    };
-
-    window.limpiarNotificaciones = function() {
-        localStorage.removeItem('notificationPermission');
-        localStorage.removeItem('lastNotificationId');
+    // Global helper functions
+    window.activarNotificaciones  = () => window.notificationManager.enable();
+    window.desactivarNotificaciones = () => window.notificationManager.disable();
+    window.estadoNotificaciones   = () => window.notificationManager.status();
+    window.limpiarNotificaciones  = () => {
+        localStorage.removeItem('shownNotifIds');
+        localStorage.removeItem('notifLastChecked');
         localStorage.removeItem('notificationModalShown');
-        console.log('✅ Limpiado. Recarga la página para reiniciar.');
+        console.log('✅ Cache de notificaciones limpiado. Recarga la página.');
     };
 
-    window.estadoNotificaciones = function() {
-        console.log('📊 Estado de notificaciones:');
-        console.log('  - Permiso:', Notification.permission);
-        console.log('  - Guardado:', localStorage.getItem('notificationPermission'));
-        console.log('  - Modal mostrado:', localStorage.getItem('notificationModalShown'));
-        console.log('  - Última notificación:', localStorage.getItem('lastNotificationId') || 'Ninguna');
-        console.log('\n💡 Funciones: activarNotificaciones() | limpiarNotificaciones() | estadoNotificaciones()');
+    const go = () => {
+        window.notificationManager.init();
+        console.log('\n💡 Sistema de notificaciones listo. Usa estadoNotificaciones() para ver el estado.');
     };
 
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            window.notificationManager.init();
-            console.log('\n💡 Sistema de notificaciones cargado. Escribe estadoNotificaciones() para ver el estado.');
-        });
+        document.addEventListener('DOMContentLoaded', go);
     } else {
-        window.notificationManager.init();
-        console.log('\n💡 Sistema de notificaciones cargado. Escribe estadoNotificaciones() para ver el estado.');
+        go();
     }
 }
 

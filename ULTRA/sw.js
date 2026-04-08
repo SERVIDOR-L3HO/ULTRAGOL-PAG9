@@ -83,3 +83,47 @@ self.addEventListener('activate', (event) => {
   );
   return self.clients.claim();
 });
+
+// Handle incoming push messages
+self.addEventListener('push', (event) => {
+  let data = { title: 'UltraGol ⚽', body: 'Nueva actualización disponible' };
+  try {
+    if (event.data) data = event.data.json();
+  } catch (_) {
+    if (event.data) data.body = event.data.text();
+  }
+
+  const options = {
+    body: data.body || data.mensaje || '',
+    icon: data.icon || data.icono || '/app-icon.png',
+    badge: '/favicon.png',
+    tag: data.tag || `ug-${Date.now()}`,
+    data: { url: data.url || '/' },
+    vibrate: [150, 80, 150],
+    requireInteraction: false
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || data.titulo || 'UltraGol ⚽', options)
+  );
+});
+
+// Handle notification click — open/focus the app
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || '/';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // Focus existing tab if found
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(url);
+          return client.focus();
+        }
+      }
+      // Otherwise open new tab
+      if (clients.openWindow) return clients.openWindow(url);
+    })
+  );
+});
