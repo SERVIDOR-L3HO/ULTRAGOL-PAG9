@@ -274,25 +274,39 @@ app.get('/api/ultragol/notificaciones', async (req, res) => {
     }
 });
 
-// Smart notifications endpoint — generates real notifications from live match data
+// Smart notifications endpoint — generates real notifications from all 6 leagues
+const LIGAS_CONFIG = [
+    { nombre: 'Liga MX',        emoji: '🇲🇽', endpoint: '/marcadores' },
+    { nombre: 'Premier League', emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', endpoint: '/premier/marcadores' },
+    { nombre: 'La Liga',        emoji: '🇪🇸', endpoint: '/laliga/marcadores' },
+    { nombre: 'Serie A',        emoji: '🇮🇹', endpoint: '/seriea/marcadores' },
+    { nombre: 'Bundesliga',     emoji: '🇩🇪', endpoint: '/bundesliga/marcadores' },
+    { nombre: 'Ligue 1',        emoji: '🇫🇷', endpoint: '/ligue1/marcadores' },
+];
+
+async function fetchLigaMatches(liga) {
+    try {
+        const r = await fetch(`${API_BASE_URL}${liga.endpoint}`, { signal: AbortSignal.timeout(6000) });
+        if (!r.ok) return [];
+        const d = await r.json();
+        const partidos = d.partidos || d.ligamx || d.matches || [];
+        return partidos.map(p => ({ ...p, _liga: liga.nombre, _emoji: liga.emoji }));
+    } catch (_) {
+        return [];
+    }
+}
+
 app.get('/api/notifications', async (req, res) => {
     try {
         const since = parseInt(req.query.since) || 0;
         const notifications = [];
         const now = Date.now();
 
-        // Fetch live match data
-        let matchData = null;
-        try {
-            const r = await fetch(`${API_BASE_URL}/marcadores`);
-            if (r.ok) matchData = await r.json();
-        } catch (_) {}
+        // Fetch all 6 leagues in parallel
+        const results = await Promise.allSettled(LIGAS_CONFIG.map(fetchLigaMatches));
+        const todosLosPartidos = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
 
-        const partidos = matchData
-            ? (matchData.ligamx || matchData.partidos || matchData.matches || [])
-            : [];
-
-        partidos.forEach(p => {
+        todosLosPartidos.forEach(p => {
             const id = p.id || p.matchId || `${p.local?.nombre}-${p.visitante?.nombre}`;
             const enVivo = p.estado?.enVivo || p.live || false;
             const finalizado = p.estado?.finalizado || p.finished || false;
@@ -301,43 +315,45 @@ app.get('/api/notifications', async (req, res) => {
             const visitante = p.visitante?.nombreCorto || p.visitante?.nombre || 'Visitante';
             const marcadorL = p.local?.marcador ?? '';
             const marcadorV = p.visitante?.marcador ?? '';
+            const liga = p._liga || '';
+            const emoji = p._emoji || '⚽';
 
             if (enVivo) {
                 notifications.push({
                     id: `live-${id}-${marcadorL}-${marcadorV}`,
-                    titulo: '⚽ Partido EN VIVO',
+                    titulo: `${emoji} EN VIVO · ${liga}`,
                     mensaje: `${local} ${marcadorL} : ${marcadorV} ${visitante}`,
                     icono: '/app-icon.png',
                     url: '/',
                     ts: now,
-                    tipo: 'live'
+                    tipo: 'live',
+                    liga
                 });
             } else if (finalizado && marcadorL !== '' && marcadorV !== '') {
                 notifications.push({
                     id: `final-${id}-${marcadorL}-${marcadorV}`,
-                    titulo: '🏁 Resultado Final',
+                    titulo: `🏁 Final · ${liga}`,
                     mensaje: `${local} ${marcadorL} - ${marcadorV} ${visitante}`,
                     icono: '/app-icon.png',
                     url: '/',
                     ts: now,
-                    tipo: 'final'
+                    tipo: 'final',
+                    liga
                 });
             } else if (programado) {
-                // Use the human-readable fecha string (already in Mexico time)
-                // Format: "10/04/26, 7:00 p.m." → extract time part
                 let hora = '';
                 if (p.fecha && typeof p.fecha === 'string') {
-                    const parts = p.fecha.split(',');
-                    hora = parts[1]?.trim() || p.fecha;
+                    hora = p.fecha.split(',')[1]?.trim() || p.fecha;
                 }
                 notifications.push({
                     id: `sched-${id}`,
-                    titulo: '📅 Partido Programado',
+                    titulo: `📅 ${liga}`,
                     mensaje: hora ? `${local} vs ${visitante} a las ${hora}` : `${local} vs ${visitante}`,
                     icono: '/app-icon.png',
                     url: '/',
                     ts: now,
-                    tipo: 'programado'
+                    tipo: 'programado',
+                    liga
                 });
             }
         });
