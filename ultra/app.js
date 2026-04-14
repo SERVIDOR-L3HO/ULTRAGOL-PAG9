@@ -2531,6 +2531,9 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     
     modal.classList.add('active');
     
+    // Reset play overlay — require user to press play before radio
+    _showStreamPlayOverlay();
+    
     // Configurar iframe
     const iframe = document.getElementById('modalIframe');
     const loader = document.getElementById('modalLoader');
@@ -2651,6 +2654,14 @@ function closePlayerModalOnly() {
         iframe.src = '';
     }
     
+    // Hide play overlay and reset radio state when modal closes
+    const overlay = document.getElementById('streamPlayOverlay');
+    if (overlay) overlay.classList.add('hidden');
+    const radioBtn = document.getElementById('radioBtnControl');
+    if (radioBtn) radioBtn.classList.remove('radio-locked', 'active');
+    streamStarted = false;
+    radioModeActive = false;
+    
     currentStreamUrl = '';
     
     // Detener la actualización automática de estadísticas
@@ -2736,8 +2747,37 @@ function openLiveChat() {
 let radioModeActive = false;
 let radioVolume = 100;
 let isRadioMuted = false;
+let streamStarted = false;
+
+function _showStreamPlayOverlay() {
+    const overlay = document.getElementById('streamPlayOverlay');
+    const radioBtn = document.getElementById('radioBtnControl');
+    if (overlay) {
+        overlay.classList.remove('hidden');
+    }
+    if (radioBtn) {
+        radioBtn.classList.add('radio-locked');
+    }
+    streamStarted = false;
+}
+
+function onStreamPlayPressed() {
+    const overlay = document.getElementById('streamPlayOverlay');
+    const radioBtn = document.getElementById('radioBtnControl');
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
+    if (radioBtn) {
+        radioBtn.classList.remove('radio-locked');
+    }
+    streamStarted = true;
+}
 
 function toggleRadioMode() {
+    if (!streamStarted) {
+        showToast('Presiona play primero para iniciar la transmisión');
+        return;
+    }
     const visualizer = document.getElementById('radioVisualizer');
     const iframe = document.getElementById('modalIframe');
     const radioBtn = document.querySelector('.radio-btn');
@@ -2928,6 +2968,9 @@ function openStream(url) {
     
     modal.classList.add('active');
     loader.style.display = 'flex';
+    
+    // Reset play overlay — require user to press play before radio
+    _showStreamPlayOverlay();
     
     iframe.src = url;
     
