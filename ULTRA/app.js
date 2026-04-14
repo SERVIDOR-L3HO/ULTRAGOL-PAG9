@@ -2748,6 +2748,10 @@ let radioModeActive = false;
 let radioVolume = 100;
 let isRadioMuted = false;
 let streamStarted = false;
+let radioAudioContext = null;
+let radioOscillator = null;
+let radioGainNode = null;
+let radioAudioElement = null;
 
 function _showStreamPlayOverlay() {
     const overlay = document.getElementById('streamPlayOverlay');
@@ -2786,19 +2790,106 @@ function toggleRadioMode() {
     
     if (radioModeActive) {
         visualizer.classList.add('active');
-        iframe.style.opacity = '0';
+        // Keep iframe rendering (don't hide it) so the browser doesn't suspend its audio
         iframe.style.pointerEvents = 'none';
         radioBtn.classList.add('active');
         document.getElementById('radioTitleText').textContent = currentStreamTitle || 'MODO RADIO ACTIVO';
+        _startBackgroundAudioKeepAlive();
         showToast('Modo Radio: Solo audio activado');
     } else {
         visualizer.classList.remove('active');
-        iframe.style.opacity = '1';
         iframe.style.pointerEvents = 'auto';
         radioBtn.classList.remove('active');
+        _stopBackgroundAudioKeepAlive();
         showToast('Modo Video activado');
     }
 }
+
+// ---------- Web Audio keep-alive helpers ----------
+function _startBackgroundAudioKeepAlive() {
+    try {
+        if (!radioAudioContext || radioAudioContext.state === 'closed') {
+            radioAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (radioAudioContext.state === 'suspended') {
+            radioAudioContext.resume();
+        }
+        // Stop any previous oscillator
+        if (radioOscillator) {
+            try { radioOscillator.stop(); } catch(e) {}
+            radioOscillator = null;
+        }
+        // Create an inaudible but continuous tone so the OS never kills the audio session
+        radioGainNode = radioAudioContext.createGain();
+        radioGainNode.gain.value = 0.00001;
+        radioGainNode.connect(radioAudioContext.destination);
+        radioOscillator = radioAudioContext.createOscillator();
+        radioOscillator.frequency.value = 440;
+        radioOscillator.connect(radioGainNode);
+        radioOscillator.start();
+        console.log('🎵 Background audio keep-alive started (Web Audio API)');
+    } catch (e) {
+        console.warn('Web Audio API unavailable, falling back to silent element:', e);
+        _startSilentAudioFallback();
+    }
+    _setupMediaSession();
+    requestWakeLock();
+}
+
+function _stopBackgroundAudioKeepAlive() {
+    if (radioOscillator) {
+        try { radioOscillator.stop(); } catch(e) {}
+        radioOscillator = null;
+    }
+    if (radioAudioContext) {
+        radioAudioContext.suspend().catch(() => {});
+    }
+    if (radioAudioElement) {
+        radioAudioElement.pause();
+    }
+    if ('mediaSession' in navigator) {
+        navigator.mediaSession.playbackState = 'none';
+    }
+    releaseWakeLock();
+}
+
+function _startSilentAudioFallback() {
+    if (!radioAudioElement) {
+        radioAudioElement = document.createElement('audio');
+        radioAudioElement.id = 'radioBackgroundAudio';
+        radioAudioElement.loop = true;
+        radioAudioElement.volume = 0.01;
+        radioAudioElement.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+        document.body.appendChild(radioAudioElement);
+    }
+    radioAudioElement.play().catch(e => console.log('Audio play error:', e));
+}
+
+function _setupMediaSession() {
+    if (!('mediaSession' in navigator)) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+        title: currentStreamTitle || 'ULTRAGOL Radio',
+        artist: 'Transmisión en vivo',
+        album: 'ULTRAGOL',
+        artwork: [
+            { src: 'ultragol-logo.png', sizes: '96x96',   type: 'image/png' },
+            { src: 'ultragol-logo.png', sizes: '128x128', type: 'image/png' },
+            { src: 'ultragol-logo.png', sizes: '192x192', type: 'image/png' },
+            { src: 'ultragol-logo.png', sizes: '256x256', type: 'image/png' },
+            { src: 'ultragol-logo.png', sizes: '384x384', type: 'image/png' },
+            { src: 'ultragol-logo.png', sizes: '512x512', type: 'image/png' }
+        ]
+    });
+    navigator.mediaSession.setActionHandler('play', () => {
+        if (radioAudioContext && radioAudioContext.state === 'suspended') radioAudioContext.resume();
+        if (radioAudioElement) radioAudioElement.play();
+        showToast('Modo Radio activado');
+    });
+    navigator.mediaSession.setActionHandler('pause', () => { deactivateRadioMode(); });
+    navigator.mediaSession.setActionHandler('stop',  () => { deactivateRadioMode(); });
+    navigator.mediaSession.playbackState = 'playing';
+}
+// --------------------------------------------------
 
 function updateRadioVolume(value) {
     radioVolume = value;
@@ -2842,58 +2933,7 @@ function activateRadioMode() {
         radioBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
     }
     
-    // Crear elemento de audio para mantener reproducción en segundo plano
-    if (!radioAudioElement) {
-        radioAudioElement = document.createElement('audio');
-        radioAudioElement.id = 'radioBackgroundAudio';
-        radioAudioElement.loop = true;
-        radioAudioElement.volume = 0.01; // Volumen muy bajo (casi silencioso)
-        
-        // Audio silencioso para mantener la sesión de audio activa
-        radioAudioElement.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-        
-        document.body.appendChild(radioAudioElement);
-    }
-    
-    // Reproducir audio silencioso para mantener sesión activa
-    radioAudioElement.play().catch(e => console.log('Audio play error:', e));
-    
-    // Configurar MediaSession API para controles de audio en pantalla de bloqueo
-    if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-            title: currentStreamTitle || 'ULTRAGOL Radio',
-            artist: 'Transmisión en vivo',
-            album: 'ULTRAGOL',
-            artwork: [
-                { src: 'ultragol-logo.png', sizes: '96x96', type: 'image/png' },
-                { src: 'ultragol-logo.png', sizes: '128x128', type: 'image/png' },
-                { src: 'ultragol-logo.png', sizes: '192x192', type: 'image/png' },
-                { src: 'ultragol-logo.png', sizes: '256x256', type: 'image/png' },
-                { src: 'ultragol-logo.png', sizes: '384x384', type: 'image/png' },
-                { src: 'ultragol-logo.png', sizes: '512x512', type: 'image/png' }
-            ]
-        });
-        
-        // Configurar acciones de MediaSession
-        navigator.mediaSession.setActionHandler('play', () => {
-            if (radioAudioElement) radioAudioElement.play();
-            showToast('Modo Radio activado');
-        });
-        
-        navigator.mediaSession.setActionHandler('pause', () => {
-            deactivateRadioMode();
-        });
-        
-        navigator.mediaSession.setActionHandler('stop', () => {
-            deactivateRadioMode();
-        });
-        
-        navigator.mediaSession.playbackState = 'playing';
-    }
-    
-    // Prevenir que la pantalla se apague (si está disponible)
-    requestWakeLock();
-    
+    _startBackgroundAudioKeepAlive();
     showToast('Modo Radio activado - El audio continuará en segundo plano');
 }
 
@@ -2908,19 +2948,7 @@ function deactivateRadioMode() {
         radioBtn.innerHTML = '<i class="fas fa-podcast"></i>';
     }
     
-    // Detener audio
-    if (radioAudioElement) {
-        radioAudioElement.pause();
-    }
-    
-    // Limpiar MediaSession
-    if ('mediaSession' in navigator) {
-        navigator.mediaSession.playbackState = 'none';
-    }
-    
-    // Liberar wake lock
-    releaseWakeLock();
-    
+    _stopBackgroundAudioKeepAlive();
     showToast('Modo Radio desactivado');
 }
 
@@ -2951,8 +2979,15 @@ function releaseWakeLock() {
 
 // Re-adquirir wake lock cuando la página vuelve a ser visible
 document.addEventListener('visibilitychange', async () => {
-    if (wakeLock !== null && document.visibilityState === 'visible' && radioModeActive) {
-        requestWakeLock();
+    if (radioModeActive) {
+        if (document.visibilityState === 'visible') {
+            // Page came back into view — resume audio context if suspended
+            if (radioAudioContext && radioAudioContext.state === 'suspended') {
+                radioAudioContext.resume().catch(() => {});
+            }
+            if (wakeLock !== null) requestWakeLock();
+        }
+        // When going hidden (screen off): AudioContext continues if started by user gesture
     }
 });
 
