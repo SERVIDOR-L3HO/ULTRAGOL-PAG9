@@ -1,388 +1,301 @@
-import { auth, signInWithGoogle, signOutUser, onAuthStateChanged } from './firebase-config.js';
+/* ===================== ULTRACANALES — HOME SCRIPT ===================== */
+const API_URL = 'https://ultragol-api-3.vercel.app/canales';
 
-let channelsData = null;
-let currentChannel = null;
-let currentUser = null;
-
-const channelLogos = {
-    'TyC Sports HD': 'attached_assets/logos/tyc-sports.jpg',
-    'TyC Sports': 'attached_assets/logos/tyc-sports.jpg',
-    'TNT Sports HD': 'attached_assets/logos/tnt-sports.jpg',
-    'ESPN Premium HD': 'attached_assets/logos/espn-premium.jpg',
-    'ESPN Premium': 'attached_assets/logos/espn-premium.jpg',
-    'DSports HD': 'attached_assets/logos/dsports.jpg',
-    'DSports': 'attached_assets/logos/dsports.jpg',
-    'DSports 2': 'attached_assets/logos/dsports2.jpg',
-    'DirectTV Sports Plus': 'attached_assets/logos/dsports-plus.jpg',
-    'Las Estrellas': 'attached_assets/logos/las-estrellas.jpg',
-    'TUDN': 'attached_assets/logos/tudn.jpg',
-    'TUDN Vix Plus': 'attached_assets/logos/vix-tudn.jpg',
-    'Fox Sports': 'attached_assets/logos/fox-sports.jpg',
-    'Fox Sports México': 'attached_assets/logos/fox-sports.jpg',
-    'Fox Sports Premium': 'attached_assets/logos/fox-sports-premium-blue.jpg',
-    'Fox Sports 2': 'attached_assets/logos/fox-sports2.jpg',
-    'Fox Sports 2 México': 'attached_assets/logos/fox-sports2.jpg',
-    'Fox Sports 3': 'attached_assets/logos/fox-sports-3-pink.jpg',
-    'Fox Sports 3 México': 'attached_assets/logos/fox-sports-3-pink.jpg',
-    'DAZN La Liga': 'attached_assets/logos/dazn-laliga.jpg',
-    'DAZN F1': 'attached_assets/logos/dazn-f1.jpg',
-    'Movistar La Liga': 'attached_assets/logos/tv-movistar.jpg',
-    'Sky Sports La Liga': 'attached_assets/logos/sky-sports-laliga.jpg',
-    'ESPN': 'attached_assets/logos/espn.jpg',
-    'ESPN México': 'attached_assets/logos/espn-mx.jpg',
-    'ESPN 2 México': 'attached_assets/logos/espn2mx.jpg',
-    'ESPN 3': 'attached_assets/logos/espn3.jpg',
-    'ESPN 3 México': 'attached_assets/logos/espn-3mx.jpg',
-    'ESPN 4': 'attached_assets/logos/espn-4.jpg',
-    'ESPN 4 México': 'attached_assets/logos/espn-4mx.jpg',
-    'ESPN 5': 'attached_assets/logos/espn5.jpg',
-    'ESPN 5 México': 'attached_assets/logos/espn-5mx.jpg',
-    'ESPN 6': 'attached_assets/logos/espn6.jpg',
-    'ESPN 7': 'attached_assets/logos/espn7.jpg',
-    'GolPeru': 'attached_assets/logos/golperu.jpg',
-    'Azteca 7': 'attached_assets/logos/azteca-7.jpg',
-    'Canal 5': 'attached_assets/logos/canal-5.jpg',
-    'TV Pública': 'attached_assets/logos/tvp.jpg',
-    'Win Sports Plus': 'attached_assets/logos/win-sports-plus.jpg'
+const CAT_META = {
+    'Sports':               { label: 'Deportes',          icon: '🏆' },
+    'News + Opinion':       { label: 'Noticias',           icon: '📰' },
+    'Entertainment':        { label: 'Entretenimiento',    icon: '⭐' },
+    'Movies':               { label: 'Películas',          icon: '🎬' },
+    'Comedy':               { label: 'Comedia',            icon: '😂' },
+    'En Español':           { label: 'En Español',         icon: '🌎' },
+    'Kids':                 { label: 'Infantil',           icon: '👶' },
+    'Anime':                { label: 'Anime',              icon: '⛩️'  },
+    'Drama':                { label: 'Drama',              icon: '🎭' },
+    'Music Videos':         { label: 'Música',             icon: '🎵' },
+    'History + Science':    { label: 'Historia y Ciencia', icon: '🔬' },
+    'Reality':              { label: 'Reality',            icon: '📷' },
+    'Classic TV':           { label: 'TV Clásica',         icon: '📺' },
+    'Animals + Nature':     { label: 'Naturaleza',         icon: '🦁' },
+    'True Crime':           { label: 'Crimen Real',        icon: '🔍' },
+    'Sci-Fi':               { label: 'Sci-Fi',             icon: '🚀' },
+    'Home + Food':          { label: 'Hogar y Comida',     icon: '🍳' },
+    'Local News':           { label: 'Noticias Locales',   icon: '📍' },
+    'Westerns':             { label: 'Westerns',           icon: '🤠' },
+    'Daytime + Game Shows': { label: 'Programas',          icon: '🎮' },
+    'Competition Reality':  { label: 'Competencias',       icon: '🏅' },
 };
+
+const CARD_COLORS = ['#8B2FC9','#2563eb','#059669','#dc2626','#d97706','#7c3aed','#0891b2','#16a34a'];
+let allChannels = [];
+let plutoChannels = [];
+let hlsInstance = null;
+let heroChannels = [];
+let heroIndex = 0;
+let heroTimer = null;
+
+// ---- INIT ----
+document.addEventListener('DOMContentLoaded', () => {
+    loadChannels();
+    setupSearch();
+    document.getElementById('ucVideo').addEventListener('error', () => {
+        showPlayerError('No se pudo cargar la señal. Intenta otro canal.');
+    });
+});
 
 async function loadChannels() {
     try {
-        const response1 = await fetch('attached_assets/ultracanales (1)_1760216153008.json');
-        channelsData = await response1.json();
-        console.log('✅ Canales cargados:', channelsData.categories.length, 'categorías');
-        renderChannels();
-    } catch (error) {
-        console.error('Error loading channels:', error);
-        document.getElementById('channels-list').innerHTML = 
-            '<p style="text-align: center; color: #999;">Error al cargar los canales. Por favor, recarga la página.</p>';
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        allChannels = data.canales || [];
+        plutoChannels = allChannels.filter(c => c.fuente === 'Pluto TV');
+        buildHero();
+        buildRows();
+        document.getElementById('loadingState').style.display = 'none';
+    } catch (e) {
+        document.getElementById('loadingState').innerHTML = '<p style="color:var(--text2)">Error al cargar los canales. Intenta de nuevo.</p>';
     }
 }
 
-function renderChannels() {
-    const container = document.getElementById('channels-list');
-    container.innerHTML = '';
-
-    const allChannels = [];
-    
-    channelsData.categories.forEach(category => {
-        category.channels.forEach(channel => {
-            allChannels.push({
-                ...channel,
-                categoryIcon: category.icon,
-                categoryName: category.name
-            });
-        });
-    });
-
-    allChannels.forEach((channel, index) => {
-        const channelItem = createChannelItem(channel, index);
-        container.appendChild(channelItem);
-    });
+// ---- HERO ----
+function buildHero() {
+    const featured = plutoChannels.filter(c => c.extra && c.extra.thumbnail);
+    if (!featured.length) return;
+    // Shuffle & pick 6
+    heroChannels = featured.sort(() => Math.random() - 0.5).slice(0, 6);
+    setHeroSlide(0);
+    buildHeroDots();
 }
 
-
-function createChannelItem(channel, index) {
-    const item = document.createElement('div');
-    item.className = 'channel-item';
-    
-    const startTime = generateRandomTime();
-    const endTime = generateRandomTime(true);
-    const progress = Math.floor(Math.random() * 100);
-    const remaining = generateRandomRemaining();
-    
-    const logo = channelLogos[channel.name];
-    const iconHtml = logo 
-        ? `<img src="${logo}" alt="${channel.name}" style="width: 100%; height: 100%; object-fit: contain;">`
-        : channel.categoryIcon;
-    
-    item.innerHTML = `
-        <div class="channel-icon">${iconHtml}</div>
-        <div class="channel-content">
-            <div class="channel-header">
-                <span class="channel-name">${channel.name}</span>
-                ${channel.live ? '<span class="live-badge">EN VIVO</span>' : ''}
-            </div>
-            <div class="channel-time">${startTime} - ${endTime}</div>
-            <div class="channel-progress">
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${progress}%"></div>
-                </div>
-                <span class="channel-remaining">${remaining} restantes</span>
+function setHeroSlide(idx) {
+    heroIndex = idx;
+    const ch = heroChannels[idx];
+    if (!ch) return;
+    const bg = document.getElementById('heroBg');
+    const content = document.getElementById('heroContent');
+    bg.style.backgroundImage = `url('${ch.extra.thumbnail}')`;
+    const cat = ch.categorias[0] || '';
+    const catMeta = CAT_META[cat] || { label: cat, icon: '📺' };
+    content.innerHTML = `
+        <div class="uc-hero-inner">
+            <div class="uc-hero-source">${catMeta.icon} ${catMeta.label} · EN VIVO</div>
+            ${ch.logo ? `<img src="${ch.logo}" alt="${ch.nombre}" class="uc-hero-logo" onerror="this.style.display='none'">` : ''}
+            <h1 class="uc-hero-title">${ch.nombre}</h1>
+            ${ch.extra && ch.extra.descripcion ? `<p class="uc-hero-desc">${ch.extra.descripcion.slice(0, 140)}...</p>` : ''}
+            <div class="uc-hero-actions">
+                <button class="uc-hero-play" onclick="playChannel(heroChannels[${idx}])">
+                    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Reproducir
+                </button>
+                <button class="uc-hero-more" onclick="window.location.href='./canales.html'">
+                    Todos los canales
+                </button>
             </div>
         </div>
     `;
-
-    item.addEventListener('click', () => openChannel(channel));
-    return item;
-}
-
-function generateRandomTime(isEnd = false) {
-    const hour = Math.floor(Math.random() * 24);
-    const minute = Math.floor(Math.random() * 60);
-    return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-}
-
-function generateRandomRemaining() {
-    const hours = Math.floor(Math.random() * 3);
-    const minutes = Math.floor(Math.random() * 60);
-    const seconds = Math.floor(Math.random() * 60);
-    
-    if (hours > 0) {
-        return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} restantes`;
-    }
-    return `${minutes}:${seconds.toString().padStart(2, '0')} restantes`;
-}
-
-function openChannel(channel) {
-    currentChannel = channel;
-    const playerSection = document.getElementById('player-section');
-    const channelName = document.getElementById('current-channel-name');
-    const player = document.getElementById('player');
-    const sourceButtons = document.getElementById('source-buttons');
-    const heroBanner = document.getElementById('hero-banner');
-
-    if (heroBanner) {
-        heroBanner.classList.add('hide');
-    }
-
-    channelName.textContent = channel.name;
-    playerSection.classList.remove('hidden');
-
-    sourceButtons.innerHTML = '';
-    
-    // Crear array de fuentes con el nuevo dominio al inicio
-    let sourcesArray = [...channel.sources];
-    
-    // Buscar si hay un link de rereyano.ru y extraer el número
-    const rereyanoLink = sourcesArray.find(s => s.includes('rereyano.ru/player/3/'));
-    if (rereyanoLink) {
-        const match = rereyanoLink.match(/\/player\/3\/(\d+)/);
-        if (match) {
-            const channelNumber = match[1];
-            const newLink = `https://ultragol-api-3.vercel.app/ultragol-l3ho?get=https://rereyano.ru/player/3/${channelNumber}`;
-            // Insertar el nuevo link al inicio
-            sourcesArray.unshift(newLink);
-        }
-    }
-    
-    const maxSources = Math.min(sourcesArray.length, 4);
-    sourcesArray.slice(0, maxSources).forEach((source, index) => {
-        const btn = document.createElement('button');
-        btn.className = 'source-btn';
-        if (index === 0) btn.classList.add('active');
-        
-        btn.textContent = `Fuente ${index + 1}`;
-        
-        btn.addEventListener('click', () => {
-            loadSource(source);
-            document.querySelectorAll('.source-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        });
-        sourceButtons.appendChild(btn);
+    // Update dots
+    document.querySelectorAll('.uc-hero-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === idx);
     });
-
-    loadSource(sourcesArray[0]);
-
-    playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Auto-rotate
+    clearTimeout(heroTimer);
+    heroTimer = setTimeout(() => setHeroSlide((heroIndex + 1) % heroChannels.length), 7000);
 }
 
-function loadSource(source) {
-    const player = document.getElementById('player');
-    player.src = source;
+function buildHeroDots() {
+    const dotsEl = document.createElement('div');
+    dotsEl.className = 'uc-hero-dots';
+    heroChannels.forEach((_, i) => {
+        const d = document.createElement('button');
+        d.className = 'uc-hero-dot' + (i === 0 ? ' active' : '');
+        d.onclick = () => setHeroSlide(i);
+        dotsEl.appendChild(d);
+    });
+    document.getElementById('heroSection').appendChild(dotsEl);
+}
+
+// ---- ROWS ----
+function buildRows() {
+    const main = document.getElementById('mainContent');
+    main.innerHTML = '';
+
+    const catOrder = ['Sports','News + Opinion','Entertainment','Movies','Comedy','En Español','Kids','Anime','Drama','Music Videos','History + Science','Classic TV','Animals + Nature','Reality','Sci-Fi','True Crime','Home + Food','Daytime + Game Shows'];
+
+    catOrder.forEach(cat => {
+        const channels = plutoChannels.filter(c => c.categorias.includes(cat));
+        if (!channels.length) return;
+        const meta = CAT_META[cat] || { label: cat, icon: '📺' };
+        const row = buildRow(meta.icon + ' ' + meta.label, channels, cat);
+        main.appendChild(row);
+    });
+}
+
+function buildRow(title, channels, catKey) {
+    const section = document.createElement('section');
+    section.className = 'uc-row';
+    section.innerHTML = `
+        <div class="uc-row-header">
+            <h2 class="uc-row-title">${title}</h2>
+            <a href="./canales.html?cat=${encodeURIComponent(catKey)}" class="uc-row-see-all">Ver todos →</a>
+        </div>
+        <div class="uc-cards-scroll">
+            <div class="uc-cards-track">
+                ${channels.map(buildCard).join('')}
+            </div>
+        </div>
+    `;
+    return section;
+}
+
+function buildCard(ch) {
+    const thumb = ch.extra && ch.extra.thumbnail ? ch.extra.thumbnail : null;
+    const cat = ch.categorias[0] || '';
+    const meta = CAT_META[cat] || { label: cat };
+    const initials = ch.nombre.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+    const colorIdx = ch.nombre.charCodeAt(0) % CARD_COLORS.length;
+    const id = `ch_${ch.id.replace(/[^a-z0-9]/gi, '_')}`;
+    return `
+        <div class="uc-card" onclick="playChannel(${JSON.stringify(ch).replace(/"/g, '&quot;')})" data-id="${id}">
+            <div class="uc-card-thumb">
+                ${thumb
+                    ? `<img src="${thumb}" alt="${ch.nombre}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'uc-card-placeholder\\'>${initials}</div>'">`
+                    : `<div class="uc-card-placeholder">${initials}</div>`
+                }
+                <div class="uc-card-live-pill">● EN VIVO</div>
+                <div class="uc-card-play-btn">
+                    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </div>
+            </div>
+            <div class="uc-card-info">
+                ${ch.logo
+                    ? `<img src="${ch.logo}" alt="${ch.nombre}" class="uc-card-logo" onerror="this.style.display='none'">`
+                    : `<div class="uc-card-logo-placeholder" style="background:${CARD_COLORS[colorIdx]}">${initials.slice(0,2)}</div>`
+                }
+                <div class="uc-card-text">
+                    <div class="uc-card-name">${ch.nombre}</div>
+                    <div class="uc-card-cat">${meta.label || cat}</div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ---- PLAYER ----
+function playChannel(ch) {
+    if (typeof ch === 'string') ch = JSON.parse(ch);
+    const overlay = document.getElementById('playerOverlay');
+    const video = document.getElementById('ucVideo');
+    const playerName = document.getElementById('playerName');
+    const playerLogo = document.getElementById('playerLogo');
+    const playerDesc = document.getElementById('playerDesc');
+    const playerSources = document.getElementById('playerSources');
+
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    playerName.textContent = ch.nombre;
+    playerDesc.textContent = (ch.extra && ch.extra.descripcion) ? ch.extra.descripcion : '';
+    if (ch.logo) {
+        playerLogo.src = ch.logo;
+        playerLogo.style.display = 'block';
+    } else {
+        playerLogo.style.display = 'none';
+    }
+
+    const streams = ch.streams || [];
+    playerSources.innerHTML = streams.map((s, i) =>
+        `<button class="uc-source-btn ${i === 0 ? 'active' : ''}" onclick="switchSource(this, '${s.url}')">Señal ${i + 1}</button>`
+    ).join('');
+
+    if (streams.length > 0) {
+        loadHLS(video, streams[0].url);
+    }
+}
+
+function switchSource(btn, url) {
+    document.querySelectorAll('.uc-source-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const video = document.getElementById('ucVideo');
+    loadHLS(video, url);
+}
+
+function loadHLS(video, url) {
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+    video.src = '';
+    const screen = video.parentNode;
+    const existingError = screen.querySelector('.uc-player-error');
+    if (existingError) existingError.remove();
+
+    if (Hls.isSupported()) {
+        hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
+        hlsInstance.loadSource(url);
+        hlsInstance.attachMedia(video);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => { video.play().catch(() => {}); });
+        hlsInstance.on(Hls.Events.ERROR, (_, data) => {
+            if (data.fatal) showPlayerError('No se pudo cargar la señal.');
+        });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
+        video.play().catch(() => {});
+    } else {
+        showPlayerError('Tu navegador no soporta HLS. Prueba con Chrome.');
+    }
+}
+
+function showPlayerError(msg) {
+    const screen = document.querySelector('.uc-player-screen');
+    const video = document.getElementById('ucVideo');
+    video.style.display = 'none';
+    let err = screen.querySelector('.uc-player-error');
+    if (!err) {
+        err = document.createElement('div');
+        err.className = 'uc-player-error';
+        screen.appendChild(err);
+    }
+    err.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${msg}`;
 }
 
 function closePlayer() {
-    const playerSection = document.getElementById('player-section');
-    const player = document.getElementById('player');
-    const heroBanner = document.getElementById('hero-banner');
-    
-    playerSection.classList.add('hidden');
-    player.src = '';
-    currentChannel = null;
-    
-    if (heroBanner) {
-        heroBanner.classList.remove('hide');
-    }
+    const overlay = document.getElementById('playerOverlay');
+    const video = document.getElementById('ucVideo');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    video.pause();
+    video.src = '';
+    video.style.display = 'block';
+    const err = document.querySelector('.uc-player-error');
+    if (err) err.remove();
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
 }
 
-function updateLikes() {
-    const likes = ['7.2K', '8.5K', '9.1K', '6.8K', '10.3K'];
-    document.getElementById('likes').textContent = likes[Math.floor(Math.random() * likes.length)];
-}
-
-function setupAuthUI(user) {
-    const loginBtn = document.getElementById('loginBtn');
-    
-    if (user) {
-        currentUser = user;
-        loginBtn.innerHTML = `
-            <img src="${user.photoURL}" alt="${user.displayName}" 
-                 style="width: 24px; height: 24px; border-radius: 50%;">
-            <span>${user.displayName?.split(' ')[0] || 'Usuario'}</span>
-        `;
-        loginBtn.onclick = handleSignOut;
-    } else {
-        currentUser = null;
-        loginBtn.innerHTML = `
-            <span class="login-icon">G</span>
-            <span>Iniciar Sesión</span>
-        `;
-        loginBtn.onclick = handleSignIn;
-    }
-}
-
-async function handleSignIn() {
-    try {
-        await signInWithGoogle();
-    } catch (error) {
-        console.error('Error al iniciar sesión:', error);
-        if (error.code === 'auth/unauthorized-domain') {
-            alert('Error: Este dominio no está autorizado. Por favor, contacta al administrador.');
-        } else {
-            alert('Error al iniciar sesión. Por favor, intenta de nuevo.');
-        }
-    }
-}
-
-async function handleSignOut() {
-    try {
-        await signOutUser();
-    } catch (error) {
-        console.error('Error al cerrar sesión:', error);
-        alert('Error al cerrar sesión. Por favor, intenta de nuevo.');
-    }
-}
-
-function searchChannels(query) {
-    const searchTerm = query.toLowerCase().trim();
-    
-    if (!searchTerm) {
-        renderChannels();
-        return;
-    }
-    
-    const channelsContainer = document.getElementById('channels-list');
-    channelsContainer.innerHTML = '';
-    
-    let allResults = [];
-    
-    if (channelsData) {
-        channelsData.categories.forEach(category => {
-            category.channels.forEach(channel => {
-                if (channel.name.toLowerCase().includes(searchTerm)) {
-                    allResults.push({
-                        ...channel,
-                        categoryIcon: category.icon,
-                        categoryName: category.name
-                    });
-                }
-            });
-        });
-    }
-    
-    if (allResults.length === 0) {
-        channelsContainer.innerHTML = '<p style="text-align: center; color: var(--text-gray); grid-column: 1/-1; padding: 2rem;">No se encontraron canales que coincidan con tu búsqueda.</p>';
-        return;
-    }
-    
-    allResults.forEach((channel, index) => {
-        const channelItem = createChannelItem(channel, index);
-        channelsContainer.appendChild(channelItem);
+// ---- SEARCH ----
+function setupSearch() {
+    const input = document.getElementById('searchInput');
+    let timer;
+    input.addEventListener('input', () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => doSearch(input.value.trim()), 280);
     });
+    input.addEventListener('keydown', e => { if (e.key === 'Escape') { input.value = ''; doSearch(''); } });
 }
 
-// Función para obtener parámetros de la URL
-function getUrlParameter(name) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(name);
+function doSearch(q) {
+    const main = document.getElementById('mainContent');
+    if (!q) { buildRows(); return; }
+    const lq = q.toLowerCase();
+    const results = allChannels.filter(c => c.nombre.toLowerCase().includes(lq) && c.streams.length > 0).slice(0, 60);
+    main.innerHTML = `
+        <div class="uc-search-results">
+            <div class="uc-row-header">
+                <h2 class="uc-row-title">🔍 Resultados para "${q}" <span style="font-size:14px;font-weight:400;color:var(--text2)">(${results.length} canales)</span></h2>
+            </div>
+            <div class="uc-search-grid">
+                ${results.map(buildCard).join('')}
+            </div>
+        </div>
+    `;
 }
 
-// Función para buscar y abrir canal por número
-function openChannelByNumber(channelNumber) {
-    if (!channelsData) {
-        console.error('Datos de canales no cargados');
-        return;
-    }
-    
-    // Buscar el canal que tenga rereyano.ru/player/3/{channelNumber} en sus fuentes
-    let targetChannel = null;
-    const searchUrl = `https://rereyano.ru/player/3/${channelNumber}`;
-    
-    for (const category of channelsData.categories) {
-        for (const channel of category.channels) {
-            // Buscar si alguna fuente del canal contiene la URL con el número específico
-            const hasMatchingSource = channel.sources && channel.sources.some(source => 
-                source.includes(`player/3/${channelNumber}`)
-            );
-            
-            if (hasMatchingSource) {
-                targetChannel = {
-                    ...channel,
-                    categoryIcon: category.icon,
-                    categoryName: category.name
-                };
-                break;
-            }
-        }
-        if (targetChannel) break;
-    }
-    
-    if (targetChannel) {
-        console.log(`✅ Abriendo Canal ${channelNumber}:`, targetChannel.name);
-        setTimeout(() => openChannel(targetChannel), 500);
-    } else {
-        console.warn(`⚠️ Canal ${channelNumber} no encontrado en el JSON. Abriendo directamente...`);
-        // Si no se encuentra el canal en el JSON, crear uno temporal con la URL de rereyano
-        const tempChannel = {
-            id: `canal-${channelNumber}`,
-            name: `Canal ${channelNumber}`,
-            sources: [searchUrl],
-            live: true,
-            categoryIcon: '📺',
-            categoryName: 'Canal Directo'
-        };
-        setTimeout(() => openChannel(tempChannel), 500);
-    }
-}
-
-onAuthStateChanged(auth, (user) => {
-    setupAuthUI(user);
+// ---- KEYBOARD ----
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closePlayer();
 });
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadChannels();
-    setInterval(updateLikes, 5000);
-    
-    // Detectar si hay un parámetro de canal o match en la URL
-    const canalParam = getUrlParameter('canal');
-    const matchParam = getUrlParameter('match');
-    
-    if (canalParam) {
-        // Esperar a que los canales se carguen antes de abrir el canal específico
-        setTimeout(() => {
-            openChannelByNumber(canalParam);
-        }, 1000);
-    } else if (matchParam) {
-        // Esperar a que los canales se carguen antes de abrir el partido específico
-        setTimeout(() => {
-            openChannelByNumber(matchParam);
-        }, 1000);
-    }
-    
-    const searchInput = document.getElementById('searchInput');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            searchChannels(e.target.value);
-        });
-        
-        const searchBtn = document.querySelector('.search-icon-btn');
-        if (searchBtn) {
-            searchBtn.addEventListener('click', () => {
-                searchChannels(searchInput.value);
-            });
-        }
-    }
-});
-
-window.closePlayer = closePlayer;

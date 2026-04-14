@@ -3,178 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ULTRACANALES — Televisión Deportiva en Vivo</title>
-    <meta name="theme-color" content="#ff8c00">
+    <title>ULTRACANALES — Televisión en Vivo</title>
+    <meta name="theme-color" content="#0a0a0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <link href="./style.css?v=20260325" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css?v=20260414">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3612607805789879" crossorigin="anonymous"></script>
 </head>
 <body>
 
-    <!-- LIVE TICKER -->
-    <div class="live-ticker">
-        <div class="ticker-badge">
-            <span class="ticker-dot"></span>
-            EN VIVO
+<!-- HEADER -->
+<header class="uc-header">
+    <div class="uc-header-inner">
+        <div class="uc-header-left">
+            <a href="/" class="uc-logo-link">
+                <img src="./attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="uc-logo-img">
+            </a>
+            <nav class="uc-nav">
+                <a href="./index.html" class="uc-nav-item active">Inicio</a>
+                <a href="./canales.html" class="uc-nav-item">Todos los Canales</a>
+            </nav>
         </div>
-        <div class="ticker-track">
-            <div class="ticker-content">
-                ⚽ Liga MX — Jornada en progreso &nbsp;·&nbsp; 🏆 Premier League — En vivo &nbsp;·&nbsp; 🎯 ESPN — Transmisión activa &nbsp;·&nbsp; 📺 Fox Sports HD — En aire &nbsp;·&nbsp; ⚡ TUDN — Cobertura en vivo &nbsp;·&nbsp; 🔴 TNT Sports — En directo &nbsp;·&nbsp; ⚽ Liga MX — Jornada en progreso &nbsp;·&nbsp; 🏆 Premier League — En vivo &nbsp;·&nbsp; 🎯 ESPN — Transmisión activa &nbsp;·&nbsp; 📺 Fox Sports HD — En aire &nbsp;·&nbsp;
-            </div>
-        </div>
-    </div>
-
-    <!-- HEADER -->
-    <header class="header">
-        <div class="header-inner">
-            <div class="header-left">
-                <a href="/" class="brand">
-                    <img src="./attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="brand-logo">
-                </a>
-                <nav class="header-nav">
-                    <a href="/" class="nav-link active">Inicio</a>
-                    <a href="./canales.html" class="nav-link">Todos los Canales</a>
-                </nav>
-            </div>
-
-            <div class="header-center">
-                <div class="search-wrap">
-                    <svg class="search-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar canal, deporte, liga...">
-                </div>
-            </div>
-
-            <div class="header-right">
-                <div class="live-count">
-                    <span class="live-dot-sm"></span>
-                    <span id="liveCounter">Canales en vivo</span>
-                </div>
-                <div class="online-counter" id="userCount">
-                    <span class="online-dot-mini"></span>
-                    <span id="onlineCountText">...</span>
-                </div>
-                <button class="login-btn" id="loginBtn">
-                    <span class="login-avatar">G</span>
-                    <span class="login-text">Iniciar Sesión</span>
-                </button>
+        <div class="uc-header-center">
+            <div class="uc-search-wrap">
+                <svg class="uc-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="searchInput" class="uc-search-input" placeholder="Buscar canal...">
             </div>
         </div>
-    </header>
-
-    <!-- HERO BANNER -->
-    <div id="hero-banner" class="hero-banner">
-        <div class="hero-overlay"></div>
-        <img src="./attached_assets/1760230812607~2_1760232142546.jpg" alt="El Fútbol Respira Aquí" class="hero-banner-image">
-        <div class="hero-content">
-            <div class="hero-badge-pill">
-                <span class="hero-live-dot"></span>
-                TRANSMISIÓN EN VIVO
-            </div>
-            <h1 class="hero-title">El Fútbol<br>Respira Aquí</h1>
-            <p class="hero-sub">Todos los canales deportivos. Sin interrupciones.</p>
+        <div class="uc-header-right">
+            <span class="uc-live-badge"><span class="uc-live-dot"></span>EN VIVO</span>
+            <span class="uc-online-counter" id="onlineCountText">...</span>
         </div>
     </div>
+</header>
 
-    <!-- PLAYER SECTION -->
-    <div id="player-section" class="player-section hidden">
-        <div class="player-stage">
-            <div class="player-screen">
-                <button class="close-player" onclick="closePlayer()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                </button>
-                <div class="player-wrapper">
-                    <iframe id="player" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-                </div>
-            </div>
-            <div class="player-sidebar">
-                <div class="now-playing-label">REPRODUCIENDO</div>
-                <h2 id="current-channel-name" class="now-channel-name">Canal</h2>
-                <div class="now-live-badge">
-                    <span class="nlb-dot"></span>
-                    EN VIVO
-                </div>
-                <div class="player-actions">
-                    <button class="action-btn share-action">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                        Compartir
-                    </button>
-                    <button class="action-btn like-action">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                        <span id="likes">7.2K</span>
-                    </button>
-                </div>
-                <div class="source-label">SEÑALES DISPONIBLES</div>
-                <div id="source-buttons" class="source-buttons"></div>
-            </div>
+<!-- HERO -->
+<section class="uc-hero" id="heroSection">
+    <div class="uc-hero-bg" id="heroBg"></div>
+    <div class="uc-hero-gradient"></div>
+    <div class="uc-hero-content" id="heroContent">
+        <div class="uc-hero-loader">
+            <div class="uc-spinner"></div>
         </div>
     </div>
+</section>
 
-    <!-- MAIN GUIDE -->
-    <main class="main-content">
-        <!-- Network filter bar -->
-        <div class="guide-header">
-            <div class="guide-title-area">
-                <h2 class="guide-title">Guía de Canales</h2>
-                <div class="guide-live-pill">
-                    <span class="glp-dot"></span>
-                    <span id="livePillCount">EN VIVO</span>
+<!-- PLAYER OVERLAY -->
+<div class="uc-player-overlay" id="playerOverlay">
+    <div class="uc-player-backdrop" onclick="closePlayer()"></div>
+    <div class="uc-player-modal">
+        <button class="uc-player-close" onclick="closePlayer()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="uc-player-screen">
+            <video id="ucVideo" controls autoplay playsinline></video>
+        </div>
+        <div class="uc-player-info">
+            <div class="uc-player-channel">
+                <img id="playerLogo" src="" alt="" class="uc-player-logo" onerror="this.style.display='none'">
+                <div>
+                    <div class="uc-player-name" id="playerName"></div>
+                    <span class="uc-live-pill"><span class="uc-live-dot"></span>EN VIVO</span>
                 </div>
             </div>
-            <div class="filter-tabs">
-                <button class="filter-tab active">Todos</button>
-                <a href="./canales.html" class="filter-tab mas-btn">Ver todos los canales →</a>
-                <button class="filter-tab">TNT Sports</button>
-            </div>
+            <p class="uc-player-desc" id="playerDesc"></p>
+            <div class="uc-player-sources" id="playerSources"></div>
         </div>
+    </div>
+</div>
 
-        <div class="channels-section">
-            <div id="channels-list" class="channels-list"></div>
+<!-- CHANNEL ROWS -->
+<main class="uc-main" id="mainContent">
+    <div class="uc-loading-state" id="loadingState">
+        <div class="uc-spinner"></div>
+        <p>Cargando canales...</p>
+    </div>
+</main>
+
+<!-- FOOTER -->
+<footer class="uc-footer">
+    <div class="uc-footer-inner">
+        <img src="./attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="uc-footer-logo">
+        <p class="uc-footer-copy">© 2025 ULTRACANALES · L3HO Interactive · Todos los derechos reservados</p>
+        <div class="uc-footer-links">
+            <a href="./index.html">Inicio</a>
+            <span>·</span>
+            <a href="./canales.html">Todos los Canales</a>
         </div>
-    </main>
+    </div>
+</footer>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="footer-inner">
-            <img src="./attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="footer-logo">
-            <p class="footer-copy">&copy; 2025 ULTRACANALES · L3HO Interactive · Todos los derechos reservados</p>
-        </div>
-    </footer>
-
-    <script type="module" src="./firebase-config.js?v=20260325"></script>
-    <script type="module" src="./script.js?v=20260325"></script>
-    <script type="module">
-        import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue, set, onDisconnect, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAneyRjnZzvhIFLzykATmW4ShN3IVuf5E0",
-            authDomain: "ligamx-daf3d.firebaseapp.com",
-            projectId: "ligamx-daf3d",
-            storageBucket: "ligamx-daf3d.appspot.com",
-            messagingSenderId: "437421248316",
-            appId: "1:437421248316:web:38e9f436a57389d2c49839",
-            databaseURL: "https://ligamx-daf3d-default-rtdb.firebaseio.com/"
-        };
-
-        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
-        const db = getDatabase(app);
-        const counterEl = document.getElementById('onlineCountText');
-
-        const connectedRef = ref(db, '.info/connected');
-        onValue(connectedRef, (snap) => {
-            if (snap.val() === true) {
-                const myRef = push(ref(db, 'online_users'));
-                set(myRef, { ts: serverTimestamp() });
-                onDisconnect(myRef).remove();
-            }
-        });
-
-        onValue(ref(db, 'online_users'), (snapshot) => {
-            const count = snapshot.size || 0;
-            if (counterEl) counterEl.textContent = `${count.toLocaleString()} ONLINE`;
-        });
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="./script.js?v=20260414"></script>
+<script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue, set, onDisconnect, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    const firebaseConfig = {
+        apiKey: "AIzaSyAneyRjnZzvhIFLzykATmW4ShN3IVuf5E0",
+        authDomain: "ligamx-daf3d.firebaseapp.com",
+        projectId: "ligamx-daf3d",
+        storageBucket: "ligamx-daf3d.appspot.com",
+        messagingSenderId: "437421248316",
+        appId: "1:437421248316:web:38e9f436a57389d2c49839",
+        databaseURL: "https://ligamx-daf3d-default-rtdb.firebaseio.com/"
+    };
+    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+    const db = getDatabase(app);
+    const el = document.getElementById('onlineCountText');
+    const connectedRef = ref(db, '.info/connected');
+    onValue(connectedRef, snap => {
+        if (snap.val() === true) {
+            const myRef = push(ref(db, 'online_users'));
+            set(myRef, { ts: serverTimestamp() });
+            onDisconnect(myRef).remove();
+        }
+    });
+    onValue(ref(db, 'online_users'), snap => {
+        const count = snap.size || 0;
+        if (el) el.textContent = `${count.toLocaleString()} online`;
+    });
+</script>
 </body>
 </html>

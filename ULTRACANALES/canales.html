@@ -3,171 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ULTRACANALES — Más de 280 canales deportivos en vivo">
-    <meta name="theme-color" content="#ff8c00">
     <title>ULTRACANALES — Todos los Canales</title>
-    <meta property="og:title" content="ULTRACANALES — Canales Deportivos en Vivo">
-    <meta property="og:description" content="Mira ESPN, Fox Sports, DAZN y más de 280 canales en vivo 🔥">
-    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#0a0a0b">
+    <meta name="description" content="Más de 8,000 canales en vivo — deportes, noticias, entretenimiento y más">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <link href="./canales-style.css?v=20260325" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./canales-style.css?v=20260414">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3612607805789879" crossorigin="anonymous"></script>
 </head>
 <body>
 
-    <!-- HEADER -->
-    <header class="header">
-        <div class="header-container">
-            <div class="header-left">
-                <a href="./index.html" class="logo-link">
-                    <img src="./attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="logo">
-                    <span class="logo-text">ULTRACANALES</span>
-                </a>
-                <nav class="nav-tabs">
-                    <button class="nav-tab active" data-tab="live">EN VIVO</button>
-                    <button class="nav-tab" data-tab="ondemand">A DEMANDA</button>
-                    <button class="nav-tab" data-tab="schedule">HORARIO</button>
-                    <button class="nav-tab" data-tab="featured">DESTACADOS</button>
-                </nav>
-            </div>
-            <div class="header-right">
-                <div class="search-container">
-                    <svg class="search-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar canal...">
-                </div>
-                <button class="login-btn" id="loginBtn">Iniciar Sesión</button>
-            </div>
-        </div>
-    </header>
-
-    <!-- CINEMATIC HERO -->
-    <section class="hero-section">
-        <div class="hero-bg-grid"></div>
-        <div class="hero-orb hero-orb-1"></div>
-        <div class="hero-orb hero-orb-2"></div>
-        <div class="hero-inner">
-            <div class="hero-eyebrow">
-                <span class="eyebrow-dot"></span>
-                PLATAFORMA DE STREAMING DEPORTIVO
-            </div>
-            <h1 class="hero-title">Todos los<br><span class="hero-title-accent">Canales.</span><br>Todo el Deporte.</h1>
-            <p class="hero-desc">Accede a más de 280 canales deportivos internacionales en tiempo real.</p>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <span class="stat-num" id="totalChannels">280+</span>
-                    <span class="stat-lbl">Canales</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="hero-stat">
-                    <span class="stat-num live-stat">EN VIVO</span>
-                    <span class="stat-lbl">Ahora mismo</span>
-                </div>
-                <div class="stat-divider"></div>
-                <div class="hero-stat">
-                    <span class="stat-num">HD</span>
-                    <span class="stat-lbl">Alta definición</span>
-                </div>
-            </div>
-        </div>
-        <div class="hero-scroll-hint">
-            <div class="scroll-line"></div>
-        </div>
-    </section>
-
-    <!-- CATEGORY BAR -->
-    <section class="categories-section">
-        <div class="categories-container">
-            <button class="category-btn active" data-category="all">
-                <span class="cat-icon">📡</span> Todos
-            </button>
-            <button class="category-btn" data-category="mexico">
-                <span class="cat-icon">🇲🇽</span> México
-            </button>
-            <button class="category-btn" data-category="fox">
-                <span class="cat-icon">🦊</span> Fox Sports
-            </button>
-            <button class="category-btn" data-category="espn">
-                <span class="cat-icon">🎯</span> ESPN
-            </button>
-            <button class="category-btn" data-category="dazn">
-                <span class="cat-icon">🏁</span> DAZN
-            </button>
-            <button class="category-btn" data-category="sudamerica">
-                <span class="cat-icon">🌎</span> Sudamérica
-            </button>
-            <button class="category-btn" data-category="entretenimiento">
-                <span class="cat-icon">🎬</span> Entretenimiento
-            </button>
-            <button class="category-btn" data-category="noticias">
-                <span class="cat-icon">📰</span> Noticias
-            </button>
-            <button class="category-btn" data-category="otros">
-                <span class="cat-icon">📺</span> Otros
-            </button>
-        </div>
-    </section>
-
-    <!-- PLAYER -->
-    <section id="player-section" class="player-section hidden">
-        <div class="player-container">
-            <button class="close-player" onclick="closePlayer()">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
-            </button>
-            <div class="player-wrapper">
-                <iframe id="player" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
-            </div>
-            <div class="player-info">
-                <div class="player-header">
-                    <div class="player-channel-info">
-                        <h2 id="current-channel-name">Canal</h2>
-                        <span class="channel-badge">
-                            <span class="cb-dot"></span>
-                            En Vivo
-                        </span>
-                    </div>
-                    <div class="player-actions">
-                        <button class="action-btn share-btn">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                            Compartir
-                        </button>
-                        <button class="action-btn like-btn">
-                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                            <span class="like-count">0</span>
-                        </button>
-                    </div>
-                </div>
-                <div id="source-buttons" class="source-buttons"></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CHANNELS GRID -->
-    <main class="main-content">
-        <div class="grid-header">
-            <div class="grid-title-row">
-                <h2 class="section-title">Canales Disponibles</h2>
-                <div class="grid-count-badge" id="channel-count">Cargando...</div>
-            </div>
-        </div>
-        <div id="all-channels-grid" class="channels-grid"></div>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="footer">
-        <div class="footer-content">
-            <img src="./attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="footer-logo">
-            <p class="footer-copy">&copy; 2025 ULTRACANALES · L3HO Interactive · Todos los derechos reservados</p>
-            <div class="footer-links">
+<!-- HEADER -->
+<header class="cn-header">
+    <div class="cn-header-inner">
+        <div class="cn-header-left">
+            <a href="./index.html" class="cn-logo-link">
+                <img src="./attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="cn-logo-img">
+            </a>
+            <div class="cn-breadcrumb">
                 <a href="./index.html">Inicio</a>
-                <span>·</span>
-                <a href="#">Contacto</a>
+                <span>›</span>
+                <span>Todos los Canales</span>
             </div>
         </div>
-    </footer>
+        <div class="cn-header-center">
+            <div class="cn-search-wrap">
+                <svg class="cn-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                <input type="text" id="searchInput" class="cn-search-input" placeholder="Buscar entre 8,000+ canales...">
+                <button class="cn-search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+            </div>
+        </div>
+        <div class="cn-header-right">
+            <span class="cn-channel-count" id="channelCount">Cargando...</span>
+        </div>
+    </div>
+</header>
 
-    <script type="module" src="./firebase-config.js?v=20260325"></script>
-    <script type="module" src="./canales-script.js?v=20260325"></script>
+<!-- PLAYER OVERLAY -->
+<div class="cn-player-overlay" id="playerOverlay">
+    <div class="cn-player-backdrop" onclick="closePlayer()"></div>
+    <div class="cn-player-modal">
+        <button class="cn-player-close" onclick="closePlayer()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+        <div class="cn-player-screen">
+            <video id="cnVideo" controls autoplay playsinline></video>
+        </div>
+        <div class="cn-player-info">
+            <div class="cn-player-channel">
+                <img id="playerLogo" src="" alt="" class="cn-player-logo" onerror="this.style.display='none'">
+                <div class="cn-player-meta">
+                    <div class="cn-player-name" id="playerName"></div>
+                    <div class="cn-player-tags" id="playerTags"></div>
+                </div>
+                <span class="cn-live-pill"><span class="cn-live-dot"></span>EN VIVO</span>
+            </div>
+            <p class="cn-player-desc" id="playerDesc"></p>
+            <div class="cn-player-sources" id="playerSources"></div>
+        </div>
+    </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="cn-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="cn-sidebar" id="sidebar">
+        <div class="cn-sidebar-title">Categorías</div>
+        <div class="cn-cat-list" id="catList">
+            <button class="cn-cat-btn active" data-cat="all" onclick="filterCat('all',this)">
+                <span class="cn-cat-icon">📡</span>
+                <span class="cn-cat-label">Todos</span>
+                <span class="cn-cat-count" id="count-all">—</span>
+            </button>
+        </div>
+        <!-- Mobile toggle -->
+        <button class="cn-sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            Categorías
+        </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="cn-main">
+        <!-- Source tabs -->
+        <div class="cn-source-tabs">
+            <button class="cn-src-tab active" data-src="all" onclick="filterSource('all',this)">📡 Todos</button>
+            <button class="cn-src-tab" data-src="Pluto TV" onclick="filterSource('Pluto TV',this)">🌙 Pluto TV</button>
+            <button class="cn-src-tab" data-src="IPTV-org" onclick="filterSource('IPTV-org',this)">📺 IPTV Global</button>
+        </div>
+
+        <!-- Grid header -->
+        <div class="cn-grid-header">
+            <div class="cn-grid-title" id="gridTitle">Todos los Canales</div>
+            <div class="cn-grid-info" id="gridInfo"></div>
+        </div>
+
+        <!-- Channel grid -->
+        <div class="cn-grid" id="channelGrid"></div>
+
+        <!-- Loading state -->
+        <div class="cn-loading" id="loadingState">
+            <div class="cn-spinner"></div>
+            <span>Cargando canales...</span>
+        </div>
+
+        <!-- Load more -->
+        <div class="cn-load-more-wrap" id="loadMoreWrap" style="display:none">
+            <button class="cn-load-more" onclick="loadMore()">
+                Cargar más canales
+            </button>
+        </div>
+    </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="cn-footer">
+    <div class="cn-footer-inner">
+        <img src="./attached_assets/297938-removebg-preview_1760222866015.png" alt="ULTRACANALES" class="cn-footer-logo">
+        <p class="cn-footer-copy">© 2025 ULTRACANALES · L3HO Interactive · Todos los derechos reservados</p>
+        <div class="cn-footer-links">
+            <a href="./index.html">Inicio</a>
+            <span>·</span>
+            <a href="#">Contacto</a>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="./canales-script.js?v=20260414"></script>
 </body>
 </html>

@@ -1,393 +1,357 @@
-import { auth, signInWithGoogle, signOutUser, onAuthStateChanged } from './firebase-config.js';
+/* ===================== ULTRACANALES — CANALES SCRIPT ===================== */
+const API_URL = 'https://ultragol-api-3.vercel.app/canales';
 
-let moreChannelsData = null;
-let currentChannel = null;
-let currentUser = null;
+const CAT_META = {
+    'Sports':               { label: 'Deportes',          icon: '🏆' },
+    'News + Opinion':       { label: 'Noticias',           icon: '📰' },
+    'Entertainment':        { label: 'Entretenimiento',    icon: '⭐' },
+    'Movies':               { label: 'Películas',          icon: '🎬' },
+    'Comedy':               { label: 'Comedia',            icon: '😂' },
+    'En Español':           { label: 'En Español',         icon: '🌎' },
+    'Kids':                 { label: 'Infantil',           icon: '👶' },
+    'Anime':                { label: 'Anime',              icon: '⛩️'  },
+    'Drama':                { label: 'Drama',              icon: '🎭' },
+    'Music Videos':         { label: 'Música',             icon: '🎵' },
+    'History + Science':    { label: 'Historia y Ciencia', icon: '🔬' },
+    'Reality':              { label: 'Reality',            icon: '📷' },
+    'Classic TV':           { label: 'TV Clásica',         icon: '📺' },
+    'Animals + Nature':     { label: 'Naturaleza',         icon: '🦁' },
+    'True Crime':           { label: 'Crimen Real',        icon: '🔍' },
+    'Sci-Fi':               { label: 'Sci-Fi',             icon: '🚀' },
+    'Home + Food':          { label: 'Hogar y Comida',     icon: '🍳' },
+    'Local News':           { label: 'Noticias Locales',   icon: '📍' },
+    'Westerns':             { label: 'Westerns',           icon: '🤠' },
+    'Daytime + Game Shows': { label: 'Programas',          icon: '🎮' },
+    'Competition Reality':  { label: 'Competencias',       icon: '🏅' },
+    'April Ghouls':         { label: 'Terror',             icon: '👻' },
+    // IPTV
+    'sports':       { label: 'Deportes',       icon: '🏆' },
+    'news':         { label: 'Noticias',       icon: '📰' },
+    'entertainment':{ label: 'Entretenimiento',icon: '⭐' },
+    'movies':       { label: 'Películas',      icon: '🎬' },
+    'kids':         { label: 'Infantil',       icon: '👶' },
+    'music':        { label: 'Música',         icon: '🎵' },
+    'documentary':  { label: 'Documentales',   icon: '🎥' },
+    'comedy':       { label: 'Comedia',        icon: '😂' },
+    'general':      { label: 'General',        icon: '📡' },
+    'business':     { label: 'Negocios',       icon: '💼' },
+    'lifestyle':    { label: 'Estilo de Vida', icon: '✨' },
+    'auto':         { label: 'Autos',          icon: '🚗' },
+    'shop':         { label: 'Shopping',       icon: '🛒' },
+    'relax':        { label: 'Relax',          icon: '🌙' },
+    'culture':      { label: 'Cultura',        icon: '🎨' },
+    'family':       { label: 'Familia',        icon: '👨‍👩‍👧' },
+    'outdoor':      { label: 'Naturaleza',     icon: '🦁' },
+    'religious':    { label: 'Religión',       icon: '✝️'  },
+    'animation':    { label: 'Animación',      icon: '🎞️'  },
+    'weather':      { label: 'Clima',          icon: '🌤️'  },
+    'classic':      { label: 'Clásicos',       icon: '📺' },
+    'education':    { label: 'Educación',      icon: '📚' },
+    'travel':       { label: 'Viajes',         icon: '✈️'  },
+    'science':      { label: 'Ciencia',        icon: '🔬' },
+    'cooking':      { label: 'Cocina',         icon: '🍳' },
+    'public':       { label: 'Público',        icon: '🏛️'  },
+};
+
+const CARD_COLORS = ['#8B2FC9','#2563eb','#059669','#dc2626','#d97706','#7c3aed','#0891b2','#16a34a','#be185d','#b45309'];
+
 let allChannels = [];
-let currentCategory = 'all';
+let filteredChannels = [];
+let visibleCount = 60;
+const PAGE_SIZE = 60;
+let currentCat = 'all';
+let currentSrc = 'all';
+let searchQuery = '';
+let hlsInstance = null;
 
-const channelLogos = {
-    'TyC Sports HD': 'attached_assets/logos/tyc-sports.jpg',
-    'TyC Sports': 'attached_assets/logos/tyc-sports.jpg',
-    'TNT Sports HD': 'attached_assets/logos/tnt-sports.jpg',
-    'ESPN Premium HD': 'attached_assets/logos/espn-premium.jpg',
-    'ESPN Premium': 'attached_assets/logos/espn-premium.jpg',
-    'DSports HD': 'attached_assets/logos/dsports.jpg',
-    'DSports': 'attached_assets/logos/dsports.jpg',
-    'DSports 2': 'attached_assets/logos/dsports2.jpg',
-    'DirectTV Sports Plus': 'attached_assets/logos/dsports-plus.jpg',
-    'Las Estrellas': 'attached_assets/logos/las-estrellas.jpg',
-    'TUDN': 'attached_assets/logos/tudn.jpg',
-    'TUDN Vix Plus': 'attached_assets/logos/vix-tudn.jpg',
-    'Fox Sports': 'attached_assets/logos/fox-sports.jpg',
-    'Fox Sports México': 'attached_assets/logos/fox-sports.jpg',
-    'Fox Sports Premium': 'attached_assets/logos/fox-sports-premium-blue.jpg',
-    'Fox Sports 2': 'attached_assets/logos/fox-sports2.jpg',
-    'Fox Sports 2 México': 'attached_assets/logos/fox-sports2.jpg',
-    'Fox Sports 3': 'attached_assets/logos/fox-sports-3-pink.jpg',
-    'Fox Sports 3 México': 'attached_assets/logos/fox-sports-3-pink.jpg',
-    'DAZN La Liga': 'attached_assets/logos/dazn-laliga.jpg',
-    'DAZN F1': 'attached_assets/logos/dazn-f1.jpg',
-    'Movistar La Liga': 'attached_assets/logos/tv-movistar.jpg',
-    'Sky Sports La Liga': 'attached_assets/logos/sky-sports-laliga.jpg',
-    'ESPN': 'attached_assets/logos/espn.jpg',
-    'ESPN México': 'attached_assets/logos/espn-mx.jpg',
-    'ESPN 2 México': 'attached_assets/logos/espn2mx.jpg',
-    'ESPN 3': 'attached_assets/logos/espn3.jpg',
-    'ESPN 3 México': 'attached_assets/logos/espn-3mx.jpg',
-    'ESPN 4': 'attached_assets/logos/espn-4.jpg',
-    'ESPN 4 México': 'attached_assets/logos/espn-4mx.jpg',
-    'ESPN 5': 'attached_assets/logos/espn5.jpg',
-    'ESPN 5 México': 'attached_assets/logos/espn-5mx.jpg',
-    'ESPN 6': 'attached_assets/logos/espn6.jpg',
-    'ESPN 7': 'attached_assets/logos/espn7.jpg',
-    'GolPeru': 'attached_assets/logos/golperu.jpg',
-    'Azteca 7': 'attached_assets/logos/azteca-7.jpg',
-    'Canal 5': 'attached_assets/logos/canal-5.jpg',
-    'TV Pública': 'attached_assets/logos/tvp.jpg',
-    'Win Sports Plus': 'attached_assets/logos/win-sports-plus.jpg'
-};
+// ---- INIT ----
+document.addEventListener('DOMContentLoaded', () => {
+    loadChannels();
+    setupSearch();
 
-const categoryMapping = {
-    'mexico': ['Azteca 7', 'Canal 5', 'Las Estrellas', 'TUDN', 'TUDN Vix Plus'],
-    'fox': ['Fox Sports', 'Fox Sports México', 'Fox Sports 2', 'Fox Sports 2 México', 'Fox Sports 3', 'Fox Sports 3 México', 'Fox Sports Premium'],
-    'espn': ['ESPN', 'ESPN México', 'ESPN 2 México', 'ESPN 3', 'ESPN 3 México', 'ESPN 4', 'ESPN 4 México', 'ESPN 5', 'ESPN 5 México', 'ESPN 6', 'ESPN 7', 'ESPN Premium', 'ESPN Premium HD'],
-    'dazn': ['DAZN F1', 'DAZN La Liga'],
-    'sudamerica': ['TyC Sports', 'TyC Sports HD', 'TV Pública', 'GolPeru', 'Win Sports Plus']
-};
+    // Read URL params
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('cat')) {
+        currentCat = params.get('cat');
+    }
+
+    document.getElementById('cnVideo').addEventListener('error', () => {
+        showPlayerError('No se pudo cargar la señal.');
+    });
+});
 
 async function loadChannels() {
     try {
-        const response = await fetch('attached_assets/ultracanales (1)_1760216153008.json');
-        moreChannelsData = await response.json();
-        
-        allChannels = [];
-        moreChannelsData.categories.forEach(category => {
-            category.channels.forEach(channel => {
-                allChannels.push({
-                    ...channel,
-                    categoryIcon: category.icon,
-                    categoryName: category.name,
-                    categoryId: category.id
-                });
-            });
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        allChannels = (data.canales || []).filter(c => c.streams && c.streams.length > 0);
+        document.getElementById('channelCount').textContent = `${allChannels.length.toLocaleString()} canales`;
+        buildSidebar();
+        applyFilters();
+        document.getElementById('loadingState').style.display = 'none';
+    } catch (e) {
+        document.getElementById('loadingState').innerHTML = '<p style="color:var(--text2)">Error al cargar. Recarga la página.</p>';
+    }
+}
+
+// ---- SIDEBAR ----
+function buildSidebar() {
+    const catList = document.getElementById('catList');
+
+    // Collect all categories with counts
+    const catCounts = {};
+    allChannels.forEach(ch => {
+        (ch.categorias || []).forEach(cat => {
+            catCounts[cat] = (catCounts[cat] || 0) + 1;
         });
-        
-        renderChannels(allChannels);
-        updateChannelCount(allChannels.length);
-        checkDeepLink();
-    } catch (error) {
-        console.error('Error loading channels:', error);
-    }
-}
-
-function updateChannelCount(count) {
-    const countEl = document.getElementById('channel-count');
-    if (countEl) {
-        countEl.textContent = `${count} canales disponibles`;
-    }
-}
-
-function renderChannels(channels) {
-    const container = document.getElementById('all-channels-grid');
-    container.innerHTML = '';
-    
-    channels.forEach(channel => {
-        const card = createChannelCard(channel);
-        container.appendChild(card);
     });
-    
-    updateChannelCount(channels.length);
+
+    // Update "all" count
+    document.getElementById('count-all').textContent = allChannels.length.toLocaleString();
+
+    // Sort: put known categories first, then rest alphabetically
+    const knownOrder = ['Sports','News + Opinion','Entertainment','Movies','Comedy','En Español','Kids','Anime','Drama','Music Videos','History + Science','Classic TV','Animals + Nature','Reality','Sci-Fi','True Crime','Home + Food','Daytime + Game Shows','Competition Reality','Westerns','April Ghouls','sports','news','entertainment','movies','kids','music','documentary','comedy','general','lifestyle','auto','relax','culture','family','outdoor','cooking','travel','science','education','animation','weather','religious','classic','public','business','shop'];
+    const allCats = [...new Set([...knownOrder.filter(k => catCounts[k]), ...Object.keys(catCounts).sort()])];
+
+    allCats.forEach(cat => {
+        const meta = CAT_META[cat] || { label: cat, icon: '📡' };
+        const count = catCounts[cat] || 0;
+        const btn = document.createElement('button');
+        btn.className = 'cn-cat-btn' + (cat === currentCat ? ' active' : '');
+        btn.dataset.cat = cat;
+        btn.innerHTML = `<span class="cn-cat-icon">${meta.icon}</span><span class="cn-cat-label">${meta.label}</span><span class="cn-cat-count">${count.toLocaleString()}</span>`;
+        btn.onclick = () => filterCat(cat, btn);
+        catList.appendChild(btn);
+        document.getElementById(`count-all`); // keep "all" first
+    });
+
+    // Activate selected cat
+    if (currentCat !== 'all') {
+        const btn = catList.querySelector(`[data-cat="${currentCat}"]`);
+        if (btn) btn.click();
+    }
 }
 
-function createChannelCard(channel) {
-    const card = document.createElement('div');
-    card.className = 'channel-card';
-    
-    let logo = channelLogos[channel.name];
-    if (!logo) {
-        const logoExtensions = ['.png', '.jpg', '.jpeg'];
-        for (const ext of logoExtensions) {
-            const potentialLogo = `attached_assets/logos/${channel.id}${ext}`;
-            logo = potentialLogo;
-            break;
-        }
+// ---- FILTERS ----
+function filterCat(cat, btn) {
+    currentCat = cat;
+    visibleCount = PAGE_SIZE;
+    document.querySelectorAll('.cn-cat-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    applyFilters();
+    // Close sidebar on mobile
+    document.getElementById('sidebar').classList.remove('open');
+}
+
+function filterSource(src, btn) {
+    currentSrc = src;
+    visibleCount = PAGE_SIZE;
+    document.querySelectorAll('.cn-src-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    applyFilters();
+}
+
+function applyFilters() {
+    let channels = allChannels;
+
+    // Source filter
+    if (currentSrc !== 'all') {
+        channels = channels.filter(c => c.fuente === currentSrc);
     }
-    
-    const imageContent = logo 
-        ? `<img src="${logo}" alt="${channel.name}" onerror="this.parentElement.innerHTML='<div style=\\'font-size: 2.5rem;\\'>${channel.categoryIcon}</div>'">`
-        : `<div style="font-size: 2.5rem;">${channel.categoryIcon}</div>`;
-    
-    card.innerHTML = `
-        <div class="channel-card-image">
-            ${imageContent}
-        </div>
-        <div class="channel-card-content">
-            <div>
-                <div class="channel-card-name">${channel.name}</div>
-                <div class="channel-card-category">${channel.categoryName}</div>
+    // Category filter
+    if (currentCat !== 'all') {
+        channels = channels.filter(c => (c.categorias || []).includes(currentCat));
+    }
+    // Search filter
+    if (searchQuery) {
+        const lq = searchQuery.toLowerCase();
+        channels = channels.filter(c =>
+            c.nombre.toLowerCase().includes(lq) ||
+            (c.pais || '').toLowerCase().includes(lq)
+        );
+    }
+
+    filteredChannels = channels;
+    renderGrid();
+    updateGridHeader();
+}
+
+function updateGridHeader() {
+    const catMeta = currentCat === 'all' ? { label: 'Todos los Canales', icon: '📡' } : (CAT_META[currentCat] || { label: currentCat, icon: '📺' });
+    let title = currentCat === 'all' ? 'Todos los Canales' : `${catMeta.icon} ${catMeta.label}`;
+    if (searchQuery) title = `🔍 Resultados para "${searchQuery}"`;
+    document.getElementById('gridTitle').textContent = title;
+    document.getElementById('gridInfo').textContent = `${filteredChannels.length.toLocaleString()} canales`;
+}
+
+// ---- GRID ---- 
+function renderGrid() {
+    const grid = document.getElementById('channelGrid');
+    const slice = filteredChannels.slice(0, visibleCount);
+    grid.innerHTML = slice.length === 0
+        ? '<div class="cn-no-results">No se encontraron canales.</div>'
+        : slice.map(buildCard).join('');
+    const loadWrap = document.getElementById('loadMoreWrap');
+    loadWrap.style.display = filteredChannels.length > visibleCount ? 'block' : 'none';
+}
+
+function buildCard(ch) {
+    const thumb = ch.extra && ch.extra.thumbnail ? ch.extra.thumbnail : null;
+    const cat = (ch.categorias || [])[0] || '';
+    const meta = CAT_META[cat] || { label: cat };
+    const initials = ch.nombre.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+    const colorIdx = ch.nombre.charCodeAt(0) % CARD_COLORS.length;
+    const chData = JSON.stringify(ch).replace(/"/g, '&quot;');
+    const isPluto = ch.fuente === 'Pluto TV';
+    return `
+        <div class="cn-card" onclick="playChannel('${chData}')">
+            <div class="cn-card-thumb">
+                ${thumb
+                    ? `<img src="${thumb}" alt="${ch.nombre}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'cn-card-placeholder\\'>${initials}</div>'">`
+                    : `<div class="cn-card-placeholder">${initials}</div>`
+                }
+                <div class="cn-card-overlay">
+                    <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </div>
+                <div class="cn-card-live">● EN VIVO</div>
+                ${isPluto ? '<div class="cn-card-source">Pluto TV</div>' : ''}
             </div>
-            <div class="channel-card-footer">
-                ${channel.live ? '<span class="channel-card-badge">EN VIVO</span>' : '<span></span>'}
-                <div class="channel-sources">${channel.sources.length} fuente${channel.sources.length > 1 ? 's' : ''}</div>
+            <div class="cn-card-info">
+                ${ch.logo
+                    ? `<img src="${ch.logo}" alt="${ch.nombre}" class="cn-card-logo" onerror="this.style.display='none'">`
+                    : `<div class="cn-card-logo-ph" style="background:${CARD_COLORS[colorIdx]}">${initials.slice(0,2)}</div>`
+                }
+                <div class="cn-card-text">
+                    <div class="cn-card-name">${ch.nombre}</div>
+                    <div class="cn-card-sub">${meta.label || cat || ch.pais || ''}</div>
+                </div>
             </div>
         </div>
     `;
-    
-    card.addEventListener('click', () => openChannel(channel));
-    return card;
 }
 
-function openChannel(channel) {
-    currentChannel = channel;
-    const playerSection = document.getElementById('player-section');
-    const channelName = document.getElementById('current-channel-name');
-    const player = document.getElementById('player');
-    const sourceButtons = document.getElementById('source-buttons');
+function loadMore() {
+    visibleCount += PAGE_SIZE;
+    renderGrid();
+}
 
-    channelName.textContent = channel.name;
-    playerSection.classList.remove('hidden');
+// ---- PLAYER ----
+function playChannel(chData) {
+    let ch;
+    try { ch = typeof chData === 'string' ? JSON.parse(chData.replace(/&quot;/g, '"')) : chData; }
+    catch (e) { return; }
 
-    sourceButtons.innerHTML = '';
-    
-    let sourcesArray = [...channel.sources];
-    
-    const rereyanoLink = sourcesArray.find(s => s.includes('rereyano.ru/player/3/'));
-    if (rereyanoLink) {
-        const match = rereyanoLink.match(/\/player\/3\/(\d+)/);
-        if (match) {
-            const channelNumber = match[1];
-            const newLink = `https://ultragol-api-3.vercel.app/ultragol-l3ho?get=https://rereyano.ru/player/3/${channelNumber}`;
-            sourcesArray.unshift(newLink);
-        }
-    }
-    
-    const maxSources = Math.min(sourcesArray.length, 4);
-    sourcesArray.slice(0, maxSources).forEach((source, index) => {
-        const btn = document.createElement('button');
-        btn.className = 'source-btn';
-        if (index === 0) btn.classList.add('active');
-        
-        btn.textContent = `Fuente ${index + 1}`;
-        
-        btn.addEventListener('click', () => {
-            loadSource(source);
-            document.querySelectorAll('.source-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+    const overlay = document.getElementById('playerOverlay');
+    const video = document.getElementById('cnVideo');
+
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    video.style.display = 'block';
+    const err = document.querySelector('.cn-player-error');
+    if (err) err.remove();
+
+    document.getElementById('playerName').textContent = ch.nombre;
+    document.getElementById('playerDesc').textContent = (ch.extra && ch.extra.descripcion) ? ch.extra.descripcion : '';
+
+    const logo = document.getElementById('playerLogo');
+    if (ch.logo) { logo.src = ch.logo; logo.style.display = 'block'; } else { logo.style.display = 'none'; }
+
+    // Tags
+    const tagsEl = document.getElementById('playerTags');
+    const tags = [];
+    if (ch.pais && ch.pais !== 'Internacional') tags.push(ch.bandera ? `${ch.bandera} ${ch.pais}` : ch.pais);
+    (ch.categorias || []).slice(0,2).forEach(cat => {
+        const m = CAT_META[cat]; if (m) tags.push(m.icon + ' ' + m.label);
+    });
+    if (ch.fuente) tags.push(ch.fuente);
+    tagsEl.innerHTML = tags.map(t => `<span class="cn-player-tag">${t}</span>`).join('');
+
+    // Sources
+    const streams = ch.streams || [];
+    document.getElementById('playerSources').innerHTML = streams.map((s, i) =>
+        `<button class="cn-source-btn ${i === 0 ? 'active' : ''}" onclick="switchSource(this, '${s.url}')">Señal ${i + 1}</button>`
+    ).join('');
+
+    if (streams.length > 0) loadHLS(video, streams[0].url);
+}
+
+function switchSource(btn, url) {
+    document.querySelectorAll('.cn-source-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadHLS(document.getElementById('cnVideo'), url);
+}
+
+function loadHLS(video, url) {
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+    video.src = '';
+    const screen = video.parentNode;
+    const existingError = screen.querySelector('.cn-player-error');
+    if (existingError) existingError.remove();
+
+    if (Hls.isSupported()) {
+        hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
+        hlsInstance.loadSource(url);
+        hlsInstance.attachMedia(video);
+        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => { video.play().catch(() => {}); });
+        hlsInstance.on(Hls.Events.ERROR, (_, data) => {
+            if (data.fatal) showPlayerError('Error al cargar la señal. Intenta otra.');
         });
-        sourceButtons.appendChild(btn);
-    });
-
-    updateMetaTags(channel);
-    loadSource(sourcesArray[0]);
-    playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = url;
+        video.play().catch(() => {});
+    } else {
+        showPlayerError('Tu navegador no soporta reproducción HLS.');
+    }
 }
 
-function updateMetaTags(channel) {
-    document.title = `${channel.name} - ULTRACANALES`;
-    
-    const metaTags = {
-        'og:title': `${channel.name} - ULTRACANALES`,
-        'og:description': `Mira ${channel.name} en vivo en ULTRACANALES 🔥 ${channel.categoryName}`,
-        'twitter:title': `${channel.name} - ULTRACANALES`,
-        'twitter:description': `Mira ${channel.name} en vivo en ULTRACANALES 🔥 ${channel.categoryName}`
-    };
-    
-    Object.entries(metaTags).forEach(([property, content]) => {
-        let meta = document.querySelector(`meta[property="${property}"]`);
-        if (!meta) {
-            meta = document.querySelector(`meta[name="${property}"]`);
-        }
-        if (meta) {
-            meta.setAttribute('content', content);
-        }
-    });
-}
-
-function loadSource(source) {
-    const player = document.getElementById('player');
-    player.src = source;
+function showPlayerError(msg) {
+    const screen = document.querySelector('.cn-player-screen');
+    const video = document.getElementById('cnVideo');
+    video.style.display = 'none';
+    let err = screen.querySelector('.cn-player-error');
+    if (!err) { err = document.createElement('div'); err.className = 'cn-player-error'; screen.appendChild(err); }
+    err.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${msg}`;
 }
 
 function closePlayer() {
-    const playerSection = document.getElementById('player-section');
-    const player = document.getElementById('player');
-    
-    playerSection.classList.add('hidden');
-    player.src = '';
-    currentChannel = null;
+    const overlay = document.getElementById('playerOverlay');
+    const video = document.getElementById('cnVideo');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+    video.pause(); video.src = '';
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+    const err = document.querySelector('.cn-player-error');
+    if (err) err.remove();
+    video.style.display = 'block';
 }
 
-function filterChannelsByCategory(category) {
-    currentCategory = category;
-    
-    if (category === 'all') {
-        renderChannels(allChannels);
-    } else if (categoryMapping[category]) {
-        const categoryChannels = categoryMapping[category];
-        const filtered = allChannels.filter(ch => 
-            categoryChannels.some(name => ch.name.includes(name) || name.includes(ch.name))
-        );
-        renderChannels(filtered);
-    } else {
-        const filtered = allChannels.filter(ch => ch.categoryId === category);
-        renderChannels(filtered);
-    }
-}
-
-function searchChannels(query) {
-    const searchTerm = query.toLowerCase().trim();
-    
-    if (!searchTerm) {
-        filterChannelsByCategory(currentCategory);
-        return;
-    }
-    
-    const filtered = allChannels.filter(ch => 
-        ch.name.toLowerCase().includes(searchTerm) ||
-        ch.categoryName.toLowerCase().includes(searchTerm)
-    );
-    
-    renderChannels(filtered);
-}
-
-function setupAuthUI(user) {
-    const loginBtn = document.getElementById('loginBtn');
-    
-    if (user) {
-        currentUser = user;
-        loginBtn.innerHTML = `
-            <img src="${user.photoURL}" alt="${user.displayName}" 
-                 style="width: 28px; height: 28px; border-radius: 50%; margin-right: 0.5rem;">
-            <span>${user.displayName?.split(' ')[0] || 'Usuario'}</span>
-        `;
-        loginBtn.onclick = handleSignOut;
-    } else {
-        currentUser = null;
-        loginBtn.innerHTML = `👤 Iniciar Sesión`;
-        loginBtn.onclick = handleSignIn;
-    }
-}
-
-async function handleSignIn() {
-    try {
-        await signInWithGoogle();
-    } catch (error) {
-        console.error('Error al iniciar sesión:', error);
-        if (error.code === 'auth/unauthorized-domain') {
-            alert('Error: Este dominio no está autorizado. Por favor, contacta al administrador.');
-        } else {
-            alert('Error al iniciar sesión. Por favor, intenta de nuevo.');
-        }
-    }
-}
-
-async function handleSignOut() {
-    try {
-        await signOutUser();
-    } catch (error) {
-        console.error('Error al cerrar sesión:', error);
-    }
-}
-
-async function shareChannel() {
-    if (!currentChannel) return;
-    
-    const shareUrl = `${window.location.origin}${window.location.pathname}?channel=${currentChannel.id}`;
-    const shareData = {
-        title: `${currentChannel.name} - ULTRACANALES`,
-        text: `Mira ${currentChannel.name} en vivo en ULTRACANALES 🔥`,
-        url: shareUrl
-    };
-    
-    try {
-        if (navigator.share) {
-            await navigator.share(shareData);
-        } else {
-            await navigator.clipboard.writeText(shareUrl);
-            showShareNotification('¡Link copiado al portapapeles! 📋');
-        }
-    } catch (error) {
-        if (error.name !== 'AbortError') {
-            try {
-                await navigator.clipboard.writeText(shareUrl);
-                showShareNotification('¡Link copiado al portapapeles! 📋');
-            } catch (clipboardError) {
-                showShareNotification('Error al compartir. Intenta de nuevo.');
-            }
-        }
-    }
-}
-
-function showShareNotification(message) {
-    const notification = document.createElement('div');
-    notification.className = 'share-notification';
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-    
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 300);
-    }, 2500);
-}
-
-function checkDeepLink() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const channelId = urlParams.get('channel');
-    
-    if (channelId && allChannels.length > 0) {
-        const channel = allChannels.find(ch => ch.id === channelId);
-        if (channel) {
-            setTimeout(() => {
-                openChannel(channel);
-            }, 500);
-        }
-    }
-}
-
-onAuthStateChanged(auth, (user) => {
-    setupAuthUI(user);
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadChannels();
-    
-    const categoryFilters = document.querySelectorAll('.category-btn');
-    categoryFilters.forEach(filter => {
-        filter.addEventListener('click', () => {
-            categoryFilters.forEach(f => f.classList.remove('active'));
-            filter.classList.add('active');
-            filterChannelsByCategory(filter.dataset.category);
-        });
+// ---- SEARCH ----
+function setupSearch() {
+    const input = document.getElementById('searchInput');
+    let timer;
+    input.addEventListener('input', () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            searchQuery = input.value.trim();
+            visibleCount = PAGE_SIZE;
+            applyFilters();
+        }, 280);
     });
-    
-    const navTabs = document.querySelectorAll('.nav-tab');
-    navTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            navTabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-        });
-    });
-    
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', (e) => {
-        searchChannels(e.target.value);
-    });
-    
-    const searchBtn = document.querySelector('.search-btn');
-    searchBtn.addEventListener('click', () => {
-        searchChannels(searchInput.value);
-    });
-    
-    const shareBtn = document.querySelector('.share-btn');
-    if (shareBtn) {
-        shareBtn.addEventListener('click', shareChannel);
-    }
-});
+    input.addEventListener('keydown', e => { if (e.key === 'Escape') clearSearch(); });
+}
 
-window.closePlayer = closePlayer;
-window.shareChannel = shareChannel;
+function clearSearch() {
+    const input = document.getElementById('searchInput');
+    input.value = '';
+    searchQuery = '';
+    visibleCount = PAGE_SIZE;
+    applyFilters();
+}
+
+// ---- SIDEBAR TOGGLE (mobile) ----
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ---- KEYBOARD ----
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePlayer(); });
