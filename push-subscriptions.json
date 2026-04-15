@@ -6,5 +6,13 @@
       "p256dh": "BI_ogLFfO9i_lrtc-i14oTgHVAceB5OFFF3qTjrFlOuyOSQgjxKnluGlRHSxJ3RCHplQW3F2yEiuFul-Oj2UQnA",
       "auth": "l2M3F8rq6HTuIE5CDH2q7w"
     }
+  },
+  "https://fcm.googleapis.com/fcm/send/fiQ0tM8KO1M:APA91bHa7eLrF_TG5Tu8Cq6ijt__5H1I-7o-y8WqAnJAsG3or_UMspDNja6VRiZQIBN3Wq2lcrR_5ztedQXWp7Kh1IzBKz_d1DEy5pkauvU3ITtidO1w6pl5isomuNSVeX-6_mcceMhC": {
+    "endpoint": "https://fcm.googleapis.com/fcm/send/fiQ0tM8KO1M:APA91bHa7eLrF_TG5Tu8Cq6ijt__5H1I-7o-y8WqAnJAsG3or_UMspDNja6VRiZQIBN3Wq2lcrR_5ztedQXWp7Kh1IzBKz_d1DEy5pkauvU3ITtidO1w6pl5isomuNSVeX-6_mcceMhC",
+    "expirationTime": null,
+    "keys": {
+      "p256dh": "BB5xQXV2JbQkVfLi5kfTv8SDSAN4O2n58j_XR6hNI0iC8vwlv8w02CDXNMoaRMs8e9BJBKkeF25D56_DE7PNmkU",
+      "auth": "67bxSPvhxm6GteUME2XkxQ"
+    }
   }
 }
