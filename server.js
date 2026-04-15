@@ -1300,6 +1300,17 @@ const _ucStaticOpts = {
 app.use('/ultracanales', express.static(path.join(__dirname, 'ULTRACANALES'), _ucStaticOpts));
 app.use('/ULTRACANALES', express.static(path.join(__dirname, 'ULTRACANALES'), _ucStaticOpts));
 
+// ultrax — exact copy of ULTRA (must be before /ultra to avoid prefix match)
+app.get('/ultrax', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ultrax', 'index.html'));
+});
+app.use('/ultrax', express.static(path.join(__dirname, 'ultrax'), {
+    index: false,
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+}));
+
 app.get('/ultra', (req, res) => {
     res.sendFile(path.join(__dirname, 'ULTRA', 'index.html'));
 });

@@ -1,0 +1,11 @@
+{
+  "transmisiones6": [
+    {
+      "id": 1,
+      "titulo": "Evento en Vivo",
+      "descripcion": "Descripción del evento de transmisión 6",
+      "url": "https://ejemplo.com/stream",
+      "horario": "00:00"
+    }
+  ]
+}

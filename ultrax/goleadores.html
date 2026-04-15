@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Goleadores - ULTRAGOL</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF6600">
+    <script>
+    (function() {
+        try {
+            var s = localStorage.getItem('ultragol_promo_status');
+            if (s) { var p = JSON.parse(s); if (p.expiresAt && Date.now() < p.expiresAt) { document.documentElement.classList.add('ads-hidden'); window.promoActive = true; }}
+        } catch(e) {}
+    })();
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3612607805789879" crossorigin="anonymous"></script>
+    <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #080808; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100dvh; overflow-x: hidden; }
+
+    /* ── APP SHELL ── */
+    .gl-app { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+
+    /* ── HEADER ── */
+    .gl-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: rgba(8,8,8,0.97); border-bottom: 1px solid rgba(255,102,0,0.15); flex-shrink: 0; backdrop-filter: blur(20px); }
+    .gl-back, .gl-share { width: 40px; height: 40px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05); color: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+    .gl-back:active, .gl-share:active { background: rgba(255,102,0,0.15); border-color: rgba(255,102,0,0.3); }
+    .gl-header-title { flex: 1; display: flex; flex-direction: column; gap: 1px; }
+    .gl-header-label { font-size: 11px; font-weight: 800; color: #FF6600; letter-spacing: 2px; }
+    .gl-header-sub { font-size: 18px; font-weight: 800; color: #fff; line-height: 1.1; }
+
+    /* ── LEAGUE CHIPS ── */
+    .gl-chips-wrap { flex-shrink: 0; padding: 10px 0; background: #080808; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .gl-chips { display: flex; gap: 8px; padding: 0 14px; overflow-x: auto; scrollbar-width: none; }
+    .gl-chips::-webkit-scrollbar { display: none; }
+    .gl-chip { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 30px; border: 1.5px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.6); font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; }
+    .gl-chip.active { background: #FF6600; border-color: #FF6600; color: #fff; box-shadow: 0 4px 16px rgba(255,102,0,0.35); }
+    .gl-chip:active { opacity: 0.75; transform: scale(0.97); }
+    .gl-chip i { font-size: 10px; }
+
+    /* ── MAIN SCROLL ── */
+    .gl-main { flex: 1; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; }
+    .gl-main::-webkit-scrollbar { width: 2px; }
+    .gl-main::-webkit-scrollbar-thumb { background: rgba(255,102,0,0.2); border-radius: 2px; }
+
+    /* ── STATS BAR ── */
+    .gl-stats { display: flex; gap: 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .gl-stat { flex: 1; padding: 12px 10px; text-align: center; border-right: 1px solid rgba(255,255,255,0.05); }
+    .gl-stat:last-child { border-right: none; }
+    .gl-stat-val { font-size: 22px; font-weight: 800; color: #FF6600; line-height: 1; }
+    .gl-stat-lbl { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.8px; margin-top: 4px; }
+
+    /* ── TABLE HEADER ── */
+    .gl-table-head { display: grid; grid-template-columns: 44px 1fr 80px; align-items: center; padding: 8px 14px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .gl-th { font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.3); letter-spacing: 1px; text-transform: uppercase; }
+    .gl-th.center { text-align: center; }
+    .gl-th.right { text-align: right; }
+
+    /* ── TABLE ROWS ── */
+    .gl-row { display: grid; grid-template-columns: 44px 1fr 80px; align-items: center; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.04); cursor: pointer; transition: background 0.15s; position: relative; }
+    .gl-row:active { background: rgba(255,102,0,0.06); }
+    .gl-row.top1 { background: linear-gradient(90deg, rgba(255,215,0,0.07) 0%, transparent 60%); }
+    .gl-row.top2 { background: linear-gradient(90deg, rgba(192,192,192,0.05) 0%, transparent 60%); }
+    .gl-row.top3 { background: linear-gradient(90deg, rgba(205,127,50,0.05) 0%, transparent 60%); }
+
+    /* Position badge */
+    .gl-pos { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; font-size: 13px; font-weight: 800; }
+    .gl-pos.rank1 { background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; box-shadow: 0 2px 10px rgba(255,215,0,0.4); }
+    .gl-pos.rank2 { background: linear-gradient(135deg, #C0C0C0, #A0A0A0); color: #000; box-shadow: 0 2px 10px rgba(192,192,192,0.3); }
+    .gl-pos.rank3 { background: linear-gradient(135deg, #CD7F32, #A0522D); color: #fff; box-shadow: 0 2px 10px rgba(205,127,50,0.3); }
+    .gl-pos.other { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+
+    /* Player cell */
+    .gl-player { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 0 8px; }
+    .gl-photo-wrap { position: relative; width: 42px; height: 42px; flex-shrink: 0; }
+    .gl-photo { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; object-position: top; background: #1a1a1a; border: 2px solid rgba(255,255,255,0.08); }
+    .gl-photo.loaded { border-color: rgba(255,102,0,0.25); }
+    .gl-photo-placeholder { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #1a1a1a, #252525); border: 2px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 16px; color: rgba(255,255,255,0.2); flex-shrink: 0; }
+    .gl-player-info { min-width: 0; }
+    .gl-player-name { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+    .gl-player-team { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Goals cell */
+    .gl-goals { display: flex; flex-direction: column; align-items: flex-end; }
+    .gl-goals-num { font-size: 20px; font-weight: 900; color: #FF6600; line-height: 1; }
+    .gl-goals-lbl { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+    /* Loading / empty */
+    .gl-loading { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 60px 20px; color: rgba(255,255,255,0.3); font-size: 14px; }
+    .gl-loading i { font-size: 30px; color: #FF6600; }
+
+    /* ── PLAYER MODAL ── */
+    .gl-modal { display: none; position: fixed; inset: 0; z-index: 9999; }
+    .gl-modal.active { display: flex; flex-direction: column; justify-content: flex-end; animation: glModalIn 0.25s ease; }
+    @keyframes glModalIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .gl-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); }
+    .gl-modal-sheet { position: relative; background: #0f0f0f; border-radius: 24px 24px 0 0; max-height: 92dvh; overflow-y: auto; overscroll-behavior: contain; border-top: 1px solid rgba(255,102,0,0.2); animation: glSheetUp 0.3s cubic-bezier(0.32,0.72,0,1); }
+    @keyframes glSheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .gl-modal-sheet::-webkit-scrollbar { display: none; }
+
+    /* Modal drag handle */
+    .gl-handle { width: 40px; height: 4px; background: rgba(255,255,255,0.15); border-radius: 2px; margin: 10px auto 0; }
+
+    /* Modal close */
+    .gl-modal-close { position: absolute; top: 14px; right: 16px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); color: #fff; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .gl-modal-close:active { background: rgba(255,60,0,0.3); }
+
+    /* Modal hero: big photo + name */
+    .gl-modal-hero { display: flex; flex-direction: column; align-items: center; padding: 20px 20px 0; text-align: center; }
+    .gl-modal-cutout { width: 140px; height: 140px; object-fit: cover; object-position: top; border-radius: 50%; border: 3px solid rgba(255,102,0,0.4); background: #1a1a1a; box-shadow: 0 8px 30px rgba(0,0,0,0.5); margin-bottom: 14px; }
+    .gl-modal-cutout.is-cutout { border-radius: 0; border: none; background: transparent; object-fit: contain; object-position: center bottom; height: 180px; width: auto; max-width: 200px; box-shadow: none; }
+    .gl-modal-name { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.3px; }
+    .gl-modal-team { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+    .gl-modal-team-logo { width: 22px; height: 22px; object-fit: contain; }
+    .gl-modal-team-name { font-size: 14px; color: rgba(255,255,255,0.5); font-weight: 600; }
+    .gl-modal-badges { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+    .gl-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 12px; border-radius: 20px; background: rgba(255,102,0,0.1); border: 1px solid rgba(255,102,0,0.25); font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.7); }
+    .gl-badge i { color: #FF6600; font-size: 10px; }
+
+    /* Modal stats grid */
+    .gl-modal-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: rgba(255,255,255,0.05); margin: 20px 16px 0; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+    .gl-mstat { background: rgba(255,255,255,0.03); padding: 14px 10px; text-align: center; }
+    .gl-mstat-val { font-size: 24px; font-weight: 900; color: #FF6600; line-height: 1; }
+    .gl-mstat-lbl { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.6px; margin-top: 5px; }
+
+    /* Modal secondary info */
+    .gl-modal-info { padding: 16px 16px 8px; display: flex; flex-direction: column; gap: 8px; }
+    .gl-info-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: rgba(255,255,255,0.03); border-radius: 12px; }
+    .gl-info-label { font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .gl-info-label i { color: #FF6600; width: 14px; text-align: center; }
+    .gl-info-value { font-size: 13px; font-weight: 700; color: #fff; }
+
+    /* Modal ESPN link */
+    .gl-modal-footer { padding: 8px 16px 30px; }
+    .gl-espn-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border-radius: 14px; border: 1.5px solid rgba(255,102,0,0.35); background: rgba(255,102,0,0.08); color: #FF6600; font-size: 13px; font-weight: 700; text-decoration: none; transition: all 0.2s; cursor: pointer; }
+    .gl-espn-btn:active { background: rgba(255,102,0,0.18); }
+
+    /* Spinner */
+    .gl-spinner { width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #FF6600; border-radius: 50%; animation: glSpin 0.8s linear infinite; margin: 0 auto; }
+    @keyframes glSpin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+<div class="gl-app">
+
+    <!-- HEADER -->
+    <header class="gl-header">
+        <button class="gl-back" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i></button>
+        <div class="gl-header-title">
+            <span class="gl-header-label">ULTRAGOL</span>
+            <span class="gl-header-sub">Goleadores</span>
+        </div>
+        <button class="gl-share" onclick="shareGoleadores()"><i class="fas fa-share-alt"></i></button>
+    </header>
+
+    <!-- LEAGUE CHIPS -->
+    <div class="gl-chips-wrap">
+        <div class="gl-chips" id="leagueChips">
+            <button class="gl-chip active" onclick="selectLeague('Liga MX', this)"><i class="fas fa-futbol"></i> Liga MX</button>
+            <button class="gl-chip" onclick="selectLeague('Premier League', this)"><i class="fas fa-futbol"></i> Premier</button>
+            <button class="gl-chip" onclick="selectLeague('La Liga', this)"><i class="fas fa-futbol"></i> La Liga</button>
+            <button class="gl-chip" onclick="selectLeague('Serie A', this)"><i class="fas fa-futbol"></i> Serie A</button>
+            <button class="gl-chip" onclick="selectLeague('Bundesliga', this)"><i class="fas fa-futbol"></i> Bundesliga</button>
+            <button class="gl-chip" onclick="selectLeague('Ligue 1', this)"><i class="fas fa-futbol"></i> Ligue 1</button>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <main class="gl-main" id="glMain">
+        <!-- Stats bar -->
+        <div class="gl-stats" id="glStats" style="display:none">
+            <div class="gl-stat"><div class="gl-stat-val" id="statPlayers">-</div><div class="gl-stat-lbl">Jugadores</div></div>
+            <div class="gl-stat"><div class="gl-stat-val" id="statGoals">-</div><div class="gl-stat-lbl">Goles totales</div></div>
+            <div class="gl-stat"><div class="gl-stat-val" id="statLeader">-</div><div class="gl-stat-lbl">Líder</div></div>
+        </div>
+
+        <!-- Table header -->
+        <div class="gl-table-head" id="glTableHead" style="display:none">
+            <div class="gl-th center">#</div>
+            <div class="gl-th">JUGADOR</div>
+            <div class="gl-th right">GOLES</div>
+        </div>
+
+        <!-- Table body -->
+        <div id="glContent">
+            <div class="gl-loading"><i class="fas fa-circle-notch fa-spin"></i><span>Cargando goleadores...</span></div>
+        </div>
+    </main>
+</div>
+
+<!-- PLAYER MODAL -->
+<div class="gl-modal" id="glModal" onclick="handleModalClick(event)">
+    <div class="gl-modal-backdrop"></div>
+    <div class="gl-modal-sheet" id="glModalSheet">
+        <div class="gl-handle"></div>
+        <button class="gl-modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+
+        <!-- Hero: Photo + Name -->
+        <div class="gl-modal-hero">
+            <img id="glModalPhoto" class="gl-modal-cutout" src="" alt="" style="display:none">
+            <div id="glModalNameWrap">
+                <div class="gl-modal-name" id="glModalName"></div>
+                <div class="gl-modal-team" id="glModalTeam" style="display:none">
+                    <img id="glModalTeamLogo" class="gl-modal-team-logo" src="" alt="" style="display:none">
+                    <span id="glModalTeamName" class="gl-modal-team-name"></span>
+                </div>
+                <div class="gl-modal-badges" id="glModalBadges"></div>
+            </div>
+        </div>
+
+        <!-- Stats grid -->
+        <div class="gl-modal-stats" id="glModalStats" style="display:none">
+            <div class="gl-mstat"><div class="gl-mstat-val" id="msGoals">-</div><div class="gl-mstat-lbl">Goles</div></div>
+            <div class="gl-mstat"><div class="gl-mstat-val" id="msAssists">-</div><div class="gl-mstat-lbl">Asistencias</div></div>
+            <div class="gl-mstat"><div class="gl-mstat-val" id="msShots">-</div><div class="gl-mstat-lbl">Tiros</div></div>
+        </div>
+
+        <!-- Info rows -->
+        <div class="gl-modal-info" id="glModalInfo"></div>
+
+        <!-- Footer -->
+        <div class="gl-modal-footer">
+            <a class="gl-espn-btn" id="glEspnLink" href="#" target="_blank" style="display:none">
+                <i class="fas fa-external-link-alt"></i> Ver perfil en ESPN
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+const API_BASE = 'https://ultragol-api-3.vercel.app';
+let currentLeague = 'Liga MX';
+let currentGoleadores = [];
+
+const leagueEndpoints = {
+    'Liga MX': '/goleadores',
+    'Premier League': '/premier/goleadores',
+    'La Liga': '/laliga/goleadores',
+    'Serie A': '/seriea/goleadores',
+    'Bundesliga': '/bundesliga/goleadores',
+    'Ligue 1': '/ligue1/goleadores'
+};
+
+// ── LOAD GOLEADORES ──────────────────────────────────────────────────────────
+async function loadGoleadores(league = 'Liga MX') {
+    const content = document.getElementById('glContent');
+    const stats = document.getElementById('glStats');
+    const tableHead = document.getElementById('glTableHead');
+
+    stats.style.display = 'none';
+    tableHead.style.display = 'none';
+    content.innerHTML = '<div class="gl-loading"><i class="fas fa-circle-notch fa-spin"></i><span>Cargando...</span></div>';
+
+    const endpoint = leagueEndpoints[league];
+    if (!endpoint) {
+        content.innerHTML = '<div class="gl-loading"><i class="fas fa-info-circle"></i><span>Próximamente disponible</span></div>';
+        return;
+    }
+
+    try {
+        const resp = await fetch(`${API_BASE}${endpoint}`);
+        const data = await resp.json();
+
+        if (!data.goleadores || data.goleadores.length === 0) throw new Error('Sin datos');
+
+        currentGoleadores = data.goleadores;
+
+        // Stats bar
+        const totalGoals = data.goleadores.reduce((s, g) => s + (g.goles || 0), 0);
+        document.getElementById('statPlayers').textContent = data.total || data.goleadores.length;
+        document.getElementById('statGoals').textContent = totalGoals;
+        document.getElementById('statLeader').textContent = data.goleadores[0].goles;
+        stats.style.display = 'flex';
+        tableHead.style.display = 'grid';
+
+        // Render rows with placeholder photos
+        content.innerHTML = data.goleadores.map((g, i) => {
+            const pos = g.posicion || (i + 1);
+            const rankClass = pos === 1 ? 'rank1 top1' : pos === 2 ? 'rank2 top2' : pos === 3 ? 'rank3 top3' : 'other';
+            const rowClass = pos === 1 ? 'top1' : pos === 2 ? 'top2' : pos === 3 ? 'top3' : '';
+            const esc = encodeURIComponent(JSON.stringify({ jugador: g.jugador, equipo: g.equipo, goles: g.goles, posicion: pos }));
+            return `
+                <div class="gl-row ${rowClass}" onclick="openPlayerModal(${i})">
+                    <div class="gl-pos ${rankClass}">${pos}</div>
+                    <div class="gl-player">
+                        <div class="gl-photo-wrap">
+                            <div class="gl-photo-placeholder" id="ph-${i}"><i class="fas fa-user"></i></div>
+                            <img class="gl-photo" id="img-${i}" src="" alt="${g.jugador}" data-name="${encodeURIComponent(g.jugador)}" style="display:none">
+                        </div>
+                        <div class="gl-player-info">
+                            <div class="gl-player-name">${g.jugador}</div>
+                            <div class="gl-player-team">${g.equipo || ''}</div>
+                        </div>
+                    </div>
+                    <div class="gl-goals">
+                        <div class="gl-goals-num">${g.goles}</div>
+                        <div class="gl-goals-lbl">goles</div>
+                    </div>
+                </div>`;
+        }).join('');
+
+        // Load photos in background
+        loadPlayerPhotos(data.goleadores);
+
+    } catch (err) {
+        content.innerHTML = '<div class="gl-loading"><i class="fas fa-exclamation-triangle"></i><span>Error al cargar. Intenta de nuevo.</span></div>';
+    }
+}
+
+// ── LOAD PHOTOS ASYNC ────────────────────────────────────────────────────────
+async function loadPlayerPhotos(players) {
+    for (let i = 0; i < players.length; i++) {
+        const g = players[i];
+        const img = document.getElementById(`img-${i}`);
+        const ph = document.getElementById(`ph-${i}`);
+        if (!img) continue;
+
+        try {
+            const params = new URLSearchParams({ name: g.jugador });
+            if (g.equipo) params.set('team', g.equipo);
+            const r = await fetch(`/api/player-photo?${params}`);
+            const d = await r.json();
+            if (d.url && img.isConnected) {
+                img.src = d.url;
+                img.onload = () => { img.style.display = 'block'; img.classList.add('loaded'); if(ph) ph.style.display = 'none'; };
+                img.onerror = () => {};
+            }
+        } catch(_) {}
+    }
+}
+
+// ── SELECT LEAGUE ────────────────────────────────────────────────────────────
+function selectLeague(league, el) {
+    document.querySelectorAll('.gl-chip').forEach(b => b.classList.remove('active'));
+    if (el) el.classList.add('active');
+    currentLeague = league;
+    loadGoleadores(league);
+}
+
+// ── OPEN PLAYER MODAL ────────────────────────────────────────────────────────
+async function openPlayerModal(idx) {
+    const g = currentGoleadores[idx];
+    if (!g) return;
+
+    const modal = document.getElementById('glModal');
+    const photoEl = document.getElementById('glModalPhoto');
+    const nameEl = document.getElementById('glModalName');
+    const teamEl = document.getElementById('glModalTeam');
+    const teamLogoEl = document.getElementById('glModalTeamLogo');
+    const teamNameEl = document.getElementById('glModalTeamName');
+    const badgesEl = document.getElementById('glModalBadges');
+    const statsEl = document.getElementById('glModalStats');
+    const infoEl = document.getElementById('glModalInfo');
+    const espnLink = document.getElementById('glEspnLink');
+
+    // Reset
+    photoEl.style.display = 'none';
+    photoEl.className = 'gl-modal-cutout';
+    teamEl.style.display = 'none';
+    statsEl.style.display = 'none';
+    espnLink.style.display = 'none';
+    nameEl.textContent = g.jugador;
+    badgesEl.innerHTML = '';
+    infoEl.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:center;padding:30px 0;gap:12px;color:rgba(255,255,255,0.3);">
+            <div class="gl-spinner"></div>
+            <span>Cargando información...</span>
+        </div>`;
+
+    // Add position badge in modal
+    const pos = g.posicion || (idx + 1);
+    const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : `#${pos}`;
+    badgesEl.innerHTML = `<span class="gl-badge"><i class="fas fa-futbol"></i> ${currentLeague}</span><span class="gl-badge">${medal} Posición ${pos}</span>`;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    // Fetch full info
+    try {
+        const infoParams = new URLSearchParams({ name: g.jugador });
+        if (g.equipo) infoParams.set('team', g.equipo);
+        const r = await fetch(`/api/player-info?${infoParams}`);
+        const info = await r.json();
+
+        // Photo
+        const photoSrc = info.cutout || info.photo;
+        if (photoSrc) {
+            photoEl.src = photoSrc;
+            photoEl.alt = info.name || g.jugador;
+            photoEl.style.display = 'block';
+            if (info.cutout) photoEl.classList.add('is-cutout');
+        }
+
+        // Name
+        nameEl.textContent = info.name || g.jugador;
+
+        // Team
+        if (info.team || g.equipo) {
+            teamNameEl.textContent = info.team || g.equipo;
+            teamEl.style.display = 'flex';
+            if (info.teamLogo) {
+                teamLogoEl.src = info.teamLogo;
+                teamLogoEl.style.display = 'block';
+            }
+        }
+
+        // Badges
+        const bParts = [`<span class="gl-badge"><i class="fas fa-futbol"></i> ${currentLeague}</span>`, `<span class="gl-badge">${medal} Posición ${pos}</span>`];
+        if (info.nationality) bParts.push(`<span class="gl-badge"><i class="fas fa-flag"></i> ${info.nationality}</span>`);
+        if (info.position) bParts.push(`<span class="gl-badge"><i class="fas fa-running"></i> ${info.position}</span>`);
+        badgesEl.innerHTML = bParts.join('');
+
+        // Stats grid
+        const goalsVal = info.goals || g.goles || '-';
+        const assistsVal = info.assists || '-';
+        const shotsVal = info.shots || '-';
+        document.getElementById('msGoals').textContent = goalsVal;
+        document.getElementById('msAssists').textContent = assistsVal;
+        document.getElementById('msShots').textContent = shotsVal;
+        statsEl.style.display = 'grid';
+
+        // Info rows
+        const rows = [];
+        if (info.born) rows.push({ icon: 'fa-birthday-cake', label: 'Fecha de nacimiento', value: `${info.born}${info.age ? ` (${info.age} años)` : ''}` });
+        if (info.height) rows.push({ icon: 'fa-ruler-vertical', label: 'Altura', value: info.height });
+        if (info.weight) rows.push({ icon: 'fa-weight', label: 'Peso', value: info.weight });
+        if (info.appearances) rows.push({ icon: 'fa-calendar-check', label: 'Apariciones', value: info.appearances });
+        rows.push({ icon: 'fa-futbol', label: 'Goles en ' + currentLeague, value: g.goles });
+
+        infoEl.innerHTML = rows.map(r => `
+            <div class="gl-info-row">
+                <span class="gl-info-label"><i class="fas ${r.icon}"></i> ${r.label}</span>
+                <span class="gl-info-value">${r.value}</span>
+            </div>`).join('');
+
+        // ESPN link
+        if (info.espnUrl) {
+            espnLink.href = info.espnUrl;
+            espnLink.style.display = 'flex';
+        }
+
+    } catch(e) {
+        infoEl.innerHTML = `
+            <div class="gl-info-row">
+                <span class="gl-info-label"><i class="fas fa-futbol"></i> Goles (${currentLeague})</span>
+                <span class="gl-info-value">${g.goles}</span>
+            </div>
+            <div class="gl-info-row">
+                <span class="gl-info-label"><i class="fas fa-shield-alt"></i> Equipo</span>
+                <span class="gl-info-value">${g.equipo || '-'}</span>
+            </div>`;
+    }
+}
+
+// ── CLOSE MODAL ───────────────────────────────────────────────────────────────
+function closeModal() {
+    document.getElementById('glModal').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function handleModalClick(e) {
+    if (e.target.classList.contains('gl-modal-backdrop') || e.target.id === 'glModal') closeModal();
+}
+
+// ── SHARE ─────────────────────────────────────────────────────────────────────
+function shareGoleadores() {
+    const data = { title: `Goleadores ${currentLeague} — ULTRAGOL`, url: location.href };
+    if (navigator.share) navigator.share(data).catch(() => {});
+    else navigator.clipboard?.writeText(location.href);
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// Init
+loadGoleadores();
+</script>
+</body>
+</html>
