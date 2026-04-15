@@ -269,10 +269,10 @@ function playChannel(chData) {
     // Sources
     const streams = ch.streams || [];
     document.getElementById('playerSources').innerHTML = streams.map((s, i) =>
-        `<button class="cn-source-btn ${i === 0 ? 'active' : ''}" onclick="switchSource(this, '${s.url}')">Señal ${i + 1}</button>`
+        `<button class="cn-source-btn ${i === 0 ? 'active' : ''}" onclick="switchSource(this, '${s.player_url || s.url}')">Señal ${i + 1}</button>`
     ).join('');
 
-    if (streams.length > 0) loadHLS(video, streams[0].url);
+    if (streams.length > 0) loadHLS(video, streams[0].player_url || streams[0].url);
 }
 
 function switchSource(btn, url) {

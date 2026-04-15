@@ -203,11 +203,11 @@ function playChannel(ch) {
 
     const streams = ch.streams || [];
     playerSources.innerHTML = streams.map((s, i) =>
-        `<button class="uc-source-btn ${i === 0 ? 'active' : ''}" onclick="switchSource(this, '${s.url}')">Señal ${i + 1}</button>`
+        `<button class="uc-source-btn ${i === 0 ? 'active' : ''}" onclick="switchSource(this, '${s.player_url || s.url}')">Señal ${i + 1}</button>`
     ).join('');
 
     if (streams.length > 0) {
-        loadHLS(video, streams[0].url);
+        loadHLS(video, streams[0].player_url || streams[0].url);
     }
 }
 
