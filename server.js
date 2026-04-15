@@ -1252,6 +1252,25 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// ULTRACANALES routes MUST come before /ultra to avoid prefix collision
+// (/ultracanales starts with /ultra so Express would match the wrong middleware)
+app.get(/^\/ultracanales$/, (req, res) => {
+    res.redirect(301, '/ultracanales/');
+});
+app.get(/^\/ULTRACANALES\/?$/, (req, res) => {
+    res.redirect(301, '/ultracanales/');
+});
+app.get('/ultracanales/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ULTRACANALES', 'index.html'));
+});
+const _ucStaticOpts = {
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+};
+app.use('/ultracanales', express.static(path.join(__dirname, 'ULTRACANALES'), _ucStaticOpts));
+app.use('/ULTRACANALES', express.static(path.join(__dirname, 'ULTRACANALES'), _ucStaticOpts));
+
 app.get('/ultra', (req, res) => {
     res.sendFile(path.join(__dirname, 'ULTRA', 'index.html'));
 });
@@ -1277,28 +1296,6 @@ app.get('/cinenova', (req, res) => {
 app.get('/knexo', (req, res) => {
     res.sendFile(path.join(__dirname, 'knexo.html'));
 });
-
-// ULTRACANALES — use regex to match ONLY without trailing slash to avoid redirect loops
-app.get(/^\/ultracanales$/, (req, res) => {
-    res.redirect(301, '/ultracanales/');
-});
-
-app.get(/^\/ULTRACANALES\/?$/, (req, res) => {
-    res.redirect(301, '/ultracanales/');
-});
-
-app.get('/ultracanales/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'ULTRACANALES', 'index.html'));
-});
-
-const staticOpts = {
-    setHeaders: (res) => {
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    }
-};
-
-app.use('/ultracanales', express.static(path.join(__dirname, 'ULTRACANALES'), staticOpts));
-app.use('/ULTRACANALES', express.static(path.join(__dirname, 'ULTRACANALES'), staticOpts));
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 UltraGol server started on port ${PORT}`);
