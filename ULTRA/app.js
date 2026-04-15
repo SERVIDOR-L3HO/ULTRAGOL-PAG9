@@ -5627,6 +5627,31 @@ function checkSharedStream() {
     const streamParam = urlParams.get('s') || urlParams.get('stream');
     const shortId = urlParams.get('id');
     const channelParam = urlParams.get('ch');
+    const matchId = urlParams.get('match');
+
+    // Nuevo formato corto: ?match=XXXXXX (servidor)
+    if (matchId) {
+        fetch(`/api/share/match/${matchId}`)
+            .then(r => r.json())
+            .then(data => {
+                if (!data.channels) { showToast('Link expirado o inválido'); return; }
+                const transmision = {
+                    evento: data.title, titulo: data.title,
+                    canales: data.channels.map(c => ({
+                        nombre: c[0], numero: '',
+                        enlaces: [{ url: c[1], calidad: 'HD' }],
+                        tipoAPI: c[2] || 'shared'
+                    }))
+                };
+                setTimeout(() => {
+                    showChannelSelector(transmision, data.title);
+                    showToast('Abriendo canales compartidos... 📺');
+                    window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
+                }, 1200);
+            })
+            .catch(() => showToast('No se pudo cargar el link compartido'));
+        return;
+    }
     
     console.log('🔍 checkSharedStream - ch:', channelParam ? 'SÍ' : 'NO');
     
@@ -5795,7 +5820,7 @@ async function shareChannelModal() {
         const { transmision, partidoNombre } = currentModalData.data;
         const title = partidoNombre || 'UltraGol - Canales';
         
-        const minimalChannels = transmision.canales.slice(0, 8).map(canal => {
+        const channels = transmision.canales.slice(0, 8).map(canal => {
             let url = '';
             if (canal.enlaces && canal.enlaces.length > 0) {
                 url = canal.enlaces[0].url || canal.enlaces[0];
@@ -5804,12 +5829,19 @@ async function shareChannelModal() {
             }
             return [canal.nombre || 'Canal', url, canal.tipoAPI || ''];
         }).filter(c => c[1]);
+
+        showToast('Generando link...');
+
+        // Guardar en el servidor y obtener ID corto
+        const resp = await fetch('/api/share/match', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title, channels })
+        });
+        const { id } = await resp.json();
+        const shareUrl = `${window.location.origin}${window.location.pathname}?match=${id}`;
         
-        const shareData = { t: title, c: minimalChannels };
-        const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(shareData));
-        const shareUrl = `${window.location.origin}${window.location.pathname}?ch=${compressed}`;
-        
-        console.log('🔗 URL generada:', shareUrl.length, 'caracteres');
+        console.log('🔗 URL corta generada:', shareUrl);
         
         if (navigator.share) {
             await navigator.share({
@@ -5817,13 +5849,11 @@ async function shareChannelModal() {
                 text: `Ver ${title} en UltraGol`,
                 url: shareUrl
             });
-            showToast('Compartido exitosamente');
+            showToast('¡Compartido! 🎉');
         } else {
             await navigator.clipboard.writeText(shareUrl);
-            showToast('Enlace copiado al portapapeles');
+            showToast('¡Enlace copiado! 📋');
         }
-        
-        console.log('✅ Modal de canales compartido:', title);
     } catch (error) {
         if (error.name !== 'AbortError') {
             console.error('Error al compartir:', error);

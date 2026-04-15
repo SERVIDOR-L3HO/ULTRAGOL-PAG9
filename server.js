@@ -310,6 +310,35 @@ function cleanBroadcasts() {
     while (broadcastQueue.length && broadcastQueue[0].ts < cutoff) broadcastQueue.shift();
 }
 
+// ── Share-link store (in-memory, 24 h TTL) ──────────────────────────────────
+const shareStore = new Map();
+const SHARE_TTL_MS = 24 * 60 * 60 * 1000;
+
+function _cleanShareStore() {
+    const cutoff = Date.now() - SHARE_TTL_MS;
+    for (const [id, val] of shareStore) { if (val.ts < cutoff) shareStore.delete(id); }
+}
+function _genShareId() {
+    return Math.random().toString(36).slice(2, 8).toUpperCase();
+}
+
+app.post('/api/share/match', express.json(), (req, res) => {
+    _cleanShareStore();
+    const { title, channels } = req.body || {};
+    if (!title || !Array.isArray(channels)) return res.status(400).json({ error: 'Faltan datos' });
+    const id = _genShareId();
+    shareStore.set(id, { title, channels, ts: Date.now() });
+    res.json({ id });
+});
+
+app.get('/api/share/match/:id', (req, res) => {
+    _cleanShareStore();
+    const data = shareStore.get((req.params.id || '').toUpperCase());
+    if (!data) return res.status(404).json({ error: 'Link expirado o no encontrado' });
+    res.json({ title: data.title, channels: data.channels });
+});
+// ────────────────────────────────────────────────────────────────────────────
+
 // SSE client registry — one entry per connected browser tab
 const sseClients = new Set();
 
