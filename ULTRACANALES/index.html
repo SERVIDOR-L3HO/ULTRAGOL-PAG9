@@ -57,7 +57,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6 6 18M6 6l12 12"/></svg>
         </button>
         <div class="uc-player-screen">
-            <video id="ucVideo" controls autoplay playsinline></video>
+            <iframe id="ucIframe" frameborder="0" allowfullscreen allow="autoplay; fullscreen; encrypted-media"></iframe>
         </div>
         <div class="uc-player-info">
             <div class="uc-player-channel">
@@ -94,7 +94,6 @@
     </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="./script.js?v=20260414"></script>
 <script type="module">
     import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";

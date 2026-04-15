@@ -62,29 +62,20 @@ const PAGE_SIZE = 60;
 let currentCat = 'all';
 let currentSrc = 'all';
 let searchQuery = '';
-let hlsInstance = null;
 
 // ---- INIT ----
 document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('cat')) currentCat = params.get('cat');
     loadChannels();
     setupSearch();
-
-    // Read URL params
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('cat')) {
-        currentCat = params.get('cat');
-    }
-
-    document.getElementById('cnVideo').addEventListener('error', () => {
-        showPlayerError('No se pudo cargar la señal.');
-    });
 });
 
 async function loadChannels() {
     try {
         const res = await fetch(API_URL);
         const data = await res.json();
-        allChannels = (data.canales || []).filter(c => c.streams && c.streams.length > 0);
+        allChannels = (data.canales || []).filter(c => c.player_url);
         document.getElementById('channelCount').textContent = `${allChannels.length.toLocaleString()} canales`;
         buildSidebar();
         applyFilters();
@@ -242,13 +233,10 @@ function playChannel(chData) {
     catch (e) { return; }
 
     const overlay = document.getElementById('playerOverlay');
-    const video = document.getElementById('cnVideo');
+    const iframe = document.getElementById('cnIframe');
 
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
-    video.style.display = 'block';
-    const err = document.querySelector('.cn-player-error');
-    if (err) err.remove();
 
     document.getElementById('playerName').textContent = ch.nombre;
     document.getElementById('playerDesc').textContent = (ch.extra && ch.extra.descripcion) ? ch.extra.descripcion : '';
@@ -266,63 +254,15 @@ function playChannel(chData) {
     if (ch.fuente) tags.push(ch.fuente);
     tagsEl.innerHTML = tags.map(t => `<span class="cn-player-tag">${t}</span>`).join('');
 
-    // Sources
-    const streams = ch.streams || [];
-    document.getElementById('playerSources').innerHTML = streams.map((s, i) =>
-        `<button class="cn-source-btn ${i === 0 ? 'active' : ''}" onclick="switchSource(this, '${s.player_url || s.url}')">Señal ${i + 1}</button>`
-    ).join('');
-
-    if (streams.length > 0) loadHLS(video, streams[0].player_url || streams[0].url);
-}
-
-function switchSource(btn, url) {
-    document.querySelectorAll('.cn-source-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    loadHLS(document.getElementById('cnVideo'), url);
-}
-
-function loadHLS(video, url) {
-    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
-    video.src = '';
-    const screen = video.parentNode;
-    const existingError = screen.querySelector('.cn-player-error');
-    if (existingError) existingError.remove();
-
-    if (Hls.isSupported()) {
-        hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
-        hlsInstance.loadSource(url);
-        hlsInstance.attachMedia(video);
-        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => { video.play().catch(() => {}); });
-        hlsInstance.on(Hls.Events.ERROR, (_, data) => {
-            if (data.fatal) showPlayerError('Error al cargar la señal. Intenta otra.');
-        });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url;
-        video.play().catch(() => {});
-    } else {
-        showPlayerError('Tu navegador no soporta reproducción HLS.');
-    }
-}
-
-function showPlayerError(msg) {
-    const screen = document.querySelector('.cn-player-screen');
-    const video = document.getElementById('cnVideo');
-    video.style.display = 'none';
-    let err = screen.querySelector('.cn-player-error');
-    if (!err) { err = document.createElement('div'); err.className = 'cn-player-error'; screen.appendChild(err); }
-    err.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${msg}`;
+    iframe.src = ch.player_url;
 }
 
 function closePlayer() {
     const overlay = document.getElementById('playerOverlay');
-    const video = document.getElementById('cnVideo');
+    const iframe = document.getElementById('cnIframe');
     overlay.classList.remove('active');
     document.body.style.overflow = '';
-    video.pause(); video.src = '';
-    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
-    const err = document.querySelector('.cn-player-error');
-    if (err) err.remove();
-    video.style.display = 'block';
+    iframe.src = '';
 }
 
 // ---- SEARCH ----

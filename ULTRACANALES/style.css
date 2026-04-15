@@ -128,7 +128,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .uc-player-close:hover { background: rgba(255,255,255,0.15); }
 .uc-player-close svg { width: 18px; height: 18px; }
 .uc-player-screen { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
-.uc-player-screen video { width: 100%; height: 100%; background: #000; display: block; }
+.uc-player-screen iframe { width: 100%; height: 100%; background: #000; display: block; border: none; }
 .uc-player-info { padding: 16px 20px 20px; }
 .uc-player-channel { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
 .uc-player-logo { height: 30px; width: auto; object-fit: contain; max-width: 120px; }

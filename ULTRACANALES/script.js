@@ -28,7 +28,6 @@ const CAT_META = {
 const CARD_COLORS = ['#8B2FC9','#2563eb','#059669','#dc2626','#d97706','#7c3aed','#0891b2','#16a34a'];
 let allChannels = [];
 let plutoChannels = [];
-let hlsInstance = null;
 let heroChannels = [];
 let heroIndex = 0;
 let heroTimer = null;
@@ -37,16 +36,13 @@ let heroTimer = null;
 document.addEventListener('DOMContentLoaded', () => {
     loadChannels();
     setupSearch();
-    document.getElementById('ucVideo').addEventListener('error', () => {
-        showPlayerError('No se pudo cargar la señal. Intenta otro canal.');
-    });
 });
 
 async function loadChannels() {
     try {
         const res = await fetch(API_URL);
         const data = await res.json();
-        allChannels = data.canales || [];
+        allChannels = (data.canales || []).filter(c => c.player_url);
         plutoChannels = allChannels.filter(c => c.fuente === 'Pluto TV');
         buildHero();
         buildRows();
@@ -183,11 +179,10 @@ function buildCard(ch) {
 function playChannel(ch) {
     if (typeof ch === 'string') ch = JSON.parse(ch);
     const overlay = document.getElementById('playerOverlay');
-    const video = document.getElementById('ucVideo');
+    const iframe = document.getElementById('ucIframe');
     const playerName = document.getElementById('playerName');
     const playerLogo = document.getElementById('playerLogo');
     const playerDesc = document.getElementById('playerDesc');
-    const playerSources = document.getElementById('playerSources');
 
     overlay.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -201,70 +196,15 @@ function playChannel(ch) {
         playerLogo.style.display = 'none';
     }
 
-    const streams = ch.streams || [];
-    playerSources.innerHTML = streams.map((s, i) =>
-        `<button class="uc-source-btn ${i === 0 ? 'active' : ''}" onclick="switchSource(this, '${s.player_url || s.url}')">Señal ${i + 1}</button>`
-    ).join('');
-
-    if (streams.length > 0) {
-        loadHLS(video, streams[0].player_url || streams[0].url);
-    }
-}
-
-function switchSource(btn, url) {
-    document.querySelectorAll('.uc-source-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const video = document.getElementById('ucVideo');
-    loadHLS(video, url);
-}
-
-function loadHLS(video, url) {
-    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
-    video.src = '';
-    const screen = video.parentNode;
-    const existingError = screen.querySelector('.uc-player-error');
-    if (existingError) existingError.remove();
-
-    if (Hls.isSupported()) {
-        hlsInstance = new Hls({ enableWorker: true, lowLatencyMode: true });
-        hlsInstance.loadSource(url);
-        hlsInstance.attachMedia(video);
-        hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => { video.play().catch(() => {}); });
-        hlsInstance.on(Hls.Events.ERROR, (_, data) => {
-            if (data.fatal) showPlayerError('No se pudo cargar la señal.');
-        });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = url;
-        video.play().catch(() => {});
-    } else {
-        showPlayerError('Tu navegador no soporta HLS. Prueba con Chrome.');
-    }
-}
-
-function showPlayerError(msg) {
-    const screen = document.querySelector('.uc-player-screen');
-    const video = document.getElementById('ucVideo');
-    video.style.display = 'none';
-    let err = screen.querySelector('.uc-player-error');
-    if (!err) {
-        err = document.createElement('div');
-        err.className = 'uc-player-error';
-        screen.appendChild(err);
-    }
-    err.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${msg}`;
+    iframe.src = ch.player_url;
 }
 
 function closePlayer() {
     const overlay = document.getElementById('playerOverlay');
-    const video = document.getElementById('ucVideo');
+    const iframe = document.getElementById('ucIframe');
     overlay.classList.remove('active');
     document.body.style.overflow = '';
-    video.pause();
-    video.src = '';
-    video.style.display = 'block';
-    const err = document.querySelector('.uc-player-error');
-    if (err) err.remove();
-    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+    iframe.src = '';
 }
 
 // ---- SEARCH ----

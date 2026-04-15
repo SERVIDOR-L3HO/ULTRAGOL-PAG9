@@ -176,7 +176,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 .cn-player-close:hover { background: rgba(255,255,255,0.15); }
 .cn-player-close svg { width: 18px; height: 18px; }
 .cn-player-screen { position: relative; width: 100%; aspect-ratio: 16/9; background: #000; }
-.cn-player-screen video { width: 100%; height: 100%; background: #000; display: block; }
+.cn-player-screen iframe { width: 100%; height: 100%; background: #000; display: block; border: none; }
 .cn-player-info { padding: 14px 20px 18px; }
 .cn-player-channel { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 8px; flex-wrap: wrap; }
 .cn-player-logo { height: 28px; width: auto; object-fit: contain; max-width: 110px; margin-top: 2px; }
