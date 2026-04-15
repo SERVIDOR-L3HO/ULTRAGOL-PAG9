@@ -591,7 +591,7 @@ app.get('/api/ultragol/transmisiones6', async (req, res) => {
         console.warn('⚠️ API externa transmisiones6 no disponible, usando JSON local:', error.message);
         try {
             const fs = require('fs');
-            const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'ULTRA', 'transmisiones6.json'), 'utf8'));
+            const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'ultrax', 'transmisiones6.json'), 'utf8'));
             res.json(data);
         } catch (localError) {
             console.error('Error al leer transmisiones6.json local:', localError);
@@ -601,7 +601,7 @@ app.get('/api/ultragol/transmisiones6', async (req, res) => {
 });
 
 app.get('/transmisiones6', (req, res) => {
-    res.sendFile(path.join(__dirname, 'ULTRA', 'index.html'));
+    res.sendFile(path.join(__dirname, 'ultrax', 'index.html'));
 });
 
 console.log('✅ UltraGol API proxy enabled');
@@ -1170,13 +1170,13 @@ function buildMatchPage({ slug, title, desc, equipo1, equipo2, logo1, logo2, est
     <meta property="og:description" content="${desc}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="${canonicalUrl}">
-    <meta property="og:image" content="https://ultragol-l3ho.com.mx/ULTRA/favicon.png">
+    <meta property="og:image" content="https://ultragol-l3ho.com.mx/ultrax/favicon.png">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="${title}">
     <meta name="twitter:description" content="${desc}">
 
-    <link rel="icon" type="image/png" href="/ULTRA/favicon.png">
+    <link rel="icon" type="image/png" href="/ultrax/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/mx/mx.css">
@@ -1188,7 +1188,7 @@ function buildMatchPage({ slug, title, desc, equipo1, equipo2, logo1, logo2, est
 
 <nav class="nav">
     <a href="/" class="nav-logo">
-        <img src="/ULTRA/favicon.png" alt="UltraGol">
+        <img src="/ultrax/favicon.png" alt="UltraGol">
         Ultra<span>Gol</span>
     </a>
     <div class="nav-links">
@@ -1255,7 +1255,7 @@ function buildMatchPage({ slug, title, desc, equipo1, equipo2, logo1, logo2, est
 
 console.log('✅ MX section enabled (/mx, /mx/:slug)');
 
-app.use(express.static(path.join(__dirname, 'ULTRA'), {
+app.use(express.static(path.join(__dirname, 'ultrax'), {
     index: false,
     setHeaders: (res, filepath) => {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -1312,10 +1312,10 @@ app.use('/ultrax', express.static(path.join(__dirname, 'ultrax'), {
 }));
 
 app.get('/ultra', (req, res) => {
-    res.sendFile(path.join(__dirname, 'ULTRA', 'index.html'));
+    res.sendFile(path.join(__dirname, 'ultrax', 'index.html'));
 });
 
-app.use('/ultra', express.static(path.join(__dirname, 'ULTRA'), {
+app.use('/ultra', express.static(path.join(__dirname, 'ultrax'), {
     index: false,
     setHeaders: (res) => {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
