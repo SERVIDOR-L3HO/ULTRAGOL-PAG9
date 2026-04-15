@@ -1300,6 +1300,16 @@ const _ucStaticOpts = {
 app.use('/ultracanales', express.static(path.join(__dirname, 'ULTRACANALES'), _ucStaticOpts));
 app.use('/ULTRACANALES', express.static(path.join(__dirname, 'ULTRACANALES'), _ucStaticOpts));
 
+// Redirects for old /ULTRA/* and /ultra/* URLs → /ultrax
+app.use('/ULTRA', (req, res) => {
+    const dest = req.path && req.path !== '/' ? `/ultrax${req.path}` : '/ultrax';
+    res.redirect(301, dest);
+});
+app.use('/ultra', (req, res) => {
+    const dest = req.path && req.path !== '/' ? `/ultrax${req.path}` : '/ultrax';
+    res.redirect(301, dest);
+});
+
 // ultrax — exact copy of ULTRA (must be before /ultra to avoid prefix match)
 app.get('/ultrax', (req, res) => {
     res.sendFile(path.join(__dirname, 'ultrax', 'index.html'));
@@ -1311,16 +1321,6 @@ app.use('/ultrax', express.static(path.join(__dirname, 'ultrax'), {
     }
 }));
 
-app.get('/ultra', (req, res) => {
-    res.sendFile(path.join(__dirname, 'ultrax', 'index.html'));
-});
-
-app.use('/ultra', express.static(path.join(__dirname, 'ultrax'), {
-    index: false,
-    setHeaders: (res) => {
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    }
-}));
 
 app.get('/test-notifications', (req, res) => {
     res.sendFile(path.join(__dirname, 'test-notifications.html'));
