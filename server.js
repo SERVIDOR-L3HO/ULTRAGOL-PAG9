@@ -1211,9 +1211,33 @@ function buildMatchPage({ slug, title, desc, equipo1, equipo2, logo1, logo2, est
         'organizer': { '@type': 'Organization', 'name': 'UltraGol', 'url': 'https://ultragol-l3ho.com.mx' }
     };
 
-    const streamSection = transmisionUrl
-        ? `<a href="${transmisionUrl}" target="_blank" rel="noopener" class="stream-btn">▶ Ver Transmisión EN VIVO</a>`
-        : `<div class="no-goals" style="padding:16px 0">Transmisión no disponible en este momento.<br>Ve a <a href="/ultra" style="color:var(--red)">ULTRA</a> para buscar más canales.</div>`;
+    // Build server list from comma-separated transmisionUrl
+    const serverUrls = transmisionUrl
+        ? [...new Set(transmisionUrl.split(',').map(s => s.trim()).filter(Boolean))]
+        : [];
+    const firstServer = serverUrls[0] || '';
+
+    const playerSection = serverUrls.length
+        ? `<div class="md-player-card">
+            <div class="md-player-frame">
+                <iframe id="md-iframe" src="${firstServer}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="no-referrer"></iframe>
+            </div>
+            <div class="md-server-bar">
+                <div class="md-server-label">SERVIDORES (${serverUrls.length}):</div>
+                <div class="md-server-buttons">
+                    ${serverUrls.map((u, i) => `<button class="md-server-btn${i === 0 ? ' active' : ''}" data-url="${encodeURIComponent(u)}">Servidor ${i + 1}</button>`).join('')}
+                </div>
+            </div>
+            <div class="md-player-actions">
+                <button class="md-fs-btn" id="md-fs-btn">⛶ Pantalla completa</button>
+                <a class="md-open-btn" href="${firstServer}" target="_blank" rel="noopener">Abrir en nueva pestaña ↗</a>
+            </div>
+        </div>`
+        : `<div class="md-no-stream">
+            <div class="md-no-stream-icon">📡</div>
+            <h3>Sin transmisión disponible</h3>
+            <p>Este partido aún no tiene canales asignados. Vuelve más cerca del horario o explora <a href="/ultrax">UltraGol Live</a> para más opciones.</p>
+        </div>`;
 
     return `<!DOCTYPE html>
 <html lang="es">
@@ -1242,70 +1266,113 @@ function buildMatchPage({ slug, title, desc, equipo1, equipo2, logo1, logo2, est
 
     <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>
 </head>
-<body>
+<body class="md-body">
 
-<nav class="nav">
-    <a href="/" class="nav-logo">
-        <img src="/ultrax/favicon.png" alt="UltraGol">
-        Ultra<span>Gol</span>
-    </a>
-    <div class="nav-links">
-        <a href="/mx" class="active">Partidos</a>
-        <a href="/ultra">ULTRA</a>
-        <a href="/">Inicio</a>
-    </div>
-</nav>
-
-<div class="match-hero">
-    <div class="match-hero-inner">
-        <div class="breadcrumb">
-            <a href="/">UltraGol</a> › <a href="/mx">Partidos de Hoy</a> › ${equipo1} vs ${equipo2}
+<header class="topbar">
+    <div class="topbar-inner">
+        <a href="/" class="brand">
+            <img src="/ULTRA/favicon.png" alt="UltraGol">
+            <span>Ultra<b>Gol</b></span>
+        </a>
+        <div class="search-wrap">
+            <svg viewBox="0 0 24 24" class="search-ic" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="text" placeholder="Buscar otro partido…" onkeydown="if(event.key==='Enter'){window.location='/mx?q='+encodeURIComponent(this.value);}">
         </div>
-        <div class="match-scorecard">
-            <div class="scorecard-team">
-                ${localLogoHtml}
-                <h2>${equipo1}</h2>
-                ${nombreCortoLocal ? `<div style="color:var(--text-muted);font-size:.8rem">${nombreCortoLocal}</div>` : ''}
+        <nav class="topnav">
+            <a href="/mx" class="active">Partidos</a>
+            <a href="/ultra">ULTRA</a>
+            <a href="/">Inicio</a>
+        </nav>
+    </div>
+</header>
+
+<div class="md-wrap">
+    <nav class="md-crumb">
+        <a href="/">Inicio</a><span>›</span>
+        <a href="/mx">Partidos de Hoy</a><span>›</span>
+        <strong>${equipo1} vs ${equipo2}</strong>
+    </nav>
+
+    <section class="md-hero">
+        <div class="md-hero-meta">
+            ${liga ? `<span class="md-chip">${liga}</span>` : ''}
+            <span class="md-status ${statusClass}">${isLive ? '🔴 ' : ''}${statusLabel}</span>
+            ${hora ? `<span class="md-chip md-chip-time">⏱ ${hora}</span>` : ''}
+        </div>
+        <div class="md-scoreboard">
+            <div class="md-team md-team-home">
+                <div class="md-team-logo">${localLogoHtml}</div>
+                <div class="md-team-name">${equipo1}</div>
+                ${nombreCortoLocal ? `<div class="md-team-abbr">${nombreCortoLocal}</div>` : ''}
             </div>
-            <div class="scorecard-center">
-                <div class="scorecard-score">${scoreLocal}<span>:</span>${scoreVisitante}</div>
-                <div class="scorecard-meta">
-                    <div class="status-badge ${statusClass}">${isLive ? '🔴 ' : ''}${statusLabel}</div>
-                    ${detalles.estadio ? `<div style="color:var(--text-muted);font-size:.8rem;text-align:center">🏟 ${detalles.estadio}</div>` : ''}
-                    ${liga ? `<div style="color:var(--text-muted);font-size:.75rem;margin-top:4px">${liga}</div>` : ''}
-                    ${hora ? `<div style="color:var(--text-muted);font-size:.75rem">${hora}</div>` : ''}
-                </div>
+            <div class="md-score-block">
+                <div class="md-score">${scoreLocal}<span class="md-score-sep">·</span>${scoreVisitante}</div>
+                ${detalles.estadio ? `<div class="md-stadium">🏟️ ${detalles.estadio}</div>` : ''}
+                ${detalles.ciudad ? `<div class="md-city">${detalles.ciudad}</div>` : ''}
             </div>
-            <div class="scorecard-team">
-                ${visitanteLogoHtml}
-                <h2>${equipo2}</h2>
-                ${nombreCortoVisitante ? `<div style="color:var(--text-muted);font-size:.8rem">${nombreCortoVisitante}</div>` : ''}
+            <div class="md-team md-team-away">
+                <div class="md-team-logo">${visitanteLogoHtml}</div>
+                <div class="md-team-name">${equipo2}</div>
+                ${nombreCortoVisitante ? `<div class="md-team-abbr">${nombreCortoVisitante}</div>` : ''}
             </div>
         </div>
-    </div>
-</div>
+    </section>
 
-<div class="detail-grid">
-    <div class="detail-card full-width">
-        <h3>Goles</h3>
-        ${golesHtml}
-    </div>
-    <div class="detail-card">
-        <h3>Información del Partido</h3>
-        ${detalles.estadio ? `<div class="info-row"><span class="info-label">Estadio</span><span class="info-value">${detalles.estadio}</span></div>` : ''}
-        ${detalles.ciudad ? `<div class="info-row"><span class="info-label">Ciudad</span><span class="info-value">${detalles.ciudad}</span></div>` : ''}
-        <div class="info-row"><span class="info-label">Estado</span><span class="info-value">${statusLabel}</span></div>
-        ${isLive && estado.reloj ? `<div class="info-row"><span class="info-label">Minuto</span><span class="info-value live-clock">${estado.reloj}</span></div>` : ''}
-    </div>
-    <div class="detail-card">
-        <h3>Transmisión</h3>
-        ${streamSection}
-    </div>
+    <section class="md-section">
+        <h2 class="md-section-title">▶ Transmisión EN VIVO</h2>
+        ${playerSection}
+    </section>
+
+    <section class="md-grid">
+        <div class="md-card">
+            <h2 class="md-section-title">⚽ Goles</h2>
+            <div class="md-goals">${golesHtml}</div>
+        </div>
+        <div class="md-card">
+            <h2 class="md-section-title">ℹ️ Información</h2>
+            <div class="md-info">
+                ${detalles.estadio ? `<div class="md-row"><span>Estadio</span><b>${detalles.estadio}</b></div>` : ''}
+                ${detalles.ciudad ? `<div class="md-row"><span>Ciudad</span><b>${detalles.ciudad}</b></div>` : ''}
+                ${liga ? `<div class="md-row"><span>Competición</span><b>${liga}</b></div>` : ''}
+                ${hora ? `<div class="md-row"><span>Hora</span><b>${hora}</b></div>` : ''}
+                <div class="md-row"><span>Estado</span><b class="${statusClass}">${statusLabel}</b></div>
+                ${isLive && estado && estado.reloj ? `<div class="md-row"><span>Minuto</span><b style="color:var(--accent)">${estado.reloj}</b></div>` : ''}
+                <div class="md-row"><span>Servidores</span><b>${serverUrls.length}</b></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="md-back">
+        <a href="/mx" class="md-back-btn">← Volver a Partidos de Hoy</a>
+    </section>
 </div>
 
 <footer class="footer">
-    <p>Volver a <a href="/mx">Partidos de Hoy</a> · <a href="/ultra">ULTRA — Todos los canales</a></p>
+    <p>© 2026 <a href="/">UltraGol</a> — Partidos en vivo, marcadores y transmisiones deportivas.</p>
 </footer>
+
+<script>
+(function(){
+    const iframe = document.getElementById('md-iframe');
+    const fsBtn = document.getElementById('md-fs-btn');
+    const buttons = document.querySelectorAll('.md-server-btn');
+    buttons.forEach(b => {
+        b.addEventListener('click', () => {
+            buttons.forEach(x => x.classList.remove('active'));
+            b.classList.add('active');
+            const url = decodeURIComponent(b.dataset.url);
+            iframe.src = url;
+        });
+    });
+    if (fsBtn && iframe) {
+        fsBtn.addEventListener('click', () => {
+            const el = iframe;
+            if (el.requestFullscreen) el.requestFullscreen();
+            else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        });
+    }
+})();
+</script>
 
 </body>
 </html>`;
