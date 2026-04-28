@@ -1151,8 +1151,8 @@ app.get('/mx/:slug', async (req, res) => {
         const parts = slug.split('-vs-');
         const t1 = (parts[0] || '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
         const t2 = ((parts[1] || '') + (parts.slice(2).join('-') ? '-' + parts.slice(2).join('-') : '')).replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        const title = `${t1} vs ${t2} EN VIVO | UltraGol`;
-        const desc = `Sigue el partido ${t1} vs ${t2} en vivo con marcador en tiempo real, goles y transmisiones en UltraGol.`;
+        const title = `${t1} vs ${t2} EN VIVO HD | Pelota Libre Premium`;
+        const desc = `Ver ${t1} vs ${t2} en vivo gratis HD en Pelota Libre Premium. Marcador en tiempo real, goles y transmisión multi-servidor sin cortes.`;
         return res.send(buildMatchPage({ slug, title, desc, equipo1: t1, equipo2: t2, logo1: null, logo2: null, estado: null, goles: [], detalles: {}, transmisionUrl: null, liga: '', hora: '' }));
     }
 
@@ -1161,8 +1161,8 @@ app.get('/mx/:slug', async (req, res) => {
     const hasScore = marcadorLocal !== null && marcadorLocal !== undefined && marcadorLocal !== '';
     const scoreStr = hasScore && estado && !estado.programado ? ` ${marcadorLocal}-${marcadorVisitante}` : '';
     const statusStr = estado && estado.enVivo ? ' EN VIVO' : (estado && estado.finalizado ? ' - Resultado Final' : '');
-    const title = `${teamTitle}${scoreStr}${statusStr} | UltraGol`;
-    const desc = `${teamTitle}${scoreStr}. Sigue el partido en vivo con marcador, goles y transmisión gratis en UltraGol.`;
+    const title = `${teamTitle}${scoreStr}${statusStr} HD | Pelota Libre Premium`;
+    const desc = `${teamTitle}${scoreStr}. Ver en vivo gratis HD en Pelota Libre Premium con marcador, goles y transmisión multi-servidor sin cortes.`;
 
     res.send(buildMatchPage({ slug, title, desc, equipo1, equipo2, logo1, logo2, estado, goles: goles || [], detalles: detalles || {}, transmisionUrl, liga, hora, nombreCortoLocal, nombreCortoVisitante, marcadorLocal, marcadorVisitante }));
 });
