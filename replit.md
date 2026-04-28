@@ -92,9 +92,16 @@ Preferred communication style: Simple, everyday language.
     - Keyboard shortcuts: ↑/↓ navigate, M mute, Esc close
     - "Swipe up" animated hint on first reel
     - Toast notifications for actions
-  - 12 varied content categories with unique tag colors: GOLAZO, FESTEJO, POLÉMICA, ATAJADA, EXCLUSIVO, JUGADA, ENTREVISTA, TROFEO, DATO, AMBIENTE, TOP 5, RÉCORD
-  - Data managed in `data/reels.json` (absolute path served from root)
-  - Files: `js/reels-viewer.js`, `css/reels-viewer.css`, `data/reels.json`
+  - **Live video scraping**: Server scrapes Wikimedia Commons (free, public domain / CC-licensed football videos) every 6 hours from 4 categories:
+    - `Category:Videos_of_association_football`
+    - `Category:Videos_of_FIFA_U-17_Women%27s_World_Cup`
+    - `Category:Football_videos_of_FIFA_World_Cup`
+    - `Category:Football_match_video_clips`
+  - Auto-categorizes by title keywords: GOLAZO, MUNDIAL, PENAL, FEMENIL, ATAJADA, JUGADA, FESTEJO, TIRO LIBRE, CÓRNER, PARTIDO
+  - Cached in `data/reels-scraped.json` and persisted between restarts
+  - API endpoint: `GET /api/reels` (force refresh: `?refresh=1`)
+  - Static fallback: `data/reels.json` if scraper fails
+  - Files: `server/reels-scraper.js`, `js/reels-viewer.js`, `css/reels-viewer.css`, `data/reels.json` (fallback), `data/reels-scraped.json` (live cache)
 - **Push Notification System**:
   - Permission request modal appears 3 seconds after page load
   - Team selector modal to choose favorite team

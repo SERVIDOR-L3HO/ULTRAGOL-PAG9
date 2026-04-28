@@ -291,6 +291,27 @@ app.get('/api/ultragol/notificaciones', async (req, res) => {
     }
 });
 
+// ─── REELS SCRAPER (Reddit-based) ───
+const reelsScraper = require('./server/reels-scraper');
+reelsScraper.start();
+
+app.get('/api/reels', async (req, res) => {
+    try {
+        const force = req.query.refresh === '1';
+        const reels = await reelsScraper.getReels(force);
+        res.set('Cache-Control', 'public, max-age=300');
+        res.json({
+            ok: true,
+            count: reels.length,
+            sources: reelsScraper.CATEGORIES,
+            reels
+        });
+    } catch (e) {
+        console.error('[/api/reels]', e);
+        res.status(500).json({ ok: false, error: 'Failed to load reels', reels: [] });
+    }
+});
+
 // Smart notifications endpoint — generates real notifications from all 6 leagues
 const LIGAS_CONFIG = [
     { nombre: 'Liga MX',        emoji: '🇲🇽', endpoint: '/marcadores' },

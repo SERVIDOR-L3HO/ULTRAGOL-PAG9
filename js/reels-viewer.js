@@ -2,7 +2,8 @@
     'use strict';
 
     const STORAGE_KEY = 'ultragol_reels_likes';
-    const DATA_URL = '/data/reels.json';
+    const API_URL = '/api/reels';
+    const FALLBACK_URL = '/data/reels.json';
 
     let reelsData = [];
     let currentIndex = 0;
@@ -23,15 +24,31 @@
         } catch (e) { /* noop */ }
     }
 
-    // ─── FETCH DATA ───
+    // ─── FETCH DATA (live API first, static fallback) ───
     async function fetchReels() {
+        // Try live scraper API first
         try {
-            const res = await fetch(DATA_URL);
+            const res = await fetch(API_URL, { cache: 'no-store' });
+            if (res.ok) {
+                const json = await res.json();
+                if (json.reels && json.reels.length > 0) {
+                    reelsData = json.reels;
+                    console.log(`[Reels] Loaded ${reelsData.length} live reels from API`);
+                    return reelsData;
+                }
+            }
+        } catch (e) {
+            console.warn('[Reels] API fetch failed, using fallback:', e.message);
+        }
+        // Fallback to static JSON
+        try {
+            const res = await fetch(FALLBACK_URL);
             const json = await res.json();
             reelsData = json.reels || [];
+            console.log(`[Reels] Loaded ${reelsData.length} fallback reels`);
             return reelsData;
         } catch (e) {
-            console.error('[Reels] Failed to load:', e);
+            console.error('[Reels] Both API and fallback failed:', e);
             return [];
         }
     }
