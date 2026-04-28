@@ -92,12 +92,15 @@ Preferred communication style: Simple, everyday language.
     - Keyboard shortcuts: ↑/↓ navigate, M mute, Esc close
     - "Swipe up" animated hint on first reel
     - Toast notifications for actions
-  - **Live video scraping**: Server scrapes Wikimedia Commons (free, public domain / CC-licensed football videos) every 6 hours from 4 categories:
-    - `Category:Videos_of_association_football`
-    - `Category:Videos_of_FIFA_U-17_Women%27s_World_Cup`
-    - `Category:Football_videos_of_FIFA_World_Cup`
-    - `Category:Football_match_video_clips`
-  - Auto-categorizes by title keywords: GOLAZO, MUNDIAL, PENAL, FEMENIL, ATAJADA, JUGADA, FESTEJO, TIRO LIBRE, CÓRNER, PARTIDO
+  - **Live video scraping (TikTok via TikWM public API)**: Server scrapes 12 keyword searches every 90 minutes:
+    - Liga MX teams: ligamx, rayados, club américa, chivas, tigres uanl, pumas unam, cruz azul
+    - Topics: futbol mexicano, futbol golazo, futbol skills
+    - Stars: messi, cristiano ronaldo
+  - Returns real viral TikTok videos with: HD MP4 URL (no watermark), thumbnail, title, likes/views/shares/comments, duration, author
+  - Auto-tags by team with brand colors (e.g. AMÉRICA = #FFD700, RAYADOS = #003DA5)
+  - Interleaves results so feed alternates between teams (no 8 América in a row)
+  - Filters out videos longer than 120 seconds (keeps it reels-style)
+  - 90-min refresh cycle (TikTok signed URLs expire eventually)
   - Cached in `data/reels-scraped.json` and persisted between restarts
   - API endpoint: `GET /api/reels` (force refresh: `?refresh=1`)
   - Static fallback: `data/reels.json` if scraper fails
