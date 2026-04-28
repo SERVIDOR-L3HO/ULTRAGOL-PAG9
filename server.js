@@ -1270,10 +1270,10 @@ function buildMatchPage({ slug, title, desc, equipo1, equipo2, logo1, logo2, est
 
 <header class="topbar">
     <div class="topbar-inner">
-        <a href="/" class="brand">
-            <img src="/ULTRA/favicon.png" alt="UltraGol">
-            <span>Ultra<b>Gol</b></span>
-        </a>
+        <div class="brand" role="img" aria-label="PelotaLibre">
+            <img src="/ULTRA/favicon.png" alt="">
+            <span>PELOTA<b>LIBRE</b></span>
+        </div>
         <div class="search-wrap">
             <svg viewBox="0 0 24 24" class="search-ic" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
             <input type="text" placeholder="Buscar otro partido…" onkeydown="if(event.key==='Enter'){window.location='/mx?q='+encodeURIComponent(this.value);}">
