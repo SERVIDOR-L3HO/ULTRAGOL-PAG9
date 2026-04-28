@@ -707,18 +707,42 @@ function getLocalLogo(teamName) {
 
 // Normalize any transmission item into a common match object
 function normalizeTransmision(item, fuente) {
-    const equipo1 = item.equipo1 || item.local || '';
-    const equipo2 = item.equipo2 || item.visitante || '';
-    const titulo = item.titulo || item.evento || `${equipo1} vs ${equipo2}`;
+    // Some sources (e.g. transmisiones5) only provide a "title" like "PSG vs Bayern"
+    let equipo1 = item.equipo1 || item.local || '';
+    let equipo2 = item.equipo2 || item.visitante || '';
+    if ((!equipo1 || !equipo2) && (item.title || item.evento || item.titulo)) {
+        const raw = item.title || item.evento || item.titulo;
+        const m = String(raw).split(/\s+vs\.?\s+|\s+x\s+/i);
+        if (m.length >= 2) {
+            equipo1 = equipo1 || m[0].trim();
+            equipo2 = equipo2 || m.slice(1).join(' vs ').trim();
+        }
+    }
+    const titulo = item.titulo || item.evento || item.title || `${equipo1} vs ${equipo2}`;
     const slug = matchSlug(equipo1, equipo2);
 
-    let transmisionUrl = null;
-    if (item.url) transmisionUrl = item.url;
-    else if (item.enlaces && item.enlaces[0]) transmisionUrl = item.enlaces[0];
-    else if (item.canales && item.canales[0]) transmisionUrl = item.canales[0].url;
-    else if (item.fuentes && item.fuentes[0]) transmisionUrl = item.fuentes[0].url;
+    // Collect ALL stream URLs available, comma-joined for multi-server playback
+    const urls = [];
+    const pushUrl = u => { if (u && typeof u === 'string' && /^https?:/i.test(u)) urls.push(u); };
+    if (item.url) pushUrl(item.url);
+    if (Array.isArray(item.enlaces)) item.enlaces.forEach(pushUrl);
+    if (Array.isArray(item.canales)) {
+        item.canales.forEach(c => pushUrl(c && (c.url || c.urlStream || c.link)));
+    }
+    if (Array.isArray(item.fuentes)) item.fuentes.forEach(f => pushUrl(f && (f.url || f.urlStream)));
+    // transmisiones5 → links: [{ type:'urls_list', data:[{ match_url, stream_source, stream_quality }] }]
+    if (Array.isArray(item.links)) {
+        item.links.forEach(group => {
+            if (group && Array.isArray(group.data)) {
+                group.data.forEach(d => pushUrl(d && (d.match_url || d.url)));
+            } else if (group && (group.match_url || group.url)) {
+                pushUrl(group.match_url || group.url);
+            }
+        });
+    }
+    const transmisionUrl = urls.length ? [...new Set(urls)].join(',') : null;
 
-    const estadoRaw = (item.estado || '').toLowerCase();
+    const estadoRaw = (item.estado || item.status || '').toString().toLowerCase();
     const enVivo = estadoRaw.includes('vivo') || estadoRaw.includes('live');
     const finalizado = estadoRaw.includes('finaliz') || estadoRaw.includes('terminado') || estadoRaw.includes('full');
 
@@ -736,10 +760,10 @@ function normalizeTransmision(item, fuente) {
         equipo2,
         logo1: localLogo1 || (eitherLocal ? null : item.logo1) || null,
         logo2: localLogo2 || (eitherLocal ? null : item.logo2) || null,
-        hora: item.hora || '',
+        hora: item.hora || item.hour || '',
         fecha: item.fecha || item.fechaISO || '',
-        liga: item.liga || item.info || item.pais || item.categoria || '',
-        deporte: item.deporte || item.categoria || 'Fútbol',
+        liga: item.liga || item.league || item.info || item.pais || item.categoria || '',
+        deporte: item.deporte || item.categoria || item.sport || 'Fútbol',
         estado: {
             enVivo,
             finalizado,
@@ -757,12 +781,14 @@ function normalizeTransmision(item, fuente) {
 
 // Fetch and merge all transmission sources + marcadores
 async function fetchAllPartidos() {
-    const [marc, t2, t3, t4, t6] = await Promise.all([
+    const [marc, t2, t3, t4, t5, t6, t7] = await Promise.all([
         safeFetch(`${API_BASE_URL}/marcadores`),
         safeFetch(`${API_BASE_URL}/transmisiones2`),
         safeFetch(`${API_BASE_URL}/transmisiones3`),
         safeFetch(`${API_BASE_URL}/transmisiones4`),
+        safeFetch(`${API_BASE_URL}/transmisiones5`),
         safeFetch(`${API_BASE_URL}/transmisiones6`),
+        safeFetch(`${API_BASE_URL}/transmisiones7`),
     ]);
 
     const map = new Map();
@@ -771,12 +797,14 @@ async function fetchAllPartidos() {
         { data: t2, key: 'transmisiones2' },
         { data: t3, key: 'transmisiones3' },
         { data: t4, key: 'transmisiones4' },
+        { data: t5, key: 'transmisiones5' },
         { data: t6, key: 'transmisiones6' },
+        { data: t7, key: 'transmisiones7' },
     ];
 
     for (const { data, key } of sources) {
         if (!data) continue;
-        const items = data.transmisiones || data.partidos || data.eventos || [];
+        const items = data.transmisiones || data.partidos || data.eventos || data.matches || [];
         for (const item of items) {
             const norm = normalizeTransmision(item, key);
             if (!norm.slug || norm.slug === '-vs-') continue;
@@ -784,10 +812,19 @@ async function fetchAllPartidos() {
                 map.set(norm.slug, norm);
             } else {
                 const existing = map.get(norm.slug);
-                if (!existing.transmisionUrl && norm.transmisionUrl) existing.transmisionUrl = norm.transmisionUrl;
+                // Merge stream URLs from multiple sources (multi-server playback)
+                if (norm.transmisionUrl) {
+                    const merged = new Set(
+                        [...(existing.transmisionUrl || '').split(','), ...norm.transmisionUrl.split(',')]
+                            .map(s => s.trim()).filter(Boolean)
+                    );
+                    existing.transmisionUrl = [...merged].join(',');
+                }
                 if (key === 'transmisiones6') { existing.estado = norm.estado; existing.fuente = key; }
                 if (!existing.logo1 && norm.logo1) existing.logo1 = norm.logo1;
                 if (!existing.logo2 && norm.logo2) existing.logo2 = norm.logo2;
+                if (!existing.liga && norm.liga) existing.liga = norm.liga;
+                if (!existing.hora && norm.hora) existing.hora = norm.hora;
             }
         }
     }
