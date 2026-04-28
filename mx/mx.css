@@ -69,9 +69,26 @@ img { display: block; max-width: 100%; }
     text-decoration: none;
     pointer-events: none;
 }
-.brand img { width: 30px; height: 30px; border-radius: 6px; }
+.brand img {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: rgba(0,0,0,.25);
+    padding: 2px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.4), 0 0 0 1px rgba(255,200,61,.25);
+}
+.brand span { color: #fff; display: inline-flex; align-items: center; gap: 6px; }
 .brand span b { color: var(--accent); font-weight: 800; }
-.brand span { color: #fff; }
+.brand span i {
+    font-style: normal;
+    font-size: 9px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: linear-gradient(135deg, #ffe98a, #ffc83d 50%, #c98a07);
+    color: #2a1a00;
+    box-shadow: 0 1px 3px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.4);
+    text-shadow: 0 1px 0 rgba(255,255,255,.3);
+}
 
 .search-wrap {
     position: relative;

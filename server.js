@@ -1270,9 +1270,9 @@ function buildMatchPage({ slug, title, desc, equipo1, equipo2, logo1, logo2, est
 
 <header class="topbar">
     <div class="topbar-inner">
-        <div class="brand" role="img" aria-label="PelotaLibre">
-            <img src="/ULTRA/favicon.png" alt="">
-            <span>PELOTA<b>LIBRE</b></span>
+        <div class="brand" role="img" aria-label="PelotaLibre Premium">
+            <img src="/mx/pelotalibre-premium.svg" alt="">
+            <span>PELOTA<b>LIBRE</b><i>PREMIUM</i></span>
         </div>
         <div class="search-wrap">
             <svg viewBox="0 0 24 24" class="search-ic" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
