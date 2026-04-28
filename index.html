@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="ULTRA/favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/reels-viewer.css">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -362,6 +363,9 @@
         </div>
     </div>
 
+    <!-- 🔥 REELS TEASER (built dynamically by js/reels-viewer.js) -->
+    <section class="reels-teaser" id="reelsTeaser" aria-label="Momentos virales de Liga MX"></section>
+
     <!-- STATS STRIP -->
     <div class="stats-strip">
         <div class="stat-item">
@@ -503,5 +507,8 @@
         const strip = document.querySelector('.stats-strip');
         if (strip) statsObserver.observe(strip);
     </script>
+
+    <!-- 🔥 ULTRAGOL REELS — Floating button + fullscreen TikTok-style viewer -->
+    <script src="js/reels-viewer.js" defer></script>
 </body>
 </html>

@@ -78,6 +78,22 @@ Preferred communication style: Simple, everyday language.
   - Real-time preview of all changes
   - Settings persistence using localStorage
   - Accessible via gear icon in chat toolbar
+- **UltraGol Reels (TikTok-style viewer)**:
+  - Floating REELS button on right side with pulsing red glow, NEW badge, and animated fire icon — always accessible while browsing
+  - Inline "Momentos del momento" teaser section on home page (right after hero) with horizontal scrolling vertical cards (9:16 aspect ratio)
+  - Cards show colored tags (GOLAZO, RESUMEN, GOLEADA, etc.), team name, title, and like/share counts
+  - Fullscreen immersive viewer with:
+    - Vertical snap-scroll for swipe up/down navigation
+    - YouTube embed support (also accepts MP4 via `type: "mp4"`)
+    - TikTok-style action buttons: like, share, mute toggle, open in YouTube
+    - Persistent likes via localStorage
+    - Native Web Share API + clipboard fallback
+    - Progress dots (clickable for jump-to-slide)
+    - Keyboard shortcuts: ↑/↓ navigate, M mute, Esc close
+    - "Swipe up" animated hint on first reel
+    - Toast notifications for actions
+  - Data managed in `data/reels.json` for easy content updates
+  - Files: `js/reels-viewer.js`, `css/reels-viewer.css`, `data/reels.json`
 - **Push Notification System**:
   - Permission request modal appears 3 seconds after page load
   - Team selector modal to choose favorite team
