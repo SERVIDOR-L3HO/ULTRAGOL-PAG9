@@ -2,7 +2,7 @@
     'use strict';
 
     const STORAGE_KEY = 'ultragol_reels_likes';
-    const DATA_URL = 'data/reels.json';
+    const DATA_URL = '/data/reels.json';
 
     let reelsData = [];
     let currentIndex = 0;
@@ -84,19 +84,16 @@
         if (viewAll) viewAll.addEventListener('click', () => openViewer(0));
     }
 
-    // ─── FLOATING BUTTON ───
-    function buildFab() {
-        if (document.querySelector('.reels-fab')) return;
-        const fab = document.createElement('button');
-        fab.className = 'reels-fab';
-        fab.setAttribute('aria-label', 'Abrir Reels de fútbol');
-        fab.innerHTML = `
-            <span class="reels-fab-badge">NEW</span>
-            <span class="reels-fab-icon">🔥</span>
-            <span class="reels-fab-text">Reels</span>
-        `;
-        fab.addEventListener('click', () => openViewer(0));
-        document.body.appendChild(fab);
+    // ─── HOOK NAV BUTTON (any element with [data-reels-trigger]) ───
+    function attachTriggers() {
+        document.querySelectorAll('[data-reels-trigger]').forEach(el => {
+            if (el.dataset.reelsHooked === '1') return;
+            el.dataset.reelsHooked = '1';
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                openViewer(0);
+            });
+        });
     }
 
     // ─── FULLSCREEN VIEWER ───
@@ -164,9 +161,9 @@
                         <span class="reels-action-icon"><i class="fas fa-share"></i></span>
                         <span class="reels-action-count">${formatCount(r.shares)}</span>
                     </button>
-                    <button class="reels-action-btn" data-open-yt="${r.videoId}" aria-label="Ver en YouTube">
-                        <span class="reels-action-icon"><i class="fab fa-youtube"></i></span>
-                        <span class="reels-action-count">YouTube</span>
+                    <button class="reels-action-btn" data-fav="${r.id}" aria-label="Guardar">
+                        <span class="reels-action-icon"><i class="fas fa-bookmark"></i></span>
+                        <span class="reels-action-count">Guardar</span>
                     </button>
                 </div>
 
@@ -200,10 +197,10 @@
             btn.addEventListener('click', () => shareReel(parseInt(btn.dataset.share, 10)));
         });
 
-        document.querySelectorAll('[data-open-yt]').forEach(btn => {
+        document.querySelectorAll('[data-fav]').forEach(btn => {
             btn.addEventListener('click', () => {
-                const id = btn.dataset.openYt;
-                window.open(`https://www.youtube.com/watch?v=${id}`, '_blank', 'noopener');
+                btn.classList.toggle('liked');
+                showToast(btn.classList.contains('liked') ? 'Guardado en favoritos' : 'Quitado de favoritos');
             });
         });
 
@@ -243,28 +240,19 @@
 
         wrap.dataset.loaded = '1';
 
-        if (r.type === 'youtube') {
-            const params = new URLSearchParams({
-                autoplay: '1',
-                mute: isMuted ? '1' : '0',
-                controls: '1',
-                rel: '0',
-                modestbranding: '1',
-                playsinline: '1',
-                loop: '1',
-                playlist: r.videoId
-            });
+        if (r.type === 'mp4' && r.videoUrl) {
             wrap.innerHTML = `
-                <iframe
-                    src="https://www.youtube.com/embed/${r.videoId}?${params.toString()}"
-                    allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                    allowfullscreen
-                    loading="lazy"
-                ></iframe>
+                <video src="${r.videoUrl}" poster="${r.thumbnail || ''}" autoplay ${isMuted ? 'muted' : ''} loop playsinline preload="metadata"></video>
             `;
-        } else if (r.type === 'mp4' && r.videoUrl) {
+            const v = wrap.querySelector('video');
+            if (v) {
+                v.addEventListener('click', () => {
+                    if (v.paused) v.play(); else v.pause();
+                });
+            }
+        } else if (r.type === 'iframe' && r.videoUrl) {
             wrap.innerHTML = `
-                <video src="${r.videoUrl}" autoplay ${isMuted ? 'muted' : ''} loop playsinline></video>
+                <iframe src="${r.videoUrl}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen loading="lazy"></iframe>
             `;
         }
     }
@@ -273,11 +261,7 @@
         const wrap = document.querySelector(`[data-video-wrap="${idx}"]`);
         if (!wrap) return;
         const video = wrap.querySelector('video');
-        if (video) video.pause();
-        // YouTube iframe pausing requires the IFrame API; for now we let it keep
-        // playing audio off-screen — but since it's muted by default and the
-        // user only sees one slide at a time (snap-scroll), it's fine.
-        // We could destroy the iframe if needed for performance.
+        if (video) { try { video.pause(); } catch(e) {} }
     }
 
     function updateAllProgressDots(activeIdx) {
@@ -296,16 +280,14 @@
     // ─── ACTIONS ───
     function toggleMute(btn) {
         isMuted = !isMuted;
-        // Update all mute buttons
         document.querySelectorAll('[data-mute]').forEach(b => {
             b.innerHTML = `<i class="fas ${isMuted ? 'fa-volume-mute' : 'fa-volume-up'}"></i>`;
         });
-        // Reload current iframe with new mute state
-        const wrap = document.querySelector(`[data-video-wrap="${currentIndex}"]`);
-        if (wrap) {
-            wrap.dataset.loaded = '0';
-            loadVideo(currentIndex);
-        }
+        // Update all currently loaded videos
+        document.querySelectorAll('.reels-video-wrap video').forEach(v => {
+            v.muted = isMuted;
+            if (!isMuted && v.paused) { v.play().catch(() => {}); }
+        });
         showToast(isMuted ? 'Sonido desactivado' : 'Sonido activado');
     }
 
@@ -330,16 +312,17 @@
     async function shareReel(idx) {
         const r = reelsData[idx];
         if (!r) return;
+        const url = window.location.href.split('#')[0] + '#reel-' + r.id;
         const shareData = {
             title: `UltraGol — ${r.title}`,
             text: `Mira este momento de ${r.team}: ${r.title}`,
-            url: `https://www.youtube.com/watch?v=${r.videoId}`
+            url
         };
         try {
             if (navigator.share) {
                 await navigator.share(shareData);
             } else {
-                await navigator.clipboard.writeText(shareData.url);
+                await navigator.clipboard.writeText(url);
                 showToast('Enlace copiado al portapapeles');
             }
         } catch (e) { /* user cancelled */ }
@@ -414,8 +397,8 @@
         loadLikes();
         await fetchReels();
         if (reelsData.length === 0) return;
-        buildFab();
         buildViewer();
+        attachTriggers();
         const teaserContainer = document.getElementById('reelsTeaser');
         if (teaserContainer) buildTeaser(teaserContainer);
     }

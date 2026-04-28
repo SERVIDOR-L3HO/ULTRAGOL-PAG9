@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="pwa-install-banner.css">
     <link rel="stylesheet" href="notifications.css?v=20251109c">
     <link rel="stylesheet" href="tv-styles.css?v=20251109c">
+    <link rel="stylesheet" href="../css/reels-viewer.css?v=1">
     
     <!-- LZ-String para comprimir URLs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
@@ -325,6 +326,15 @@
             <button class="nav-btn" data-nav="search" onclick="navTo('search', this)">
                 <div class="nav-icon-wrap"><i class="fas fa-magnifying-glass"></i></div>
                 <span class="nav-label">Buscar</span>
+            </button>
+            <!-- 🔥 BOTÓN CENTRAL DE REELS — verde + rosa, elevado del nav -->
+            <button class="nav-reels-btn" data-reels-trigger aria-label="Abrir Reels">
+                <span class="nav-reels-glow"></span>
+                <span class="nav-reels-ring"></span>
+                <span class="nav-reels-icon">
+                    <i class="fas fa-bolt"></i>
+                </span>
+                <span class="nav-reels-label">REELS</span>
             </button>
             <button class="nav-btn" data-nav="noticias" onclick="navBounce(this); window.location.href='noticias.html'">
                 <div class="nav-icon-wrap"><i class="fas fa-newspaper"></i></div>
@@ -1050,5 +1060,8 @@
             <span class="bubble-pulse"></span>
         </div>
     </a>
+
+    <!-- 🔥 ULTRAGOL REELS — TikTok-style viewer triggered by center nav button -->
+    <script src="../js/reels-viewer.js?v=2" defer></script>
 </body>
 </html>

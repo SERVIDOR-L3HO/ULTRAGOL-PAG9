@@ -10,71 +10,123 @@
 }
 
 /* ─────────────────────────────────────────────
-   FLOATING REELS BUTTON (right side, vertical)
+   CENTER NAV REELS BUTTON (green + pink, elevated)
+   Lives between regular nav-btns in the bottom nav
    ───────────────────────────────────────────── */
-.reels-fab {
-    position: fixed;
-    right: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 9998;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 16px 12px;
-    background: linear-gradient(180deg, #ff3860 0%, #e94560 50%, #c73652 100%);
-    color: #fff;
+.nav-reels-btn {
+    position: relative;
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+    margin: -22px 8px 0;
+    padding: 0;
     border: none;
-    border-radius: 50px;
+    background: transparent;
     cursor: pointer;
-    box-shadow: 0 8px 32px var(--reels-glow), 0 0 0 0 var(--reels-glow);
-    animation: reelsPulse 2s ease-in-out infinite;
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    text-decoration: none;
-    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    z-index: 5;
+    font-family: inherit;
 }
 
-.reels-fab:hover {
-    transform: translateY(-50%) scale(1.1) translateX(-4px);
-}
-
-.reels-fab .reels-fab-icon {
-    font-size: 24px;
-    animation: fireDance 1.5s ease-in-out infinite alternate;
-}
-
-.reels-fab .reels-fab-text {
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    font-weight: 900;
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    transform: rotate(180deg);
-}
-
-.reels-fab .reels-fab-badge {
+/* Pink-green gradient ring (rotating) */
+.nav-reels-ring {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #00ff41;
-    color: #000;
-    font-size: 9px;
-    font-weight: 900;
-    padding: 3px 7px;
-    border-radius: 50px;
-    letter-spacing: 0.5px;
-    box-shadow: 0 2px 8px rgba(0, 255, 65, 0.5);
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 0deg,
+        #ff3b8b 0%,
+        #00ff95 25%,
+        #ff3b8b 50%,
+        #00ff95 75%,
+        #ff3b8b 100%
+    );
+    animation: reelsRingSpin 3s linear infinite;
+    padding: 3px;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
 }
 
-@keyframes reelsPulse {
-    0%, 100% {
-        box-shadow: 0 8px 32px var(--reels-glow), 0 0 0 0 var(--reels-glow);
-    }
-    50% {
-        box-shadow: 0 8px 32px var(--reels-glow), 0 0 0 16px transparent;
-    }
+/* Outer glow halo */
+.nav-reels-glow {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 59, 139, 0.55) 0%, rgba(0, 255, 149, 0.25) 50%, transparent 70%);
+    filter: blur(8px);
+    animation: reelsGlowPulse 1.8s ease-in-out infinite;
+    z-index: -1;
+}
+
+/* Inner icon disc */
+.nav-reels-icon {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff3b8b 0%, #b91d73 35%, #00cc7a 65%, #00ff95 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 22px;
+    box-shadow:
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+        0 6px 16px rgba(255, 59, 139, 0.5),
+        0 8px 22px rgba(0, 255, 149, 0.35);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 2;
+}
+
+.nav-reels-icon i {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+    animation: reelsIconBolt 1.2s ease-in-out infinite alternate;
+}
+
+/* Tiny "REELS" label below */
+.nav-reels-label {
+    position: absolute;
+    bottom: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8.5px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    color: #fff;
+    background: linear-gradient(90deg, #ff3b8b, #00ff95);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 12px rgba(255, 59, 139, 0.5);
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.nav-reels-btn:hover .nav-reels-icon {
+    transform: scale(1.1) rotate(-8deg);
+}
+
+.nav-reels-btn:active .nav-reels-icon {
+    transform: scale(0.92);
+}
+
+@keyframes reelsRingSpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes reelsGlowPulse {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.18); }
+}
+
+@keyframes reelsIconBolt {
+    0% { transform: scale(1) rotate(-4deg); }
+    100% { transform: scale(1.15) rotate(4deg); }
 }
 
 @keyframes fireDance {
