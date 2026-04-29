@@ -991,6 +991,228 @@ app.get('/api/player-info', async (req, res) => {
     res.json(result);
 });
 
+// ─── TEAM PROFILE — Google-style aggregated data (TheSportsDB, caché 30 min) ──
+const teamProfileCache = new Map();
+const TEAM_PROFILE_TTL = 30 * 60 * 1000;
+const TSDB_KEY = process.env.TSDB_API_KEY || '3';
+const TSDB_BASE = `https://www.thesportsdb.com/api/v1/json/${TSDB_KEY}`;
+
+const _normTeam = s => (s || '').toString().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+
+async function _tsdbFetch(url, timeoutMs = 5000) {
+    try {
+        const r = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) });
+        if (!r.ok) return null;
+        return await r.json();
+    } catch (_) { return null; }
+}
+
+function _pickBestTeam(teams, query, sportHint, preferMexican = false) {
+    if (!Array.isArray(teams) || teams.length === 0) return null;
+    const q = _normTeam(query);
+    const sport = (sportHint || 'soccer').toLowerCase();
+    let pool = teams.filter(t => (t.strSport || '').toLowerCase().includes(sport === 'soccer' ? 'soccer' : sport));
+    if (pool.length === 0) pool = teams;
+    pool.sort((a, b) => {
+        // Prefer Mexican Primera League for known Liga MX team queries
+        if (preferMexican) {
+            const am = (a.strLeague || '').toLowerCase().includes('mexican primera') ? 0 : 1;
+            const bm = (b.strLeague || '').toLowerCase().includes('mexican primera') ? 0 : 1;
+            if (am !== bm) return am - bm;
+        }
+        const an = _normTeam(a.strTeam);
+        const bn = _normTeam(b.strTeam);
+        const ax = an === q ? 0 : an.startsWith(q) ? 1 : an.includes(q) ? 2 : 3;
+        const bx = bn === q ? 0 : bn.startsWith(q) ? 1 : bn.includes(q) ? 2 : 3;
+        if (ax !== bx) return ax - bx;
+        // tie-break: prefer top European/American leagues
+        const topLeagues = ['english premier', 'spanish la liga', 'italian serie a', 'german bundesliga', 'french ligue 1', 'mls'];
+        const ap = topLeagues.some(l => (a.strLeague || '').toLowerCase().includes(l)) ? 0 : 1;
+        const bp = topLeagues.some(l => (b.strLeague || '').toLowerCase().includes(l)) ? 0 : 1;
+        return ap - bp;
+    });
+    return pool[0];
+}
+
+app.get('/api/team-profile', async (req, res) => {
+    const name = (req.query.name || '').trim();
+    const sport = (req.query.sport || 'soccer').trim();
+    if (!name) return res.status(400).json({ ok: false, error: 'name required' });
+
+    const cacheKey = `${_normTeam(name)}:${sport}`;
+    const cached = teamProfileCache.get(cacheKey);
+    if (cached && Date.now() - cached.ts < TEAM_PROFILE_TTL) {
+        return res.json(cached.data);
+    }
+
+    try {
+        // 1. Search team — try multiple variants to handle prefixes/aliases
+        const variants = [];
+        const original = name.trim();
+        variants.push(original);
+        // strip common prefixes
+        const stripped = original.replace(/^(club|cf|fc|cd|real|deportivo|atlético|atletico|sc|ac)\s+/i, '').trim();
+        if (stripped && stripped.toLowerCase() !== original.toLowerCase()) variants.push(stripped);
+        // longest token (helps "Club América" -> "América")
+        const tokens = original.split(/\s+/).filter(t => t.length >= 4);
+        if (tokens.length > 1) {
+            const longest = tokens.sort((a, b) => b.length - a.length)[0];
+            if (!variants.find(v => v.toLowerCase() === longest.toLowerCase())) variants.push(longest);
+        }
+        // Liga MX aliases — TheSportsDB uses specific names (CF America, CD Guadalajara)
+        const ligaMxAliases = {
+            'america': ['CF America', 'Club America'],
+            'club america': ['CF America'],
+            'chivas': ['CD Guadalajara'],
+            'guadalajara': ['CD Guadalajara'],
+            'tigres': ['Tigres'],
+            'tigres uanl': ['Tigres'],
+            'rayados': ['Monterrey'],
+            'monterrey': ['Monterrey'],
+            'pumas': ['Pumas'],
+            'pumas unam': ['Pumas'],
+            'unam': ['Pumas'],
+            'cruz azul': ['Cruz Azul'],
+            'tuzos': ['Pachuca'],
+            'pachuca': ['Pachuca'],
+            'xolos': ['Tijuana'],
+            'tijuana': ['Tijuana'],
+            'atlas': ['Atlas'],
+            'leon': ['León'], 'león': ['León'],
+            'toluca': ['Toluca'],
+            'puebla': ['Puebla'],
+            'necaxa': ['Necaxa'],
+            'santos': ['Santos Laguna'],
+            'mazatlan': ['Mazatlán'], 'mazatlán': ['Mazatlán'],
+            'queretaro': ['Queretaro FC'], 'querétaro': ['Queretaro FC'],
+            'juarez': ['FC Juarez'], 'juárez': ['FC Juarez'],
+            'san luis': ['Atletico de San Luis'], 'atletico san luis': ['Atletico de San Luis'],
+        };
+        const aliasKey = original.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+        const ligaMxMatches = ligaMxAliases[aliasKey] || [];
+        const isLigaMx = ligaMxMatches.length > 0;
+        ligaMxMatches.forEach(m => {
+            if (!variants.find(v => v.toLowerCase() === m.toLowerCase())) variants.push(m);
+        });
+
+        let team = null;
+        for (const v of variants) {
+            const search = await _tsdbFetch(`${TSDB_BASE}/searchteams.php?t=${encodeURIComponent(v)}`);
+            team = _pickBestTeam(search?.teams, v, sport, isLigaMx);
+            if (team) break;
+        }
+        if (!team) {
+            const empty = { ok: false, error: 'team_not_found', query: name };
+            teamProfileCache.set(cacheKey, { data: empty, ts: Date.now() });
+            return res.json(empty);
+        }
+
+        const teamId = team.idTeam;
+        const leagueId = team.idLeague;
+
+        // 2. Parallel fetch: last events, next events, squad, standings
+        const [last, next, squad, standings] = await Promise.all([
+            _tsdbFetch(`${TSDB_BASE}/eventslast.php?id=${teamId}`),
+            _tsdbFetch(`${TSDB_BASE}/eventsnext.php?id=${teamId}`),
+            _tsdbFetch(`${TSDB_BASE}/lookup_all_players.php?id=${teamId}`),
+            leagueId ? _tsdbFetch(`${TSDB_BASE}/lookuptable.php?l=${leagueId}&s=${encodeURIComponent(team.strCurrentSeason || '2025-2026')}`) : Promise.resolve(null),
+        ]);
+
+        const mapEvent = e => ({
+            id: e.idEvent,
+            date: e.dateEvent || e.dateEventLocal,
+            time: e.strTime || e.strTimeLocal || '',
+            timestamp: e.strTimestamp,
+            league: e.strLeague,
+            round: e.intRound,
+            home: e.strHomeTeam,
+            away: e.strAwayTeam,
+            homeId: e.idHomeTeam,
+            awayId: e.idAwayTeam,
+            homeScore: e.intHomeScore,
+            awayScore: e.intAwayScore,
+            homeBadge: e.strHomeTeamBadge || null,
+            awayBadge: e.strAwayTeamBadge || null,
+            status: e.strStatus || (e.intHomeScore != null ? 'Finished' : 'Scheduled'),
+            thumb: e.strThumb || null,
+            video: e.strVideo || null,
+            venue: e.strVenue || null,
+        });
+
+        const data = {
+            ok: true,
+            team: {
+                id: teamId,
+                name: team.strTeam,
+                shortName: team.strTeamShort || team.strTeam,
+                alternate: team.strAlternate,
+                league: team.strLeague,
+                leagueId: leagueId,
+                country: team.strCountry,
+                founded: team.intFormedYear,
+                stadium: team.strStadium,
+                stadiumThumb: team.strStadiumThumb,
+                stadiumLocation: team.strStadiumLocation,
+                stadiumCapacity: team.intStadiumCapacity,
+                stadiumDescription: team.strStadiumDescription,
+                website: team.strWebsite,
+                instagram: team.strInstagram,
+                twitter: team.strTwitter,
+                facebook: team.strFacebook,
+                youtube: team.strYoutube,
+                badge: team.strBadge || team.strTeamBadge,
+                logo: team.strLogo,
+                banner: team.strBanner,
+                fanart: team.strFanart1 || team.strFanart2 || null,
+                jersey: team.strEquipment,
+                description: team.strDescriptionES || team.strDescriptionEN || '',
+                colors: [team.strColour1, team.strColour2, team.strColour3].filter(Boolean),
+            },
+            lastMatches: (last?.results || []).map(mapEvent),
+            nextMatches: (next?.events || []).map(mapEvent),
+            squad: (squad?.player || []).map(p => ({
+                id: p.idPlayer,
+                name: p.strPlayer,
+                position: p.strPosition,
+                nationality: p.strNationality,
+                born: p.dateBorn,
+                photo: p.strCutout || p.strThumb,
+                number: p.strNumber,
+                wage: p.strWage,
+                height: p.strHeight,
+                weight: p.strWeight,
+                signed: p.strSigning,
+            })).filter(p => p.name),
+            standings: (standings?.table || []).map(s => ({
+                position: parseInt(s.intRank, 10),
+                teamId: s.idTeam,
+                team: s.strTeam,
+                badge: s.strBadge || s.strTeamBadge,
+                played: parseInt(s.intPlayed, 10),
+                wins: parseInt(s.intWin, 10),
+                draws: parseInt(s.intDraw, 10),
+                losses: parseInt(s.intLoss, 10),
+                goalsFor: parseInt(s.intGoalsFor, 10),
+                goalsAgainst: parseInt(s.intGoalsAgainst, 10),
+                goalDifference: parseInt(s.intGoalDifference, 10),
+                points: parseInt(s.intPoints, 10),
+                form: s.strForm || '',
+                isCurrent: s.idTeam === teamId,
+            })),
+            cachedAt: Date.now(),
+        };
+
+        teamProfileCache.set(cacheKey, { data, ts: Date.now() });
+        res.set('Cache-Control', 'public, max-age=900');
+        res.json(data);
+    } catch (e) {
+        console.error('[/api/team-profile]', e);
+        res.status(500).json({ ok: false, error: 'fetch_failed' });
+    }
+});
+
 // ─── LOGO LOOKUP (scrape ESPN por nombre de equipo, con caché 30 min) ─────────
 const logoCache = new Map();
 app.get('/api/team-logo', async (req, res) => {

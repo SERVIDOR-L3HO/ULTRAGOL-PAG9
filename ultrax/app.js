@@ -3365,6 +3365,259 @@ function filterSearch(filterType, element) {
     }
 }
 
+// ===== TEAM PROFILE (Google-style) — real scraped data ===========================
+let _currentTeamProfile = null;
+let _currentTeamQuery = '';
+let _profileTab = 'overview';
+const _teamProfileMemCache = new Map();
+
+async function fetchTeamProfile(query) {
+    const key = query.trim().toLowerCase();
+    const cached = _teamProfileMemCache.get(key);
+    if (cached && Date.now() - cached.ts < 10 * 60 * 1000) return cached.data;
+    try {
+        const r = await fetch(`/api/team-profile?name=${encodeURIComponent(query)}`, { signal: AbortSignal.timeout(8000) });
+        const data = await r.json();
+        _teamProfileMemCache.set(key, { data, ts: Date.now() });
+        return data;
+    } catch (_) { return null; }
+}
+
+// Heuristic: only fetch profile for single-team-style queries (1-3 tokens, no "vs"/"en vivo")
+function _shouldTryTeamProfile(q) {
+    const s = (q || '').trim().toLowerCase();
+    if (s.length < 3) return false;
+    if (/\b(vs|en vivo|live|hoy|próximo|proximo|finalizado|programado|champions|premier|liga mx|nba|ufc|nfl|mundial|copa)\b/.test(s)) return false;
+    const tokens = s.split(/\s+/);
+    if (tokens.length > 3) return false;
+    return true;
+}
+
+function switchProfileTab(tab) {
+    _profileTab = tab;
+    const tabsBar = document.querySelector('.tp-tabs');
+    if (tabsBar) {
+        tabsBar.querySelectorAll('.tp-tab').forEach(t => t.classList.toggle('tp-tab-active', t.dataset.tab === tab));
+    }
+    const body = document.getElementById('tpTabBody');
+    if (body && _currentTeamProfile) body.innerHTML = renderProfileTab(tab, _currentTeamProfile);
+}
+
+function _fmtMatchDate(d) {
+    if (!d) return '';
+    try {
+        const dt = new Date(d);
+        return dt.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch (_) { return d; }
+}
+
+function _safeImg(src, alt = '', cls = '') {
+    const fallback = "this.style.visibility='hidden'";
+    return src ? `<img class="${cls}" src="${src}" alt="${alt}" onerror="${fallback}">` : '';
+}
+
+function renderProfileTab(tab, profile) {
+    const t = profile.team || {};
+
+    if (tab === 'overview') {
+        const next = (profile.nextMatches || [])[0];
+        const last = (profile.lastMatches || [])[0];
+        const top4 = (profile.standings || []).slice(0, 4);
+        const currentPos = (profile.standings || []).find(s => s.isCurrent);
+        return `
+            ${last ? `
+                <div class="tp-card tp-card-match">
+                    <div class="tp-card-head">
+                        <span class="tp-card-tag">${last.league || ''} · Último partido</span>
+                        <span class="tp-card-result ${last.homeScore != null ? 'tp-finished' : ''}">${last.status || 'Finalizado'}</span>
+                    </div>
+                    <div class="tp-match-row">
+                        <div class="tp-match-team">${_safeImg(last.homeBadge, last.home, 'tp-team-badge')}<span>${last.home}</span></div>
+                        <div class="tp-match-score">${last.homeScore ?? '-'} <span>·</span> ${last.awayScore ?? '-'}</div>
+                        <div class="tp-match-team tp-match-team-away">${_safeImg(last.awayBadge, last.away, 'tp-team-badge')}<span>${last.away}</span></div>
+                    </div>
+                    <div class="tp-match-meta">${_fmtMatchDate(last.date)}${last.venue ? ' · ' + last.venue : ''}</div>
+                    ${last.video ? `<a class="tp-match-video" href="${last.video}" target="_blank" rel="noopener"><i class="fas fa-play-circle"></i> Resumen del partido</a>` : ''}
+                </div>` : ''}
+            ${next ? `
+                <div class="tp-card">
+                    <div class="tp-card-head"><span class="tp-card-tag">Próximo partido</span><span class="tp-card-date">${_fmtMatchDate(next.date)}${next.time ? ' · ' + next.time.slice(0,5) : ''}</span></div>
+                    <div class="tp-match-row">
+                        <div class="tp-match-team">${_safeImg(next.homeBadge, next.home, 'tp-team-badge')}<span>${next.home}</span></div>
+                        <div class="tp-match-vs">vs</div>
+                        <div class="tp-match-team tp-match-team-away">${_safeImg(next.awayBadge, next.away, 'tp-team-badge')}<span>${next.away}</span></div>
+                    </div>
+                    ${next.venue ? `<div class="tp-match-meta"><i class="fas fa-map-marker-alt"></i> ${next.venue}</div>` : ''}
+                </div>` : ''}
+            <div class="tp-grid-2">
+                ${top4.length ? `
+                    <div class="tp-card tp-card-link" onclick="switchProfileTab('standings')">
+                        <div class="tp-card-head"><span class="tp-card-tag">Posiciones</span><i class="fas fa-chevron-right tp-chev"></i></div>
+                        <div class="tp-card-sub">${t.league || ''}</div>
+                        <div class="tp-mini-table">
+                            ${top4.map(s => `
+                                <div class="tp-mini-row ${s.isCurrent ? 'tp-mini-row-current' : ''}">
+                                    <span class="tp-mini-pos">${s.position}</span>
+                                    ${_safeImg(s.badge, s.team, 'tp-mini-badge')}
+                                    <span class="tp-mini-team">${s.team.length > 14 ? s.team.slice(0,14)+'…' : s.team}</span>
+                                    <span class="tp-mini-pts">${s.points} ptos</span>
+                                </div>`).join('')}
+                            ${currentPos && currentPos.position > 4 ? `
+                                <div class="tp-mini-row tp-mini-row-current">
+                                    <span class="tp-mini-pos">${currentPos.position}</span>
+                                    ${_safeImg(currentPos.badge, currentPos.team, 'tp-mini-badge')}
+                                    <span class="tp-mini-team">${t.shortName || t.name}</span>
+                                    <span class="tp-mini-pts">${currentPos.points} ptos</span>
+                                </div>` : ''}
+                        </div>
+                    </div>` : ''}
+                ${(profile.squad || []).length ? `
+                    <div class="tp-card tp-card-link" onclick="switchProfileTab('squad')">
+                        <div class="tp-card-head"><span class="tp-card-tag">Jugadores</span><i class="fas fa-chevron-right tp-chev"></i></div>
+                        <div class="tp-mini-players">
+                            ${profile.squad.slice(0,3).map(p => `
+                                <div class="tp-mini-player">
+                                    ${p.photo ? `<img src="${p.photo}" alt="${p.name}" onerror="this.style.display='none'">` : '<div class="tp-mini-player-ph"><i class="fas fa-user"></i></div>'}
+                                    <div>
+                                        <div class="tp-mini-player-name">${p.name}</div>
+                                        <div class="tp-mini-player-pos">${p.position || ''}</div>
+                                    </div>
+                                </div>`).join('')}
+                        </div>
+                        <div class="tp-mini-more">+${Math.max(0, profile.squad.length - 3)} más</div>
+                    </div>` : ''}
+            </div>
+            ${t.stadium ? `
+                <div class="tp-card">
+                    <div class="tp-card-head"><span class="tp-card-tag">Estadio local</span></div>
+                    <div class="tp-stadium">
+                        ${t.stadiumThumb ? `<img class="tp-stadium-img" src="${t.stadiumThumb}" alt="${t.stadium}" onerror="this.style.display='none'">` : '<div class="tp-stadium-ph"><i class="fas fa-stadium"></i></div>'}
+                        <div class="tp-stadium-info">
+                            <div class="tp-stadium-name">${t.stadium}</div>
+                            ${t.stadiumLocation ? `<div class="tp-stadium-loc"><i class="fas fa-map-marker-alt"></i> ${t.stadiumLocation}</div>` : ''}
+                            ${t.stadiumCapacity ? `<div class="tp-stadium-cap"><i class="fas fa-users"></i> Capacidad: ${Number(t.stadiumCapacity).toLocaleString('es-MX')}</div>` : ''}
+                        </div>
+                    </div>
+                </div>` : ''}
+            ${t.description ? `
+                <div class="tp-card">
+                    <div class="tp-card-head"><span class="tp-card-tag">Acerca de</span></div>
+                    <p class="tp-desc">${t.description.length > 320 ? t.description.slice(0,320)+'…' : t.description}</p>
+                    <div class="tp-meta-row">
+                        ${t.founded ? `<span><i class="fas fa-calendar"></i> Fundado ${t.founded}</span>` : ''}
+                        ${t.country ? `<span><i class="fas fa-flag"></i> ${t.country}</span>` : ''}
+                        ${t.league ? `<span><i class="fas fa-trophy"></i> ${t.league}</span>` : ''}
+                    </div>
+                </div>` : ''}
+        `;
+    }
+
+    if (tab === 'matches') {
+        const lastM = profile.lastMatches || [];
+        const nextM = profile.nextMatches || [];
+        if (!lastM.length && !nextM.length) {
+            return '<div class="tp-empty"><i class="far fa-calendar"></i><p>Sin partidos disponibles</p></div>';
+        }
+        const renderMatch = (m, finished) => `
+            <div class="tp-card tp-card-match">
+                <div class="tp-card-head">
+                    <span class="tp-card-tag">${m.league || ''}${m.round ? ' · J' + m.round : ''}</span>
+                    <span class="tp-card-date">${_fmtMatchDate(m.date)}${m.time ? ' · ' + m.time.slice(0,5) : ''}</span>
+                </div>
+                <div class="tp-match-row">
+                    <div class="tp-match-team">${_safeImg(m.homeBadge, m.home, 'tp-team-badge')}<span>${m.home}</span></div>
+                    ${finished
+                        ? `<div class="tp-match-score">${m.homeScore ?? '-'} <span>·</span> ${m.awayScore ?? '-'}</div>`
+                        : `<div class="tp-match-vs">vs</div>`}
+                    <div class="tp-match-team tp-match-team-away">${_safeImg(m.awayBadge, m.away, 'tp-team-badge')}<span>${m.away}</span></div>
+                </div>
+                ${m.venue ? `<div class="tp-match-meta"><i class="fas fa-map-marker-alt"></i> ${m.venue}</div>` : ''}
+                ${m.video ? `<a class="tp-match-video" href="${m.video}" target="_blank" rel="noopener"><i class="fas fa-play-circle"></i> Resumen</a>` : ''}
+            </div>`;
+        return `
+            ${nextM.length ? `<div class="tp-section-h"><i class="far fa-clock"></i> Próximos</div>${nextM.map(m => renderMatch(m, false)).join('')}` : ''}
+            ${lastM.length ? `<div class="tp-section-h"><i class="fas fa-history"></i> Recientes</div>${lastM.map(m => renderMatch(m, true)).join('')}` : ''}
+        `;
+    }
+
+    if (tab === 'standings') {
+        const rows = profile.standings || [];
+        if (!rows.length) return '<div class="tp-empty"><i class="fas fa-list-ol"></i><p>Sin tabla de posiciones disponible</p></div>';
+        return `
+            <div class="tp-card tp-card-flush">
+                <div class="tp-card-head"><span class="tp-card-tag">${t.league || 'Tabla de posiciones'}</span></div>
+                <div class="tp-standings">
+                    <div class="tp-standings-head">
+                        <span>#</span><span>Equipo</span><span>PJ</span><span>DG</span><span>Pts</span>
+                    </div>
+                    ${rows.map(s => `
+                        <div class="tp-standings-row ${s.isCurrent ? 'tp-standings-row-current' : ''}">
+                            <span class="tp-standings-pos">${s.position}</span>
+                            <span class="tp-standings-team">${_safeImg(s.badge, s.team, 'tp-standings-badge')}<span>${s.team}</span></span>
+                            <span>${s.played ?? '-'}</span>
+                            <span>${s.goalDifference > 0 ? '+' : ''}${s.goalDifference ?? '-'}</span>
+                            <span class="tp-standings-pts">${s.points ?? '-'}</span>
+                        </div>`).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    if (tab === 'squad') {
+        const players = profile.squad || [];
+        if (!players.length) return '<div class="tp-empty"><i class="fas fa-users"></i><p>Sin información de jugadores</p></div>';
+        const groups = { 'Portero': [], 'Defensa': [], 'Mediocampista': [], 'Delantero': [], 'Otros': [] };
+        players.forEach(p => {
+            const pos = (p.position || '').toLowerCase();
+            if (/goal|portero/.test(pos)) groups['Portero'].push(p);
+            else if (/defen|back/.test(pos)) groups['Defensa'].push(p);
+            else if (/mid|medio/.test(pos)) groups['Mediocampista'].push(p);
+            else if (/forw|delant|striker|wing/.test(pos)) groups['Delantero'].push(p);
+            else groups['Otros'].push(p);
+        });
+        return Object.entries(groups).filter(([, arr]) => arr.length).map(([label, arr]) => `
+            <div class="tp-section-h">${label} <span class="tp-section-count">${arr.length}</span></div>
+            <div class="tp-squad-grid">
+                ${arr.map(p => `
+                    <div class="tp-player-card">
+                        <div class="tp-player-photo">
+                            ${p.photo ? `<img src="${p.photo}" alt="${p.name}" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=&quot;fas fa-user&quot;></i>'">` : '<i class="fas fa-user"></i>'}
+                            ${p.number ? `<span class="tp-player-num">${p.number}</span>` : ''}
+                        </div>
+                        <div class="tp-player-name">${p.name}</div>
+                        <div class="tp-player-meta">${p.position || ''}${p.nationality ? ' · ' + p.nationality : ''}</div>
+                    </div>`).join('')}
+            </div>
+        `).join('');
+    }
+
+    return '';
+}
+
+function renderTeamProfileHeader(profile) {
+    const t = profile.team || {};
+    const banner = t.fanart || t.banner || t.stadiumThumb || '';
+    return `
+        <div class="tp-header" ${banner ? `style="background-image: linear-gradient(180deg, rgba(15,15,15,0) 0%, rgba(15,15,15,0.85) 60%, #0f0f0f 100%), url('${banner}'); background-size: cover; background-position: center;"` : ''}>
+            <div class="tp-header-inner">
+                <div class="tp-header-badge">${_safeImg(t.badge, t.name, '')}</div>
+                <div class="tp-header-info">
+                    <h2 class="tp-header-name">${t.name}</h2>
+                    <div class="tp-header-sub">${t.league || ''}${t.country ? ' · ' + t.country : ''}</div>
+                </div>
+                <button class="tp-follow-btn" onclick="this.classList.toggle('tp-following'); this.innerHTML = this.classList.contains('tp-following') ? '<i class=&quot;fas fa-check&quot;></i> Siguiendo' : 'Seguir'">Seguir</button>
+            </div>
+            <div class="tp-tabs">
+                <button class="tp-tab tp-tab-active" data-tab="overview" onclick="switchProfileTab('overview')">Información general</button>
+                <button class="tp-tab" data-tab="matches" onclick="switchProfileTab('matches')">Partidos</button>
+                <button class="tp-tab" data-tab="standings" onclick="switchProfileTab('standings')">Posiciones</button>
+                <button class="tp-tab" data-tab="squad" onclick="switchProfileTab('squad')">Jugadores</button>
+            </div>
+        </div>
+        <div id="tpTabBody" class="tp-tab-body">${renderProfileTab('overview', profile)}</div>
+    `;
+}
+
 async function performSearch(query) {
     if (!query || query.trim() === '') {
         showSearchWelcome();
@@ -3379,6 +3632,15 @@ async function performSearch(query) {
     }
     
     resultsContainer.innerHTML = '<div class="search-loading"><div class="spinner"></div><p>Buscando en todo UltraGol...</p></div>';
+
+    // Try to fetch a team profile in parallel (Google-style real scraped info)
+    _currentTeamProfile = null;
+    _currentTeamQuery = query;
+    _profileTab = 'overview';
+    let teamProfilePromise = null;
+    if (_shouldTryTeamProfile(query)) {
+        teamProfilePromise = fetchTeamProfile(query);
+    }
     
     const searchTerm = normalizarNombre(query);
     const results = {
@@ -3531,6 +3793,14 @@ async function performSearch(query) {
     const leagues = ['Liga MX', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Champions League', 'Copa Libertadores'];
     results.leagues = leagues.filter(league => league.toLowerCase().includes(searchTerm));
     
+    // Esperar perfil de equipo (si aplica) antes de renderizar
+    if (teamProfilePromise) {
+        const profile = await teamProfilePromise;
+        if (profile && profile.ok && profile.team) {
+            _currentTeamProfile = profile;
+        }
+    }
+
     // Mostrar resultados
     displaySearchResults(results, searchTerm);
 }
@@ -3538,10 +3808,28 @@ async function performSearch(query) {
 function displaySearchResults(results, query) {
     const resultsContainer = document.getElementById('searchResults');
     let html = '';
+
+    // Render team profile header at top if available
+    if (_currentTeamProfile && _currentTeamProfile.ok) {
+        html += renderTeamProfileHeader(_currentTeamProfile);
+    }
     
     const totalResults = results.matches.length + results.teams.length + results.leagues.length + results.importantMatches.length;
     
     if (totalResults === 0) {
+        // If we have a team profile, show it with a "no transmissions" notice instead
+        if (_currentTeamProfile && _currentTeamProfile.ok) {
+            html += `
+                <div class="tp-no-tx">
+                    <i class="fas fa-broadcast-tower"></i>
+                    <div>
+                        <strong>Sin transmisiones disponibles</strong>
+                        <p>No encontramos transmisiones en vivo para "${query}" ahora mismo.</p>
+                    </div>
+                </div>`;
+            resultsContainer.innerHTML = html;
+            return;
+        }
         resultsContainer.innerHTML = `
             <div class="search-no-results">
                 <div class="no-results-icon">
