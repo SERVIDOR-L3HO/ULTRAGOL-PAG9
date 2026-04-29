@@ -1,5 +1,6 @@
 (function () {
     const API = '/api/mx/partidos';
+    const BRAND_PREFIX = window.location.pathname.startsWith('/rojadirecta') ? '/rojadirecta' : '/mx';
     let allMatches = [];
     let filterSport = 'all';
     let filterState = 'all';
@@ -132,7 +133,7 @@
                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                     ${hasStream ? 'VER' : 'Sin señal'}
                 </button>
-                <a class="btn-detail" href="/mx/${slug}" title="Detalle del partido" aria-label="Detalle">
+                <a class="btn-detail" href="${BRAND_PREFIX}/${slug}" title="Detalle del partido" aria-label="Detalle">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
                 </a>
             </div>
@@ -263,7 +264,8 @@
     function openModal(url, title, sub, slug) {
         document.getElementById('modal-title').textContent = title;
         document.getElementById('modal-sub').textContent = sub;
-        document.getElementById('modal-detail').href = `/mx/${slug}`;
+        const brandPrefix = window.location.pathname.startsWith('/rojadirecta') ? '/rojadirecta' : '/mx';
+        document.getElementById('modal-detail').href = `${brandPrefix}/${slug}`;
 
         // Build server list — primary stream + alternate proxies (best-effort)
         currentServers = [{ name: 'Servidor 1', url }];

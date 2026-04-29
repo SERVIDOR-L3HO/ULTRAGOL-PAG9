@@ -281,3 +281,16 @@ Required environment variables:
 - Autoscale deployment type
 - Host binding to 0.0.0.0 for external access
 - Cache control headers for fresh content delivery
+### Aggregator Brand Pages (April 2026)
+Two parallel branded match-aggregator surfaces share the same backend (`fetchAllPartidos` from ULTRAGOL Statistics API):
+
+- **`/mx`** — *Pelota Libre Premium* (green theme, gold premium accents)
+  - Files: `mx/index.html`, `mx/mx.css`, `mx/mx.js`, `mx/pelotalibre-premium.svg`
+  - Detail pages: `/mx/:slug` (rendered server-side via `buildMatchPage({brand:'pelotalibre'})`)
+
+- **`/rojadirecta`** — *Roja Directa TV Premium* (red theme, gold premium accents)
+  - Files: `rojadirecta/index.html`, `rojadirecta/theme.css` (overrides), `rojadirecta/icon.svg`
+  - Detail pages: `/rojadirecta/:slug` (rendered via `buildMatchPage({brand:'rojadirecta'})`)
+  - Aliases: `/roja-directa`, `/rojadirectatv` → 301 redirect
+
+Both detail pages share the premium template in `server.js → buildMatchPage()` with brand-aware logo, colors, canonical URL, OG/Twitter meta, JSON-LD organizer, mini-scoreboard on scroll, tabs (Reproductor / Goles / Información / Más partidos), multi-server iframe player with theater mode, related matches grid, and share buttons (WhatsApp, Twitter, Facebook, Telegram, copy link). The unclickable brand logo combines a sport ball with a gold crown + PRO badge; sitemap (`/sitemap.xml`) lists both brand surfaces.
