@@ -1080,8 +1080,9 @@ app.get('/sitemap.xml', async (req, res) => {
     const today = new Date().toISOString().split('T')[0];
 
     const staticPages = [
-        { url: '/',   priority: '1.0', changefreq: 'daily' },
-        { url: '/mx', priority: '0.9', changefreq: 'hourly' },
+        { url: '/',            priority: '1.0', changefreq: 'daily' },
+        { url: '/mx',          priority: '0.9', changefreq: 'hourly' },
+        { url: '/rojadirecta', priority: '0.9', changefreq: 'hourly' },
     ];
 
     let matchPages = [];
@@ -1134,6 +1135,18 @@ app.get('/mx', (req, res) => {
 app.get('/partidos-hoy', (req, res) => {
     res.redirect(301, '/mx');
 });
+
+// Roja Directa TV Premium — same data, different brand
+app.get(['/rojadirecta', '/rojadirecta/'], (req, res) => {
+    res.sendFile(path.join(__dirname, 'rojadirecta', 'index.html'));
+});
+app.use('/rojadirecta', express.static(path.join(__dirname, 'rojadirecta'), {
+    index: false,
+    redirect: false,
+    setHeaders: (res) => res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+}));
+app.get('/roja-directa', (req, res) => res.redirect(301, '/rojadirecta'));
+app.get('/rojadirectatv', (req, res) => res.redirect(301, '/rojadirecta'));
 
 // SSR: individual match page — full HTML generated with SEO meta tags
 app.get('/mx/:slug', async (req, res) => {

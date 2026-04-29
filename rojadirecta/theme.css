@@ -1,0 +1,61 @@
+/* Roja Directa TV Premium — Red theme overrides for /rojadirecta */
+:root {
+    --accent: #e60023 !important;
+    --accent-2: #ff4d4d !important;
+    --accent-ink: #ffffff !important;
+    --bg: #110305 !important;
+    --bg-2: #1a0608 !important;
+    --bg-3: #22090c !important;
+    --bg-4: #2c0c10 !important;
+    --line: rgba(255, 77, 77, .15) !important;
+    --line-2: rgba(255, 77, 77, .25) !important;
+}
+
+/* Brand badge "PREMIUM" — keep gold but border accent on logo */
+.brand img {
+    box-shadow: 0 2px 8px rgba(0,0,0,.5), 0 0 0 1px rgba(230, 0, 35, .35) !important;
+}
+
+/* Accent text recolor */
+.brand span b { color: var(--accent) !important; }
+h1 span { color: var(--accent) !important; }
+
+/* Live ticker red */
+.live-strip { background: linear-gradient(90deg, rgba(230,0,35,.15), transparent) !important; }
+
+/* Buttons */
+.chip-btn:hover, .ghost-btn:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+
+/* Top nav active */
+.topnav a.active {
+    background: var(--accent) !important;
+    color: #fff !important;
+}
+
+/* Sidebar active items */
+.sport-list li.active, .state-list li.active, .league-list li.active {
+    border-left-color: var(--accent) !important;
+    background: rgba(230, 0, 35, .12) !important;
+}
+.sport-list li.active .count, .state-list li.active .count {
+    background: var(--accent) !important;
+    color: #fff !important;
+}
+
+/* Match cards hover */
+.match-card:hover { border-color: var(--accent) !important; box-shadow: 0 6px 24px rgba(230,0,35,.18) !important; }
+.live-pill, .badge-live { background: var(--accent) !important; }
+
+/* Server buttons */
+.server-btn:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+.server-btn.active { background: var(--accent) !important; color: #fff !important; border-color: var(--accent) !important; }
+
+/* Ver button on cards */
+.btn-ver, .ver-btn {
+    background: var(--accent) !important;
+    color: #fff !important;
+}
+.btn-ver:hover, .ver-btn:hover { background: var(--accent-2) !important; }
+
+/* Spinner */
+.spinner { border-top-color: var(--accent) !important; }
