@@ -324,18 +324,18 @@
                 <div class="nav-icon-wrap"><i class="fas fa-house"></i></div>
                 <span class="nav-label">Inicio</span>
             </button>
-            <button class="nav-btn" data-nav="search" onclick="navTo('search', this)">
-                <div class="nav-icon-wrap"><i class="fas fa-magnifying-glass"></i></div>
-                <span class="nav-label">Buscar</span>
+            <button class="nav-btn" data-nav="reels" data-reels-trigger aria-label="Abrir Reels">
+                <div class="nav-icon-wrap"><i class="fas fa-bolt"></i></div>
+                <span class="nav-label">Reels</span>
             </button>
-            <!-- 🔥 BOTÓN CENTRAL DE REELS — verde + rosa, elevado del nav -->
-            <button class="nav-reels-btn" data-reels-trigger aria-label="Abrir Reels">
+            <!-- 🔥 BOTÓN CENTRAL DE BÚSQUEDA — verde + rosa, elevado del nav -->
+            <button class="nav-reels-btn" data-nav="search" onclick="navTo('search', this)" aria-label="Buscar">
                 <span class="nav-reels-glow"></span>
                 <span class="nav-reels-ring"></span>
                 <span class="nav-reels-icon">
-                    <i class="fas fa-bolt"></i>
+                    <i class="fas fa-magnifying-glass"></i>
                 </span>
-                <span class="nav-reels-label">REELS</span>
+                <span class="nav-reels-label">BUSCAR</span>
             </button>
             <button class="nav-btn" data-nav="noticias" onclick="navBounce(this); window.location.href='noticias.html'">
                 <div class="nav-icon-wrap"><i class="fas fa-newspaper"></i></div>
