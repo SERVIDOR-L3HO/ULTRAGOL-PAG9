@@ -1009,6 +1009,132 @@ async function _tsdbFetch(url, timeoutMs = 5000) {
     } catch (_) { return null; }
 }
 
+const _ligaMxAliases = {
+    'america': ['CF America', 'Club America'],
+    'club america': ['CF America'],
+    'chivas': ['CD Guadalajara'],
+    'guadalajara': ['CD Guadalajara'],
+    'tigres': ['Tigres'],
+    'tigres uanl': ['Tigres'],
+    'rayados': ['Monterrey'],
+    'monterrey': ['Monterrey'],
+    'pumas': ['Pumas'],
+    'pumas unam': ['Pumas'],
+    'unam': ['Pumas'],
+    'cruz azul': ['Cruz Azul'],
+    'tuzos': ['Pachuca'],
+    'pachuca': ['Pachuca'],
+    'xolos': ['Tijuana'],
+    'tijuana': ['Tijuana'],
+    'atlas': ['Atlas'],
+    'leon': ['León'], 'león': ['León'],
+    'toluca': ['Toluca'],
+    'puebla': ['Puebla'],
+    'necaxa': ['Necaxa'],
+    'santos': ['Santos Laguna'],
+    'mazatlan': ['Mazatlán'], 'mazatlán': ['Mazatlán'],
+    'queretaro': ['Queretaro FC'], 'querétaro': ['Queretaro FC'],
+    'juarez': ['FC Juarez'], 'juárez': ['FC Juarez'],
+    'san luis': ['Atletico de San Luis'], 'atletico san luis': ['Atletico de San Luis'],
+};
+
+// Common aliases for international clubs (city/short name → TheSportsDB team name)
+const _intlAliases = {
+    'los angeles': ['Los Angeles FC', 'LA Galaxy'],
+    'la': ['Los Angeles FC', 'LA Galaxy'],
+    'lafc': ['Los Angeles FC'],
+    'la galaxy': ['LA Galaxy'],
+    'inter miami': ['Inter Miami CF', 'Inter Miami'],
+    'miami': ['Inter Miami CF'],
+    'new york': ['New York City FC', 'New York Red Bulls'],
+    'nyc': ['New York City FC'],
+    'nycfc': ['New York City FC'],
+    'psg': ['Paris Saint-Germain', 'Paris SG'],
+    'paris': ['Paris Saint-Germain'],
+    'manchester united': ['Manchester United'],
+    'man united': ['Manchester United'],
+    'man utd': ['Manchester United'],
+    'manchester city': ['Manchester City'],
+    'man city': ['Manchester City'],
+    'bayern': ['Bayern Munich'],
+    'barca': ['Barcelona'], 'barça': ['Barcelona'],
+    'atleti': ['Atletico Madrid'],
+    'atletico': ['Atletico Madrid'],
+    'atlético': ['Atletico Madrid'],
+    'juventus': ['Juventus'],
+    'juve': ['Juventus'],
+    'milan': ['AC Milan'],
+    'inter': ['Inter Milan'],
+    'inter milan': ['Inter Milan'],
+    'liverpool': ['Liverpool'],
+    'arsenal': ['Arsenal'],
+    'chelsea': ['Chelsea'],
+    'tottenham': ['Tottenham'], 'spurs': ['Tottenham'],
+    'dortmund': ['Borussia Dortmund'],
+    'bvb': ['Borussia Dortmund'],
+};
+
+async function _resolveTeam(name, sport = 'soccer') {
+    if (!name) return null;
+    const variants = [];
+    const original = name.trim();
+    variants.push(original);
+    const stripped = original.replace(/^(club|cf|fc|cd|real|deportivo|atlético|atletico|sc|ac)\s+/i, '').trim();
+    if (stripped && stripped.toLowerCase() !== original.toLowerCase()) variants.push(stripped);
+    const tokens = original.split(/\s+/).filter(t => t.length >= 4);
+    if (tokens.length > 1) {
+        const longest = tokens.sort((a, b) => b.length - a.length)[0];
+        if (!variants.find(v => v.toLowerCase() === longest.toLowerCase())) variants.push(longest);
+    }
+    const aliasKey = original.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    const ligaMxMatches = _ligaMxAliases[aliasKey] || [];
+    const intlMatches = _intlAliases[aliasKey] || [];
+    const isLigaMx = ligaMxMatches.length > 0;
+    [...ligaMxMatches, ...intlMatches].forEach(m => {
+        if (!variants.find(v => v.toLowerCase() === m.toLowerCase())) variants.push(m);
+    });
+    // Fallback: try common suffixes for short queries
+    if (original.split(/\s+/).length <= 2 && !ligaMxMatches.length && !intlMatches.length) {
+        ['FC', 'United'].forEach(suffix => {
+            const v = `${original} ${suffix}`;
+            if (!variants.find(x => x.toLowerCase() === v.toLowerCase())) variants.push(v);
+        });
+    }
+    for (const v of variants) {
+        const search = await _tsdbFetch(`${TSDB_BASE}/searchteams.php?t=${encodeURIComponent(v)}`);
+        const team = _pickBestTeam(search?.teams, v, sport, isLigaMx);
+        if (team) return team;
+    }
+    return null;
+}
+
+function _mapEvent(e) {
+    return {
+        id: e.idEvent,
+        date: e.dateEvent || e.dateEventLocal,
+        time: e.strTime || e.strTimeLocal || '',
+        timestamp: e.strTimestamp,
+        league: e.strLeague,
+        leagueId: e.idLeague,
+        season: e.strSeason,
+        round: e.intRound,
+        home: e.strHomeTeam,
+        away: e.strAwayTeam,
+        homeId: e.idHomeTeam,
+        awayId: e.idAwayTeam,
+        homeScore: e.intHomeScore,
+        awayScore: e.intAwayScore,
+        homeBadge: e.strHomeTeamBadge || null,
+        awayBadge: e.strAwayTeamBadge || null,
+        status: e.strStatus || (e.intHomeScore != null ? 'Finished' : 'Scheduled'),
+        thumb: e.strThumb || null,
+        video: e.strVideo || null,
+        venue: e.strVenue || null,
+        country: e.strCountry || null,
+        postponed: e.strPostponed || null,
+    };
+}
+
 function _pickBestTeam(teams, query, sportHint, preferMexican = false) {
     if (!Array.isArray(teams) || teams.length === 0) return null;
     const q = _normTeam(query);
@@ -1048,61 +1174,7 @@ app.get('/api/team-profile', async (req, res) => {
     }
 
     try {
-        // 1. Search team — try multiple variants to handle prefixes/aliases
-        const variants = [];
-        const original = name.trim();
-        variants.push(original);
-        // strip common prefixes
-        const stripped = original.replace(/^(club|cf|fc|cd|real|deportivo|atlético|atletico|sc|ac)\s+/i, '').trim();
-        if (stripped && stripped.toLowerCase() !== original.toLowerCase()) variants.push(stripped);
-        // longest token (helps "Club América" -> "América")
-        const tokens = original.split(/\s+/).filter(t => t.length >= 4);
-        if (tokens.length > 1) {
-            const longest = tokens.sort((a, b) => b.length - a.length)[0];
-            if (!variants.find(v => v.toLowerCase() === longest.toLowerCase())) variants.push(longest);
-        }
-        // Liga MX aliases — TheSportsDB uses specific names (CF America, CD Guadalajara)
-        const ligaMxAliases = {
-            'america': ['CF America', 'Club America'],
-            'club america': ['CF America'],
-            'chivas': ['CD Guadalajara'],
-            'guadalajara': ['CD Guadalajara'],
-            'tigres': ['Tigres'],
-            'tigres uanl': ['Tigres'],
-            'rayados': ['Monterrey'],
-            'monterrey': ['Monterrey'],
-            'pumas': ['Pumas'],
-            'pumas unam': ['Pumas'],
-            'unam': ['Pumas'],
-            'cruz azul': ['Cruz Azul'],
-            'tuzos': ['Pachuca'],
-            'pachuca': ['Pachuca'],
-            'xolos': ['Tijuana'],
-            'tijuana': ['Tijuana'],
-            'atlas': ['Atlas'],
-            'leon': ['León'], 'león': ['León'],
-            'toluca': ['Toluca'],
-            'puebla': ['Puebla'],
-            'necaxa': ['Necaxa'],
-            'santos': ['Santos Laguna'],
-            'mazatlan': ['Mazatlán'], 'mazatlán': ['Mazatlán'],
-            'queretaro': ['Queretaro FC'], 'querétaro': ['Queretaro FC'],
-            'juarez': ['FC Juarez'], 'juárez': ['FC Juarez'],
-            'san luis': ['Atletico de San Luis'], 'atletico san luis': ['Atletico de San Luis'],
-        };
-        const aliasKey = original.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-        const ligaMxMatches = ligaMxAliases[aliasKey] || [];
-        const isLigaMx = ligaMxMatches.length > 0;
-        ligaMxMatches.forEach(m => {
-            if (!variants.find(v => v.toLowerCase() === m.toLowerCase())) variants.push(m);
-        });
-
-        let team = null;
-        for (const v of variants) {
-            const search = await _tsdbFetch(`${TSDB_BASE}/searchteams.php?t=${encodeURIComponent(v)}`);
-            team = _pickBestTeam(search?.teams, v, sport, isLigaMx);
-            if (team) break;
-        }
+        const team = await _resolveTeam(name, sport);
         if (!team) {
             const empty = { ok: false, error: 'team_not_found', query: name };
             teamProfileCache.set(cacheKey, { data: empty, ts: Date.now() });
@@ -1119,27 +1191,6 @@ app.get('/api/team-profile', async (req, res) => {
             _tsdbFetch(`${TSDB_BASE}/lookup_all_players.php?id=${teamId}`),
             leagueId ? _tsdbFetch(`${TSDB_BASE}/lookuptable.php?l=${leagueId}&s=${encodeURIComponent(team.strCurrentSeason || '2025-2026')}`) : Promise.resolve(null),
         ]);
-
-        const mapEvent = e => ({
-            id: e.idEvent,
-            date: e.dateEvent || e.dateEventLocal,
-            time: e.strTime || e.strTimeLocal || '',
-            timestamp: e.strTimestamp,
-            league: e.strLeague,
-            round: e.intRound,
-            home: e.strHomeTeam,
-            away: e.strAwayTeam,
-            homeId: e.idHomeTeam,
-            awayId: e.idAwayTeam,
-            homeScore: e.intHomeScore,
-            awayScore: e.intAwayScore,
-            homeBadge: e.strHomeTeamBadge || null,
-            awayBadge: e.strAwayTeamBadge || null,
-            status: e.strStatus || (e.intHomeScore != null ? 'Finished' : 'Scheduled'),
-            thumb: e.strThumb || null,
-            video: e.strVideo || null,
-            venue: e.strVenue || null,
-        });
 
         const data = {
             ok: true,
@@ -1170,8 +1221,8 @@ app.get('/api/team-profile', async (req, res) => {
                 description: team.strDescriptionES || team.strDescriptionEN || '',
                 colors: [team.strColour1, team.strColour2, team.strColour3].filter(Boolean),
             },
-            lastMatches: (last?.results || []).map(mapEvent),
-            nextMatches: (next?.events || []).map(mapEvent),
+            lastMatches: (last?.results || []).map(_mapEvent),
+            nextMatches: (next?.events || []).map(_mapEvent),
             squad: (squad?.player || []).map(p => ({
                 id: p.idPlayer,
                 name: p.strPlayer,
@@ -1209,6 +1260,161 @@ app.get('/api/team-profile', async (req, res) => {
         res.json(data);
     } catch (e) {
         console.error('[/api/team-profile]', e);
+        res.status(500).json({ ok: false, error: 'fetch_failed' });
+    }
+});
+
+// ─── MATCH PROFILE (scrape para "EquipoA vs EquipoB", caché 15 min) ──────────
+const matchProfileCache = new Map();
+const MATCH_PROFILE_TTL = 15 * 60 * 1000;
+
+app.get('/api/match-profile', async (req, res) => {
+    const home = (req.query.home || '').trim();
+    const away = (req.query.away || '').trim();
+    const sport = (req.query.sport || 'soccer').trim();
+    if (!home || !away) return res.status(400).json({ ok: false, error: 'home and away required' });
+
+    const cacheKey = `${_normTeam(home)}|${_normTeam(away)}|${sport}`;
+    const cached = matchProfileCache.get(cacheKey);
+    if (cached && Date.now() - cached.ts < MATCH_PROFILE_TTL) {
+        return res.json(cached.data);
+    }
+
+    try {
+        // Resolve both teams in parallel
+        const [teamA, teamB] = await Promise.all([
+            _resolveTeam(home, sport),
+            _resolveTeam(away, sport),
+        ]);
+
+        if (!teamA && !teamB) {
+            const empty = { ok: false, error: 'teams_not_found', home, away };
+            matchProfileCache.set(cacheKey, { data: empty, ts: Date.now() });
+            return res.json(empty);
+        }
+
+        // Fetch each team's last/next events in parallel
+        const fetches = [];
+        if (teamA) {
+            fetches.push(_tsdbFetch(`${TSDB_BASE}/eventslast.php?id=${teamA.idTeam}`));
+            fetches.push(_tsdbFetch(`${TSDB_BASE}/eventsnext.php?id=${teamA.idTeam}`));
+        } else { fetches.push(null, null); }
+        if (teamB) {
+            fetches.push(_tsdbFetch(`${TSDB_BASE}/eventslast.php?id=${teamB.idTeam}`));
+            fetches.push(_tsdbFetch(`${TSDB_BASE}/eventsnext.php?id=${teamB.idTeam}`));
+        } else { fetches.push(null, null); }
+
+        const [lastA, nextA, lastB, nextB] = await Promise.all(fetches);
+
+        const allEvents = [
+            ...((lastA?.results || []).map(_mapEvent)),
+            ...((nextA?.events || []).map(_mapEvent)),
+            ...((lastB?.results || []).map(_mapEvent)),
+            ...((nextB?.events || []).map(_mapEvent)),
+        ];
+
+        // Find head-to-head events (matches involving BOTH teams)
+        const h2hAll = teamA && teamB
+            ? allEvents.filter(e => {
+                const ids = [String(e.homeId), String(e.awayId)];
+                return ids.includes(String(teamA.idTeam)) && ids.includes(String(teamB.idTeam));
+            })
+            : [];
+        // Dedup by event id
+        const seen = new Set();
+        const h2h = h2hAll.filter(e => {
+            if (seen.has(e.id)) return false;
+            seen.add(e.id);
+            return true;
+        }).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+        // Pick "main match": next upcoming H2H, fallback to most recent H2H
+        const now = Date.now();
+        const upcoming = h2h.filter(e => {
+            const t = e.date ? new Date(e.date + (e.time ? 'T' + e.time : '')).getTime() : 0;
+            return t >= now - 6 * 3600 * 1000; // include matches starting up to 6h ago (live)
+        }).sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+        const mainMatch = upcoming[0] || h2h[0] || null;
+
+        // Pick league for standings: from main match, else from teamA, else teamB
+        const leagueId = mainMatch?.leagueId || teamA?.idLeague || teamB?.idLeague || null;
+        const leagueName = mainMatch?.league || teamA?.strLeague || teamB?.strLeague || null;
+        const season = teamA?.strCurrentSeason || teamB?.strCurrentSeason || '2025-2026';
+
+        const standingsRaw = leagueId
+            ? await _tsdbFetch(`${TSDB_BASE}/lookuptable.php?l=${leagueId}&s=${encodeURIComponent(season)}`)
+            : null;
+
+        const standings = (standingsRaw?.table || []).map(s => ({
+            position: parseInt(s.intRank, 10),
+            teamId: s.idTeam,
+            team: s.strTeam,
+            badge: s.strBadge || s.strTeamBadge,
+            played: parseInt(s.intPlayed, 10),
+            wins: parseInt(s.intWin, 10),
+            draws: parseInt(s.intDraw, 10),
+            losses: parseInt(s.intLoss, 10),
+            goalsFor: parseInt(s.intGoalsFor, 10),
+            goalsAgainst: parseInt(s.intGoalsAgainst, 10),
+            goalDifference: parseInt(s.intGoalDifference, 10),
+            points: parseInt(s.intPoints, 10),
+            form: s.strForm || '',
+            isHome: teamA && s.idTeam === teamA.idTeam,
+            isAway: teamB && s.idTeam === teamB.idTeam,
+        }));
+
+        // Each team's last 5 results (form)
+        const teamForm = (raw, teamId) => (raw?.results || []).slice(0, 5).map(e => {
+            const isHome = String(e.idHomeTeam) === String(teamId);
+            const myScore = isHome ? parseInt(e.intHomeScore, 10) : parseInt(e.intAwayScore, 10);
+            const oppScore = isHome ? parseInt(e.intAwayScore, 10) : parseInt(e.intHomeScore, 10);
+            let result = '?';
+            if (!isNaN(myScore) && !isNaN(oppScore)) {
+                if (myScore > oppScore) result = 'V';
+                else if (myScore < oppScore) result = 'D';
+                else result = 'E';
+            }
+            return {
+                result,
+                date: e.dateEvent,
+                opponent: isHome ? e.strAwayTeam : e.strHomeTeam,
+                myScore: isNaN(myScore) ? null : myScore,
+                oppScore: isNaN(oppScore) ? null : oppScore,
+                isHome,
+            };
+        });
+
+        const teamCard = t => t ? {
+            id: t.idTeam,
+            name: t.strTeam,
+            shortName: t.strTeamShort || t.strTeam,
+            badge: t.strBadge || t.strTeamBadge,
+            league: t.strLeague,
+            country: t.strCountry,
+            stadium: t.strStadium,
+        } : null;
+
+        const data = {
+            ok: true,
+            query: { home, away },
+            home: teamCard(teamA),
+            away: teamCard(teamB),
+            mainMatch,
+            headToHead: h2h.slice(0, 8),
+            homeForm: teamForm(lastA, teamA?.idTeam),
+            awayForm: teamForm(lastB, teamB?.idTeam),
+            homeNext: ((nextA?.events || []).map(_mapEvent)).slice(0, 3),
+            awayNext: ((nextB?.events || []).map(_mapEvent)).slice(0, 3),
+            league: leagueName ? { id: leagueId, name: leagueName, season } : null,
+            standings,
+            cachedAt: Date.now(),
+        };
+
+        matchProfileCache.set(cacheKey, { data, ts: Date.now() });
+        res.set('Cache-Control', 'public, max-age=600');
+        res.json(data);
+    } catch (e) {
+        console.error('[/api/match-profile]', e);
         res.status(500).json({ ok: false, error: 'fetch_failed' });
     }
 });

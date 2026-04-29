@@ -3369,7 +3369,9 @@ function filterSearch(filterType, element) {
 let _currentTeamProfile = null;
 let _currentTeamQuery = '';
 let _profileTab = 'overview';
+let _currentMatchProfile = null;
 const _teamProfileMemCache = new Map();
+const _matchProfileMemCache = new Map();
 
 async function fetchTeamProfile(query) {
     const key = query.trim().toLowerCase();
@@ -3381,6 +3383,30 @@ async function fetchTeamProfile(query) {
         _teamProfileMemCache.set(key, { data, ts: Date.now() });
         return data;
     } catch (_) { return null; }
+}
+
+async function fetchMatchProfile(home, away) {
+    const key = `${home}|${away}`.toLowerCase();
+    const cached = _matchProfileMemCache.get(key);
+    if (cached && Date.now() - cached.ts < 10 * 60 * 1000) return cached.data;
+    try {
+        const r = await fetch(`/api/match-profile?home=${encodeURIComponent(home)}&away=${encodeURIComponent(away)}`, { signal: AbortSignal.timeout(10000) });
+        const data = await r.json();
+        _matchProfileMemCache.set(key, { data, ts: Date.now() });
+        return data;
+    } catch (_) { return null; }
+}
+
+// Detect "X vs Y" / "X x Y" / "X - Y" patterns. Returns {home, away} or null.
+function _parseMatchQuery(q) {
+    const s = (q || '').trim();
+    if (s.length < 5) return null;
+    const m = s.match(/^(.+?)\s+(?:vs?\.?|×|x|-)\s+(.+)$/i);
+    if (!m) return null;
+    const home = m[1].trim();
+    const away = m[2].trim();
+    if (home.length < 2 || away.length < 2) return null;
+    return { home, away };
 }
 
 // Heuristic: only fetch profile for single-team-style queries (1-3 tokens, no "vs"/"en vivo")
@@ -3618,6 +3644,103 @@ function renderTeamProfileHeader(profile) {
     `;
 }
 
+function _formChip(r) {
+    const cls = r === 'V' ? 'win' : r === 'D' ? 'loss' : r === 'E' ? 'draw' : 'unknown';
+    return `<span class="mp-form-chip mp-form-${cls}" title="${r === 'V' ? 'Victoria' : r === 'D' ? 'Derrota' : r === 'E' ? 'Empate' : '—'}">${r}</span>`;
+}
+
+function renderMatchProfileHeader(mp) {
+    const home = mp.home || {};
+    const away = mp.away || {};
+    const main = mp.mainMatch;
+    const homeName = home.name || mp.query?.home || '—';
+    const awayName = away.name || mp.query?.away || '—';
+    const homeBadge = home.badge || (main && main.homeBadge) || '';
+    const awayBadge = away.badge || (main && main.awayBadge) || '';
+
+    let scoreOrTime = '';
+    let statusLabel = '';
+    if (main) {
+        if (main.homeScore != null && main.awayScore != null) {
+            scoreOrTime = `<div class="mp-score">${main.homeScore} <span>:</span> ${main.awayScore}</div>`;
+            statusLabel = main.status === 'Match Finished' || main.status === 'FT' ? 'Finalizado' : (main.status || 'Finalizado');
+        } else {
+            scoreOrTime = `<div class="mp-vs">VS</div>`;
+            statusLabel = main.date ? `${_fmtMatchDate(main.date)}${main.time ? ' · ' + main.time.slice(0, 5) : ''}` : 'Próximamente';
+        }
+    } else {
+        scoreOrTime = `<div class="mp-vs">VS</div>`;
+        statusLabel = 'Sin partido programado';
+    }
+
+    const leagueLine = main?.league || mp.league?.name || '';
+    const venueLine = main?.venue ? `<i class="fas fa-map-marker-alt"></i> ${main.venue}` : '';
+
+    const homeFormHtml = (mp.homeForm || []).map(f => _formChip(f.result)).join('') || '<span class="mp-form-empty">—</span>';
+    const awayFormHtml = (mp.awayForm || []).map(f => _formChip(f.result)).join('') || '<span class="mp-form-empty">—</span>';
+
+    const h2hHtml = (mp.headToHead || []).slice(0, 5).map(e => {
+        const score = (e.homeScore != null && e.awayScore != null) ? `${e.homeScore} - ${e.awayScore}` : 'Próximo';
+        return `
+            <li class="mp-h2h-item">
+                <span class="mp-h2h-date">${_fmtMatchDate(e.date)}</span>
+                <span class="mp-h2h-teams">${e.home} <strong>${score}</strong> ${e.away}</span>
+                <span class="mp-h2h-comp">${e.league || ''}</span>
+            </li>`;
+    }).join('') || '<li class="mp-h2h-empty">Sin enfrentamientos recientes registrados.</li>';
+
+    const standingsRows = (mp.standings || []).map(s => `
+        <tr class="${s.isHome ? 'mp-row-home' : ''} ${s.isAway ? 'mp-row-away' : ''}">
+            <td>${s.position || ''}</td>
+            <td class="mp-stand-team">${_safeImg(s.badge, s.team, 'mp-stand-badge')} <span>${s.team}</span></td>
+            <td>${s.played || 0}</td>
+            <td>${s.goalDifference >= 0 ? '+' : ''}${s.goalDifference || 0}</td>
+            <td><strong>${s.points || 0}</strong></td>
+        </tr>`).join('');
+
+    return `
+        <div class="mp-card">
+            <div class="mp-banner">
+                <div class="mp-league-bar">
+                    <span class="mp-league-name">${leagueLine || 'Partido'}</span>
+                    <span class="mp-status">${statusLabel}</span>
+                </div>
+                <div class="mp-teams-row">
+                    <div class="mp-team mp-team-home">
+                        <div class="mp-team-badge">${_safeImg(homeBadge, homeName, '')}</div>
+                        <div class="mp-team-name">${homeName}</div>
+                        <div class="mp-team-form">${homeFormHtml}</div>
+                    </div>
+                    <div class="mp-center">
+                        ${scoreOrTime}
+                        ${venueLine ? `<div class="mp-venue">${venueLine}</div>` : ''}
+                    </div>
+                    <div class="mp-team mp-team-away">
+                        <div class="mp-team-badge">${_safeImg(awayBadge, awayName, '')}</div>
+                        <div class="mp-team-name">${awayName}</div>
+                        <div class="mp-team-form">${awayFormHtml}</div>
+                    </div>
+                </div>
+            </div>
+
+            ${(mp.headToHead && mp.headToHead.length) ? `
+            <div class="mp-section">
+                <h3 class="mp-section-title"><i class="fas fa-history"></i> Cara a cara</h3>
+                <ul class="mp-h2h-list">${h2hHtml}</ul>
+            </div>` : ''}
+
+            ${standingsRows ? `
+            <div class="mp-section">
+                <h3 class="mp-section-title"><i class="fas fa-list-ol"></i> ${mp.league?.name || 'Tabla'}</h3>
+                <table class="mp-standings">
+                    <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>DG</th><th>Pts</th></tr></thead>
+                    <tbody>${standingsRows}</tbody>
+                </table>
+            </div>` : ''}
+        </div>
+    `;
+}
+
 async function performSearch(query) {
     if (!query || query.trim() === '') {
         showSearchWelcome();
@@ -3633,12 +3756,17 @@ async function performSearch(query) {
     
     resultsContainer.innerHTML = '<div class="search-loading"><div class="spinner"></div><p>Buscando en todo UltraGol...</p></div>';
 
-    // Try to fetch a team profile in parallel (Google-style real scraped info)
+    // Try to fetch a team OR match profile in parallel (Google-style real scraped info)
     _currentTeamProfile = null;
+    _currentMatchProfile = null;
     _currentTeamQuery = query;
     _profileTab = 'overview';
     let teamProfilePromise = null;
-    if (_shouldTryTeamProfile(query)) {
+    let matchProfilePromise = null;
+    const matchParts = _parseMatchQuery(query);
+    if (matchParts) {
+        matchProfilePromise = fetchMatchProfile(matchParts.home, matchParts.away);
+    } else if (_shouldTryTeamProfile(query)) {
         teamProfilePromise = fetchTeamProfile(query);
     }
     
@@ -3793,11 +3921,17 @@ async function performSearch(query) {
     const leagues = ['Liga MX', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Champions League', 'Copa Libertadores'];
     results.leagues = leagues.filter(league => league.toLowerCase().includes(searchTerm));
     
-    // Esperar perfil de equipo (si aplica) antes de renderizar
+    // Esperar perfil de equipo o partido (si aplica) antes de renderizar
     if (teamProfilePromise) {
         const profile = await teamProfilePromise;
         if (profile && profile.ok && profile.team) {
             _currentTeamProfile = profile;
+        }
+    }
+    if (matchProfilePromise) {
+        const mp = await matchProfilePromise;
+        if (mp && mp.ok && (mp.home || mp.away)) {
+            _currentMatchProfile = mp;
         }
     }
 
@@ -3809,16 +3943,18 @@ function displaySearchResults(results, query) {
     const resultsContainer = document.getElementById('searchResults');
     let html = '';
 
-    // Render team profile header at top if available
-    if (_currentTeamProfile && _currentTeamProfile.ok) {
+    // Render match profile header (priority over team profile when both exist)
+    if (_currentMatchProfile && _currentMatchProfile.ok) {
+        html += renderMatchProfileHeader(_currentMatchProfile);
+    } else if (_currentTeamProfile && _currentTeamProfile.ok) {
         html += renderTeamProfileHeader(_currentTeamProfile);
     }
     
     const totalResults = results.matches.length + results.teams.length + results.leagues.length + results.importantMatches.length;
     
     if (totalResults === 0) {
-        // If we have a team profile, show it with a "no transmissions" notice instead
-        if (_currentTeamProfile && _currentTeamProfile.ok) {
+        // If we have any profile, show it with a "no transmissions" notice instead
+        if ((_currentMatchProfile && _currentMatchProfile.ok) || (_currentTeamProfile && _currentTeamProfile.ok)) {
             html += `
                 <div class="tp-no-tx">
                     <i class="fas fa-broadcast-tower"></i>
