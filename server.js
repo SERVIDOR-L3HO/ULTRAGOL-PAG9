@@ -1061,6 +1061,12 @@ app.get('/api/team-logo', async (req, res) => {
     res.json({ url: null });
 });
 
+// ─── Google Search Console verification (explicit route so Vercel bundles the file) ──
+app.get('/google45d0913179243d5e.html', (req, res) => {
+    res.type('text/html');
+    res.send('google-site-verification: google45d0913179243d5e.html');
+});
+
 // ─── ROBOTS.TXT — must be BEFORE static middlewares so ULTRA/robots.txt doesn't win ──
 app.get('/robots.txt', (req, res) => {
     res.type('text/plain');
