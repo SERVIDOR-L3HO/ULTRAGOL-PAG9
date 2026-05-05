@@ -1,296 +1,62 @@
-# UltraGol - Football Streaming and Information Platform
+# UltraGol - Liga MX Football Streaming and Information Platform
 
-## Overview
+## Run & Operate
+- **Run Main Server:** `npm start` (starts `server.js` on port 5000)
+- **Run ULTRA Server:** `cd ULTRA && npm start` (starts `ULTRA/server.js` on port 5000)
+- **Required Env Vars:** `PORT`, `SESSION_SECRET`, `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `STRIPE_SECRET_KEY`, `NODE_ENV`
+- **Reels Scraper:** `node server/reels-scraper.js` (runs every 90 mins, output to `data/reels-scraped.json`)
 
-UltraGol is a comprehensive Spanish-language football platform focused on Liga MX, created by L3HO. The platform combines live streaming capabilities, real-time match information, team statistics, user authentication, and social features. It serves as a centralized hub for football fans to discover streams, track their favorite teams, engage with the community, and support the platform through donations.
+## Stack
+- **Frontend:** Pure HTML5, CSS3, Vanilla JavaScript (ES6+), PWA, Web Components
+- **Backend:** Node.js, Express.js 5.x
+- **Database:** Google Firestore (NoSQL), Firebase Authentication, Firebase Storage
+- **Payments:** PayPal SDK, Stripe SDK
+- **Build Tool:** _Populate as you build_
 
-The application consists of two main components:
-1. **Main Website** - Liga MX information portal with team data, standings, calendars, and statistics
-2. **ULTRA Platform** - Live streaming discovery and sharing platform with user-generated content
+## Where things live
+- **Main Server Entry:** `server.js`
+- **ULTRA Server Entry:** `ULTRA/server.js`
+- **DB Schema:** Google Firestore collections (`users`, `streams`, `comments`, `notifications`, `donations`, `match_links`)
+- **Static Data:** `data/standings.json`, `data/teams.json`, `data/fixtures.json`, `data/jornadas.json`, `data/videos-highlights.json`, `data/reels.json` (fallback), `data/reels-scraped.json` (live cache)
+- **Reels Scraper Logic:** `server/reels-scraper.js`
+- **Reels Frontend:** `js/reels-viewer.js`, `css/reels-viewer.css`
+- **PWA Manifests:** `manifest.json` (main site), `ULTRA/manifest.json` (ULTRA platform)
+- **Main Site Styles:** various `.css` files in root and subdirectories
+- **ULTRA Site Styles:** `ULTRA/css/style.css`, `ULTRA/css/dark.css`
+- **Aggregator Brand Pages:**
+    - Pelota Libre: `/mx/index.html`, `/mx/:slug`
+    - Roja Directa: `/rojadirecta/index.html`, `/rojadirecta/:slug`
 
-## User Preferences
+## Architecture decisions
+- **Hybrid Data Storage:** Static JSON for stable data (teams, historical records) to minimize Firebase costs, Firebase for dynamic and user-generated content requiring real-time updates.
+- **PWA First:** Extensive PWA implementation with service workers and manifests for offline capabilities and native-like installation.
+- **Vanilla JS Frontend:** Avoids framework overhead for faster load times and smaller bundle sizes, prioritizing browser native features.
+- **Dual Server Instances:** Separate Express servers for the main website and the ULTRA streaming platform to manage distinct functionalities and resource allocation.
+- **TikTok Scraper:** Custom server-side scraper for TikTok videos, ensuring relevant and fresh "Reels" content.
 
+## Product
+- Live streaming discovery for Liga MX matches
+- Real-time match information, statistics, and standings
+- User authentication and profile management
+- Social features: comments, sharing
+- Donation system (PayPal, Stripe)
+- Personalized push notifications for favorite teams
+- TikTok-style video reels with Liga MX content
+- Two premium match aggregator brand pages (`/mx` and `/rojadirecta`)
+
+## User preferences
 Preferred communication style: Simple, everyday language.
 
-## System Architecture
+## Gotchas
+- **Reels Data Expiration:** TikTok signed URLs for video reels expire, necessitating the 90-minute scraper refresh.
+- **PWA Install Banner:** The PWA install banner has a 7-day dismissal memory; be mindful of this during testing.
+- **CORS:** Both server instances have CORS enabled; ensure proper configuration if deploying to different domains.
+- **Firebase Quotas:** Be aware of Firebase quotas for Firestore reads/writes, especially with real-time data.
 
-### Frontend Architecture
-
-**Technology Stack:**
-- Pure HTML5, CSS3, and vanilla JavaScript (no framework dependencies)
-- Modern ES6+ modules for code organization
-- Responsive design with mobile-first approach
-- **Progressive Web App (PWA)** with complete installation capabilities:
-  - Professional install banner on both main site and ULTRA platform
-  - Service Workers for offline functionality and caching
-  - Web App Manifests with custom app icons
-  - Installable as native-like app on mobile devices
-  - Smart caching strategy that ignores query string parameters
-  - Banner auto-displays after 3 seconds on compatible browsers
-  - 7-day dismissal memory to avoid annoying users
-
-**Design System:**
-- **Main Site**: Orange (#ff9933) and blue gradient theme with professional sports aesthetics
-- **ULTRA Platform**: Black, green (#00ff41), and orange theme with modern dark UI
-- Custom CSS variables for consistent theming
-- Glassmorphism effects and modern animations throughout
-- Typography: Space Grotesk, Inter, and JetBrains Mono fonts
-
-**Key Frontend Components:**
-- Multi-page application with dedicated pages for teams, standings, calendars, statistics, news, and donations
-- Interactive team profiles with detailed statistics and match history
-- Advanced calendar system with jornada (matchday) and monthly views
-- Real-time match tracking with live updates and automatic 30-second refresh
-- **Featured Match Carousel** (ULTRA Platform):
-  - Swipeable carousel displaying ALL Liga MX matches simultaneously
-  - Touch-enabled swipe gestures for mobile navigation
-  - Previous/Next navigation buttons for desktop
-  - Visual indicators showing total matches and current position
-  - Preserves user's selected match during automatic data refreshes
-  - Shows live match clock, scores, team logos, and match status
-  - Displays goal information (player names and minutes) when available
-- **Important Matches Modal** (ULTRA Platform):
-  - Uniform card design for all matches regardless of channel availability
-  - Status badges with animated indicators (live dot for "EN VIVO", clock for "PRÓXIMO", check for "Finalizado")
-  - Consistent layout: status badge, match title, date/time, channel info, and action button
-  - Channel information displayed in highlighted box with orange accent border
-  - "Sin canales disponibles" message shown when no channels exist
-  - Persistent "Ver" button on all cards (disabled state when no channels available)
-  - Professional disabled button styling with reduced opacity and no hover effects
-- User authentication UI with registration, login, and profile management
-- Comments and social interaction features
-- Picture-in-picture video player for floating stream viewing
-- Cookie consent banner (GDPR compliant)
-- **PWA Install Banner**:
-  - Modern gradient purple design with smooth animations
-  - Custom app icon (ULTRAGOL branded soccer ball with fire effects)
-  - "Instalar App" button triggers native browser installation
-  - Fully responsive for mobile and desktop
-  - Separate banners for main site and ULTRA platform
-  - localStorage-based dismissal tracking
-- **Settings/Configuration System** (Live Chat):
-  - Professional settings modal with gray, white, and black color scheme
-  - Typography customization: font family, size, and weight selection
-  - Color customization: text color, accent color with preset palettes
-  - Background options: solid colors and gradient backgrounds
-  - Custom gradient builder with angle control
-  - 8 predefined themes (Default, Dark, Ocean, Forest, Sunset, Rose, Minimal, Neon)
-  - Real-time preview of all changes
-  - Settings persistence using localStorage
-  - Accessible via gear icon in chat toolbar
-- **UltraGol Reels (TikTok-style viewer, ULTRA platform only)**:
-  - Entry point: elevated center button in `ultrax/index.html` bottom nav (between Buscar and Noticias) with rotating green→pink gradient ring, glow halo, and lightning bolt icon
-  - Triggered via any element with `data-reels-trigger` attribute
-  - Fullscreen immersive viewer:
-    - Vertical snap-scroll for swipe up/down navigation
-    - Direct MP4 video playback (no YouTube) — also supports custom iframe embeds
-    - TikTok-style action buttons: like, share, mute toggle, save to favorites
-    - Tap video to pause/play
-    - Persistent likes via localStorage
-    - Native Web Share API + clipboard fallback
-    - Progress dots (clickable for jump-to-slide)
-    - Keyboard shortcuts: ↑/↓ navigate, M mute, Esc close
-    - "Swipe up" animated hint on first reel
-    - Toast notifications for actions
-  - **Live video scraping (TikTok via TikWM public API)**: Server scrapes 12 keyword searches every 90 minutes:
-    - Liga MX teams: ligamx, rayados, club américa, chivas, tigres uanl, pumas unam, cruz azul
-    - Topics: futbol mexicano, futbol golazo, futbol skills
-    - Stars: messi, cristiano ronaldo
-  - Returns real viral TikTok videos with: HD MP4 URL (no watermark), thumbnail, title, likes/views/shares/comments, duration, author
-  - Auto-tags by team with brand colors (e.g. AMÉRICA = #FFD700, RAYADOS = #003DA5)
-  - Interleaves results so feed alternates between teams (no 8 América in a row)
-  - Filters out videos longer than 120 seconds (keeps it reels-style)
-  - 90-min refresh cycle (TikTok signed URLs expire eventually)
-  - Cached in `data/reels-scraped.json` and persisted between restarts
-  - API endpoint: `GET /api/reels` (force refresh: `?refresh=1`)
-  - Static fallback: `data/reels.json` if scraper fails
-  - Files: `server/reels-scraper.js`, `js/reels-viewer.js`, `css/reels-viewer.css`, `data/reels.json` (fallback), `data/reels-scraped.json` (live cache)
-- **Push Notification System**:
-  - Permission request modal appears 3 seconds after page load
-  - Team selector modal to choose favorite team
-  - Real-time notifications from https://ultragol-api-3.vercel.app/notificaciones API
-  - Automatic polling every 60 seconds for new notifications
-  - Smart filtering: only shows notifications for user's selected team
-  - Browser notification API integration with custom icons and badges
-  - localStorage persistence for preferences and last notification ID
-  - Fully client-side implementation (works on static GitHub Pages)
-  - Available on both main site and ULTRA platform
-  - Toast messages for user feedback
-  - Welcome notification on first activation
-
-### Backend Architecture
-
-**Server Framework:**
-- Express.js 5.x for HTTP server
-- Two separate server instances:
-  - Main server (`server.js`) on port 5000 - handles main website
-  - ULTRA server (`ULTRA/server.js`) on port 5000 - handles streaming platform
-- CORS enabled for cross-origin requests
-- Static file serving with cache control headers
-- Session management with express-session
-
-**API Endpoints:**
-- `/api/paypal/orders` - Create PayPal donation orders
-- `/api/paypal/orders/:id/capture` - Capture completed PayPal payments
-- `/api/paypal/config` - Retrieve PayPal configuration
-- `/api/stripe/*` - Stripe payment integration endpoints
-- `/api/cookie-consent` - Cookie consent management
-
-**Security Measures:**
-- Helmet.js for HTTP security headers
-- Cookie parser for secure cookie handling
-- Session secret management via environment variables
-- Content Security Policy configuration
-- HTTPS-only cookies in production
-
-### Data Storage
-
-**Firebase Integration:**
-- **Firestore Database**: Real-time NoSQL database for user data, streams, comments, notifications
-- **Firebase Authentication**: Email/password and Google OAuth authentication
-- **Firebase Storage**: User avatars, team logos, and media uploads
-- **Collections**:
-  - `users` - User profiles with favorite teams and preferences
-  - `streams` - Live stream submissions and metadata
-  - `comments` - User comments on matches and content
-  - `notifications` - User notification queue
-  - `donations` - Donation transaction records
-  - `match_links` - Community-shared streaming links
-
-**Static Data Files (JSON):**
-- `data/standings.json` - League standings and team statistics
-- `data/teams.json` - Team information, colors, logos, history
-- `data/fixtures.json` - Match schedules and results
-- `data/jornadas.json` - Matchday schedules and dates
-- `data/videos-highlights.json` - Video highlights and YouTube embeds
-
-**Data Architecture Decisions:**
-- Static JSON files for relatively stable data (teams, historical records) to reduce database costs
-- Firebase for dynamic, user-generated content requiring real-time updates
-- Local storage for user preferences and session state
-- No SQL database currently in use (architecture supports future PostgreSQL via Drizzle if needed)
-
-### Authentication System
-
-**Multi-Provider Authentication:**
-- Email/password registration and login
-- Google OAuth integration
-- Session persistence across page reloads
-- Real-time auth state observation
-
-**User Profile System:**
-- Custom user profiles with favorite team selection
-- Avatar upload and management
-- User statistics tracking (posts, likes, comments)
-- Achievement and badge system
-- Follower/following relationships
-
-**Authorization:**
-- Admin role system with privileged access
-- User-specific content (my streams, my profile)
-- Comment ownership verification for edit/delete
-- Protected routes requiring authentication
-
-### Third-Party Service Integration
-
-**Payment Processing:**
-1. **PayPal Integration** (Primary):
-   - PayPal Server SDK v1.1.0
-   - Sandbox and production environment support
-   - Order creation and capture flow
-   - Dynamic button rendering
-   - Webhook support for payment verification
-
-2. **Stripe Integration** (Alternative):
-   - Stripe SDK v18.5.0
-   - Card payment processing
-   - Subscription management ready
-   - Secure payment intent flow
-
-**Video and Media:**
-- YouTube embedded videos for highlights
-- Custom video player with Picture-in-Picture support
-- Iframe-based live stream embedding
-- Browser popup windows for floating video
-
-**External Links:**
-- UltraGol LIVE external platform integration
-- Social media sharing capabilities
-- External streaming service links
-
-## External Dependencies
-
-### NPM Packages (Main Project)
-- `express` (^5.1.0) - Web server framework
-- `cors` (^2.8.5) - Cross-origin resource sharing
-- `helmet` (^8.1.0) - Security middleware
-- `cookie-parser` (^1.4.7) - Cookie parsing
-- `express-session` (^1.18.2) - Session management
-- `@paypal/paypal-server-sdk` (^1.1.0) - PayPal payment processing
-- `stripe` (^18.5.0) - Stripe payment processing
-
-### NPM Packages (ULTRA Platform)
-- `express` (^4.21.2) - Web server
-- `cors` (^2.8.5) - CORS middleware
-
-### CDN Dependencies
-- **Firebase SDK** (v9.22.0 and v10.7.1):
-  - firebase-app-compat.js
-  - firebase-auth-compat.js
-  - firebase-firestore-compat.js
-  - firebase-storage-compat.js
-  - Modular SDK for ULTRA platform
-- **Font Awesome** (v6.0.0) - Icon library
-- **Google Fonts**:
-  - Roboto (multiple weights)
-  - Space Grotesk
-  - Inter
-  - JetBrains Mono
-  - Playfair Display
-
-### Firebase Services
-- **Project**: ligamx-daf3d
-- **Authentication**: Email/password, Google OAuth
-- **Firestore**: Real-time database
-- **Storage**: File uploads and media
-- **Hosting**: Authorized domains for authentication
-
-### External APIs
-- YouTube API (for video embeds)
-- PayPal REST API
-- Stripe API
-- Google OAuth API
-- **ULTRAGOL Statistics API** (https://ultragol-api-3.vercel.app/):
-  - Real-time match statistics for 6 major leagues (Liga MX, Premier League, La Liga, Serie A, Bundesliga, Ligue 1)
-  - Endpoints: `/estadisticas/partido/{eventId}` for match stats, events, and lineups
-  - Auto-updates every 30 seconds for live matches
-  - Provides: possession, shots, passes, corners, fouls, cards, saves, clearances, interceptions, tackles, duels
-  - Integrated in player modal statistics tab
-
-### Environment Configuration
-Required environment variables:
-- `PORT` - Server port (default: 5000)
-- `SESSION_SECRET` - Session encryption key
-- `PAYPAL_CLIENT_ID` - PayPal client identifier
-- `PAYPAL_CLIENT_SECRET` - PayPal secret key
-- `STRIPE_SECRET_KEY` - Stripe API secret
-- `NODE_ENV` - Environment (development/production)
-
-### Deployment Platform
-- Configured for Replit deployment
-- Autoscale deployment type
-- Host binding to 0.0.0.0 for external access
-- Cache control headers for fresh content delivery
-### Aggregator Brand Pages (April 2026)
-Two parallel branded match-aggregator surfaces share the same backend (`fetchAllPartidos` from ULTRAGOL Statistics API):
-
-- **`/mx`** — *Pelota Libre Premium* (green theme, gold premium accents)
-  - Files: `mx/index.html`, `mx/mx.css`, `mx/mx.js`, `mx/pelotalibre-premium.svg`
-  - Detail pages: `/mx/:slug` (rendered server-side via `buildMatchPage({brand:'pelotalibre'})`)
-
-- **`/rojadirecta`** — *Roja Directa TV Premium* (red theme, gold premium accents)
-  - Files: `rojadirecta/index.html`, `rojadirecta/theme.css` (overrides), `rojadirecta/icon.svg`
-  - Detail pages: `/rojadirecta/:slug` (rendered via `buildMatchPage({brand:'rojadirecta'})`)
-  - Aliases: `/roja-directa`, `/rojadirectatv` → 301 redirect
-
-Both detail pages share the premium template in `server.js → buildMatchPage()` with brand-aware logo, colors, canonical URL, OG/Twitter meta, JSON-LD organizer, mini-scoreboard on scroll, tabs (Reproductor / Goles / Información / Más partidos), multi-server iframe player with theater mode, related matches grid, and share buttons (WhatsApp, Twitter, Facebook, Telegram, copy link). The unclickable brand logo combines a sport ball with a gold crown + PRO badge; sitemap (`/sitemap.xml`) lists both brand surfaces.
+## Pointers
+- **Firebase Documentation:** [https://firebase.google.com/docs](https://firebase.google.com/docs)
+- **PayPal Developer Docs:** [https://developer.paypal.com/docs](https://developer.paypal.com/docs)
+- **Stripe API Reference:** [https://stripe.com/docs/api](https://stripe.com/docs/api)
+- **Express.js Guide:** [https://expressjs.com/](https://expressjs.com/)
+- **PWA Fundamentals:** [https://web.dev/pwq/](https://web.dev/pwq/)
+- **ULTRAGOL Statistics API:** [https://ultragol-api-3.vercel.app/](https://ultragol-api-3.vercel.app/)
