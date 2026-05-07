@@ -571,3 +571,92 @@ body.tv-mode .smp-teams-row { font-size: 19px; }
 body.tv-mode .server-count-badge { font-size: 13px; padding: 5px 12px; }
 body.tv-mode .channel-selector-body::-webkit-scrollbar { width: 6px; }
 body.tv-mode .channel-selector-body::-webkit-scrollbar-thumb { background: #ff6b35; border-radius: 3px; }
+
+/* ═══════════════════════════════════════════════════════
+   BARRA DE BOTONES DE COLOR — Control Remoto TV
+   ═══════════════════════════════════════════════════════ */
+
+/* Oculta por defecto — solo aparece en modo TV */
+.tv-color-bar {
+    display: none;
+    position: fixed;
+    bottom: 78px; /* justo encima del bottom-nav */
+    left: 0;
+    right: 0;
+    z-index: 1400;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.82));
+    pointer-events: none;
+}
+
+body.tv-mode .tv-color-bar {
+    display: flex;
+    pointer-events: all;
+    animation: tvBarIn .35s ease both;
+}
+
+@keyframes tvBarIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.tv-color-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0,0,0,0.55);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 20px;
+    padding: 6px 14px 6px 8px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    transition: transform .18s, box-shadow .18s, background .18s;
+    backdrop-filter: blur(8px);
+    white-space: nowrap;
+}
+.tv-color-btn:hover,
+.tv-color-btn:focus-visible {
+    transform: scale(1.08);
+    background: rgba(0,0,0,0.75);
+    outline: 2px solid rgba(255,255,255,0.4) !important;
+    outline-offset: 2px !important;
+}
+.tv-color-btn:active { transform: scale(0.95); }
+
+.tv-color-dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* Colores de cada botón */
+.tv-red    .tv-color-dot { background: #e53935; box-shadow: 0 0 8px rgba(229,57,53,.7); }
+.tv-green  .tv-color-dot { background: #43a047; box-shadow: 0 0 8px rgba(67,160,71,.7); }
+.tv-yellow .tv-color-dot { background: #fdd835; box-shadow: 0 0 8px rgba(253,216,53,.7); }
+.tv-blue   .tv-color-dot { background: #1e88e5; box-shadow: 0 0 8px rgba(30,136,229,.7); }
+
+.tv-red:hover    { border-color: rgba(229,57,53,.5);   }
+.tv-green:hover  { border-color: rgba(67,160,71,.5);   }
+.tv-yellow:hover { border-color: rgba(253,216,53,.5);  }
+.tv-blue:hover   { border-color: rgba(30,136,229,.5);  }
+
+.tv-color-label { color: rgba(255,255,255,0.9); }
+
+/* En pantallas grandes la barra sube un poco más */
+@media (min-width: 960px) {
+    .tv-color-bar { bottom: 90px; gap: 12px; }
+    .tv-color-btn { padding: 8px 18px 8px 10px; font-size: 13px; }
+    .tv-color-dot { width: 16px; height: 16px; }
+}
+
+body.tv-mode .tv-color-bar {
+    bottom: 82px;
+}

@@ -322,6 +322,22 @@
 
 
 
+        <!-- Barra de ayuda control remoto — solo visible en modo TV -->
+        <div class="tv-color-bar" id="tvColorBar" aria-hidden="true">
+            <button class="tv-color-btn tv-red"    onclick="navTo('home', document.querySelector('[data-nav=home]'))" title="Inicio">
+                <span class="tv-color-dot"></span><span class="tv-color-label">Inicio</span>
+            </button>
+            <button class="tv-color-btn tv-green"  onclick="openImportantMatchesModal()" title="En Vivo">
+                <span class="tv-color-dot"></span><span class="tv-color-label">En Vivo</span>
+            </button>
+            <button class="tv-color-btn tv-yellow" onclick="showSearchModal()" title="Buscar">
+                <span class="tv-color-dot"></span><span class="tv-color-label">Buscar</span>
+            </button>
+            <button class="tv-color-btn tv-blue"   onclick="toggleTVMode()" title="Modo TV">
+                <span class="tv-color-dot"></span><span class="tv-color-label">Modo TV</span>
+            </button>
+        </div>
+
         <nav class="bottom-nav" id="bottomNav">
             <button class="nav-btn active" data-nav="home" onclick="navTo('home', this)">
                 <div class="nav-icon-wrap"><i class="fas fa-house"></i></div>

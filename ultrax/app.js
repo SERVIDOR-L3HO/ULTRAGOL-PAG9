@@ -6546,6 +6546,38 @@ function claimReward(days, code) {
         const isInput = tag === 'input' || tag === 'textarea' || tag === 'select';
 
         switch (e.key) {
+            // ── Botones de color del control remoto TV ─────────────
+            // Rojo (F1 / keyCode 403) → Inicio (Liga MX)
+            case 'F1':
+            case 'ColorF0Red':
+                e.preventDefault();
+                closeAllModals && closeAllModals();
+                navTo && navTo('home', document.querySelector('[data-nav="home"]'));
+                break;
+
+            // Verde (F2 / keyCode 404) → Partidos en vivo
+            case 'F2':
+            case 'ColorF1Green':
+                e.preventDefault();
+                closeAllModals && closeAllModals();
+                openImportantMatchesModal && openImportantMatchesModal();
+                break;
+
+            // Amarillo (F3 / keyCode 405) → Búsqueda
+            case 'F3':
+            case 'ColorF2Yellow':
+                e.preventDefault();
+                closeAllModals && closeAllModals();
+                showSearchModal && showSearchModal();
+                break;
+
+            // Azul (F4 / keyCode 406) → Activar/desactivar modo TV
+            case 'F4':
+            case 'ColorF3Blue':
+                e.preventDefault();
+                toggleTVMode && toggleTVMode();
+                break;
+
             case 'Escape':
                 if (!isInput) {
                     e.preventDefault();
