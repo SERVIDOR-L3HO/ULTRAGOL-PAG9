@@ -1587,6 +1587,9 @@ function showChannelSelector(transmision, partidoNombre) {
 
             channelsHtml += `
                 <div class="server-node-card" style="animation-delay:${entranceDelay}"
+                     tabindex="0" role="button"
+                     aria-label="Canal ${serverNum}: ${canalNombre}, ${apiType}"
+                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playChannelFromSelector('${enlace}','${safeNombre}')}"
                      onclick="playChannelFromSelector('${enlace}', '${safeNombre}')">
                     <div class="node-scan"></div>
                     <div class="node-edge"></div>
@@ -1640,6 +1643,11 @@ function showChannelSelector(transmision, partidoNombre) {
     
     body.innerHTML = channelsHtml;
     modal.classList.add('active');
+    // Auto-focus primer canal para navegación TV
+    setTimeout(() => {
+        const first = body.querySelector('.server-node-card[tabindex]');
+        if (first) first.focus();
+    }, 120);
 }
 
 function playChannelFromSelector(url, title) {
@@ -4198,7 +4206,11 @@ function displaySearchResults(results, query) {
             }
 
             html += `
-                <div class="smp-card ${isLive ? 'smp-card-live' : ''}" onclick='selectImportantMatchByName("${safeEvent}")'>
+                <div class="smp-card ${isLive ? 'smp-card-live' : ''}"
+                     tabindex="0" role="button"
+                     aria-label="${eventName}"
+                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectImportantMatchByName('${safeEvent}')}"
+                     onclick='selectImportantMatchByName("${safeEvent}")'>
                     <div class="smp-logos-col">
                         ${hasLogos ? `
                             <img class="smp-team-logo" src="${logo1}" alt="${eq1}" onerror="this.style.display='none'">
@@ -5229,7 +5241,11 @@ function renderImportantMatches() {
         const ligaBadge = liga ? `<span class="rim-liga"><i class="fas ${sportIcon}"></i> ${liga.toUpperCase()}</span>` : '';
 
         return `
-            <div class="rim-card ${isLive ? 'live' : ''}" onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
+            <div class="rim-card ${isLive ? 'live' : ''}"
+                 tabindex="0" role="button"
+                 aria-label="${evento}"
+                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectImportantMatchByTransmision('${eventoEscapado}')}"
+                 onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
                 <div class="rim-teams">
                     <div class="rim-team">
                         <img class="rim-logo" src="/ULTRA/favicon.png" alt="${equipo1}" data-team="${encodeURIComponent(equipo1)}">
@@ -6477,3 +6493,109 @@ function claimReward(days, code) {
     }
 }
 
+
+// ═══════════════════════════════════════════════════════
+//  NAVEGACIÓN TV — Control Remoto (teclas flecha + Enter)
+// ═══════════════════════════════════════════════════════
+(function initTVNavigation() {
+    const TV_KEY = 'ultragol_tv_mode';
+    if (localStorage.getItem(TV_KEY) === '1') {
+        document.body.classList.add('tv-mode');
+    }
+
+    window.toggleTVMode = function() {
+        const active = document.body.classList.toggle('tv-mode');
+        localStorage.setItem(TV_KEY, active ? '1' : '0');
+        showToast(active ? '📺 Modo TV activado — usa las flechas del control' : '📱 Modo TV desactivado');
+        const btn = document.getElementById('tvToggleBtn');
+        if (btn) btn.title = active ? 'Desactivar modo TV' : 'Activar modo TV (control remoto)';
+    };
+
+    // Devuelve todos los elementos navegables visibles dentro de un contenedor
+    function getFocusables(container) {
+        const sel = '.server-node-card[tabindex], .rim-card[tabindex], .smp-card[tabindex], .lbar-btn, .nav-btn, .nav-reels-btn';
+        return [...(container || document).querySelectorAll(sel)]
+            .filter(el => el.offsetParent !== null);
+    }
+
+    // Mueve el foco hacia arriba o abajo en la lista
+    function moveFocus(dir, container) {
+        const items = getFocusables(container);
+        if (!items.length) return;
+        const idx = items.indexOf(document.activeElement);
+        let next;
+        if (dir === 'down') next = idx < items.length - 1 ? items[idx + 1] : items[0];
+        else next = idx > 0 ? items[idx - 1] : items[items.length - 1];
+        if (next) { next.focus(); next.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    }
+
+    // Detecta qué modal/contenedor está activo
+    function getActiveContainer() {
+        const cs = document.getElementById('channelSelectorModal');
+        if (cs?.classList.contains('active')) return cs.querySelector('.channel-selector-body');
+        const im = document.getElementById('importantMatchesModal');
+        if (im?.classList.contains('active')) return im.querySelector('.important-modal-body');
+        const sm = document.getElementById('searchModal');
+        if (sm?.classList.contains('active')) return sm.querySelector('.search-modal-body');
+        return null;
+    }
+
+    // Listener global de teclado
+    document.addEventListener('keydown', function(e) {
+        const tag = (document.activeElement?.tagName || '').toLowerCase();
+        const isInput = tag === 'input' || tag === 'textarea' || tag === 'select';
+
+        switch (e.key) {
+            case 'Escape':
+                if (!isInput) {
+                    e.preventDefault();
+                    if (typeof closeAllModals === 'function') closeAllModals();
+                    else if (typeof navigateBack === 'function') navigateBack();
+                }
+                break;
+
+            case 'ArrowDown':
+            case 'ArrowRight':
+                if (!isInput) {
+                    e.preventDefault();
+                    moveFocus('down', getActiveContainer());
+                }
+                break;
+
+            case 'ArrowUp':
+            case 'ArrowLeft':
+                if (!isInput) {
+                    e.preventDefault();
+                    moveFocus('up', getActiveContainer());
+                }
+                break;
+
+            case 'Enter':
+            case ' ':
+                if (!isInput) {
+                    const el = document.activeElement;
+                    if (el && el.tagName !== 'BUTTON' &&
+                        (el.classList.contains('server-node-card') ||
+                         el.classList.contains('rim-card') ||
+                         el.classList.contains('smp-card'))) {
+                        e.preventDefault();
+                        el.click();
+                    }
+                }
+                break;
+        }
+    }, true);
+
+    // Auto-focus primer partido al abrir modal de partidos importantes
+    const observer = new MutationObserver(() => {
+        const im = document.getElementById('importantMatchesModal');
+        if (im?.classList.contains('active')) {
+            setTimeout(() => {
+                const first = im.querySelector('.rim-card[tabindex]');
+                if (first && !im.contains(document.activeElement)) first.focus();
+            }, 200);
+        }
+    });
+    const im = document.getElementById('importantMatchesModal');
+    if (im) observer.observe(im, { attributes: true, attributeFilter: ['class'] });
+})();

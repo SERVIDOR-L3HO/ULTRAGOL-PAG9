@@ -449,3 +449,125 @@ body.tv-mode .spinner {
     height: 80px;
     border-width: 8px;
 }
+
+/* ═══════════════════════════════════════════════════════
+   MODO TV — Foco visible + Navegación control remoto
+   ═══════════════════════════════════════════════════════ */
+
+/* Anula el outline:none que ponía el archivo para tv-mode */
+body.tv-mode *:focus { outline: revert; }
+
+/* Anillo de foco naranja brillante — visible en cualquier fondo */
+.server-node-card:focus,
+.server-node-card:focus-visible {
+    outline: none !important;
+    background: rgba(255,107,53,0.16) !important;
+    border-color: rgba(255,107,53,0.65) !important;
+    box-shadow: 0 0 0 4px rgba(255,107,53,0.45),
+                0 10px 36px rgba(0,0,0,0.55) !important;
+    transform: scale(1.025) translateY(-2px) !important;
+}
+.server-node-card:focus .node-edge,
+.server-node-card:focus-visible .node-edge {
+    background: linear-gradient(180deg,#ff6b35,#ff4500) !important;
+    box-shadow: 0 0 20px rgba(255,107,53,0.95) !important;
+    width: 5px !important;
+}
+.server-node-card:focus .node-connect-btn,
+.server-node-card:focus-visible .node-connect-btn {
+    background: linear-gradient(135deg,#ff6b35,#ff4500) !important;
+    transform: scale(1.18) !important;
+}
+
+/* Foco en tarjetas de partidos importantes */
+.rim-card:focus,
+.rim-card:focus-visible {
+    outline: none !important;
+    border: 2px solid rgba(255,107,53,0.75) !important;
+    box-shadow: 0 0 0 3px rgba(255,107,53,0.38) !important;
+    background: rgba(255,107,53,0.12) !important;
+    transform: scale(1.015) !important;
+}
+
+/* Foco en tarjetas de búsqueda */
+.smp-card:focus,
+.smp-card:focus-visible {
+    outline: none !important;
+    border: 2px solid rgba(255,107,53,0.7) !important;
+    box-shadow: 0 0 0 3px rgba(255,107,53,0.35) !important;
+    background: rgba(255,107,53,0.08) !important;
+}
+
+/* Botones de modal */
+.back-modal-btn:focus-visible,
+.close-channel-selector:focus-visible,
+.close-important-modal:focus-visible,
+.close-search-modal:focus-visible,
+.nav-btn:focus-visible,
+.nav-reels-btn:focus-visible,
+.icon-btn:focus-visible,
+.lbar-btn:focus-visible {
+    outline: 3px solid #ff6b35 !important;
+    outline-offset: 3px !important;
+}
+
+/* ── Botón TV MODE en header ─────────────────────────── */
+.tv-toggle-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: var(--text, #eee);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all .22s;
+    flex-shrink: 0;
+}
+.tv-toggle-btn:hover { background: rgba(255,107,53,0.2); border-color: rgba(255,107,53,.5); }
+.tv-toggle-btn:focus-visible { outline: 3px solid #ff6b35 !important; outline-offset: 3px !important; }
+body.tv-mode .tv-toggle-btn {
+    background: rgba(255,107,53,0.28);
+    border-color: rgba(255,107,53,0.7);
+    color: #ff6b35;
+    box-shadow: 0 0 10px rgba(255,107,53,0.4);
+}
+
+/* ── Escalado automático canal selector en TV (≥960px) ── */
+@media (min-width: 960px) {
+    .channel-selector-content { max-width: 780px; max-height: 88vh; }
+    .channel-selector-header h3 { font-size: 19px; }
+    .server-node-card { padding: 18px 22px; min-height: 72px; }
+    .node-name { font-size: 17px; }
+    .node-provider-tag, .node-quality-tag { font-size: 12px; padding: 4px 10px; }
+    .node-connect-btn { width: 46px; height: 46px; font-size: 18px; }
+    .rim-card { padding: 16px 22px; min-height: 76px; }
+    .rim-name { font-size: 15px; }
+    .smp-card { padding: 16px 18px; min-height: 76px; }
+    .smp-teams-row { font-size: 16px; }
+}
+
+/* ── body.tv-mode — tamaños XL para tele con cursor ─────── */
+body.tv-mode .channel-selector-content { max-width: 900px; max-height: 92vh; }
+body.tv-mode .channel-selector-header h3 { font-size: 22px; }
+body.tv-mode .server-node-card { padding: 22px 28px; min-height: 88px; border-radius: 22px; }
+body.tv-mode .node-name { font-size: 20px; font-weight: 700; }
+body.tv-mode .node-provider-tag,
+body.tv-mode .node-quality-tag { font-size: 14px; padding: 5px 12px; border-radius: 8px; }
+body.tv-mode .node-connect-btn { width: 54px; height: 54px; font-size: 22px; }
+body.tv-mode .node-latency { font-size: 13px; font-weight: 700; }
+body.tv-mode .server-grid-creative { gap: 14px; }
+body.tv-mode .back-modal-btn { padding: 12px 20px; font-size: 16px; font-weight: 700; }
+body.tv-mode .close-channel-selector,
+body.tv-mode .close-important-modal { width: 46px; height: 46px; font-size: 18px; }
+body.tv-mode .rim-card { padding: 20px 26px; min-height: 88px; border-radius: 16px; }
+body.tv-mode .rim-name { font-size: 18px; font-weight: 700; }
+body.tv-mode .rim-vs { font-size: 15px; }
+body.tv-mode .smp-card { padding: 20px 22px; min-height: 90px; }
+body.tv-mode .smp-teams-row { font-size: 19px; }
+body.tv-mode .server-count-badge { font-size: 13px; padding: 5px 12px; }
+body.tv-mode .channel-selector-body::-webkit-scrollbar { width: 6px; }
+body.tv-mode .channel-selector-body::-webkit-scrollbar-thumb { background: #ff6b35; border-radius: 3px; }
