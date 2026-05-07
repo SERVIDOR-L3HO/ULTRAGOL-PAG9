@@ -6499,8 +6499,42 @@ function claimReward(days, code) {
 // ═══════════════════════════════════════════════════════
 (function initTVNavigation() {
     const TV_KEY = 'ultragol_tv_mode';
-    if (localStorage.getItem(TV_KEY) === '1') {
+
+    // ── Detección automática de TV ───────────────────────────────────────────
+    function detectarTV() {
+        const ua = navigator.userAgent.toLowerCase();
+
+        // 1. User-agent de plataformas TV conocidas
+        const tvUAs = [
+            'tizen', 'webos', 'netcast', 'smarttv', 'smart-tv', 'hbbtv',
+            'viera', 'bravia', 'philips', 'roku', 'googletv', 'crkey',
+            'firetv', 'fire tv', 'aftb', 'aftt', 'aftm', 'aftn', 'afts',
+            'android tv', 'aquos', 'kdl', 'nettv'
+        ];
+        if (tvUAs.some(k => ua.includes(k))) return true;
+
+        // 2. Pantalla ≥1280px SIN puntos táctiles → probablemente TV o monitor
+        if (window.screen.width >= 1280 && navigator.maxTouchPoints === 0) return true;
+
+        // 3. Control remoto: pointer:coarse (no ratón fino) + hover:hover
+        //    Esto distingue TV del móvil (móvil = coarse + hover:none)
+        const coarse = window.matchMedia('(pointer: coarse)').matches;
+        const hover  = window.matchMedia('(hover: hover)').matches;
+        if (coarse && hover) return true;
+
+        return false;
+    }
+
+    const esTV = detectarTV();
+
+    if (esTV) {
+        // TV detectada → activar modo TV automáticamente + marcar como detectado
+        document.body.classList.add('tv-mode', 'tv-detected');
+        localStorage.setItem(TV_KEY, '1');
+    } else if (localStorage.getItem(TV_KEY) === '1') {
+        // El usuario lo activó manualmente antes (no TV real)
         document.body.classList.add('tv-mode');
+        // NO añadimos tv-detected → la barra de colores no aparece en móvil
     }
 
     window.toggleTVMode = function() {
