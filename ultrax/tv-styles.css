@@ -512,6 +512,7 @@ body.tv-mode *:focus { outline: revert; }
 }
 
 /* ── Botón TV MODE en header ─────────────────────────── */
+/* Oculto por defecto; solo visible cuando se detecta una TV real (clase tv-detected) */
 .tv-toggle-btn {
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.14);
@@ -519,13 +520,17 @@ body.tv-mode *:focus { outline: revert; }
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     font-size: 15px;
     transition: all .22s;
     flex-shrink: 0;
+}
+/* Solo aparece en TVs reales detectadas automáticamente */
+body.tv-detected .tv-toggle-btn {
+    display: flex;
 }
 .tv-toggle-btn:hover { background: rgba(255,107,53,0.2); border-color: rgba(255,107,53,.5); }
 .tv-toggle-btn:focus-visible { outline: 3px solid #ff6b35 !important; outline-offset: 3px !important; }
