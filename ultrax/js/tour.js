@@ -106,17 +106,12 @@
         <button class="tour-btn-next" id="tNext">Siguiente <i class="fas fa-arrow-right"></i></button>
       </div>`;
 
-    const triggerBtn = mk('div','tour-trigger-btn');
-    triggerBtn.title   = 'Ver guía de UltraGol';
-    triggerBtn.innerHTML = '<i class="fas fa-question"></i>';
-
     // ── MOUNT ─────────────────────────────────────────────────────────────────
     function mount() {
         document.body.appendChild(welcome);
         panels.forEach(p => document.body.appendChild(p));
         document.body.appendChild(ring);
         document.body.appendChild(card);
-        document.body.appendChild(triggerBtn);
 
         // Dots
         const dotsEl = document.getElementById('tDots');
@@ -131,7 +126,6 @@
         document.getElementById('tourDismiss').addEventListener('click', dismiss);
         document.getElementById('tNext').addEventListener('click', next);
         document.getElementById('tSkip').addEventListener('click', endTour);
-        triggerBtn.addEventListener('click', () => { step = 0; showWelcome(); });
     }
 
     // ── WELCOME ───────────────────────────────────────────────────────────────
