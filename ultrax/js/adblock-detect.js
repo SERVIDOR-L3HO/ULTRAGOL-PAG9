@@ -4,10 +4,53 @@
 
     var overlayMounted = false;
 
-    // ── MÉTODO 1: Elemento <ins> cebo (Google Ads fingerprint) ────────────────
-    // Brave, uBlock, ABP filtran exactamente <ins class="adsbygoogle"> con
-    // data-ad-client / data-ad-slot — es la firma real de Google Ads.
-    // Hacemos polling cada 350ms hasta 2.1 segundos para dar tiempo a los filtros.
+    // ── MÉTODO 1: fetch no-cors (detecta Brave móvil y DNS blockers) ──────────
+    // KEY INSIGHT: fetch con mode:'no-cors' RESUELVE aunque el servidor devuelva
+    // 403/400 (el servidor es alcanzable). Solo RECHAZA cuando la red bloquea
+    // la conexión por completo (Brave Shields, AdGuard DNS, Pi-hole, etc.).
+    // Esto elimina los falsos positivos de Chrome sin bloqueador.
+    function fetchBaitCheck() {
+        return new Promise(function (resolve) {
+            if (typeof fetch !== 'function') { resolve(false); return; }
+
+            var done  = false;
+            var timer = setTimeout(function () {
+                if (!done) { done = true; resolve(false); } // timeout = no conclusive
+            }, 5000);
+
+            // Probar dos dominios de ad-networks bloqueados por Brave/uBlock
+            var urls = [
+                'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
+                'https://static.doubleclick.net/instream/ad_status.js'
+            ];
+
+            // Basta con que UNO cargue para saber que no hay bloqueador de red
+            var loaded = 0;
+            var errors = 0;
+
+            urls.forEach(function (url) {
+                fetch(url, { method: 'GET', mode: 'no-cors', cache: 'no-store' })
+                    .then(function () {
+                        // Servidor alcanzable (incluso si devuelve 403) → sin bloqueador
+                        loaded++;
+                        if (!done) { done = true; clearTimeout(timer); resolve(false); }
+                    })
+                    .catch(function () {
+                        // Red bloqueada → bloqueador detectado
+                        errors++;
+                        if (errors === urls.length && !done) {
+                            done = true;
+                            clearTimeout(timer);
+                            resolve(true);
+                        }
+                    });
+            });
+        });
+    }
+
+    // ── MÉTODO 2: Elemento <ins> cebo (detecta extensiones CSS) ──────────────
+    // Brave desktop, uBlock, ABP, AdGuard extensión ocultan <ins class="adsbygoogle">
+    // con data-ad-client/slot — firma exacta de Google AdSense.
     function baitInsCheck() {
         return new Promise(function (resolve) {
             var ins = document.createElement('ins');
@@ -23,11 +66,11 @@
                 tries++;
                 var cs = window.getComputedStyle(ins);
                 var blocked = (
-                    cs.display          === 'none'   ||
-                    cs.visibility       === 'hidden'  ||
-                    parseFloat(cs.opacity) < 0.05     ||
-                    ins.offsetHeight    === 0          ||
-                    ins.offsetWidth     === 0          ||
+                    cs.display       === 'none'  ||
+                    cs.visibility    === 'hidden' ||
+                    parseFloat(cs.opacity) < 0.05 ||
+                    ins.offsetHeight === 0         ||
+                    ins.offsetWidth  === 0         ||
                     !document.body.contains(ins)
                 );
                 if (blocked) {
@@ -35,88 +78,10 @@
                     resolve(true);
                     return;
                 }
-                if (tries < 6) {
-                    setTimeout(poll, 350);
-                } else {
-                    try { ins.remove(); } catch (e) {}
-                    resolve(false);
-                }
+                if (tries < 6) { setTimeout(poll, 350); }
+                else { try { ins.remove(); } catch (e) {} resolve(false); }
             }
             setTimeout(poll, 350);
-        });
-    }
-
-    // ── MÉTODO 2: Elemento div cebo con clases EasyList ──────────────────────
-    // Segunda línea: clases que EasyList esconde con CSS cosmético.
-    function baitDivCheck() {
-        return new Promise(function (resolve) {
-            var el = document.createElement('div');
-            el.className = 'adsbox pub_300x250 banner_ad advertisement textads';
-            el.style.cssText = 'width:300px;height:250px;position:fixed;top:-99998px;left:-99998px;';
-            el.innerHTML = '&nbsp;';
-            document.body.appendChild(el);
-
-            var tries = 0;
-            function poll() {
-                tries++;
-                var cs = window.getComputedStyle(el);
-                var blocked = (
-                    cs.display          === 'none'   ||
-                    cs.visibility       === 'hidden'  ||
-                    parseFloat(cs.opacity) < 0.05     ||
-                    el.offsetHeight     === 0          ||
-                    el.offsetWidth      === 0          ||
-                    !document.body.contains(el)
-                );
-                if (blocked) {
-                    try { el.remove(); } catch (e) {}
-                    resolve(true);
-                    return;
-                }
-                if (tries < 6) {
-                    setTimeout(poll, 350);
-                } else {
-                    try { el.remove(); } catch (e) {}
-                    resolve(false);
-                }
-            }
-            setTimeout(poll, 350);
-        });
-    }
-
-    // ── MÉTODO 3: Script cebo con verificación de variable ────────────────────
-    // Funciona para extensiones de navegador (uBlock, ABP, AdGuard extensión)
-    // que bloquean por nombre de archivo. No funciona bien en Brave móvil (bloquea
-    // por dominio), pero sirve como capa extra para extensiones en desktop.
-    function scriptBaitCheck() {
-        return new Promise(function (resolve) {
-            window.__ugAdsOk = false;
-            var done = false;
-
-            var timer = setTimeout(function () {
-                if (!done) { done = true; resolve(true); }
-            }, 4000);
-
-            var el = document.createElement('script');
-            el.src = '/ultrax/js/adsbygoogle.js?t=' + Date.now();
-
-            el.onload = function () {
-                if (done) return;
-                done = true;
-                clearTimeout(timer);
-                // Si el script corrió, __ugAdsOk = true. Si Brave devolvió vacío, sigue false.
-                resolve(!window.__ugAdsOk);
-                el.remove();
-            };
-            el.onerror = function () {
-                if (done) return;
-                done = true;
-                clearTimeout(timer);
-                resolve(true);
-                el.remove();
-            };
-
-            document.head.appendChild(el);
         });
     }
 
@@ -139,21 +104,21 @@
             '      <span class="adb-step-icon">🦁</span>',
             '      <div>',
             '        <strong>Brave</strong>',
-            '        <span>Toca el ícono del León en la barra de dirección → desactiva los Escudos para este sitio</span>',
+            '        <span>Toca el ícono del León en la barra → desactiva Escudos para este sitio</span>',
             '      </div>',
             '    </div>',
             '    <div class="adb-step">',
             '      <span class="adb-step-icon">🛡</span>',
             '      <div>',
             '        <strong>AdGuard DNS / NextDNS / Pi-hole</strong>',
-            '        <span>Agrega este sitio a la lista blanca (whitelist) en tu configuración de DNS</span>',
+            '        <span>Agrega este sitio a la lista blanca en tu configuración de DNS</span>',
             '      </div>',
             '    </div>',
             '    <div class="adb-step">',
             '      <span class="adb-step-icon">🔧</span>',
             '      <div>',
             '        <strong>uBlock Origin / Adblock Plus</strong>',
-            '        <span>Haz clic en el ícono de la extensión → pausa o desactiva en este sitio</span>',
+            '        <span>Haz clic en el ícono de la extensión → pausa en este sitio</span>',
             '      </div>',
             '    </div>',
             '  </div>',
@@ -165,26 +130,21 @@
         ].join('');
 
         document.body.appendChild(overlay);
-
         document.getElementById('adbCheck').addEventListener('click', function () {
             window.location.reload();
         });
     }
 
     // ── INIT ──────────────────────────────────────────────────────────────────
-    // Los tres métodos corren en paralelo. El primero que detecte bloqueo
-    // muestra el overlay inmediatamente sin esperar a los demás.
     function run() {
         var shown = false;
         function check(blocked) {
-            if (blocked && !shown) {
-                shown = true;
-                showOverlay();
-            }
+            if (blocked && !shown) { shown = true; showOverlay(); }
         }
+        // Ambos métodos corren en paralelo. El primero que detecte bloqueo
+        // muestra el overlay sin esperar al otro.
+        fetchBaitCheck().then(check);
         baitInsCheck().then(check);
-        baitDivCheck().then(check);
-        scriptBaitCheck().then(check);
     }
 
     if (document.readyState === 'loading') {
