@@ -4,13 +4,14 @@
 
     var overlayMounted = false;
 
-    // ── MÉTODO 1: Elemento cebo ───────────────────────────────────────────────
-    // Brave Shields, uBlock Origin, Adblock Plus ocultan elementos con nombres
-    // de clase típicos de anuncios. Si el elemento termina invisible = bloqueador.
+    // ── MÉTODO 1: Elemento cebo CSS ───────────────────────────────────────────
+    // Brave Shields, uBlock, Adblock Plus ocultan elementos con clases de anuncios.
+    // Usamos 800ms para que Brave tenga tiempo de aplicar sus filtros cosméticos.
     function baitCheck() {
         return new Promise(function (resolve) {
             var el = document.createElement('div');
-            el.className = 'adsbox ad-placement pub_300x250 banner_ad advertisement';
+            // Clases que están en EasyList y bloquean Brave, uBlock, ABP
+            el.className = 'adsbox pub_300x250 banner_ad advertisement textads';
             el.style.cssText = [
                 'width:1px',
                 'height:1px',
@@ -18,46 +19,59 @@
                 'top:-9999px',
                 'left:-9999px',
                 'opacity:1',
-                'pointer-events:none'
+                'pointer-events:none',
+                'display:block'
             ].join(';');
             el.innerHTML = '&nbsp;';
             document.body.appendChild(el);
 
+            // 800ms: tiempo suficiente para que Brave aplique filtros cosméticos
             setTimeout(function () {
                 var cs = window.getComputedStyle(el);
                 var blocked = (
-                    cs.display     === 'none'   ||
-                    cs.visibility  === 'hidden'  ||
-                    cs.opacity     === '0'       ||
-                    el.offsetHeight === 0         ||
+                    cs.display      === 'none'   ||
+                    cs.visibility   === 'hidden'  ||
+                    parseFloat(cs.opacity) < 0.1  ||
+                    el.offsetHeight === 0          ||
                     el.offsetWidth  === 0
                 );
                 try { el.remove(); } catch (e) {}
                 resolve(blocked);
-            }, 250);
+            }, 800);
         });
     }
 
-    // ── MÉTODO 2: Script cebo con nombre de dominio conocido ─────────────────
-    // El archivo /ultrax/js/adsbygoogle.js EXISTE en el servidor (placeholder).
-    // Brave Shields y uBlock lo bloquean por el nombre "adsbygoogle.js" antes
-    // de que llegue la respuesta → onerror. Sin bloqueador → onload normal.
-    // Cero falsos positivos porque el archivo realmente existe en nuestro servidor.
+    // ── MÉTODO 2: Script cebo con verificación de variable ────────────────────
+    // El archivo /ultrax/js/adsbygoogle.js EXISTE y setea window.__ugAdsOk = true.
+    // Brave/uBlock bloquean el request (onerror) o devuelven respuesta vacía (onload
+    // pero sin ejecutar el script). Verificamos la variable para capturar ambos casos.
     function scriptBaitCheck() {
         return new Promise(function (resolve) {
-            var timer = setTimeout(function () { resolve(false); }, 3500);
+            window.__ugAdsOk = false;
+
+            var timer = setTimeout(function () {
+                // El script tardó demasiado → probablemente bloqueado a nivel DNS
+                resolve(true);
+            }, 3500);
+
             var el = document.createElement('script');
             el.src = '/ultrax/js/adsbygoogle.js?t=' + Date.now();
+
             el.onload = function () {
                 clearTimeout(timer);
-                resolve(false);
+                // Si el script corrió de verdad, __ugAdsOk será true.
+                // Si Brave devolvió respuesta vacía, __ugAdsOk seguirá false → bloqueado.
+                resolve(!window.__ugAdsOk);
                 el.remove();
             };
+
             el.onerror = function () {
                 clearTimeout(timer);
+                // El request fue rechazado por el bloqueador → bloqueado
                 resolve(true);
                 el.remove();
             };
+
             document.head.appendChild(el);
         });
     }
@@ -81,7 +95,7 @@
             '      <span class="adb-step-icon">🦁</span>',
             '      <div>',
             '        <strong>Brave</strong>',
-            '        <span>Toca el ícono del León (🦁) en la barra de dirección → desactiva los Escudos para este sitio</span>',
+            '        <span>Toca el ícono del León en la barra de dirección → desactiva los Escudos para este sitio</span>',
             '      </div>',
             '    </div>',
             '    <div class="adb-step">',
@@ -115,6 +129,9 @@
 
     // ── INIT ──────────────────────────────────────────────────────────────────
     function run() {
+        // Ambos métodos corren en paralelo. Cualquiera que detecte bloqueador
+        // muestra el overlay. scriptBaitCheck resolverá primero si hay bloqueo
+        // de red; baitCheck resolverá a los 800ms con el chequeo CSS.
         Promise.all([baitCheck(), scriptBaitCheck()]).then(function (results) {
             if (results[0] || results[1]) {
                 showOverlay();
