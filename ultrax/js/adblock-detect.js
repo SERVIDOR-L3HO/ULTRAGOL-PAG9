@@ -38,18 +38,27 @@
         });
     }
 
-    // ── MÉTODO 2: Prueba de red / DNS ─────────────────────────────────────────
-    // AdGuard DNS, NextDNS, Pi-hole bloquean en nivel DNS: el dominio no resuelve.
-    // Probamos cargar un recurso de un servidor de anuncios conocido.
-    // Si falla o tarda demasiado → bloqueador DNS activo.
-    function networkCheck() {
+    // ── MÉTODO 2: Script cebo con nombre de dominio conocido ─────────────────
+    // El archivo /ultrax/js/adsbygoogle.js EXISTE en el servidor (placeholder).
+    // Brave Shields y uBlock lo bloquean por el nombre "adsbygoogle.js" antes
+    // de que llegue la respuesta → onerror. Sin bloqueador → onload normal.
+    // Cero falsos positivos porque el archivo realmente existe en nuestro servidor.
+    function scriptBaitCheck() {
         return new Promise(function (resolve) {
-            var timer = setTimeout(function () { resolve(true); }, 4000);
-            var img = new Image();
-            img.onload = function () { clearTimeout(timer); resolve(false); };
-            img.onerror = function () { clearTimeout(timer); resolve(true); };
-            // Cache-bust para evitar resultados cacheados
-            img.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?t=' + Date.now();
+            var timer = setTimeout(function () { resolve(false); }, 3500);
+            var el = document.createElement('script');
+            el.src = '/ultrax/js/adsbygoogle.js?t=' + Date.now();
+            el.onload = function () {
+                clearTimeout(timer);
+                resolve(false);
+                el.remove();
+            };
+            el.onerror = function () {
+                clearTimeout(timer);
+                resolve(true);
+                el.remove();
+            };
+            document.head.appendChild(el);
         });
     }
 
@@ -106,7 +115,7 @@
 
     // ── INIT ──────────────────────────────────────────────────────────────────
     function run() {
-        Promise.all([baitCheck(), networkCheck()]).then(function (results) {
+        Promise.all([baitCheck(), scriptBaitCheck()]).then(function (results) {
             if (results[0] || results[1]) {
                 showOverlay();
             }
