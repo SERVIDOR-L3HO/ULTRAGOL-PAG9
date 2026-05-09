@@ -25,6 +25,15 @@ let pushSubscriptions = loadSubscriptions(); // { endpoint: subscriptionObject }
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ── Redirigir sin-www → www en producción ─────────────────────────────────────
+app.use((req, res, next) => {
+    const host = req.headers.host || '';
+    if (process.env.NODE_ENV === 'production' && host === 'ultragol-l3ho.com.mx') {
+        return res.redirect(301, `https://www.ultragol-l3ho.com.mx${req.originalUrl}`);
+    }
+    next();
+});
+
 app.use(helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false
@@ -1504,13 +1513,13 @@ Disallow: /api/
 Disallow: /ultra/
 Disallow: /ultracanales/
 
-Sitemap: https://ultragol-l3ho.com.mx/sitemap.xml
+Sitemap: https://www.ultragol-l3ho.com.mx/sitemap.xml
 `);
 });
 
 // ─── SITEMAP.XML dinámico ─────────────────────────────────────────────────────
 app.get('/sitemap.xml', async (req, res) => {
-    const BASE = 'https://ultragol-l3ho.com.mx';
+    const BASE = 'https://www.ultragol-l3ho.com.mx';
     const today = new Date().toISOString().split('T')[0];
 
     const staticPages = [
@@ -1664,7 +1673,7 @@ function buildMatchPage({ brand = 'pelotalibre', slug, title, desc, equipo1, equ
         logo: '/rojadirecta/icon.svg',
         themeCSS: '/rojadirecta/theme.css',
         basePath: '/rojadirecta',
-        domain: 'https://ultragol-l3ho.com.mx',
+        domain: 'https://www.ultragol-l3ho.com.mx',
         otherLabel: 'PelotaLibre',
         otherSlugPath: `/mx/${slug}`,
         themeColor: '#e60023'
@@ -1674,7 +1683,7 @@ function buildMatchPage({ brand = 'pelotalibre', slug, title, desc, equipo1, equ
         logo: '/mx/pelotalibre-premium.svg',
         themeCSS: null,
         basePath: '/mx',
-        domain: 'https://ultragol-l3ho.com.mx',
+        domain: 'https://www.ultragol-l3ho.com.mx',
         otherLabel: 'RojaDirecta',
         otherSlugPath: `/rojadirecta/${slug}`,
         themeColor: '#00d35a'
