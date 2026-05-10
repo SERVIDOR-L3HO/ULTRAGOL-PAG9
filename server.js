@@ -113,13 +113,15 @@ const ALLOWED_ORIGINS = [
     'https://www.ultragol-l3ho.com.mx',
     'https://ultragol-l3ho.com.mx',
     process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : null,
+    process.env.REPLIT_DEPLOYMENT_ID ? `https://${process.env.REPLIT_DEPLOYMENT_ID}.repl.co` : null,
 ].filter(Boolean);
 
 function apiOriginGuard(req, res, next) {
-    // Permitir peticiones del mismo servidor (SSR, internos)
     const origin = req.headers['origin'] || '';
     const referer = req.headers['referer'] || '';
-    const cfIP = req.headers['cf-connecting-ip'];
+
+    // Allow same-origin requests from Replit domains (*.replit.dev, *.repl.co)
+    const isReplitDomain = (s) => s.includes('.replit.dev') || s.includes('.repl.co') || s.includes('.replit.app');
 
     // Si viene directo sin origen (curl, bots simples) y no es localhost → bloquear
     if (!origin && !referer) {
@@ -128,6 +130,11 @@ function apiOriginGuard(req, res, next) {
         if (!isLocal) {
             return res.status(403).json({ error: 'Acceso denegado' });
         }
+        return next();
+    }
+
+    // Allow any Replit-hosted domain automatically
+    if (isReplitDomain(origin) || isReplitDomain(referer)) {
         return next();
     }
 
@@ -183,13 +190,22 @@ app.post('/api/turnstile/verify', async (req, res) => {
 
 // UltraGol API Proxy (para evitar problemas de CORS)
 const API_BASE_URL = 'https://ultragol-api-3.vercel.app';
+const ULTRAGOL_API_KEY = process.env.ULTRAGOL_API_KEY || '';
+
+function apiUrl(endpoint) {
+    const url = `${API_BASE_URL}${endpoint}`;
+    return ULTRAGOL_API_KEY ? `${url}${endpoint.includes('?') ? '&' : '?'}apiKey=${ULTRAGOL_API_KEY}` : url;
+}
 
 // Authentication API Configuration
-const AUTH_API_URL = process.env.AUTH_API_URL || 'https://472832aade2073.lhr.life';
-const AUTH_API_FALLBACK = process.env.AUTH_API_FALLBACK_URL || 'http://192.168.100.15:5000';
+const AUTH_API_URL = process.env.AUTH_API_URL || '';
+const AUTH_API_FALLBACK = process.env.AUTH_API_FALLBACK_URL || '';
 
 async function callAuthAPI(endpoint, options = {}) {
-    const urls = [AUTH_API_URL, AUTH_API_FALLBACK];
+    const urls = [AUTH_API_URL, AUTH_API_FALLBACK].filter(Boolean);
+    if (urls.length === 0) {
+        throw new Error('No auth API configured');
+    }
     
     for (const baseUrl of urls) {
         try {
@@ -217,6 +233,10 @@ app.post('/api/auth/register', async (req, res) => {
         
         if (!username || !password) {
             return res.status(400).json({ error: 'Username y password son requeridos' });
+        }
+
+        if (!AUTH_API_URL && !AUTH_API_FALLBACK) {
+            return res.status(503).json({ error: 'Servicio de autenticación no configurado' });
         }
 
         const registerData = { username, password };
@@ -256,6 +276,10 @@ app.post('/api/auth/login', async (req, res) => {
         
         if (!username || !password) {
             return res.status(400).json({ error: 'Username y password son requeridos' });
+        }
+
+        if (!AUTH_API_URL && !AUTH_API_FALLBACK) {
+            return res.status(503).json({ error: 'Servicio de autenticación no configurado' });
         }
 
         const response = await callAuthAPI('/login', {
@@ -347,7 +371,7 @@ console.log('✅ Authentication API proxy enabled');
 
 app.get('/api/ultragol/tabla', async (req, res) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/tabla`);
+        const response = await fetch(apiUrl('/tabla'));
         const data = await response.json();
         res.json(data);
     } catch (error) {
@@ -358,7 +382,7 @@ app.get('/api/ultragol/tabla', async (req, res) => {
 
 app.get('/api/ultragol/goleadores', async (req, res) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/goleadores`);
+        const response = await fetch(apiUrl('/goleadores'));
         const data = await response.json();
         res.json(data);
     } catch (error) {
@@ -369,7 +393,7 @@ app.get('/api/ultragol/goleadores', async (req, res) => {
 
 app.get('/api/ultragol/noticias', async (req, res) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/Noticias`);
+        const response = await fetch(apiUrl('/Noticias'));
         const data = await response.json();
         res.json(data);
     } catch (error) {
@@ -380,7 +404,7 @@ app.get('/api/ultragol/noticias', async (req, res) => {
 
 app.get('/api/ultragol/equipos', async (req, res) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/Equipos`);
+        const response = await fetch(apiUrl('/Equipos'));
         const data = await response.json();
         res.json(data);
     } catch (error) {
@@ -391,7 +415,7 @@ app.get('/api/ultragol/equipos', async (req, res) => {
 
 app.get('/api/ultragol/videos', async (req, res) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/videos`);
+        const response = await fetch(apiUrl('/videos'));
         const data = await response.json();
         res.json(data);
     } catch (error) {
@@ -402,7 +426,7 @@ app.get('/api/ultragol/videos', async (req, res) => {
 
 app.get('/api/ultragol/notificaciones', async (req, res) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/notificaciones`);
+        const response = await fetch(apiUrl('/notificaciones'));
         const data = await response.json();
         res.json(data);
     } catch (error) {
@@ -619,7 +643,7 @@ app.post('/api/admin/broadcast', async (req, res) => {
 
 async function fetchLigaMatches(liga) {
     try {
-        const r = await fetch(`${API_BASE_URL}${liga.endpoint}`, { signal: AbortSignal.timeout(6000) });
+        const r = await fetch(apiUrl(liga.endpoint), { signal: AbortSignal.timeout(6000) });
         if (!r.ok) return [];
         const d = await r.json();
         const partidos = d.partidos || d.ligamx || d.matches || [];
@@ -714,7 +738,7 @@ app.get('/api/notifications', async (req, res) => {
 
 app.get('/api/ultragol/transmisiones3', async (req, res) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/transmisiones3`);
+        const response = await fetch(apiUrl('/transmisiones3'));
         const data = await response.json();
         res.json(data);
     } catch (error) {
@@ -725,7 +749,7 @@ app.get('/api/ultragol/transmisiones3', async (req, res) => {
 
 app.get('/api/ultragol/transmisiones6', async (req, res) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/transmisiones6`);
+        const response = await fetch(apiUrl('/transmisiones6'));
         const data = await response.json();
         res.json(data);
     } catch (error) {
@@ -902,13 +926,13 @@ function normalizeTransmision(item, fuente) {
 // Fetch and merge all transmission sources + marcadores
 async function fetchAllPartidos() {
     const [marc, t2, t3, t4, t5, t6, t7] = await Promise.all([
-        safeFetch(`${API_BASE_URL}/marcadores`),
-        safeFetch(`${API_BASE_URL}/transmisiones2`),
-        safeFetch(`${API_BASE_URL}/transmisiones3`),
-        safeFetch(`${API_BASE_URL}/transmisiones4`),
-        safeFetch(`${API_BASE_URL}/transmisiones5`),
-        safeFetch(`${API_BASE_URL}/transmisiones6`),
-        safeFetch(`${API_BASE_URL}/transmisiones7`),
+        safeFetch(apiUrl('/marcadores')),
+        safeFetch(apiUrl('/transmisiones2')),
+        safeFetch(apiUrl('/transmisiones3')),
+        safeFetch(apiUrl('/transmisiones4')),
+        safeFetch(apiUrl('/transmisiones5')),
+        safeFetch(apiUrl('/transmisiones6')),
+        safeFetch(apiUrl('/transmisiones7')),
     ]);
 
     const map = new Map();
