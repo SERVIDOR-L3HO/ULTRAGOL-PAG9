@@ -35,7 +35,7 @@ app.use((req, res, next) => {
 });
 
 // ── MODO MANTENIMIENTO ────────────────────────────────────────────────────────
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === 'true' || false;
 
 app.use((req, res, next) => {
     if (!MAINTENANCE_MODE) return next();
