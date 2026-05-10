@@ -5516,21 +5516,30 @@ function renderImportantMatches() {
 
         const ligaBadge = liga ? `<span class="rim-liga"><i class="fas ${sportIcon}"></i> ${liga.toUpperCase()}</span>` : '';
 
+        const entranceDelay = (idx * 45) + 'ms';
+
         return `
             <div class="rim-card ${isLive ? 'live' : ''}"
+                 style="animation-delay:${entranceDelay}"
                  tabindex="0" role="button"
                  aria-label="${evento}"
                  onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectImportantMatchByTransmision('${eventoEscapado}')}"
                  onclick='selectImportantMatchByTransmision("${eventoEscapado}")'>
                 <div class="rim-teams">
                     <div class="rim-team">
-                        <img class="rim-logo" src="/ULTRA/favicon.png" alt="${equipo1}" data-team="${encodeURIComponent(equipo1)}">
+                        <div class="rim-logo-box">
+                            <img class="rim-logo" src="/ULTRA/favicon.png" alt="${equipo1}" data-team="${encodeURIComponent(equipo1)}">
+                        </div>
                         <span class="rim-name">${equipo1.toUpperCase()}</span>
                     </div>
-                    <span class="rim-vs">VS</span>
+                    <div class="rim-vs-col">
+                        <span class="rim-vs">VS</span>
+                    </div>
                     <div class="rim-team rim-team-right">
                         <span class="rim-name">${equipo2.toUpperCase()}</span>
-                        <img class="rim-logo" src="/ULTRA/favicon.png" alt="${equipo2}" data-team="${encodeURIComponent(equipo2)}">
+                        <div class="rim-logo-box">
+                            <img class="rim-logo" src="/ULTRA/favicon.png" alt="${equipo2}" data-team="${encodeURIComponent(equipo2)}">
+                        </div>
                     </div>
                 </div>
                 <div class="rim-footer-row">
@@ -5539,64 +5548,163 @@ function renderImportantMatches() {
                 </div>
             </div>
         `;
-    }).join('') || `<div class="rim-empty">No hay partidos en este momento</div>`;
+    }).join('') || `<div class="rim-empty"><i class="fas fa-satellite-dish"></i><p>No hay partidos en este momento</p></div>`;
 
     body.innerHTML = `
         <style>
-            .rokc-wrapper{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#080808;}
-            .rokc-list{flex:1;overflow-y:auto;padding:10px 10px 0;}
+            /* ── Wrapper & scroll ── */
+            .rokc-wrapper{width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;background:#08080c;}
+            .rokc-list{flex:1;overflow-y:auto;padding:12px 12px 4px;display:flex;flex-direction:column;gap:9px;}
             .rokc-list::-webkit-scrollbar{width:2px;}
-            .rokc-list::-webkit-scrollbar-thumb{background:rgba(255,102,0,0.25);border-radius:2px;}
+            .rokc-list::-webkit-scrollbar-thumb{background:rgba(255,107,53,0.3);border-radius:2px;}
+
+            /* ── Base card ── */
+            @keyframes rimIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+            @keyframes rimPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,64,64,.55);}50%{opacity:.6;box-shadow:0 0 0 5px rgba(255,64,64,0);}}
 
             .rim-card{
-                background:linear-gradient(135deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%);
-                border:1px solid rgba(255,102,0,0.12);
-                border-radius:16px;
-                padding:14px 14px 10px;
-                margin-bottom:8px;
+                background:rgba(255,255,255,0.035);
+                border:1px solid rgba(255,255,255,0.08);
+                border-radius:18px;
+                padding:14px 14px 11px 18px;
                 cursor:pointer;
-                backdrop-filter:blur(24px);
-                -webkit-backdrop-filter:blur(24px);
-                transition:all 0.18s ease;
                 position:relative;
                 overflow:hidden;
+                transition:background 0.18s ease, border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+                animation:rimIn 0.35s ease both;
             }
+            /* top shimmer line */
             .rim-card::before{
                 content:'';position:absolute;top:0;left:0;right:0;height:1px;
-                background:linear-gradient(90deg,transparent,rgba(255,102,0,0.25),transparent);
+                background:linear-gradient(90deg,transparent 10%,rgba(255,255,255,0.1) 50%,transparent 90%);
+            }
+            /* left accent bar */
+            .rim-card::after{
+                content:'';position:absolute;top:12px;bottom:12px;left:0;
+                width:3px;border-radius:0 3px 3px 0;
+                background:rgba(255,255,255,0.08);
+                transition:background 0.2s ease, box-shadow 0.2s ease;
+            }
+            .rim-card.live::after{
+                background:linear-gradient(180deg,#ff6b35,#ff3d00);
+                box-shadow:0 0 12px rgba(255,69,0,0.65);
             }
             .rim-card.live{
-                border-color:rgba(255,102,0,0.3);
-                background:linear-gradient(135deg,rgba(255,102,0,0.1) 0%,rgba(255,50,0,0.04) 100%);
-                box-shadow:0 0 20px rgba(255,102,0,0.08),inset 0 1px 0 rgba(255,102,0,0.15);
+                border-color:rgba(255,107,53,0.22);
+                background:linear-gradient(135deg,rgba(255,107,53,0.07) 0%,rgba(255,50,0,0.025) 100%);
+                box-shadow:0 0 24px rgba(255,69,0,0.07);
             }
-            .rim-card:active{transform:scale(0.98);opacity:0.85;}
+            .rim-card:hover{
+                background:rgba(255,255,255,0.065);
+                border-color:rgba(255,255,255,0.14);
+                transform:translateY(-2px);
+                box-shadow:0 8px 28px rgba(0,0,0,0.4);
+            }
+            .rim-card.live:hover{
+                background:linear-gradient(135deg,rgba(255,107,53,0.12) 0%,rgba(255,50,0,0.05) 100%);
+                border-color:rgba(255,107,53,0.35);
+                box-shadow:0 8px 28px rgba(255,69,0,0.14);
+            }
+            .rim-card:active{transform:scale(0.98);opacity:0.88;}
 
-            .rim-teams{display:flex;align-items:center;gap:6px;margin-bottom:10px;}
+            /* ── Team row ── */
+            .rim-teams{display:flex;align-items:center;gap:6px;margin-bottom:9px;}
             .rim-team{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
             .rim-team-right{justify-content:flex-end;}
-            .rim-logo{width:30px;height:30px;object-fit:contain;border-radius:6px;flex-shrink:0;opacity:0.4;transition:opacity 0.35s ease;}
+
+            .rim-logo-box{
+                width:34px;height:34px;border-radius:10px;
+                background:rgba(255,255,255,0.07);
+                border:1px solid rgba(255,255,255,0.09);
+                display:flex;align-items:center;justify-content:center;
+                flex-shrink:0;overflow:hidden;
+            }
+            .rim-logo{width:26px;height:26px;object-fit:contain;opacity:0.35;transition:opacity 0.3s ease;}
             .rim-logo.loaded{opacity:1;}
-            .rim-name{font-size:12px;font-weight:800;color:#fff;letter-spacing:0.4px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+            .rim-name{
+                font-size:13px;font-weight:800;color:#f0f0f0;
+                letter-spacing:0.3px;line-height:1.2;
+                overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+            }
             .rim-team.rim-team-right .rim-name{text-align:right;}
-            .rim-vs{font-size:10px;font-weight:900;color:rgba(255,102,0,0.6);letter-spacing:1px;flex-shrink:0;padding:2px 4px;background:rgba(255,102,0,0.08);border-radius:4px;}
 
-            .rim-footer-row{display:flex;align-items:center;justify-content:space-between;}
-            .rim-badges{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-            .rim-live{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;color:#ff4040;letter-spacing:0.6px;text-transform:uppercase;}
-            .rim-dot{width:5px;height:5px;background:#ff4040;border-radius:50%;animation:rimPulse 1s ease-in-out infinite;box-shadow:0 0 4px #ff4040;}
-            .rim-time{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.45);}
-            .rim-liga{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:rgba(255,102,0,0.7);letter-spacing:0.3px;}
-            .rim-liga i{font-size:9px;}
-            .rim-chevron{font-size:11px;color:rgba(255,102,0,0.4);flex-shrink:0;}
-            .rim-empty{text-align:center;color:rgba(255,255,255,0.3);padding:60px 20px;font-size:14px;}
-            @keyframes rimPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.25;transform:scale(0.5);}}
+            .rim-vs-col{flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:0 2px;}
+            .rim-vs{
+                font-size:9px;font-weight:900;letter-spacing:1.2px;
+                color:#ff7a40;
+                background:rgba(255,107,53,0.12);
+                border:1px solid rgba(255,107,53,0.22);
+                border-radius:6px;
+                padding:3px 6px;
+            }
 
-            .rokc-footer{padding:12px 10px;background:#080808;border-top:1px solid rgba(255,102,0,0.12);flex-shrink:0;}
-            .rokc-footer-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px 16px;border-radius:14px;border:1.5px solid rgba(255,102,0,0.4);background:linear-gradient(135deg,rgba(255,102,0,0.12),rgba(255,60,0,0.06));color:#FF6600;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;backdrop-filter:blur(12px);}
-            .rokc-footer-btn:active{background:rgba(255,102,0,0.2);transform:scale(0.98);}
-            .rokc-footer-btn i{font-size:14px;}
-            .rokc-footer-hint{text-align:center;margin-top:7px;font-size:10px;color:rgba(255,255,255,0.2);line-height:1.5;}
+            /* ── Footer row ── */
+            .rim-footer-row{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+            .rim-badges{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0;}
+
+            .rim-live{
+                display:inline-flex;align-items:center;gap:5px;
+                background:rgba(255,40,40,0.14);
+                border:1px solid rgba(255,60,60,0.28);
+                border-radius:20px;padding:2px 8px;
+                font-size:9.5px;font-weight:800;color:#ff6060;
+                letter-spacing:0.8px;text-transform:uppercase;
+            }
+            .rim-dot{
+                width:5px;height:5px;background:#ff4040;border-radius:50%;
+                animation:rimPulse 1.2s ease-in-out infinite;
+                flex-shrink:0;
+            }
+            .rim-time{
+                display:inline-flex;align-items:center;gap:4px;
+                font-size:9.5px;font-weight:600;color:rgba(255,255,255,0.38);
+                background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);
+                border-radius:20px;padding:2px 8px;
+            }
+            .rim-liga{
+                display:inline-flex;align-items:center;gap:4px;
+                background:rgba(255,107,53,0.08);
+                border:1px solid rgba(255,107,53,0.15);
+                border-radius:20px;padding:2px 8px;
+                font-size:9.5px;font-weight:700;color:rgba(255,130,60,0.85);
+                letter-spacing:0.3px;
+                max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+            }
+            .rim-liga i{font-size:8px;flex-shrink:0;}
+            .rim-chevron{
+                font-size:11px;color:rgba(255,255,255,0.2);flex-shrink:0;
+                transition:color 0.18s ease, transform 0.18s ease;
+            }
+            .rim-card:hover .rim-chevron{color:rgba(255,107,53,0.7);transform:translateX(2px);}
+
+            /* ── Empty state ── */
+            .rim-empty{
+                text-align:center;color:rgba(255,255,255,0.25);
+                padding:60px 20px;font-size:14px;
+                display:flex;flex-direction:column;align-items:center;gap:14px;
+            }
+            .rim-empty i{font-size:36px;color:rgba(255,255,255,0.1);}
+            .rim-empty p{font-size:13px;}
+
+            /* ── Footer ── */
+            .rokc-footer{padding:12px 12px 16px;background:#08080c;border-top:1px solid rgba(255,255,255,0.06);flex-shrink:0;}
+            .rokc-footer::before{
+                content:'';display:block;height:1px;margin-bottom:12px;
+                background:linear-gradient(90deg,transparent,rgba(255,107,53,0.2),transparent);
+            }
+            .rokc-footer-btn{
+                display:flex;align-items:center;justify-content:center;gap:9px;
+                width:100%;padding:13px 16px;border-radius:14px;
+                border:1px solid rgba(255,107,53,0.3);
+                background:rgba(255,107,53,0.08);
+                color:#ff8a50;font-size:13px;font-weight:700;
+                cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;
+            }
+            .rokc-footer-btn:hover{background:rgba(255,107,53,0.14);border-color:rgba(255,107,53,0.5);}
+            .rokc-footer-btn:active{transform:scale(0.98);}
+            .rokc-footer-btn i{font-size:13px;}
+            .rokc-footer-hint{text-align:center;margin-top:8px;font-size:10px;color:rgba(255,255,255,0.18);line-height:1.5;}
         </style>
         <div class="rokc-wrapper">
             <div class="rokc-list">${rowsHTML}</div>
