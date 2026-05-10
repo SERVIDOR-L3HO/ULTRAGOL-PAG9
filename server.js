@@ -34,6 +34,90 @@ app.use((req, res, next) => {
     next();
 });
 
+// ── MODO MANTENIMIENTO ────────────────────────────────────────────────────────
+const MAINTENANCE_MODE = true;
+
+app.use((req, res, next) => {
+    if (!MAINTENANCE_MODE) return next();
+    // Allow API and static assets to pass through
+    if (req.path.startsWith('/api/') || req.path.match(/\.(js|css|png|jpg|jpeg|svg|ico|webp|woff|woff2|ttf|json)$/)) {
+        return next();
+    }
+    res.status(503).send(`<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UltraGol — En Mantenimiento</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            height: 100%;
+            background: #000;
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            max-width: 500px;
+        }
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+        h1 span {
+            color: #e94560;
+        }
+        p {
+            color: rgba(255,255,255,0.55);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .dot {
+            display: inline-block;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #e94560;
+            margin: 2rem auto 0;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+        .dot:nth-child(2) { animation-delay: 0.2s; margin: 2rem 4px 0; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes pulse {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <span class="icon">⚙️</span>
+        <h1>Sitio en <span>Mantenimiento</span></h1>
+        <p>Estamos trabajando para mejorar tu experiencia. Volvemos pronto.</p>
+        <div>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</body>
+</html>`);
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 app.use(helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false
