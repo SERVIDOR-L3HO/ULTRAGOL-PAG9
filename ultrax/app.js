@@ -1822,19 +1822,6 @@ function showChannelSelector(transmision, partidoNombre) {
     
     const totalCanales = transmision.canales ? transmision.canales.length : 0;
 
-    let channelsHtml = `
-        <div class="server-selector-creative">
-            <div class="server-header-creative">
-                <div class="server-title-group">
-                    <span class="pulse-icon"></span>
-                    <span class="server-label">Señales disponibles</span>
-                    <span class="server-count-badge">${totalCanales} NODO${totalCanales !== 1 ? 'S' : ''}</span>
-                </div>
-                <div class="server-subtitle-creative">Selecciona una señal para ver el partido</div>
-            </div>
-            <div class="server-grid-creative">
-    `;
-
     const servidorMap = {
         'rereyano':       'SERVIDOR 1',
         'golazolvhd':     'SERVIDOR 1',
@@ -1847,14 +1834,17 @@ function showChannelSelector(transmision, partidoNombre) {
         'transmisiones6': 'SERVIDOR 6',
     };
 
+    let cardsHtml = '';
+
     if (totalCanales > 0) {
         transmision.canales.forEach((canal, index) => {
-            const serverNum = index + 1;
-            const rawType = (canal.tipoAPI || canal.fuente || '').toLowerCase();
-            const apiType = servidorMap[rawType] || `SERVIDOR ${serverNum}`;
-            const latencyVal = Math.floor(Math.random() * 38) + 5;
-            const latencyClass = latencyVal < 20 ? 'lat-fast' : latencyVal < 35 ? 'lat-medium' : 'lat-slow';
-            const entranceDelay = (index * 55) + 'ms';
+            const serverNum  = index + 1;
+            const rawType    = (canal.tipoAPI || canal.fuente || '').toLowerCase();
+            const apiType    = servidorMap[rawType] || `SERVIDOR ${serverNum}`;
+            const pingVal    = Math.floor(Math.random() * 38) + 5;
+            const pingClass  = pingVal < 20 ? 'sv-ping-fast' : pingVal < 35 ? 'sv-ping-medium' : 'sv-ping-slow';
+            const delay      = (index * 55) + 'ms';
+            const isFeatured = index === 0 ? 'sv-card-featured' : '';
 
             let enlace = '';
             if (canal.url) {
@@ -1867,61 +1857,62 @@ function showChannelSelector(transmision, partidoNombre) {
                 enlace = canal.link;
             }
 
-            const canalNombre = canal.nombre || `Servidor #${serverNum}`;
-            const safeNombre = partidoNombre.replace(/'/g, "\\'");
+            const canalNombre = canal.nombre || `Servidor ${serverNum}`;
+            const safeNombre  = partidoNombre.replace(/'/g, "\\'");
+            const numLabel    = String(serverNum).padStart(2, '0');
 
-            channelsHtml += `
-                <div class="server-node-card" style="animation-delay:${entranceDelay}"
+            cardsHtml += `
+                <div class="sv-card ${isFeatured}" style="animation-delay:${delay}"
                      tabindex="0" role="button"
-                     aria-label="Canal ${serverNum}: ${canalNombre}, ${apiType}"
+                     aria-label="Servidor ${serverNum}: ${canalNombre}"
                      onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playChannelFromSelector('${enlace}','${safeNombre}')}"
-                     onclick="playChannelFromSelector('${enlace}', '${safeNombre}')">
-                    <div class="node-scan"></div>
-                    <div class="node-edge"></div>
-                    <div class="node-content">
-                        <div class="node-visual">
-                            <div class="node-icon-wrapper">
-                                <i class="fas fa-satellite-dish"></i>
-                                <div class="node-online-dot"></div>
-                                <span class="node-num-badge">#${serverNum}</span>
-                            </div>
-                            <div class="node-latency ${latencyClass}">${latencyVal}ms</div>
+                     onclick="playChannelFromSelector('${enlace}','${safeNombre}')">
+                    <div class="sv-num">
+                        ${numLabel}
+                        <div class="sv-online"></div>
+                    </div>
+                    <div class="sv-body">
+                        <div class="sv-name">${canalNombre}</div>
+                        <div class="sv-tags">
+                            <span class="sv-tag">${apiType}</span>
+                            <span class="sv-tag sv-tag-quality">HD PREMIUM</span>
+                            <span class="sv-ping ${pingClass}">${pingVal}ms</span>
                         </div>
-                        <div class="node-info">
-                            <div class="node-name">${canalNombre}</div>
-                            <div class="node-meta">
-                                <span class="node-provider-tag">${apiType.toUpperCase()}</span>
-                                <span class="node-quality-tag">HD PREMIUM</span>
-                            </div>
+                        <div class="sv-wave">
+                            <span></span><span></span><span></span><span></span><span></span>
                         </div>
-                        <div class="node-action">
-                            <div class="node-connect-btn">
-                                <i class="fas fa-play"></i>
-                            </div>
-                        </div>
+                    </div>
+                    <div class="sv-play">
+                        <i class="fas fa-play" style="margin-left:2px;"></i>
                     </div>
                 </div>
             `;
         });
     } else {
-        channelsHtml += `
-            <div style="text-align:center; padding:40px 20px; color:#505050;">
-                <i class="fas fa-satellite" style="font-size:36px; margin-bottom:14px; color:#333; display:block;"></i>
-                <p style="font-size:13px;">No se encontraron señales activas en este momento</p>
+        cardsHtml = `
+            <div class="sv-empty">
+                <div class="sv-empty-icon"><i class="fas fa-satellite"></i></div>
+                <p class="sv-empty-text">No se encontraron señales activas.<br>Intenta de nuevo en unos momentos.</p>
             </div>
         `;
     }
 
-    channelsHtml += `
+    let channelsHtml = `
+        <div class="sv-wrapper">
+            <div class="sv-meta">
+                <span class="sv-live-dot"></span>
+                <span class="sv-live-label">Señales disponibles</span>
+                <span class="sv-count-pill">${totalCanales} NODO${totalCanales !== 1 ? 'S' : ''}</span>
             </div>
-            <div class="server-terminal-footer">
-                <div class="signal-bars">
+            <p class="sv-hint">Selecciona una señal para ver el partido</p>
+            <div class="sv-list">
+                ${cardsHtml}
+            </div>
+            <div class="sv-footer">
+                <div class="sv-footer-waves">
                     <span></span><span></span><span></span><span></span>
                 </div>
-                <div class="terminal-text">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Conexión cifrada y optimizada</span>
-                </div>
+                <span class="sv-footer-text">Conexión cifrada y optimizada</span>
             </div>
         </div>
     `;
@@ -1930,7 +1921,7 @@ function showChannelSelector(transmision, partidoNombre) {
     modal.classList.add('active');
     // Auto-focus primer canal para navegación TV
     setTimeout(() => {
-        const first = body.querySelector('.server-node-card[tabindex]');
+        const first = body.querySelector('.sv-card[tabindex]');
         if (first) first.focus();
     }, 120);
 }
@@ -6832,7 +6823,7 @@ function claimReward(days, code) {
 
     // Devuelve todos los elementos navegables visibles dentro de un contenedor
     function getFocusables(container) {
-        const sel = '.server-node-card[tabindex], .rim-card[tabindex], .smp-card[tabindex], .lbar-btn, .nav-btn, .nav-reels-btn';
+        const sel = '.sv-card[tabindex], .server-node-card[tabindex], .rim-card[tabindex], .smp-card[tabindex], .lbar-btn, .nav-btn, .nav-reels-btn';
         return [...(container || document).querySelectorAll(sel)]
             .filter(el => el.offsetParent !== null);
     }
@@ -6926,7 +6917,8 @@ function claimReward(days, code) {
                 if (!isInput) {
                     const el = document.activeElement;
                     if (el && el.tagName !== 'BUTTON' &&
-                        (el.classList.contains('server-node-card') ||
+                        (el.classList.contains('sv-card') ||
+                         el.classList.contains('server-node-card') ||
                          el.classList.contains('rim-card') ||
                          el.classList.contains('smp-card'))) {
                         e.preventDefault();
