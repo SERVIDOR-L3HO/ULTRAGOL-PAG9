@@ -774,142 +774,232 @@ async function loadTransmisiones() {
     }
 }
 
+// ─── FEATURED MATCH PRO ──────────────────────────────────────────────────────
+// Previous scores tracker for goal detection
+const _fmpPrevScores = {};
+let _fmpAutoTimer = null;
+
+const STADIUM_BACKGROUNDS = [
+    'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
+    'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80',
+    'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&q=80',
+    'https://images.unsplash.com/photo-1483000805330-4eaf0a0d82da?w=800&q=80',
+    'https://images.unsplash.com/photo-1540747913346-19212a4b279d?w=800&q=80',
+];
+
+const LEAGUE_LOGOS = {
+    'Liga MX':        'https://a.espncdn.com/i/leaguelogos/soccer/500/193.png',
+    'Premier League': 'https://a.espncdn.com/i/leaguelogos/soccer/500/23.png',
+    'La Liga':        'https://a.espncdn.com/i/leaguelogos/soccer/500/15.png',
+    'Serie A':        'https://a.espncdn.com/i/leaguelogos/soccer/500/12.png',
+    'Bundesliga':     'https://a.espncdn.com/i/leaguelogos/soccer/500/10.png',
+    'Ligue 1':        'https://a.espncdn.com/i/leaguelogos/soccer/500/9.png',
+};
+
+function _fmpBuildStatusBadge(partido) {
+    const hora = typeof formatearHora === 'function' ? formatearHora(partido.fecha) : (partido.fecha || '');
+    if (partido.estado?.enVivo) {
+        const min = partido.reloj || partido.minuto || '';
+        return `<div class="fmp-status live"><span class="fmp-status-dot"></span>EN VIVO${min ? ' ' + min + "'": ''}</div>`;
+    }
+    if (partido.estado?.finalizado) {
+        return `<div class="fmp-status finished"><i class="fas fa-check-circle" style="font-size:9px;margin-right:3px;"></i>FINALIZADO</div>`;
+    }
+    return `<div class="fmp-status scheduled"><i class="fas fa-clock" style="font-size:9px;margin-right:4px;"></i>${hora}</div>`;
+}
+
+function _fmpBuildSlide(partido, index, bgUrl, leagueName) {
+    const statusBadge = _fmpBuildStatusBadge(partido);
+    const leagueLogo = LEAGUE_LOGOS[leagueName] || LEAGUE_LOGOS['Liga MX'];
+    const localLogo = partido.local?.logo || partido.logo1 || '';
+    const visitLogo = partido.visitante?.logo || partido.logo2 || '';
+    const localName = partido.local?.nombreCorto || partido.equipo1 || '';
+    const visitName = partido.visitante?.nombreCorto || partido.equipo2 || '';
+    const localScore = partido.local?.marcador ?? partido.marcadorLocal ?? '-';
+    const visitScore = partido.visitante?.marcador ?? partido.marcadorVisitante ?? '-';
+    const matchId = partido.id || partido.slug || index;
+    const hasStream = partido.transmisionUrl || partido.url;
+
+    return `
+        <div class="fmp-slide" data-index="${index}" data-id="${matchId}"
+             data-local="${localScore}" data-visit="${visitScore}">
+            <img class="fmp-bg" src="${bgUrl}"
+                 onerror="this.src='${STADIUM_BACKGROUNDS[0]}'" alt="Estadio">
+            <div class="fmp-overlay"></div>
+            <div class="fmp-color-overlay" style="background:linear-gradient(135deg,rgba(20,20,40,0.5),rgba(40,20,20,0.4))"></div>
+
+            <!-- Top bar -->
+            <div class="fmp-topbar">
+                <div class="fmp-league-badge">
+                    <img src="${leagueLogo}" alt="${leagueName}"
+                         onerror="this.style.display='none'">
+                    ${leagueName}
+                </div>
+                ${statusBadge}
+            </div>
+
+            <!-- Score area -->
+            <div class="fmp-score-area">
+                <div class="fmp-team">
+                    <div class="fmp-team-logo-wrap">
+                        <img class="fmp-team-logo" src="${localLogo}" alt="${localName}"
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><circle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2256%25%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22white%22>${localName.charAt(0)}</text></svg>'">
+                    </div>
+                    <span class="fmp-team-name">${localName}</span>
+                </div>
+
+                <div class="fmp-scorebox">
+                    <span class="fmp-score-num" id="fmpL${index}">${localScore}</span>
+                    <div class="fmp-score-sep">
+                        <div class="fmp-sep-dot"></div>
+                        <div class="fmp-sep-dot"></div>
+                    </div>
+                    <span class="fmp-score-num" id="fmpV${index}">${visitScore}</span>
+                </div>
+
+                <div class="fmp-team">
+                    <div class="fmp-team-logo-wrap">
+                        <img class="fmp-team-logo" src="${visitLogo}" alt="${visitName}"
+                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><circle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2256%25%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22white%22>${visitName.charAt(0)}</text></svg>'">
+                    </div>
+                    <span class="fmp-team-name">${visitName}</span>
+                </div>
+            </div>
+
+            <!-- Bottom bar -->
+            <div class="fmp-bottom">
+                <div class="fmp-indicators" id="fmpDots"></div>
+                ${hasStream
+                    ? `<button class="fmp-watch-btn pulsing" onclick="watchMatch('${matchId}')">
+                            <span class="play-icon"><i class="fas fa-play"></i></span>
+                            Ver en vivo
+                       </button>`
+                    : `<button class="fmp-watch-btn" onclick="openImportantMatchesModal()" style="background:linear-gradient(135deg,#555,#333);box-shadow:none;">
+                            <span class="play-icon"><i class="fas fa-search"></i></span>
+                            Ver canales
+                       </button>`
+                }
+                <button class="fmp-share-btn" onclick="_fmpShare('${matchId}','${localName} vs ${visitName}')" title="Compartir">
+                    <i class="fas fa-share-alt"></i>
+                </button>
+            </div>
+        </div>`;
+}
+
+function _fmpShare(matchId, title) {
+    const url = `${location.origin}${location.pathname}?match=${matchId}`;
+    if (navigator.share) {
+        navigator.share({ title: 'UltraGol — ' + title, url });
+    } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(url);
+    }
+}
+
+function _fmpUpdateTrack() {
+    const track = document.getElementById('fmpTrack');
+    if (!track) return;
+    track.style.transform = `translateX(-${currentFeaturedIndex * 100}%)`;
+
+    // Update dots inside current slide
+    const allDots = document.querySelectorAll('.fmp-indicators');
+    allDots.forEach(dotsEl => {
+        dotsEl.innerHTML = featuredMatches.map((_, i) =>
+            `<button class="fmp-dot${i === currentFeaturedIndex ? ' active' : ''}" onclick="goToFeaturedMatch(${i})"></button>`
+        ).join('');
+    });
+
+    // Update nav arrows state
+    const prev = document.getElementById('fmpPrev');
+    const next = document.getElementById('fmpNext');
+    if (prev) { prev.style.opacity = currentFeaturedIndex === 0 ? '0.35' : '1'; prev.disabled = currentFeaturedIndex === 0; }
+    if (next) { next.style.opacity = currentFeaturedIndex === featuredMatches.length - 1 ? '0.35' : '1'; next.disabled = currentFeaturedIndex === featuredMatches.length - 1; }
+
+    // Animate bg scale for active slide
+    document.querySelectorAll('.fmp-slide').forEach((s, i) => {
+        s.classList.toggle('active', i === currentFeaturedIndex);
+    });
+}
+
+function _fmpCheckGoals() {
+    featuredMatches.forEach((partido, i) => {
+        const id = partido.id || partido.slug || i;
+        const lScore = partido.local?.marcador ?? partido.marcadorLocal;
+        const vScore = partido.visitante?.marcador ?? partido.marcadorVisitante;
+        const prev = _fmpPrevScores[id];
+        if (prev && (lScore > prev.l || vScore > prev.v)) {
+            // Goal detected! Animate the score nums and show overlay
+            ['fmpL' + i, 'fmpV' + i].forEach(elId => {
+                const el = document.getElementById(elId);
+                if (el) { el.classList.remove('goal-flash'); void el.offsetWidth; el.classList.add('goal-flash'); }
+            });
+            if (i === currentFeaturedIndex) {
+                const overlay = document.getElementById('fmpGoalOverlay');
+                if (overlay) { overlay.classList.remove('show'); void overlay.offsetWidth; overlay.classList.add('show'); setTimeout(() => overlay.classList.remove('show'), 1900); }
+            }
+        }
+        _fmpPrevScores[id] = { l: lScore, v: vScore };
+    });
+}
+
 // Actualizar el carrusel del partido destacado con TODOS los partidos
 function updateFeaturedMatch(data) {
     if (!data || !data.partidos || data.partidos.length === 0) return;
-    
-    const carousel = document.getElementById('featuredCarousel');
-    if (!carousel) return;
-    
-    // Preservar la posición actual del usuario
-    const previousMatchId = featuredMatches[currentFeaturedIndex]?.id;
-    
-    // Guardar todos los partidos para el carrusel
+
+    const track = document.getElementById('fmpTrack');
+    const skeleton = document.getElementById('fmpSkeleton');
+    if (!track) return;
+
+    // Detect goals before overwriting data
+    _fmpCheckGoals();
+
+    // Preserve user position
+    const previousId = featuredMatches[currentFeaturedIndex]?.id || featuredMatches[currentFeaturedIndex]?.slug;
     featuredMatches = data.partidos;
-    
-    // Intentar mantener el mismo partido que el usuario estaba viendo
-    if (previousMatchId) {
-        const matchIndex = featuredMatches.findIndex(p => p.id === previousMatchId);
-        if (matchIndex !== -1) {
-            // El partido todavía existe, mantener la posición
-            currentFeaturedIndex = matchIndex;
-        } else {
-            // El partido ya no existe, resetear a 0
-            currentFeaturedIndex = 0;
-        }
+
+    if (previousId) {
+        const idx = featuredMatches.findIndex(p => (p.id || p.slug) === previousId);
+        currentFeaturedIndex = idx !== -1 ? idx : 0;
     } else {
-        // Primera carga, empezar en 0
         currentFeaturedIndex = 0;
     }
-    
-    // Crear un slide para cada partido
-    carousel.innerHTML = featuredMatches.map((partido, index) => {
-        const hora = formatearHora(partido.fecha);
-        const isActive = index === currentFeaturedIndex ? 'active' : '';
-        
-        // Determinar el badge apropiado
-        let liveBadgeHTML = '';
-        if (partido.estado?.enVivo) {
-            liveBadgeHTML = `
-                <div class="live-badge">
-                    <span class="live-dot"></span>
-                    <span>EN VIVO - ${partido.reloj}</span>
-                </div>
-            `;
-        } else if (partido.estado?.programado) {
-            liveBadgeHTML = `
-                <div class="live-badge" style="background: rgba(255, 165, 0, 0.95);">
-                    <span class="live-dot" style="background: #ffa500;"></span>
-                    <span>${hora}</span>
-                </div>
-            `;
-        } else if (partido.estado?.finalizado) {
-            liveBadgeHTML = `
-                <div class="live-badge" style="background: rgba(128, 128, 128, 0.95);">
-                    <i class="fas fa-check-circle"></i>
-                    <span>FINALIZADO</span>
-                </div>
-            `;
-        }
-        
-        return `
-            <div class="featured-match ${isActive}" data-index="${index}">
-                <div class="match-overlay"></div>
-                <img src="soccer-fire-bg.jpg" alt="Stadium" class="match-bg">
 
-                <div class="match-score">
-                    <div class="carousel-team">
-                        <div class="team-logo">
-                            <img src="${partido.local.logo}" alt="${partido.local.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
-                        </div>
-                        <span class="carousel-team-name">${partido.local.nombreCorto}</span>
-                    </div>
-                    <div class="score-display">
-                        <span class="score-num">${partido.local.marcador}</span>
-                        <div class="score-sep"><span>:</span></div>
-                        <span class="score-num">${partido.visitante.marcador}</span>
-                    </div>
-                    <div class="carousel-team">
-                        <div class="team-logo">
-                            <img src="${partido.visitante.logo}" alt="${partido.visitante.nombreCorto}" onerror="this.src='https://via.placeholder.com/50'">
-                        </div>
-                        <span class="carousel-team-name">${partido.visitante.nombreCorto}</span>
-                    </div>
-                </div>
+    const leagueName = currentLeague || 'Liga MX';
 
-                <div class="match-info">
-                    <div class="match-badges">
-                        <span class="badge-icon" title="Marcador"><i class="fas fa-circle"></i></span>
-                        <span class="badge-icon play-badge-icon" title="Ver partido en vivo" onclick="watchMatch('${partido.id}')"><i class="fas fa-play"></i></span>
-                        <span class="badge-icon" title="Transmisión"><i class="fas fa-wifi"></i></span>
-                    </div>
-                </div>
-
-                ${liveBadgeHTML}
-            </div>
-        `;
+    // Render slides
+    track.innerHTML = featuredMatches.map((partido, index) => {
+        const bgUrl = STADIUM_BACKGROUNDS[index % STADIUM_BACKGROUNDS.length];
+        return _fmpBuildSlide(partido, index, bgUrl, leagueName);
     }).join('');
-    
-    // Actualizar indicadores
-    updateCarouselIndicators();
-    
-    // Mostrar/ocultar botones de navegación según cantidad de partidos
-    const prevBtn = document.querySelector('.carousel-prev');
-    const nextBtn = document.querySelector('.carousel-next');
-    
-    if (featuredMatches.length > 1) {
-        if (prevBtn) prevBtn.style.display = 'flex';
-        if (nextBtn) nextBtn.style.display = 'flex';
-    } else {
-        if (prevBtn) prevBtn.style.display = 'none';
-        if (nextBtn) nextBtn.style.display = 'none';
-    }
-    
-    // Agregar soporte para swipe táctil
+
+    // Hide skeleton
+    if (skeleton) skeleton.style.display = 'none';
+
+    // Show/hide nav arrows
+    const prevBtn = document.getElementById('fmpPrev');
+    const nextBtn = document.getElementById('fmpNext');
+    const show = featuredMatches.length > 1;
+    if (prevBtn) prevBtn.style.display = show ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = show ? 'flex' : 'none';
+
+    _fmpUpdateTrack();
     initTouchSupport();
-}
 
-// Actualizar indicadores del carrusel
-function updateCarouselIndicators() {
-    const indicatorsContainer = document.getElementById('carouselIndicators');
-    if (!indicatorsContainer) return;
-    
-    if (featuredMatches.length <= 1) {
-        indicatorsContainer.innerHTML = '';
-        return;
+    // Auto-advance every 6 seconds
+    if (_fmpAutoTimer) clearInterval(_fmpAutoTimer);
+    if (featuredMatches.length > 1) {
+        _fmpAutoTimer = setInterval(() => {
+            currentFeaturedIndex = (currentFeaturedIndex + 1) % featuredMatches.length;
+            _fmpUpdateTrack();
+        }, 6000);
     }
-    
-    indicatorsContainer.innerHTML = featuredMatches.map((_, index) => {
-        const isActive = index === currentFeaturedIndex ? 'active' : '';
-        return `<span class="indicator ${isActive}" onclick="goToFeaturedMatch(${index})"></span>`;
-    }).join('');
 }
 
 // Navegar al siguiente partido
 function nextFeaturedMatch() {
     if (currentFeaturedIndex < featuredMatches.length - 1) {
         currentFeaturedIndex++;
-        updateCarouselPosition();
+        _fmpUpdateTrack();
+        _fmpResetAutoTimer();
     }
 }
 
@@ -917,7 +1007,8 @@ function nextFeaturedMatch() {
 function prevFeaturedMatch() {
     if (currentFeaturedIndex > 0) {
         currentFeaturedIndex--;
-        updateCarouselPosition();
+        _fmpUpdateTrack();
+        _fmpResetAutoTimer();
     }
 }
 
@@ -925,35 +1016,33 @@ function prevFeaturedMatch() {
 function goToFeaturedMatch(index) {
     if (index >= 0 && index < featuredMatches.length) {
         currentFeaturedIndex = index;
-        updateCarouselPosition();
+        _fmpUpdateTrack();
+        _fmpResetAutoTimer();
     }
 }
 
-// Actualizar posición del carrusel
-function updateCarouselPosition() {
-    const slides = document.querySelectorAll('.featured-match');
-    slides.forEach((slide, index) => {
-        slide.classList.remove('active');
-        if (index === currentFeaturedIndex) {
-            slide.classList.add('active');
-        }
-    });
-    
-    updateCarouselIndicators();
+function _fmpResetAutoTimer() {
+    if (_fmpAutoTimer) { clearInterval(_fmpAutoTimer); _fmpAutoTimer = null; }
+    if (featuredMatches.length > 1) {
+        _fmpAutoTimer = setInterval(() => {
+            currentFeaturedIndex = (currentFeaturedIndex + 1) % featuredMatches.length;
+            _fmpUpdateTrack();
+        }, 6000);
+    }
 }
+
+// Keep backward compat alias
+function updateCarouselPosition() { _fmpUpdateTrack(); }
+function updateCarouselIndicators() { _fmpUpdateTrack(); }
 
 // Inicializar soporte táctil para swipe
 function initTouchSupport() {
-    const carousel = document.getElementById('featuredCarousel');
-    if (!carousel) return;
-    
-    // Remover listeners anteriores si existen
-    carousel.removeEventListener('touchstart', handleTouchStart);
-    carousel.removeEventListener('touchend', handleTouchEnd);
-    
-    // Agregar nuevos listeners
-    carousel.addEventListener('touchstart', handleTouchStart, { passive: true });
-    carousel.addEventListener('touchend', handleTouchEnd, { passive: true });
+    const track = document.getElementById('fmpTrack');
+    if (!track) return;
+    track.removeEventListener('touchstart', handleTouchStart);
+    track.removeEventListener('touchend', handleTouchEnd);
+    track.addEventListener('touchstart', handleTouchStart, { passive: true });
+    track.addEventListener('touchend', handleTouchEnd, { passive: true });
 }
 
 // Manejar inicio de touch
@@ -969,17 +1058,9 @@ function handleTouchEnd(e) {
 
 // Detectar gesto de swipe
 function handleSwipeGesture() {
-    const swipeThreshold = 50; // Mínimo de píxeles para considerar swipe
-    
-    if (touchEndX < touchStartX - swipeThreshold) {
-        // Swipe izquierda - siguiente partido
-        nextFeaturedMatch();
-    }
-    
-    if (touchEndX > touchStartX + swipeThreshold) {
-        // Swipe derecha - partido anterior
-        prevFeaturedMatch();
-    }
+    const swipeThreshold = 50;
+    if (touchEndX < touchStartX - swipeThreshold) { nextFeaturedMatch(); }
+    if (touchEndX > touchStartX + swipeThreshold) { prevFeaturedMatch(); }
 }
 
 // Actualizar partidos en vivo

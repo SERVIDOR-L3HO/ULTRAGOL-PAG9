@@ -28,6 +28,8 @@
     <link rel="stylesheet" href="tv-styles.css?v=20251109c">
     <!-- 🔥 Reels CSS — local path so it always deploys with /ultrax/ -->
     <link rel="stylesheet" href="css/reels-viewer.css?v=4">
+    <!-- 🎯 Featured Match Pro -->
+    <link rel="stylesheet" href="css/featured-match-pro.css?v=1">
     <!-- Tour Guide -->
     <link rel="stylesheet" href="css/tour.css">
     
@@ -134,53 +136,35 @@
             </button>
         </div>
 
-        <div class="featured-match-container">
-            <!-- Botón navegación izquierda -->
-            <button class="carousel-nav carousel-prev" onclick="prevFeaturedMatch()" style="display: none;">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            
-            <!-- Carrusel de partidos -->
-            <div class="featured-carousel" id="featuredCarousel">
-                <div class="featured-match active">
-                    <div class="match-overlay"></div>
-                    <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800" alt="Stadium" class="match-bg">
-
-                    <div class="match-score">
-                        <div class="team-logo">
-                            <img src="https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg" alt="Team 1">
-                        </div>
-                        <div class="score-display">
-                            <span class="score">1 - 1</span>
-                        </div>
-                        <div class="team-logo">
-                            <img src="https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg" alt="Team 2">
-                        </div>
+        <!-- Featured Match PRO carousel -->
+        <div class="fmp-container" id="fmpContainer">
+            <!-- Skeleton loader -->
+            <div class="fmp-skeleton" id="fmpSkeleton">
+                <div style="display:flex;gap:18px;align-items:center;">
+                    <div class="fmp-skeleton-logo"></div>
+                    <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
+                        <div class="fmp-skeleton-text"></div>
+                        <div class="fmp-skeleton-text" style="width:80px;"></div>
                     </div>
-
-                    <div class="match-info">
-                        <h2 class="match-title">MODO DEMO FAVOR DE ESPERAR 1 MINUTO..</h2>
-                        <div class="match-badges">
-                            <span class="badge-icon"><i class="fas fa-circle"></i></span>
-                            <span class="badge-icon"><i class="fas fa-users"></i></span>
-                            <span class="badge-icon"><i class="fas fa-wifi"></i></span>
-                        </div>
-                    </div>
-
-                    <div class="live-badge">
-                        <span class="live-dot"></span>
-                        <span>LIVE</span>
-                    </div>
+                    <div class="fmp-skeleton-logo"></div>
                 </div>
             </div>
-            
-            <!-- Botón navegación derecha -->
-            <button class="carousel-nav carousel-next" onclick="nextFeaturedMatch()" style="display: none;">
+
+            <!-- Slides track -->
+            <div class="fmp-track" id="fmpTrack"></div>
+
+            <!-- Nav arrows -->
+            <button class="fmp-nav fmp-nav-prev" id="fmpPrev" onclick="prevFeaturedMatch()" style="display:none;">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="fmp-nav fmp-nav-next" id="fmpNext" onclick="nextFeaturedMatch()" style="display:none;">
                 <i class="fas fa-chevron-right"></i>
             </button>
-            
-            <!-- Indicadores de posición -->
-            <div class="carousel-indicators" id="carouselIndicators"></div>
+
+            <!-- Goal celebration overlay -->
+            <div class="fmp-goal-overlay" id="fmpGoalOverlay">
+                <span class="fmp-goal-text">⚽ GOL!</span>
+            </div>
         </div>
 
     <!-- Banner Copa Mundial 2026 -->
