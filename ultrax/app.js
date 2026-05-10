@@ -985,16 +985,10 @@ function _fmpBuildSlide(partido, index, bgUrl, leagueName) {
             <!-- BOTTOM ACTION STRIP -->
             <div class="fmp-bottom">
                 <div class="fmp-dots" id="fmpDots${index}"></div>
-                ${hasStream
-                    ? `<button class="fmp-watch-btn fmp-has-stream" onclick="watchMatch('${matchId}')">
-                           <span class="fmp-play-icon"><i class="fas fa-play"></i></span>
-                           Ver en vivo
-                       </button>`
-                    : `<button class="fmp-watch-btn fmp-no-stream" onclick="openImportantMatchesModal()">
-                           <span class="fmp-play-icon"><i class="fas fa-tv"></i></span>
-                           Ver canales
-                       </button>`
-                }
+                <button class="fmp-watch-btn fmp-has-stream" onclick="openFeaturedMatchChannels(${index})">
+                    <span class="fmp-play-icon"><i class="fas fa-tv"></i></span>
+                    VER CANALES
+                </button>
                 <button class="fmp-share-btn"
                         onclick="_fmpShare('${matchId}','${localName} vs ${visitName}')"
                         title="Compartir">
@@ -1008,6 +1002,56 @@ function _fmpShare(matchId, title) {
     const url = `${location.origin}${location.pathname}?match=${matchId}`;
     if (navigator.share) { navigator.share({ title: 'UltraGol — ' + title, url }); }
     else if (navigator.clipboard) { navigator.clipboard.writeText(url); }
+}
+
+function openFeaturedMatchChannels(index) {
+    const partido = featuredMatches[index];
+    if (!partido) { showToast('No se encontró el partido'); return; }
+
+    const localName  = partido.local?.nombreCorto  || partido.local?.nombre  || partido.equipo1  || 'Local';
+    const visitName  = partido.visitante?.nombreCorto || partido.visitante?.nombre || partido.equipo2 || 'Visitante';
+    const directUrl  = partido.transmisionUrl || partido.url || '';
+    const eventoRef  = `${localName} vs ${visitName}`;
+    const titulo     = eventoRef;
+
+    const apis = [
+        { data: transmisionesAPI1, fuente: 'rereyano'        },
+        { data: transmisionesAPI2, fuente: 'e1link'          },
+        { data: transmisionesAPI3, fuente: 'voodc'           },
+        { data: transmisionesAPI4, fuente: 'transmisiones4'  },
+        { data: transmisionesAPI5, fuente: 'donromans'       },
+        { data: transmisionesAPI6, fuente: 'transmisiones6'  },
+    ];
+
+    let canalesCombinados = [];
+
+    if (directUrl) {
+        directUrl.split(',').map(u => u.trim()).filter(Boolean).forEach((url, i) => {
+            canalesCombinados.push({ nombre: `Servidor ${i + 1}`, url, fuente: 'rereyano' });
+        });
+    }
+
+    for (const { data, fuente } of apis) {
+        if (!data?.transmisiones) continue;
+        const coincidentes = data.transmisiones.filter(t => _matchesTransmision(eventoRef, t));
+        for (const t of coincidentes) {
+            if (t.canales?.length) canalesCombinados.push(...t.canales.map(c => ({ ...c, fuente })));
+        }
+    }
+
+    const seen = new Set();
+    canalesCombinados = canalesCombinados.filter(c => {
+        const url = c.url || c.src || c.stream_url || '';
+        if (!url || seen.has(url)) return !url;
+        seen.add(url);
+        return true;
+    });
+
+    if (canalesCombinados.length > 0) {
+        showChannelSelector({ evento: titulo, titulo, canales: canalesCombinados }, titulo);
+    } else {
+        showToast('No hay canales disponibles aún. Espera unos segundos e intenta de nuevo.');
+    }
 }
 
 function _fmpSpawnParticles() {
