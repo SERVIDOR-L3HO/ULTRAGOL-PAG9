@@ -70,6 +70,88 @@ app.use((req, res, next) => {
     next();
 });
 
+// ── Rate limiting (in-memory, por IP) ────────────────────────────────────────
+const rateLimitStore = new Map();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minuto
+const RATE_LIMIT_MAX = 60;           // máx 60 peticiones por minuto por IP
+
+function getRealIP(req) {
+    return (req.headers['cf-connecting-ip'] ||
+            req.headers['x-forwarded-for']?.split(',')[0] ||
+            req.ip || '').trim();
+}
+
+function rateLimit(req, res, next) {
+    const ip = getRealIP(req);
+    const now = Date.now();
+    const entry = rateLimitStore.get(ip) || { count: 0, start: now };
+
+    if (now - entry.start > RATE_LIMIT_WINDOW) {
+        entry.count = 1;
+        entry.start = now;
+    } else {
+        entry.count++;
+    }
+    rateLimitStore.set(ip, entry);
+
+    if (entry.count > RATE_LIMIT_MAX) {
+        return res.status(429).json({ error: 'Demasiadas peticiones. Intenta en un momento.' });
+    }
+    next();
+}
+
+// Limpieza periódica del store de rate limit
+setInterval(() => {
+    const cutoff = Date.now() - RATE_LIMIT_WINDOW * 2;
+    for (const [ip, e] of rateLimitStore) {
+        if (e.start < cutoff) rateLimitStore.delete(ip);
+    }
+}, 5 * 60 * 1000);
+
+// ── Protección de origen para rutas API ──────────────────────────────────────
+const ALLOWED_ORIGINS = [
+    'https://www.ultragol-l3ho.com.mx',
+    'https://ultragol-l3ho.com.mx',
+    process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : null,
+].filter(Boolean);
+
+function apiOriginGuard(req, res, next) {
+    // Permitir peticiones del mismo servidor (SSR, internos)
+    const origin = req.headers['origin'] || '';
+    const referer = req.headers['referer'] || '';
+    const cfIP = req.headers['cf-connecting-ip'];
+
+    // Si viene directo sin origen (curl, bots simples) y no es localhost → bloquear
+    if (!origin && !referer) {
+        const ip = getRealIP(req);
+        const isLocal = ip === '127.0.0.1' || ip === '::1' || ip.startsWith('192.168.');
+        if (!isLocal) {
+            return res.status(403).json({ error: 'Acceso denegado' });
+        }
+        return next();
+    }
+
+    const allowed = ALLOWED_ORIGINS.some(o =>
+        origin.startsWith(o) || referer.startsWith(o)
+    );
+    if (!allowed) {
+        return res.status(403).json({ error: 'Origen no permitido' });
+    }
+    next();
+}
+
+// Aplicar rate limit a todas las rutas /api/*
+app.use('/api/', rateLimit);
+
+// Aplicar origin guard a los endpoints de datos sensibles
+[
+    '/api/ultragol/',
+    '/api/mx/',
+    '/api/reels',
+    '/api/share/',
+    '/api/notifications',
+].forEach(path => app.use(path, apiOriginGuard));
+
 // ── Cloudflare Turnstile verification ─────────────────────────────────────────
 app.post('/api/turnstile/verify', async (req, res) => {
     const token = req.body?.token;
