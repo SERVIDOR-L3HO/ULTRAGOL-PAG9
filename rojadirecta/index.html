@@ -190,5 +190,33 @@
 </footer>
 
 <script src="/mx/mx.js"></script>
+
+<!-- Cloudflare Turnstile (invisible) -->
+<div id="_cf_ts" style="display:none"></div>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+<script>
+(function() {
+    if (sessionStorage.getItem('_hv')) return;
+    function runTS() {
+        if (typeof turnstile === 'undefined') { setTimeout(runTS, 300); return; }
+        turnstile.render('#_cf_ts', {
+            sitekey: '0x4AAAAAAdMXFUj4xnnJf5fN',
+            size: 'invisible',
+            execution: 'execute',
+            callback: function(token) {
+                fetch('/api/turnstile/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+                }).then(function(r) { return r.json(); }).then(function(d) {
+                    if (d.success) sessionStorage.setItem('_hv', '1');
+                }).catch(function() {});
+            }
+        });
+        turnstile.execute('#_cf_ts');
+    }
+    runTS();
+})();
+</script>
 </body>
 </html>

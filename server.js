@@ -70,6 +70,35 @@ app.use((req, res, next) => {
     next();
 });
 
+// ── Cloudflare Turnstile verification ─────────────────────────────────────────
+app.post('/api/turnstile/verify', async (req, res) => {
+    const token = req.body?.token;
+    if (!token) return res.json({ success: false, error: 'missing_token' });
+
+    const secret = process.env.TURNSTILE_SECRET_KEY;
+    if (!secret) {
+        // If no secret is configured, allow through (dev mode)
+        return res.json({ success: true, dev: true });
+    }
+
+    try {
+        const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ secret, response: token, remoteip: req.ip })
+        });
+        const data = await r.json();
+        if (data.success) {
+            req.session.humanVerified = true;
+            req.session.humanVerifiedAt = Date.now();
+        }
+        res.json({ success: data.success, error: data['error-codes']?.[0] });
+    } catch (e) {
+        console.error('[Turnstile]', e.message);
+        res.status(500).json({ success: false, error: 'server_error' });
+    }
+});
+
 // UltraGol API Proxy (para evitar problemas de CORS)
 const API_BASE_URL = 'https://ultragol-api-3.vercel.app';
 
