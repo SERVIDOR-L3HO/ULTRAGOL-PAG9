@@ -559,16 +559,43 @@ function cleanBroadcasts() {
     while (broadcastQueue.length && broadcastQueue[0].ts < cutoff) broadcastQueue.shift();
 }
 
-// ── Share-link store (in-memory, 24 h TTL) ──────────────────────────────────
+// ── Share-link store (file-backed, 48 h TTL) ─────────────────────────────────
+const SHARE_STORE_FILE = path.join(__dirname, 'data', 'share-store.json');
+const SHARE_TTL_MS = 48 * 60 * 60 * 1000;
 const shareStore = new Map();
-const SHARE_TTL_MS = 24 * 60 * 60 * 1000;
+
+(function _loadShareStore() {
+    try {
+        if (fs.existsSync(SHARE_STORE_FILE)) {
+            const raw = JSON.parse(fs.readFileSync(SHARE_STORE_FILE, 'utf8'));
+            const cutoff = Date.now() - SHARE_TTL_MS;
+            for (const [id, val] of Object.entries(raw)) {
+                if (val.ts >= cutoff) shareStore.set(id, val);
+            }
+            console.log(`📎 Share store cargado: ${shareStore.size} enlaces`);
+        }
+    } catch (e) { console.warn('⚠️  No se pudo cargar share store:', e.message); }
+})();
+
+function _saveShareStore() {
+    try {
+        const obj = {};
+        for (const [id, val] of shareStore) obj[id] = val;
+        fs.writeFileSync(SHARE_STORE_FILE, JSON.stringify(obj), 'utf8');
+    } catch (e) { console.warn('⚠️  No se pudo guardar share store:', e.message); }
+}
 
 function _cleanShareStore() {
     const cutoff = Date.now() - SHARE_TTL_MS;
-    for (const [id, val] of shareStore) { if (val.ts < cutoff) shareStore.delete(id); }
+    let removed = 0;
+    for (const [id, val] of shareStore) { if (val.ts < cutoff) { shareStore.delete(id); removed++; } }
+    if (removed) _saveShareStore();
 }
+
 function _genShareId() {
-    return Math.random().toString(36).slice(2, 8).toUpperCase();
+    let id;
+    do { id = Math.random().toString(36).slice(2, 8).toUpperCase(); } while (shareStore.has(id));
+    return id;
 }
 
 app.post('/api/share/match', express.json(), (req, res) => {
@@ -577,6 +604,8 @@ app.post('/api/share/match', express.json(), (req, res) => {
     if (!title || !Array.isArray(channels)) return res.status(400).json({ error: 'Faltan datos' });
     const id = _genShareId();
     shareStore.set(id, { title, channels, ts: Date.now() });
+    _saveShareStore();
+    console.log(`🔗 Share link creado: ${id} — "${title}" (${channels.length} canales)`);
     res.json({ id });
 });
 

@@ -990,7 +990,7 @@ function _fmpBuildSlide(partido, index, bgUrl, leagueName) {
                     VER CANALES
                 </button>
                 <button class="fmp-share-btn"
-                        onclick="_fmpShare('${matchId}','${localName} vs ${visitName}')"
+                        onclick="_fmpShare(${index},'${localName} vs ${visitName}')"
                         title="Compartir">
                     <i class="fas fa-share-alt"></i>
                 </button>
@@ -998,10 +998,80 @@ function _fmpBuildSlide(partido, index, bgUrl, leagueName) {
         </div>`;
 }
 
-function _fmpShare(matchId, title) {
-    const url = `${location.origin}${location.pathname}?match=${matchId}`;
-    if (navigator.share) { navigator.share({ title: 'UltraGol — ' + title, url }); }
-    else if (navigator.clipboard) { navigator.clipboard.writeText(url); }
+async function _fmpShare(index, title) {
+    const partido = featuredMatches[index];
+    if (!partido) { showToast('No se pudo compartir'); return; }
+
+    const localName = partido.local?.nombreCorto || partido.local?.nombre || partido.equipo1 || 'Local';
+    const visitName = partido.visitante?.nombreCorto || partido.visitante?.nombre || partido.equipo2 || 'Visitante';
+    const eventoRef = `${localName} vs ${visitName}`;
+
+    showToast('Generando link... ⏳');
+
+    // Resolve channels the same way openFeaturedMatchChannels does
+    let canalesCombinados = [];
+    const directUrl = partido.transmisionUrl || partido.url || '';
+    if (directUrl) {
+        directUrl.split(',').map(u => u.trim()).filter(Boolean).forEach((url, i) => {
+            canalesCombinados.push({ nombre: `Servidor ${i + 1}`, url, fuente: 'rereyano' });
+        });
+    }
+    const apis = [
+        { data: transmisionesAPI1, fuente: 'rereyano'        },
+        { data: transmisionesAPI2, fuente: 'e1link'          },
+        { data: transmisionesAPI3, fuente: 'voodc'           },
+        { data: transmisionesAPI4, fuente: 'transmisiones4'  },
+        { data: transmisionesAPI5, fuente: 'donromans'       },
+        { data: transmisionesAPI6, fuente: 'transmisiones6'  },
+    ];
+    for (const { data, fuente } of apis) {
+        if (!data?.transmisiones) continue;
+        const coincidentes = data.transmisiones.filter(t => _matchesTransmision(eventoRef, t));
+        for (const t of coincidentes) {
+            if (t.canales?.length) canalesCombinados.push(...t.canales.map(c => ({ ...c, fuente })));
+        }
+    }
+    // Deduplicate by URL
+    const seen = new Set();
+    canalesCombinados = canalesCombinados.filter(c => {
+        const url = c.url || c.src || c.stream_url || '';
+        if (!url || seen.has(url)) return false;
+        seen.add(url); return true;
+    });
+
+    // Build compact channel array for the server
+    const channels = canalesCombinados.map(c => {
+        const url = c.url || c.enlaces?.[0]?.url || c.link || c.src || c.stream_url || '';
+        return [c.nombre || c.fuente || 'Canal', url, c.tipoAPI || c.fuente || ''];
+    }).filter(c => c[1]);
+
+    try {
+        const resp = await fetch('/api/share/match', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ title: eventoRef, channels })
+        });
+        if (!resp.ok) throw new Error('server error');
+        const { id } = await resp.json();
+        const shareUrl = `${window.location.origin}${window.location.pathname}?match=${id}`;
+
+        if (navigator.share) {
+            await navigator.share({
+                title: `${eventoRef} - UltraGol`,
+                text: `Ver ${eventoRef} en UltraGol`,
+                url: shareUrl
+            });
+            showToast('¡Compartido! 🎉');
+        } else if (navigator.clipboard) {
+            await navigator.clipboard.writeText(shareUrl);
+            showToast('¡Enlace copiado! 📋');
+        }
+    } catch (e) {
+        if (e.name !== 'AbortError') {
+            console.error('_fmpShare error:', e);
+            showToast('No se pudo generar el link');
+        }
+    }
 }
 
 function openFeaturedMatchChannels(index) {
