@@ -774,17 +774,21 @@ async function loadTransmisiones() {
     }
 }
 
-// ─── FEATURED MATCH PRO ──────────────────────────────────────────────────────
-// Previous scores tracker for goal detection
+// ─── FEATURED MATCH PRO v2 ───────────────────────────────────────────────────
 const _fmpPrevScores = {};
 let _fmpAutoTimer = null;
+let _fmpProgressTimer = null;
+let _fmpProgressStart = null;
+const FMP_AUTO_INTERVAL = 7000;
 
 const STADIUM_BACKGROUNDS = [
-    'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
-    'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80',
-    'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800&q=80',
-    'https://images.unsplash.com/photo-1483000805330-4eaf0a0d82da?w=800&q=80',
-    'https://images.unsplash.com/photo-1540747913346-19212a4b279d?w=800&q=80',
+    'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=900&q=85',
+    'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=900&q=85',
+    'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=900&q=85',
+    'https://images.unsplash.com/photo-1483000805330-4eaf0a0d82da?w=900&q=85',
+    'https://images.unsplash.com/photo-1540747913346-19212a4b279d?w=900&q=85',
+    'https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=900&q=85',
+    'https://images.unsplash.com/photo-1530549387789-4c1017266635?w=900&q=85',
 ];
 
 const LEAGUE_LOGOS = {
@@ -794,92 +798,206 @@ const LEAGUE_LOGOS = {
     'Serie A':        'https://a.espncdn.com/i/leaguelogos/soccer/500/12.png',
     'Bundesliga':     'https://a.espncdn.com/i/leaguelogos/soccer/500/10.png',
     'Ligue 1':        'https://a.espncdn.com/i/leaguelogos/soccer/500/9.png',
+    'Liga Argentina': 'https://a.espncdn.com/i/leaguelogos/soccer/500/26.png',
+    'Liga Ecuador':   'https://a.espncdn.com/i/leaguelogos/soccer/500/184.png',
 };
+
+// Team primary colors for gradient splits
+const TEAM_COLORS = {
+    'america': '#FFD700', 'club america': '#FFD700',
+    'chivas': '#C8102E', 'guadalajara': '#C8102E',
+    'tigres': '#F5B400', 'tigres uanl': '#F5B400',
+    'monterrey': '#003DA5', 'rayados': '#003DA5',
+    'cruz azul': '#1E4D9B',
+    'pumas': '#1B295E', 'pumas unam': '#1B295E',
+    'pachuca': '#1C3F8E',
+    'toluca': '#CC0000',
+    'atlas': '#8B1A1A',
+    'leon': '#006400', 'león': '#006400',
+    'santos': '#00A550', 'santos laguna': '#00A550',
+    'tijuana': '#C8102E', 'xolos': '#C8102E',
+    'necaxa': '#CC0000',
+    'mazatlan': '#7B2D8B', 'mazatlán': '#7B2D8B',
+    'queretaro': '#003DA5', 'querétaro': '#003DA5',
+    'juarez': '#111111', 'juárez': '#111111',
+    'atletico san luis': '#CC0000',
+    'manchester united': '#DA291C', 'man united': '#DA291C', 'man utd': '#DA291C',
+    'liverpool': '#C8102E',
+    'arsenal': '#EF0107',
+    'chelsea': '#034694',
+    'manchester city': '#6CABDD', 'man city': '#6CABDD',
+    'tottenham': '#132257', 'spurs': '#132257',
+    'newcastle': '#241F20',
+    'aston villa': '#95BFE5',
+    'west ham': '#7A263A',
+    'barcelona': '#A50044',
+    'real madrid': '#00529F',
+    'atletico madrid': '#CC0000', 'atlético madrid': '#CC0000',
+    'sevilla': '#D4AF37',
+    'juventus': '#000000',
+    'inter milan': '#003399', 'inter': '#003399',
+    'ac milan': '#CC0000', 'milan': '#CC0000',
+    'napoli': '#087AC7',
+    'roma': '#8B0000',
+    'lazio': '#87CEEB',
+    'bayern munich': '#DC052D', 'bayern': '#DC052D',
+    'borussia dortmund': '#FDE100', 'dortmund': '#FDE100', 'bvb': '#FDE100',
+    'psg': '#004170', 'paris saint-germain': '#004170',
+    'lyon': '#1B66B1',
+    'marseille': '#6EC6E6',
+};
+
+function _fmpGetTeamColor(name) {
+    if (!name) return '#e94560';
+    const key = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    return TEAM_COLORS[key] || '#e94560';
+}
+
+function _fmpHexToRgb(hex) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return `${r},${g},${b}`;
+}
 
 function _fmpBuildStatusBadge(partido) {
     const hora = typeof formatearHora === 'function' ? formatearHora(partido.fecha) : (partido.fecha || '');
     if (partido.estado?.enVivo) {
         const min = partido.reloj || partido.minuto || '';
-        return `<div class="fmp-status live"><span class="fmp-status-dot"></span>EN VIVO${min ? ' ' + min + "'": ''}</div>`;
+        return `<div class="fmp-status live"><span class="fmp-live-dot"></span>EN VIVO${min ? ' · ' + min + "'" : ''}</div>`;
     }
     if (partido.estado?.finalizado) {
-        return `<div class="fmp-status finished"><i class="fas fa-check-circle" style="font-size:9px;margin-right:3px;"></i>FINALIZADO</div>`;
+        return `<div class="fmp-status finished"><i class="fas fa-check-circle" style="font-size:9px;margin-right:4px;"></i>FINALIZADO</div>`;
     }
-    return `<div class="fmp-status scheduled"><i class="fas fa-clock" style="font-size:9px;margin-right:4px;"></i>${hora}</div>`;
+    return `<div class="fmp-status scheduled"><i class="fas fa-clock" style="font-size:9px;margin-right:5px;"></i>${hora}</div>`;
+}
+
+function _fmpMinutePercent(partido) {
+    if (!partido.estado?.enVivo) return 0;
+    const min = parseInt(partido.reloj || partido.minuto || '0', 10);
+    if (isNaN(min)) return 0;
+    return Math.min(100, Math.round((min / 90) * 100));
 }
 
 function _fmpBuildSlide(partido, index, bgUrl, leagueName) {
     const statusBadge = _fmpBuildStatusBadge(partido);
-    const leagueLogo = LEAGUE_LOGOS[leagueName] || LEAGUE_LOGOS['Liga MX'];
-    const localLogo = partido.local?.logo || partido.logo1 || '';
-    const visitLogo = partido.visitante?.logo || partido.logo2 || '';
-    const localName = partido.local?.nombreCorto || partido.equipo1 || '';
-    const visitName = partido.visitante?.nombreCorto || partido.equipo2 || '';
-    const localScore = partido.local?.marcador ?? partido.marcadorLocal ?? '-';
+    const leagueLogo  = LEAGUE_LOGOS[leagueName] || LEAGUE_LOGOS['Liga MX'];
+
+    const localName  = partido.local?.nombreCorto  || partido.local?.nombre  || partido.equipo1  || 'Local';
+    const visitName  = partido.visitante?.nombreCorto || partido.visitante?.nombre || partido.equipo2 || 'Visitante';
+    const localLogo  = partido.local?.logo  || partido.logo1  || '';
+    const visitLogo  = partido.visitante?.logo || partido.logo2 || '';
+    const localScore = partido.local?.marcador  ?? partido.marcadorLocal  ?? '-';
     const visitScore = partido.visitante?.marcador ?? partido.marcadorVisitante ?? '-';
-    const matchId = partido.id || partido.slug || index;
-    const hasStream = partido.transmisionUrl || partido.url;
+    const matchId    = partido.id || partido.slug || index;
+    const hasStream  = !!(partido.transmisionUrl || partido.url);
+
+    // Team colors for gradient
+    const colL  = _fmpGetTeamColor(localName);
+    const colV  = _fmpGetTeamColor(visitName);
+    const rgbL  = _fmpHexToRgb(colL);
+    const rgbV  = _fmpHexToRgb(colV);
+
+    const minutePct = _fmpMinutePercent(partido);
+    const minLabel  = partido.estado?.enVivo
+        ? (partido.reloj || partido.minuto ? `${partido.reloj || partido.minuto}'` : 'EN VIVO')
+        : (partido.estado?.finalizado ? 'FT' : '');
+
+    const fallbackSvg = (letter, color) =>
+        `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><circle cx='30' cy='30' r='30' fill='${encodeURIComponent(color)}'/><text x='50%25' y='57%25' text-anchor='middle' font-size='22' font-weight='900' fill='white' font-family='Inter,Arial'>${letter}</text></svg>`;
 
     return `
-        <div class="fmp-slide" data-index="${index}" data-id="${matchId}"
-             data-local="${localScore}" data-visit="${visitScore}">
-            <img class="fmp-bg" src="${bgUrl}"
-                 onerror="this.src='${STADIUM_BACKGROUNDS[0]}'" alt="Estadio">
-            <div class="fmp-overlay"></div>
-            <div class="fmp-color-overlay" style="background:linear-gradient(135deg,rgba(20,20,40,0.5),rgba(40,20,20,0.4))"></div>
+        <div class="fmp-slide" data-index="${index}" data-id="${matchId}">
+            <!-- Background stadium photo -->
+            <img class="fmp-bg" src="${bgUrl}" alt="Estadio"
+                 onerror="this.src='${STADIUM_BACKGROUNDS[0]}'">
 
-            <!-- Top bar -->
+            <!-- Team color gradient split -->
+            <div class="fmp-color-split" style="background:linear-gradient(100deg,
+                rgba(${rgbL},0.72) 0%,
+                rgba(${rgbL},0.15) 42%,
+                rgba(${rgbV},0.15) 58%,
+                rgba(${rgbV},0.72) 100%)"></div>
+
+            <!-- Bottom fade -->
+            <div class="fmp-bottom-fade"></div>
+
+            <!-- TOP BAR -->
             <div class="fmp-topbar">
                 <div class="fmp-league-badge">
-                    <img src="${leagueLogo}" alt="${leagueName}"
-                         onerror="this.style.display='none'">
+                    <img src="${leagueLogo}" alt="${leagueName}" onerror="this.style.display='none'">
                     ${leagueName}
                 </div>
                 ${statusBadge}
             </div>
 
-            <!-- Score area -->
-            <div class="fmp-score-area">
+            <!-- SCORE BODY -->
+            <div class="fmp-body">
+                <!-- Local team -->
                 <div class="fmp-team">
-                    <div class="fmp-team-logo-wrap">
-                        <img class="fmp-team-logo" src="${localLogo}" alt="${localName}"
-                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><circle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2256%25%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22white%22>${localName.charAt(0)}</text></svg>'">
+                    <div class="fmp-logo-ring">
+                        <div class="fmp-logo-glow" style="background:${colL}"></div>
+                        <div class="fmp-logo-spinner"></div>
+                        <div class="fmp-logo-img-wrap"
+                             style="box-shadow:0 0 0 2.5px ${colL}, 0 10px 30px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.18);">
+                            <img class="fmp-logo-img" src="${localLogo}" alt="${localName}"
+                                 onerror="this.src='${fallbackSvg(localName.charAt(0), colL)}'">
+                        </div>
                     </div>
                     <span class="fmp-team-name">${localName}</span>
                 </div>
 
-                <div class="fmp-scorebox">
-                    <span class="fmp-score-num" id="fmpL${index}">${localScore}</span>
-                    <div class="fmp-score-sep">
-                        <div class="fmp-sep-dot"></div>
-                        <div class="fmp-sep-dot"></div>
+                <!-- Score center -->
+                <div class="fmp-score-center">
+                    <div class="fmp-scoreboard">
+                        <span class="fmp-score-digit" id="fmpL${index}">${localScore}</span>
+                        <div class="fmp-colon-wrap">
+                            <div class="fmp-colon-dot"></div>
+                            <div class="fmp-colon-dot"></div>
+                        </div>
+                        <span class="fmp-score-digit" id="fmpV${index}">${visitScore}</span>
                     </div>
-                    <span class="fmp-score-num" id="fmpV${index}">${visitScore}</span>
+                    ${minutePct > 0 || minLabel ? `
+                    <div class="fmp-match-time">
+                        ${minLabel ? `<span class="fmp-minute-label">${minLabel}</span>` : ''}
+                        ${minutePct > 0 ? `
+                        <div class="fmp-minute-bar-wrap">
+                            <div class="fmp-minute-bar" style="width:${minutePct}%"></div>
+                        </div>` : ''}
+                    </div>` : ''}
                 </div>
 
+                <!-- Away team -->
                 <div class="fmp-team">
-                    <div class="fmp-team-logo-wrap">
-                        <img class="fmp-team-logo" src="${visitLogo}" alt="${visitName}"
-                             onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 40%22><circle cx=%2220%22 cy=%2220%22 r=%2220%22 fill=%22%23333%22/><text x=%2250%25%22 y=%2256%25%22 text-anchor=%22middle%22 font-size=%2214%22 fill=%22white%22>${visitName.charAt(0)}</text></svg>'">
+                    <div class="fmp-logo-ring">
+                        <div class="fmp-logo-glow" style="background:${colV}"></div>
+                        <div class="fmp-logo-spinner"></div>
+                        <div class="fmp-logo-img-wrap"
+                             style="box-shadow:0 0 0 2.5px ${colV}, 0 10px 30px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.18);">
+                            <img class="fmp-logo-img" src="${visitLogo}" alt="${visitName}"
+                                 onerror="this.src='${fallbackSvg(visitName.charAt(0), colV)}'">
+                        </div>
                     </div>
                     <span class="fmp-team-name">${visitName}</span>
                 </div>
             </div>
 
-            <!-- Bottom bar -->
+            <!-- BOTTOM ACTION STRIP -->
             <div class="fmp-bottom">
-                <div class="fmp-indicators" id="fmpDots"></div>
+                <div class="fmp-dots" id="fmpDots${index}"></div>
                 ${hasStream
-                    ? `<button class="fmp-watch-btn pulsing" onclick="watchMatch('${matchId}')">
-                            <span class="play-icon"><i class="fas fa-play"></i></span>
-                            Ver en vivo
+                    ? `<button class="fmp-watch-btn fmp-has-stream" onclick="watchMatch('${matchId}')">
+                           <span class="fmp-play-icon"><i class="fas fa-play"></i></span>
+                           Ver en vivo
                        </button>`
-                    : `<button class="fmp-watch-btn" onclick="openImportantMatchesModal()" style="background:linear-gradient(135deg,#555,#333);box-shadow:none;">
-                            <span class="play-icon"><i class="fas fa-search"></i></span>
-                            Ver canales
+                    : `<button class="fmp-watch-btn fmp-no-stream" onclick="openImportantMatchesModal()">
+                           <span class="fmp-play-icon"><i class="fas fa-tv"></i></span>
+                           Ver canales
                        </button>`
                 }
-                <button class="fmp-share-btn" onclick="_fmpShare('${matchId}','${localName} vs ${visitName}')" title="Compartir">
+                <button class="fmp-share-btn"
+                        onclick="_fmpShare('${matchId}','${localName} vs ${visitName}')"
+                        title="Compartir">
                     <i class="fas fa-share-alt"></i>
                 </button>
             </div>
@@ -888,10 +1006,34 @@ function _fmpBuildSlide(partido, index, bgUrl, leagueName) {
 
 function _fmpShare(matchId, title) {
     const url = `${location.origin}${location.pathname}?match=${matchId}`;
-    if (navigator.share) {
-        navigator.share({ title: 'UltraGol — ' + title, url });
-    } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(url);
+    if (navigator.share) { navigator.share({ title: 'UltraGol — ' + title, url }); }
+    else if (navigator.clipboard) { navigator.clipboard.writeText(url); }
+}
+
+function _fmpSpawnParticles() {
+    const container = document.getElementById('fmpContainer');
+    if (!container) return;
+    const colors = ['#ffd700','#ff6b35','#e94560','#ffffff','#00ff88'];
+    for (let i = 0; i < 18; i++) {
+        const p = document.createElement('div');
+        p.className = 'fmp-particle';
+        const angle = Math.random() * 360;
+        const dist  = 80 + Math.random() * 120;
+        const tx    = Math.cos(angle * Math.PI / 180) * dist;
+        const ty    = -(60 + Math.random() * dist);
+        p.style.cssText = `
+            left:${40 + Math.random()*20}%;
+            top:${40 + Math.random()*20}%;
+            background:${colors[Math.floor(Math.random()*colors.length)]};
+            border-radius:${Math.random()>0.5?'50%':'3px'};
+            width:${5+Math.random()*7}px;
+            height:${5+Math.random()*7}px;
+            --tx:translate(${tx}px,${ty}px);
+            animation-delay:${Math.random()*0.3}s;
+            animation-duration:${1.2+Math.random()*0.5}s;
+        `;
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 2000);
     }
 }
 
@@ -900,41 +1042,68 @@ function _fmpUpdateTrack() {
     if (!track) return;
     track.style.transform = `translateX(-${currentFeaturedIndex * 100}%)`;
 
-    // Update dots inside current slide
-    const allDots = document.querySelectorAll('.fmp-indicators');
-    allDots.forEach(dotsEl => {
+    // Refresh dots in ALL slides
+    document.querySelectorAll('[id^="fmpDots"]').forEach(dotsEl => {
         dotsEl.innerHTML = featuredMatches.map((_, i) =>
-            `<button class="fmp-dot${i === currentFeaturedIndex ? ' active' : ''}" onclick="goToFeaturedMatch(${i})"></button>`
+            `<button class="fmp-dot${i === currentFeaturedIndex ? ' fmp-active' : ''}"
+                     onclick="goToFeaturedMatch(${i})"></button>`
         ).join('');
     });
 
-    // Update nav arrows state
+    // Nav arrow opacity
     const prev = document.getElementById('fmpPrev');
     const next = document.getElementById('fmpNext');
-    if (prev) { prev.style.opacity = currentFeaturedIndex === 0 ? '0.35' : '1'; prev.disabled = currentFeaturedIndex === 0; }
-    if (next) { next.style.opacity = currentFeaturedIndex === featuredMatches.length - 1 ? '0.35' : '1'; next.disabled = currentFeaturedIndex === featuredMatches.length - 1; }
+    if (prev) { prev.style.opacity = currentFeaturedIndex === 0 ? '0.3' : '1'; prev.disabled = currentFeaturedIndex === 0; }
+    if (next) { next.style.opacity = currentFeaturedIndex >= featuredMatches.length - 1 ? '0.3' : '1'; next.disabled = currentFeaturedIndex >= featuredMatches.length - 1; }
 
-    // Animate bg scale for active slide
+    // Active slide class (triggers bg scale-in)
     document.querySelectorAll('.fmp-slide').forEach((s, i) => {
-        s.classList.toggle('active', i === currentFeaturedIndex);
+        s.classList.toggle('fmp-active', i === currentFeaturedIndex);
     });
+
+    // Animate progress bar
+    _fmpStartProgress();
+}
+
+function _fmpStartProgress() {
+    const bar = document.getElementById('fmpProgressBar');
+    if (!bar || featuredMatches.length <= 1) return;
+    bar.style.transition = 'none';
+    bar.style.width = '0%';
+    // Force reflow
+    void bar.offsetWidth;
+    bar.style.transition = `width ${FMP_AUTO_INTERVAL}ms linear`;
+    bar.style.width = '100%';
 }
 
 function _fmpCheckGoals() {
     featuredMatches.forEach((partido, i) => {
-        const id = partido.id || partido.slug || i;
-        const lScore = partido.local?.marcador ?? partido.marcadorLocal;
+        const id     = partido.id || partido.slug || i;
+        const lScore = partido.local?.marcador  ?? partido.marcadorLocal;
         const vScore = partido.visitante?.marcador ?? partido.marcadorVisitante;
-        const prev = _fmpPrevScores[id];
-        if (prev && (lScore > prev.l || vScore > prev.v)) {
-            // Goal detected! Animate the score nums and show overlay
-            ['fmpL' + i, 'fmpV' + i].forEach(elId => {
+        const prev   = _fmpPrevScores[id];
+
+        if (prev !== undefined && (Number(lScore) > Number(prev.l) || Number(vScore) > Number(prev.v))) {
+            // Animate score digits
+            [`fmpL${i}`, `fmpV${i}`].forEach(elId => {
                 const el = document.getElementById(elId);
-                if (el) { el.classList.remove('goal-flash'); void el.offsetWidth; el.classList.add('goal-flash'); }
+                if (el) {
+                    el.classList.remove('fmp-goal-pop');
+                    void el.offsetWidth;
+                    el.classList.add('fmp-goal-pop');
+                    el.addEventListener('animationend', () => el.classList.remove('fmp-goal-pop'), { once: true });
+                }
             });
+
             if (i === currentFeaturedIndex) {
                 const overlay = document.getElementById('fmpGoalOverlay');
-                if (overlay) { overlay.classList.remove('show'); void overlay.offsetWidth; overlay.classList.add('show'); setTimeout(() => overlay.classList.remove('show'), 1900); }
+                if (overlay) {
+                    overlay.classList.remove('fmp-show');
+                    void overlay.offsetWidth;
+                    overlay.classList.add('fmp-show');
+                    setTimeout(() => overlay.classList.remove('fmp-show'), 2100);
+                }
+                _fmpSpawnParticles();
             }
         }
         _fmpPrevScores[id] = { l: lScore, v: vScore };
@@ -945,16 +1114,16 @@ function _fmpCheckGoals() {
 function updateFeaturedMatch(data) {
     if (!data || !data.partidos || data.partidos.length === 0) return;
 
-    const track = document.getElementById('fmpTrack');
+    const track    = document.getElementById('fmpTrack');
     const skeleton = document.getElementById('fmpSkeleton');
     if (!track) return;
 
-    // Detect goals before overwriting data
+    // Check goals BEFORE overwriting data
     _fmpCheckGoals();
 
-    // Preserve user position
+    // Preserve the match the user is viewing
     const previousId = featuredMatches[currentFeaturedIndex]?.id || featuredMatches[currentFeaturedIndex]?.slug;
-    featuredMatches = data.partidos;
+    featuredMatches  = data.partidos;
 
     if (previousId) {
         const idx = featuredMatches.findIndex(p => (p.id || p.slug) === previousId);
@@ -965,11 +1134,10 @@ function updateFeaturedMatch(data) {
 
     const leagueName = currentLeague || 'Liga MX';
 
-    // Render slides
-    track.innerHTML = featuredMatches.map((partido, index) => {
-        const bgUrl = STADIUM_BACKGROUNDS[index % STADIUM_BACKGROUNDS.length];
-        return _fmpBuildSlide(partido, index, bgUrl, leagueName);
-    }).join('');
+    // Build slides HTML
+    track.innerHTML = featuredMatches.map((partido, index) =>
+        _fmpBuildSlide(partido, index, STADIUM_BACKGROUNDS[index % STADIUM_BACKGROUNDS.length], leagueName)
+    ).join('');
 
     // Hide skeleton
     if (skeleton) skeleton.style.display = 'none';
@@ -977,21 +1145,13 @@ function updateFeaturedMatch(data) {
     // Show/hide nav arrows
     const prevBtn = document.getElementById('fmpPrev');
     const nextBtn = document.getElementById('fmpNext');
-    const show = featuredMatches.length > 1;
-    if (prevBtn) prevBtn.style.display = show ? 'flex' : 'none';
-    if (nextBtn) nextBtn.style.display = show ? 'flex' : 'none';
+    const multi   = featuredMatches.length > 1;
+    if (prevBtn) prevBtn.style.display = multi ? 'flex' : 'none';
+    if (nextBtn) nextBtn.style.display = multi ? 'flex' : 'none';
 
     _fmpUpdateTrack();
     initTouchSupport();
-
-    // Auto-advance every 6 seconds
-    if (_fmpAutoTimer) clearInterval(_fmpAutoTimer);
-    if (featuredMatches.length > 1) {
-        _fmpAutoTimer = setInterval(() => {
-            currentFeaturedIndex = (currentFeaturedIndex + 1) % featuredMatches.length;
-            _fmpUpdateTrack();
-        }, 6000);
-    }
+    _fmpResetAutoTimer();
 }
 
 // Navegar al siguiente partido
@@ -1027,7 +1187,7 @@ function _fmpResetAutoTimer() {
         _fmpAutoTimer = setInterval(() => {
             currentFeaturedIndex = (currentFeaturedIndex + 1) % featuredMatches.length;
             _fmpUpdateTrack();
-        }, 6000);
+        }, FMP_AUTO_INTERVAL);
     }
 }
 

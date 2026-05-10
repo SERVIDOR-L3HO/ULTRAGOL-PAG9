@@ -29,7 +29,7 @@
     <!-- 🔥 Reels CSS — local path so it always deploys with /ultrax/ -->
     <link rel="stylesheet" href="css/reels-viewer.css?v=4">
     <!-- 🎯 Featured Match Pro -->
-    <link rel="stylesheet" href="css/featured-match-pro.css?v=1">
+    <link rel="stylesheet" href="css/featured-match-pro.css?v=3">
     <!-- Tour Guide -->
     <link rel="stylesheet" href="css/tour.css">
     
@@ -139,14 +139,15 @@
         <!-- Featured Match PRO carousel -->
         <div class="fmp-container" id="fmpContainer">
             <!-- Skeleton loader -->
+            <!-- Auto-advance progress bar -->
+            <div class="fmp-progress-bar" id="fmpProgressBar"></div>
+
+            <!-- Skeleton loader -->
             <div class="fmp-skeleton" id="fmpSkeleton">
-                <div style="display:flex;gap:18px;align-items:center;">
-                    <div class="fmp-skeleton-logo"></div>
-                    <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
-                        <div class="fmp-skeleton-text"></div>
-                        <div class="fmp-skeleton-text" style="width:80px;"></div>
-                    </div>
-                    <div class="fmp-skeleton-logo"></div>
+                <div class="fmp-skel-inner">
+                    <div class="fmp-skel-circle"></div>
+                    <div class="fmp-skel-score"></div>
+                    <div class="fmp-skel-circle"></div>
                 </div>
             </div>
 
@@ -154,10 +155,10 @@
             <div class="fmp-track" id="fmpTrack"></div>
 
             <!-- Nav arrows -->
-            <button class="fmp-nav fmp-nav-prev" id="fmpPrev" onclick="prevFeaturedMatch()" style="display:none;">
+            <button class="fmp-nav fmp-nav-prev" id="fmpPrev" onclick="prevFeaturedMatch()" style="display:none;" aria-label="Partido anterior">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <button class="fmp-nav fmp-nav-next" id="fmpNext" onclick="nextFeaturedMatch()" style="display:none;">
+            <button class="fmp-nav fmp-nav-next" id="fmpNext" onclick="nextFeaturedMatch()" style="display:none;" aria-label="Siguiente partido">
                 <i class="fas fa-chevron-right"></i>
             </button>
 
