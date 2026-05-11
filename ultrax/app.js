@@ -5114,77 +5114,115 @@ function getTeamLogo(nombre) {
 }
 
 async function loadStandings() {
+    const standingsTable = document.getElementById('standingsTable');
+    if (!standingsTable) return;
+
+    standingsTable.innerHTML = `
+        <div class="standings-loading">
+            <div class="standings-spinner"></div>
+            <span>Cargando posiciones…</span>
+        </div>`;
+
     try {
         const leagueConfig = leaguesConfig[currentLeague];
         const endpoint = leagueConfig ? leagueConfig.tabla : '/tabla';
+        if (!endpoint) {
+            standingsTable.innerHTML = `<div class="standings-loading">Tabla no disponible para esta liga.</div>`;
+            return;
+        }
+
         const response = await fetchWithTimeout(`https://ultragol-api-3.vercel.app${endpoint}`, 8000);
         const data = await response.json();
-        
-        const standingsTable = document.getElementById('standingsTable');
-        if (!standingsTable) return;
-        
+
         if (!data.tabla || data.tabla.length === 0) {
             standingsTable.innerHTML = '<div class="standings-loading">No hay datos de tabla disponibles</div>';
             return;
         }
-        
+
         const equipos = data.tabla.sort((a, b) => a.posicion - b.posicion);
-        
-        standingsTable.innerHTML = `
-            <div class="standings-header">
-                <div class="standings-row header-row">
-                    <div class="pos">#</div>
-                    <div class="team-cell">Equipo</div>
-                    <div class="stat">PJ</div>
-                    <div class="stat">G</div>
-                    <div class="stat">E</div>
-                    <div class="stat">P</div>
-                    <div class="stat points">PTS</div>
+
+        // Determine zone thresholds based on league
+        const isLigaMX = currentLeague === 'Liga MX';
+        const directZone  = isLigaMX ? 6  : 4;
+        const playinZone  = isLigaMX ? 10 : 6;
+
+        function getZoneClass(index) {
+            if (index === 0)               return 'zona-lider';
+            if (index < directZone)        return 'zona-calificacion-directa';
+            if (index < playinZone)        return 'zona-repechaje';
+            return 'zona-media';
+        }
+
+        function buildSep(type, label) {
+            return `
+            <div class="standings-zone-sep sep-${type}">
+                <div class="standings-zone-line"></div>
+                <span class="standings-zone-label">${label}</span>
+                <div class="standings-zone-line"></div>
+            </div>`;
+        }
+
+        let rowsHtml = '';
+        let prevZone = null;
+
+        equipos.forEach((equipo, index) => {
+            const zone = getZoneClass(index);
+            const logoUrl = equipo.logo || getTeamLogo(equipo.equipo);
+            const pts = equipo.estadisticas?.pts || 0;
+            const pj  = equipo.estadisticas?.pj  || 0;
+            const pg  = equipo.estadisticas?.pg  || 0;
+            const pe  = equipo.estadisticas?.pe  || 0;
+            const pp  = equipo.estadisticas?.pp  || 0;
+
+            // Zone separators
+            if (index > 0 && zone !== prevZone) {
+                if (zone === 'zona-repechaje') {
+                    rowsHtml += buildSep('playin', isLigaMX ? 'Play-In' : 'Europa League');
+                } else if (zone === 'zona-media') {
+                    rowsHtml += buildSep('elim', 'Eliminados');
+                }
+            }
+            prevZone = zone;
+
+            // Team logo
+            const logoEl = logoUrl
+                ? `<img src="${logoUrl}" alt="${equipo.equipo}" class="team-logo-small" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+                : '';
+            const ph = `<div class="team-logo-placeholder" style="${logoUrl ? 'display:none' : ''}">${(equipo.equipo||'').substring(0,2).toUpperCase()}</div>`;
+
+            rowsHtml += `
+            <div class="standings-row ${zone}" style="animation-delay:${index * 0.04}s">
+                <div class="pos">
+                    <span class="pos-number">${equipo.posicion || index + 1}</span>
                 </div>
-            </div>
-            <div class="standings-body">
-                ${equipos.map((equipo, index) => {
-                    let zoneClass = '';
-                    if (index < 4) {
-                        zoneClass = 'zona-calificacion-directa';
-                    } else if (index < 6) {
-                        zoneClass = 'zona-calificacion';
-                    } else if (index < 10) {
-                        zoneClass = 'zona-repechaje';
-                    } else if (index < equipos.length - 3) {
-                        zoneClass = 'zona-media';
-                    } else {
-                        zoneClass = 'zona-descenso';
-                    }
-                    
-                    const logoUrl = equipo.logo || getTeamLogo(equipo.equipo);
-                    
-                    return `
-                    <div class="standings-row ${zoneClass}" data-position="${index + 1}">
-                        <div class="position-indicator"></div>
-                        <div class="pos">
-                            <span class="pos-number">${equipo.posicion}</span>
-                        </div>
-                        <div class="team-cell">
-                            ${logoUrl ? `<img src="${logoUrl}" alt="${equipo.equipo}" class="team-logo-small" onerror="this.style.display='none'">` : ''}
-                            <span class="team-name-standings">${equipo.equipo}</span>
-                        </div>
-                        <div class="stat">${equipo.estadisticas?.pj || 0}</div>
-                        <div class="stat">${equipo.estadisticas?.pg || 0}</div>
-                        <div class="stat">${equipo.estadisticas?.pe || 0}</div>
-                        <div class="stat">${equipo.estadisticas?.pp || 0}</div>
-                        <div class="stat points">${equipo.estadisticas?.pts || 0}</div>
+                <div class="team-cell">
+                    ${logoEl}${ph}
+                    <div class="team-info-standings">
+                        <div class="team-name-standings">${equipo.equipo}</div>
                     </div>
-                    `;
-                }).join('')}
+                </div>
+                <div class="stat">${pj}</div>
+                <div class="stat">${pg}</div>
+                <div class="stat">${pp}</div>
+                <div class="stat points">${pts}</div>
+            </div>`;
+        });
+
+        standingsTable.innerHTML = `
+            <div class="standings-col-header">
+                <div class="sh-num">#</div>
+                <div class="sh-team">Equipo</div>
+                <div class="sh-num">PJ</div>
+                <div class="sh-num">G</div>
+                <div class="sh-num">P</div>
+                <div class="sh-num">PTS</div>
             </div>
+            ${rowsHtml}
         `;
+
     } catch (error) {
         console.error('Error loading standings:', error);
-        const standingsTable = document.getElementById('standingsTable');
-        if (standingsTable) {
-            standingsTable.innerHTML = '<div class="standings-loading">Error al cargar la tabla</div>';
-        }
+        standingsTable.innerHTML = '<div class="standings-loading">Error al cargar la tabla. Intenta de nuevo.</div>';
     }
 }
 

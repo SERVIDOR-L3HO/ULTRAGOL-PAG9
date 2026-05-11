@@ -284,10 +284,13 @@
 
 
         <section class="standings-section">
-            <div class="section-header">
-                <h3 id="standingsLeagueName">TABLA DE POSICIONES</h3>
+            <div class="standings-section-head">
+                <div class="standings-section-title">
+                    <span class="trophy-icon">🏆</span>
+                    <span id="standingsLeagueName">Tabla de Posiciones</span>
+                </div>
             </div>
-            
+
             <div class="standings-tabs">
                 <button class="standings-tab active" onclick="switchStandingsTab('table', this)">
                     <i class="fas fa-list-ol"></i> Tabla
@@ -299,10 +302,28 @@
 
             <div class="standings-container">
                 <div class="standings-table" id="standingsTable">
-                    <div class="standings-loading">Cargando tabla...</div>
+                    <div class="standings-loading">
+                        <div class="standings-spinner"></div>
+                        <span>Cargando tabla…</span>
+                    </div>
                 </div>
                 <div class="results-container" id="resultsContainer" style="display: none;">
                     <div class="standings-loading">Cargando resultados...</div>
+                </div>
+            </div>
+
+            <div class="standings-legend">
+                <div class="standings-legend-item">
+                    <div class="legend-dot-s" style="background:#f5b942"></div>
+                    <span>Líder</span>
+                </div>
+                <div class="standings-legend-item">
+                    <div class="legend-dot-s" style="background:#22d3a0"></div>
+                    <span>Liguilla directa</span>
+                </div>
+                <div class="standings-legend-item">
+                    <div class="legend-dot-s" style="background:#ff9500"></div>
+                    <span>Play-In</span>
                 </div>
             </div>
         </section>
