@@ -680,23 +680,11 @@
         </div>
 
         <!-- Live ticker -->
-        <div class="live-ticker">
-            <span class="ticker-label">En vivo</span>
+        <div class="live-ticker" id="liveTicker">
+            <span class="ticker-label" id="tickerLabel">Cargando…</span>
             <div class="ticker-track">
                 <div class="ticker-items" id="tickerItems">
-                    <span class="ticker-match">Cruz Azul vs Pumas <span class="score">1 - 0</span></span>
-                    <span class="ticker-match">Manchester City vs Arsenal <span class="score">2 - 1</span></span>
-                    <span class="ticker-match">Real Madrid vs Barcelona <span class="score">0 - 0</span></span>
-                    <span class="ticker-match">América vs Chivas <span class="score">3 - 2</span></span>
-                    <span class="ticker-match">Lakers vs Warriors <span class="score">98 - 94</span></span>
-                    <span class="ticker-match">Fórmula 1 GP México <span class="score">En marcha</span></span>
-                    <!-- duplicado para loop infinito -->
-                    <span class="ticker-match">Cruz Azul vs Pumas <span class="score">1 - 0</span></span>
-                    <span class="ticker-match">Manchester City vs Arsenal <span class="score">2 - 1</span></span>
-                    <span class="ticker-match">Real Madrid vs Barcelona <span class="score">0 - 0</span></span>
-                    <span class="ticker-match">América vs Chivas <span class="score">3 - 2</span></span>
-                    <span class="ticker-match">Lakers vs Warriors <span class="score">98 - 94</span></span>
-                    <span class="ticker-match">Fórmula 1 GP México <span class="score">En marcha</span></span>
+                    <span class="ticker-match" style="color:rgba(255,255,255,0.35);font-style:italic">Conectando con la API…</span>
                 </div>
             </div>
         </div>
@@ -897,7 +885,93 @@
         const strip = document.querySelector('.stats-strip');
         if (strip) statsObserver.observe(strip);
 
-        // Fake live count (psychological: social proof)
+        // ── LIVE TICKER — Real matches from the 6 league APIs ──────────────────
+        const API = 'https://ultragol-api-3.vercel.app';
+        const LIGA_ENDPOINTS = [
+            { nombre: 'Liga MX',        url: `${API}/marcadores` },
+            { nombre: 'Premier League', url: `${API}/premier/marcadores` },
+            { nombre: 'La Liga',        url: `${API}/laliga/marcadores` },
+            { nombre: 'Serie A',        url: `${API}/seriea/marcadores` },
+            { nombre: 'Bundesliga',     url: `${API}/bundesliga/marcadores` },
+            { nombre: 'Ligue 1',        url: `${API}/ligue1/marcadores` },
+        ];
+
+        function getTeamName(p, side) {
+            if (side === 'local')
+                return p.local?.nombreCorto || p.local?.nombre || p.equipo1 || '?';
+            return p.visitante?.nombreCorto || p.visitante?.nombre || p.equipo2 || '?';
+        }
+
+        function getScore(p) {
+            const gl = p.marcador?.local    ?? p.golesLocal    ?? p.goles_local    ?? '0';
+            const gv = p.marcador?.visitante ?? p.golesVisitante ?? p.goles_visitante ?? '0';
+            return `${gl} - ${gv}`;
+        }
+
+        function getMinute(p) {
+            const m = p.reloj || p.minuto || '';
+            return m ? `${m}'` : 'EN VIVO';
+        }
+
+        async function fetchLeague(cfg) {
+            try {
+                const r = await fetch(cfg.url, { signal: AbortSignal.timeout(7000) });
+                const data = await r.json();
+                const partidos = data.partidos || data.matches || data.events || [];
+                return partidos.map(p => ({ ...p, _liga: cfg.nombre }));
+            } catch { return []; }
+        }
+
+        async function loadTicker() {
+            const all = await Promise.all(LIGA_ENDPOINTS.map(fetchLeague));
+            const flat = all.flat();
+
+            // Priority: live first, then upcoming (programado), skip finished if we have live
+            const live     = flat.filter(p => p.estado?.enVivo);
+            const upcoming = flat.filter(p => p.estado?.programado && !p.estado?.finalizado);
+            const finished = flat.filter(p => p.estado?.finalizado);
+
+            let matches = live.length  ? live
+                        : upcoming.length ? upcoming.slice(0, 8)
+                        : finished.slice(-6);
+
+            const tickerLabel = document.getElementById('tickerLabel');
+            const tickerItems = document.getElementById('tickerItems');
+
+            if (!matches.length) {
+                tickerLabel.textContent = 'Próximos';
+                tickerItems.innerHTML = '<span class="ticker-match" style="color:rgba(255,255,255,0.4)">Sin partidos en este momento — vuelve pronto</span>';
+                return;
+            }
+
+            tickerLabel.textContent = live.length ? `${live.length} En vivo` : 'Próximos';
+
+            // Build items × 2 for seamless infinite loop
+            const buildItem = (p) => {
+                const home  = getTeamName(p, 'local');
+                const away  = getTeamName(p, 'visitante');
+                const isLive = p.estado?.enVivo;
+                const label  = isLive ? getMinute(p)
+                             : p.estado?.finalizado ? 'FT'
+                             : (p.hora || p.time || '');
+                const score  = isLive || p.estado?.finalizado ? getScore(p) : p._liga;
+                return `<span class="ticker-match">${home} <span style="color:rgba(255,255,255,0.35)">vs</span> ${away} <span class="score">${score}${label ? ' · ' + label : ''}</span></span>`;
+            };
+
+            const html = matches.map(buildItem).join('') + matches.map(buildItem).join('');
+            tickerItems.innerHTML = html;
+
+            // Reset animation so it re-fires cleanly
+            tickerItems.style.animation = 'none';
+            tickerItems.offsetHeight; // reflow
+            const duration = Math.max(18, matches.length * 5);
+            tickerItems.style.animation = `tickerScroll ${duration}s linear infinite`;
+        }
+
+        loadTicker();
+        setInterval(loadTicker, 60000); // refresh every 60 s
+
+        // ── Live viewer count (social proof) ────────────────────────────────────
         function updateLiveCount() {
             const base = 1240;
             const variance = Math.floor(Math.random() * 180) - 90;
