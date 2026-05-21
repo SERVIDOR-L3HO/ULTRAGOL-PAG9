@@ -1,5 +1,4 @@
-const GEMINI_API_KEY = 'AIzaSyA-YgCzTMN35yreG9uWvWMHFYbtA5a_3L8';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
+const GEMINI_API_URL = '/api/gemini/chat';
 
 class GeminiLigaMXChat {
     constructor() {
@@ -256,17 +255,13 @@ tabla de posiciones, próximos partidos y resultados recientes. Estos datos son 
         const fullPrompt = `${systemPrompt}\n\nUsuario: ${userMessage}`;
 
         try {
-            const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+            const response = await fetch(GEMINI_API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: fullPrompt
-                        }]
-                    }],
+                    prompt: fullPrompt,
                     generationConfig: {
                         temperature: 0.7,
                         topK: 40,

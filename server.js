@@ -884,6 +884,38 @@ app.get('/transmisiones6', (req, res) => {
 
 console.log('✅ UltraGol API proxy enabled');
 
+// ── Gemini AI proxy (keeps API key server-side) ───────────────────────────────
+app.post('/api/gemini/chat', express.json(), async (req, res) => {
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    if (!GEMINI_API_KEY) {
+        return res.status(503).json({ error: 'Gemini AI not configured' });
+    }
+    const { prompt, generationConfig } = req.body || {};
+    if (!prompt) return res.status(400).json({ error: 'prompt required' });
+    try {
+        const r = await fetch(
+            `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    generationConfig: generationConfig || {
+                        temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 1024
+                    }
+                }),
+                signal: AbortSignal.timeout(30000)
+            }
+        );
+        const data = await r.json();
+        if (!r.ok) return res.status(r.status).json(data);
+        res.json(data);
+    } catch (e) {
+        console.error('[/api/gemini/chat]', e.message);
+        res.status(500).json({ error: 'AI request failed' });
+    }
+});
+
 if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {
     const { 
         createPaypalOrder, 
