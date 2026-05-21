@@ -884,6 +884,22 @@ app.get('/transmisiones6', (req, res) => {
 
 console.log('✅ UltraGol API proxy enabled');
 
+// ── Geo: country detection proxy (evita CORS del navegador) ──────────────────
+app.get('/api/geo', async (req, res) => {
+    const ip = getRealIP(req);
+    try {
+        const r = await fetch(`https://ipapi.co/${ip}/json/`, {
+            headers: { 'User-Agent': 'UltraGol/1.0' },
+            signal: AbortSignal.timeout(4000)
+        });
+        if (!r.ok) return res.json({ country_code: null });
+        const data = await r.json();
+        res.json({ country_code: data.country_code || null, country_name: data.country_name || null });
+    } catch (_) {
+        res.json({ country_code: null });
+    }
+});
+
 // ── Gemini AI proxy (keeps API key server-side) ───────────────────────────────
 app.post('/api/gemini/chat', express.json(), async (req, res) => {
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;

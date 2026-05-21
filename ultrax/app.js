@@ -5564,6 +5564,51 @@ function closeSponsorModal(e) {
     }
 }
 
+// ── Auto-show sponsor modal for international visitors ──────────────────────
+(async function initIntlSponsorPromo() {
+    // Only trigger once per session, never for returning closers
+    const SK = 'ug_sponsor_shown';
+    if (sessionStorage.getItem(SK)) return;
+
+    try {
+        const ctrl = new AbortController();
+        setTimeout(() => ctrl.abort(), 4000);
+        const r = await fetch('/api/geo', { signal: ctrl.signal });
+        if (!r.ok) return;
+        const data = await r.json();
+        const country = (data.country_code || '').toUpperCase();
+
+        // Show for everyone EXCEPT Mexico (MX)
+        if (country === 'MX' || !country) return;
+
+        // Update modal stat to reflect international reach
+        const statNum = document.querySelector('.sponsor-stat-num');
+        if (statNum) statNum.textContent = '50K+';
+
+        // Inject country-aware badge into the modal
+        const badge = document.querySelector('.sponsor-modal-badge');
+        if (badge && country) {
+            const flag = country.split('').map(c =>
+                String.fromCodePoint(c.charCodeAt(0) + 127397)
+            ).join('');
+            badge.innerHTML = `<span class="sponsor-badge-dot"></span>${flag} Visitante Internacional`;
+        }
+
+        // Mark as shown so it only fires once
+        sessionStorage.setItem(SK, '1');
+
+        // Wait 30 s then open with a smooth entrance
+        setTimeout(() => {
+            const modal = document.getElementById('sponsorModal');
+            if (!modal || modal.classList.contains('active')) return;
+            openSponsorModal();
+        }, 30000);
+
+    } catch (_) {
+        // Silently ignore network errors — no disruption to users
+    }
+})();
+
 async function loadImportantMatches() {
     try {
         if (!transmisionesData || !transmisionesData.transmisiones) {
