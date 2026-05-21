@@ -223,16 +223,16 @@ body {
     position: fixed;
     inset: 0;
     z-index: 9999;
-    background: rgba(0,0,0,0.75);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     align-items: center;
     justify-content: center;
-    padding: 20px;
+    padding: 16px;
 }
 .sponsor-modal-overlay.active {
     display: flex;
-    animation: modal-fade-in 0.25s ease;
+    animation: modal-fade-in 0.2s ease;
 }
 @keyframes modal-fade-in {
     from { opacity: 0; }
@@ -241,127 +241,314 @@ body {
 
 .sponsor-modal-card {
     position: relative;
-    background: linear-gradient(160deg, #1a1a2e 0%, #16213e 60%, #0f1b2d 100%);
-    border: 1px solid rgba(255,165,0,0.25);
-    border-radius: 24px;
-    padding: 36px 28px 28px;
-    max-width: 340px;
     width: 100%;
-    text-align: center;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05);
-    animation: modal-slide-up 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    max-width: 360px;
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,165,0,0.2);
+    animation: modal-slide-up 0.35s cubic-bezier(0.34,1.45,0.64,1);
 }
 @keyframes modal-slide-up {
-    from { transform: translateY(40px) scale(0.95); opacity: 0; }
-    to   { transform: translateY(0) scale(1);       opacity: 1; }
+    from { transform: translateY(50px) scale(0.92); opacity: 0; }
+    to   { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+/* ── Hero header del modal ── */
+.sponsor-modal-hero {
+    position: relative;
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a0533 40%, #2d0a00 100%);
+    padding: 36px 24px 28px;
+    text-align: center;
+    overflow: hidden;
+}
+
+/* fondo con patrón de estadio */
+.sponsor-modal-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(circle at 20% 50%, rgba(255,107,0,0.18) 0%, transparent 55%),
+        radial-gradient(circle at 80% 20%, rgba(255,165,0,0.12) 0%, transparent 50%),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 28px,
+            rgba(255,255,255,0.025) 28px,
+            rgba(255,255,255,0.025) 29px
+        ),
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 28px,
+            rgba(255,255,255,0.025) 28px,
+            rgba(255,255,255,0.025) 29px
+        );
+    pointer-events: none;
+}
+
+/* anillo de luz detrás del ícono */
+.sponsor-modal-hero::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 160px;
+    height: 160px;
+    background: radial-gradient(circle, rgba(255,140,0,0.22) 0%, transparent 70%);
+    pointer-events: none;
 }
 
 .sponsor-modal-close {
     position: absolute;
     top: 14px;
-    right: 16px;
-    background: rgba(255,255,255,0.07);
-    border: none;
-    color: rgba(255,255,255,0.5);
-    width: 30px;
-    height: 30px;
+    right: 14px;
+    z-index: 10;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.6);
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     font-size: 13px;
     cursor: pointer;
-    transition: background 0.2s, color 0.2s;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+    backdrop-filter: blur(4px);
 }
 .sponsor-modal-close:hover {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.18);
     color: #fff;
+    transform: rotate(90deg);
+}
+
+.sponsor-modal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(255,165,0,0.15);
+    border: 1px solid rgba(255,165,0,0.35);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #ffa500;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 2;
+}
+.sponsor-badge-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ffa500;
+    animation: dot-pulse 1.8s ease-in-out infinite;
 }
 
 .sponsor-modal-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 16px;
-    background: linear-gradient(135deg, #ff6b00, #ffa500);
+    position: relative;
+    z-index: 2;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 18px;
+    background: linear-gradient(135deg, #ff6b00 0%, #ffb300 100%);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
-    box-shadow: 0 8px 24px rgba(255,107,0,0.4);
-    animation: icon-bounce 2.5s ease-in-out infinite;
+    font-size: 32px;
+    box-shadow:
+        0 0 0 8px rgba(255,107,0,0.12),
+        0 0 0 16px rgba(255,107,0,0.06),
+        0 12px 30px rgba(255,107,0,0.5);
+    animation: icon-bounce 3s ease-in-out infinite;
 }
 @keyframes icon-bounce {
-    0%, 100% { transform: translateY(0); }
-    50%       { transform: translateY(-5px); }
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%       { transform: translateY(-6px) scale(1.04); }
 }
 
 .sponsor-modal-title {
-    font-size: 20px;
+    position: relative;
+    z-index: 2;
+    font-size: 22px;
     font-weight: 900;
     color: #fff;
-    line-height: 1.25;
-    margin-bottom: 10px;
-    letter-spacing: -0.3px;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+.sponsor-modal-title em {
+    font-style: normal;
+    background: linear-gradient(90deg, #ff6b00, #ffd000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .sponsor-modal-subtitle {
+    position: relative;
+    z-index: 2;
     font-size: 13px;
-    color: rgba(255,255,255,0.55);
-    line-height: 1.55;
-    margin-bottom: 20px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.6;
+    max-width: 260px;
+    margin: 0 auto;
 }
 
+/* ── Cuerpo del modal ── */
+.sponsor-modal-body {
+    background: #0f0f17;
+    padding: 22px 22px 24px;
+}
+
+/* stats row */
+.sponsor-modal-stats {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+.sponsor-stat {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    padding: 12px 8px;
+    text-align: center;
+}
+.sponsor-stat-num {
+    display: block;
+    font-size: 18px;
+    font-weight: 900;
+    color: #ffa500;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+.sponsor-stat-label {
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* perks */
 .sponsor-modal-perks {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
 }
 .sponsor-perk {
     display: flex;
     align-items: center;
-    gap: 5px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 20px;
-    padding: 5px 11px;
-    font-size: 11px;
-    color: rgba(255,255,255,0.7);
+    gap: 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.75);
     font-weight: 500;
+    transition: border-color 0.2s, background 0.2s;
+}
+.sponsor-perk:hover {
+    background: rgba(255,165,0,0.06);
+    border-color: rgba(255,165,0,0.25);
 }
 .perk-icon {
-    font-size: 13px;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+.perk-text strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 1px;
+}
+.perk-text span {
+    font-size: 10px;
+    color: rgba(255,255,255,0.4);
 }
 
+/* urgency badge */
+.sponsor-urgency {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: rgba(255,50,50,0.1);
+    border: 1px solid rgba(255,80,80,0.25);
+    border-radius: 10px;
+    padding: 7px 14px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #ff7070;
+    letter-spacing: 0.3px;
+    margin-bottom: 16px;
+}
+.urgency-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff5050;
+    animation: dot-pulse 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+/* CTA button */
 .sponsor-modal-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
     width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, #ff6b00, #ffa500);
+    padding: 15px;
+    background: linear-gradient(135deg, #ff5500 0%, #ffaa00 100%);
     color: #fff;
     font-size: 15px;
-    font-weight: 800;
-    border-radius: 14px;
+    font-weight: 900;
+    border-radius: 16px;
     text-decoration: none;
-    letter-spacing: 0.3px;
-    box-shadow: 0 6px 20px rgba(255,107,0,0.45);
+    letter-spacing: 0.4px;
+    box-shadow: 0 6px 24px rgba(255,100,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+}
+.sponsor-modal-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 40%;
+    height: 200%;
+    background: rgba(255,255,255,0.15);
+    transform: skewX(-20deg);
+    animation: btn-shine 3s ease-in-out infinite;
+}
+@keyframes btn-shine {
+    0%   { left: -60%; }
+    40%  { left: 120%; }
+    100% { left: 120%; }
 }
 .sponsor-modal-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(255,107,0,0.6);
+    box-shadow: 0 12px 32px rgba(255,100,0,0.65), inset 0 1px 0 rgba(255,255,255,0.2);
 }
 .sponsor-btn-icon {
-    font-size: 17px;
+    font-size: 18px;
 }
 
 .sponsor-modal-email {
-    font-size: 11px;
-    color: rgba(255,255,255,0.3);
-    letter-spacing: 0.3px;
+    text-align: center;
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.5px;
 }
 
 /* Resto de estilos */
