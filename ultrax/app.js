@@ -7284,3 +7284,47 @@ function claimReward(days, code) {
     const im = document.getElementById('importantMatchesModal');
     if (im) observer.observe(im, { attributes: true, attributeFilter: ['class'] });
 })();
+
+// ══════════════════════════════════════════════════════
+// CHAT EN VIVO — floating panel
+// ══════════════════════════════════════════════════════
+(function initLiveChat() {
+    let chatOpen = false;
+    let iframeLoaded = false;
+
+    window.toggleLiveChat = function () {
+        const panel   = document.getElementById('livechatPanel');
+        const overlay = document.getElementById('livechatOverlay');
+        const fab     = document.getElementById('livechatFab');
+        if (!panel) return;
+
+        chatOpen = !chatOpen;
+        panel.classList.toggle('open', chatOpen);
+        if (overlay) overlay.classList.toggle('show', chatOpen);
+        if (fab) fab.classList.toggle('active', chatOpen);
+
+        // Lazy-load iframe only when opened for the first time
+        if (chatOpen && !iframeLoaded) {
+            const frame = document.getElementById('livechatFrame');
+            if (frame && frame.dataset.src) {
+                frame.src = frame.dataset.src;
+                iframeLoaded = true;
+            }
+        }
+
+        // Hide pulse ring once user has opened chat
+        const pulse = document.querySelector('.livechat-pulse');
+        if (pulse) pulse.style.display = 'none';
+    };
+
+    window.expandLiveChat = function () {
+        const panel = document.getElementById('livechatPanel');
+        if (!panel) return;
+        panel.classList.toggle('expanded');
+    };
+
+    // Close with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && chatOpen) window.toggleLiveChat();
+    });
+})();
