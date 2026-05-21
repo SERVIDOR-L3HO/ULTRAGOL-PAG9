@@ -5547,6 +5547,23 @@ function closeImportantMatchesModal() {
     closeAllModals();
 }
 
+function openSponsorModal() {
+    const modal = document.getElementById('sponsorModal');
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeSponsorModal(e) {
+    if (e && e.target !== document.getElementById('sponsorModal') && !e.target.classList.contains('sponsor-modal-close')) return;
+    const modal = document.getElementById('sponsorModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
 async function loadImportantMatches() {
     try {
         if (!transmisionesData || !transmisionesData.transmisiones) {

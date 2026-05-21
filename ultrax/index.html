@@ -196,84 +196,126 @@
     </div>
 
     <!-- Patrocinadores -->
-    <div class="sponsors-strip">
-        <span class="sponsors-label">PATROCINADORES</span>
+    <div class="sponsors-strip" onclick="openSponsorModal()">
+        <div class="sponsors-strip-header">
+            <span class="sponsors-label">
+                <span class="sponsors-dot"></span>
+                PATROCINADORES OFICIALES
+            </span>
+            <span class="sponsors-cta-hint">¿Quieres aparecer aquí? <strong>Únete →</strong></span>
+        </div>
         <div class="sponsors-track-wrapper">
-            <div class="sponsors-track" id="sponsorsTrack">
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">SPONSOR</text>
-                    </svg>
+            <div class="sponsors-track">
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU MARCA</span>
+                    </div>
                 </div>
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">BRAND</text>
-                    </svg>
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU LOGO</span>
+                    </div>
                 </div>
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">PARTNER</text>
-                    </svg>
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU MARCA</span>
+                    </div>
                 </div>
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">APOYO</text>
-                    </svg>
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU LOGO</span>
+                    </div>
                 </div>
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">MARCA</text>
-                    </svg>
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU MARCA</span>
+                    </div>
                 </div>
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">TU LOGO</text>
-                    </svg>
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU LOGO</span>
+                    </div>
                 </div>
-                <!-- duplicados para loop infinito -->
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">SPONSOR</text>
-                    </svg>
+                <!-- duplicados loop infinito -->
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU MARCA</span>
+                    </div>
                 </div>
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">BRAND</text>
-                    </svg>
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU LOGO</span>
+                    </div>
                 </div>
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">PARTNER</text>
-                    </svg>
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU MARCA</span>
+                    </div>
                 </div>
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">APOYO</text>
-                    </svg>
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU LOGO</span>
+                    </div>
                 </div>
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">MARCA</text>
-                    </svg>
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU MARCA</span>
+                    </div>
                 </div>
-                <div class="sponsor-logo" title="Patrocinador Oficial">
-                    <svg viewBox="0 0 80 30" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect width="80" height="30" rx="6" fill="rgba(255,255,255,0.06)"/>
-                        <text x="40" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="rgba(255,255,255,0.55)" font-family="Arial">TU LOGO</text>
-                    </svg>
+                <div class="sponsor-slot">
+                    <div class="sponsor-slot-inner">
+                        <span class="slot-plus">+</span>
+                        <span class="slot-text">TU LOGO</span>
+                    </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Modal Patrocinadores -->
+    <div class="sponsor-modal-overlay" id="sponsorModal" onclick="closeSponsorModal(event)">
+        <div class="sponsor-modal-card">
+            <button class="sponsor-modal-close" onclick="closeSponsorModal()">✕</button>
+
+            <div class="sponsor-modal-icon">
+                <span>⚽</span>
+            </div>
+
+            <h2 class="sponsor-modal-title">¿Listo para brillar<br>frente a miles de fans?</h2>
+            <p class="sponsor-modal-subtitle">Tu marca aquí, vista por apasionados del fútbol todos los días del Mundial 2026 y más allá.</p>
+
+            <div class="sponsor-modal-perks">
+                <div class="sponsor-perk">
+                    <span class="perk-icon">👁️</span>
+                    <span>Visibilidad masiva</span>
+                </div>
+                <div class="sponsor-perk">
+                    <span class="perk-icon">🏆</span>
+                    <span>Asociación con el fútbol</span>
+                </div>
+                <div class="sponsor-perk">
+                    <span class="perk-icon">📱</span>
+                    <span>Presencia 24/7</span>
+                </div>
+            </div>
+
+            <a class="sponsor-modal-btn" href="mailto:servidorl3ho@gmail.com?subject=Quiero%20ser%20patrocinador%20de%20UltraGol&body=Hola%2C%20me%20interesa%20patrocinar%20UltraGol.%20Por%20favor%20contáctenme%20para%20más%20información.">
+                <span class="sponsor-btn-icon">✉️</span>
+                Contáctanos ahora
+            </a>
+
+            <p class="sponsor-modal-email">servidorl3ho@gmail.com</p>
         </div>
     </div>
 
