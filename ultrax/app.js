@@ -1017,8 +1017,8 @@ async function _fmpShare(index, title) {
         });
     }
     const apis = [
-        { data: transmisionesAPI1, fuente: 'rereyano'        },
         { data: transmisionesAPI2, fuente: 'e1link'          },
+        { data: transmisionesAPI1, fuente: 'rereyano'        },
         { data: transmisionesAPI3, fuente: 'voodc'           },
         { data: transmisionesAPI4, fuente: 'transmisiones4'  },
         { data: transmisionesAPI5, fuente: 'donromans'       },
@@ -1085,8 +1085,8 @@ function openFeaturedMatchChannels(index) {
     const titulo     = eventoRef;
 
     const apis = [
-        { data: transmisionesAPI1, fuente: 'rereyano'        },
         { data: transmisionesAPI2, fuente: 'e1link'          },
+        { data: transmisionesAPI1, fuente: 'rereyano'        },
         { data: transmisionesAPI3, fuente: 'voodc'           },
         { data: transmisionesAPI4, fuente: 'transmisiones4'  },
         { data: transmisionesAPI5, fuente: 'donromans'       },
@@ -1893,10 +1893,10 @@ function showChannelSelector(transmision, partidoNombre) {
     const totalCanales = transmision.canales ? transmision.canales.length : 0;
 
     const servidorMap = {
-        'rereyano':       'SERVIDOR 1',
-        'golazolvhd':     'SERVIDOR 1',
-        'e1link':         'SERVIDOR 2',
-        'ellink':         'SERVIDOR 2',
+        'e1link':         'SERVIDOR 1',
+        'ellink':         'SERVIDOR 1',
+        'rereyano':       'SERVIDOR 2',
+        'golazolvhd':     'SERVIDOR 2',
         'transmisiones4': 'SERVIDOR 3',
         'voodc':          'SERVIDOR 3',
         'ftvhd':          'SERVIDOR 4',
@@ -4734,8 +4734,8 @@ function selectImportantMatch(index) {
 // ─── Función central: busca el mismo partido en TODAS las APIs y combina canales ─
 function _combinarCanalesDeAPIs(eventoRef, tituloMostrar, fallbackTransmision) {
     const apis = [
-        { data: transmisionesAPI1, nombre: 'API 1 (rereyano)',      fuente: 'rereyano'        },
         { data: transmisionesAPI2, nombre: 'API 2 (e1link)',         fuente: 'e1link'          },
+        { data: transmisionesAPI1, nombre: 'API 1 (rereyano)',      fuente: 'rereyano'        },
         { data: transmisionesAPI3, nombre: 'API 3 (voodc)',          fuente: 'voodc'           },
         { data: transmisionesAPI4, nombre: 'API 4 (transmisiones4)', fuente: 'transmisiones4'  },
         { data: transmisionesAPI5, nombre: 'API 5 (donromans)',      fuente: 'donromans'       },
@@ -6194,8 +6194,8 @@ function selectImportantMatchByTransmision(eventoNombre) {
 
     // Reutiliza la función central, pero cierra el modal de partidos importantes antes
     const apis = [
-        { data: transmisionesAPI1, fuente: 'rereyano'       },
         { data: transmisionesAPI2, fuente: 'e1link'         },
+        { data: transmisionesAPI1, fuente: 'rereyano'       },
         { data: transmisionesAPI3, fuente: 'voodc'          },
         { data: transmisionesAPI4, fuente: 'transmisiones4' },
         { data: transmisionesAPI5, fuente: 'donromans'      },
