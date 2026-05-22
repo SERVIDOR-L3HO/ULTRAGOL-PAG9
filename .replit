@@ -42,3 +42,5 @@ run = ["node", "server.js"]
 
 [userenv.shared]
 TURNSTILE_SITE_KEY = "0x4AAAAAAdMXFUj4xnnJf5fN"
+VAPID_PUBLIC_KEY = "BNM5t2bsIMpDNEhPTtz3IvUjejXTs5x6NmpuT0C2xomXTuxBhlqlU_gSdGXf-66tv2VMiyg1e_w33oJXBjC7mKs"
+VAPID_PRIVATE_KEY = "QEDtfLL6iA2dh_jF2Pkoi1wVsDE6HR5eT8MrvDMOP8Y"
