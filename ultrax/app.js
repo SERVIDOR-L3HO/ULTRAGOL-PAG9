@@ -1,3 +1,8 @@
+const _log = process?.env?.NODE_ENV === 'production' ? () => {} : (() => {
+    const _isDev = location.hostname.includes('localhost') || location.hostname.includes('replit.dev') || location.hostname.includes('127.0.0.1');
+    return _isDev ? console.log.bind(console) : () => {};
+})();
+
 let currentStreamUrl = '';
 let currentStreamTitle = '';
 let activeTab = 'live';
@@ -364,17 +369,17 @@ let modalHistory = [];
 const modalNavigation = {
     resetHistory() {
         modalHistory = [];
-        console.log('📋 Historial de modales reseteado');
+        _log('📋 Historial de modales reseteado');
     },
     
     pushModal(modalId, data = {}) {
         modalHistory.push({ id: modalId, data: data });
-        console.log(`📌 Modal añadido al historial: ${modalId}`, modalHistory);
+        _log(`📌 Modal añadido al historial: ${modalId}`, modalHistory);
     },
     
     popModal() {
         const popped = modalHistory.pop();
-        console.log(`📤 Modal removido del historial: ${popped?.id}`, modalHistory);
+        _log(`📤 Modal removido del historial: ${popped?.id}`, modalHistory);
         return popped;
     },
     
@@ -393,8 +398,8 @@ const modalNavigation = {
 
 // Inicializar cuando se carga la página
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('📱 ULTRAGOL iniciando... URL:', window.location.href);
-    console.log('🔗 Query params:', window.location.search);
+    _log('📱 ULTRAGOL iniciando... URL:', window.location.href);
+    _log('🔗 Query params:', window.location.search);
     
     // Iniciar reloj en tiempo real
     startRealTimeClock();
@@ -405,7 +410,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Verificar inmediatamente si hay link compartido
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('ch')) {
-        console.log('⚡ Link compartido detectado, procesando primero...');
+        _log('⚡ Link compartido detectado, procesando primero...');
         checkSharedStream();
     }
     
@@ -439,7 +444,7 @@ function startRealTimeClock() {
     }
 
     updateClock();
-    setInterval(updateClock, 1000);
+    setInterval(updateClock, 60000);
 }
 
 // Función para el contador de usuarios reales usando Firebase Realtime Database
@@ -465,7 +470,7 @@ function startOnlineCounter() {
                         set(myUserRef, { ts: serverTimestamp() });
                         // Al cerrar pestaña o perder conexión, se borra automáticamente
                         onDisconnect(myUserRef).remove();
-                        console.log('🟢 Presencia registrada en Firebase');
+                        _log('🟢 Presencia registrada en Firebase');
                     }
                 });
 
@@ -474,18 +479,18 @@ function startOnlineCounter() {
                 onValue(onlineUsersRef, (snapshot) => {
                     const count = snapshot.size || 0;
                     counterElement.textContent = `${count.toLocaleString()} ONLINE`;
-                    console.log('📊 Usuarios conectados (Firebase):', count);
+                    _log('📊 Usuarios conectados (Firebase):', count);
                 }, (error) => {
-                    console.error('Error leyendo online_users:', error);
+                    _log('Error leyendo online_users:', error);
                     counterElement.textContent = 'ONLINE';
                 });
 
             }).catch(err => {
-                console.error('Error cargando Firebase RTDB module:', err);
+                _log('Error cargando Firebase RTDB module:', err);
                 counterElement.textContent = 'CONECTADO';
             });
         } catch (e) {
-            console.error('Error general en contador:', e);
+            _log('Error general en contador:', e);
         }
     }
 
@@ -506,7 +511,7 @@ async function loadMarcadores() {
         const data = await response.json();
         marcadoresData = data;
         
-        console.log('✅ Marcadores cargados:', endpoint);
+        _log('✅ Marcadores cargados:', endpoint);
         
         updateFeaturedMatch(data);
         
@@ -518,7 +523,7 @@ async function loadMarcadores() {
         
         return data;
     } catch (error) {
-        console.error('❌ Error cargando marcadores:', error);
+        _log('❌ Error cargando marcadores:', error);
         return null;
     }
 }
@@ -532,37 +537,37 @@ async function loadTransmisiones() {
             fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 1 (rereyano):', err.message);
+                    _log('⚠️ Error cargando API 1 (rereyano):', err.message);
                     return { transmisiones: [] };
                 }),
             fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones3', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 2 (e1link):', err.message);
+                    _log('⚠️ Error cargando API 2 (e1link):', err.message);
                     return { transmisiones: [] };
                 }),
             fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones2', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 3 (voodc):', err.message);
+                    _log('⚠️ Error cargando API 3 (voodc):', err.message);
                     return { transmisiones: [] };
                 }),
             fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones4', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 4 (transmisiones4):', err.message);
+                    _log('⚠️ Error cargando API 4 (transmisiones4):', err.message);
                     return { transmisiones: [] };
                 }),
             fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones5', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 5 (donromans):', err.message);
+                    _log('⚠️ Error cargando API 5 (donromans):', err.message);
                     return { matches: [] };
                 }),
             fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones6', 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    console.warn('⚠️ Error cargando API 6 (external):', err.message);
+                    _log('⚠️ Error cargando API 6 (external):', err.message);
                     return { transmisiones: [] };
                 })
         ]);
@@ -759,25 +764,25 @@ async function loadTransmisiones() {
             transmisiones: transmisionesCombinadas
         };
         
-        console.log('✅ Transmisiones cargadas desde API 1 (rereyano):', data1.transmisiones?.length || 0);
-        console.log('✅ Transmisiones cargadas desde API 2 (e1link):', data2.transmisiones?.length || 0);
-        console.log('✅ Transmisiones cargadas desde API 3 (voodc):', data3.transmisiones?.length || 0);
-        console.log('✅ Transmisiones cargadas desde API 4 (transmisiones4):', data4.transmisiones?.length || 0);
-        console.log('✅ Transmisiones cargadas desde API 5 (donromans):', data5.matches?.length || 0);
-        console.log('✅ Transmisiones cargadas desde API 6 (local):', data6.transmisiones?.length || 0);
+        _log('✅ Transmisiones cargadas desde API 1 (rereyano):', data1.transmisiones?.length || 0);
+        _log('✅ Transmisiones cargadas desde API 2 (e1link):', data2.transmisiones?.length || 0);
+        _log('✅ Transmisiones cargadas desde API 3 (voodc):', data3.transmisiones?.length || 0);
+        _log('✅ Transmisiones cargadas desde API 4 (transmisiones4):', data4.transmisiones?.length || 0);
+        _log('✅ Transmisiones cargadas desde API 5 (donromans):', data5.matches?.length || 0);
+        _log('✅ Transmisiones cargadas desde API 6 (local):', data6.transmisiones?.length || 0);
         
         // Log detallado de API 5 para debugging
         const totalCanalesAPI5 = transmisionesNormalizadasAPI5.reduce((sum, t) => sum + (t.canales?.length || 0), 0);
-        console.log(`✅ Total canales en API 5 (donromans): ${totalCanalesAPI5}`);
+        _log(`✅ Total canales en API 5 (donromans): ${totalCanalesAPI5}`);
         if (totalCanalesAPI5 === 0 && data5.matches?.length > 0) {
-            console.warn('⚠️ API 5 tiene matches pero sin canales procesados. Estructura:', data5.matches[0]);
+            _log('⚠️ API 5 tiene matches pero sin canales procesados. Estructura:', data5.matches[0]);
         }
         
-        console.log('✅ Total transmisiones combinadas:', transmisionesCombinadas.length);
+        _log('✅ Total transmisiones combinadas:', transmisionesCombinadas.length);
         
         return transmisionesData;
     } catch (error) {
-        console.error('❌ Error cargando transmisiones:', error);
+        _log('❌ Error cargando transmisiones:', error);
         // Retornar objeto vacío en lugar de null para evitar errores
         transmisionesData = { transmisiones: [] };
         return transmisionesData;
@@ -1078,7 +1083,7 @@ async function _fmpShare(index, title) {
         }
     } catch (e) {
         if (e.name !== 'AbortError') {
-            console.error('_fmpShare error:', e);
+            _log('_fmpShare error:', e);
             showToast('No se pudo generar el link');
         }
     }
@@ -1627,19 +1632,24 @@ function switchTab(tab, element) {
     }
 }
 
-// Iniciar actualización automática cada 30 segundos
+// Iniciar actualización automática cada 45 segundos
 function startAutoUpdate() {
-    // Limpiar intervalo anterior si existe
     if (updateInterval) {
         clearInterval(updateInterval);
     }
-    
-    // Actualizar cada 30 segundos
     updateInterval = setInterval(async () => {
-        console.log('🔄 Actualizando marcadores...');
-        await loadMarcadores();
-    }, 30000);
+        if (!document.hidden) {
+            await loadMarcadores();
+        }
+    }, 45000);
 }
+
+// Pausar/reanudar intervalos cuando la app va al fondo
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && activeTab === 'live') {
+        loadMarcadores();
+    }
+});
 
 function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     if (videoUrl) {
@@ -1727,9 +1737,9 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     const aliasesLocal = obtenerAliases(partido.local.nombreCorto);
     const aliasesVisitante = obtenerAliases(partido.visitante.nombreCorto);
     
-    console.log(`🔍 Buscando transmisión para:`);
-    console.log(`   Local: "${nombreLocal}" → aliases: [${aliasesLocal.join(', ')}]`);
-    console.log(`   Visitante: "${nombreVisitante}" → aliases: [${aliasesVisitante.join(', ')}]`);
+    _log(`🔍 Buscando transmisión para:`);
+    _log(`   Local: "${nombreLocal}" → aliases: [${aliasesLocal.join(', ')}]`);
+    _log(`   Visitante: "${nombreVisitante}" → aliases: [${aliasesVisitante.join(', ')}]`);
     
     // Función para buscar transmisión en una lista con búsqueda mejorada
     const buscarTransmision = (transmisiones) => {
@@ -1755,7 +1765,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
                 (palabrasVisitante.length > 3 && evento.includes(palabrasVisitante.split(' ')[0]));
             
             if (tieneLocal && tieneVisitante) {
-                console.log(`  ✅ Match encontrado (con aliases): "${evento}"`);
+                _log(`  ✅ Match encontrado (con aliases): "${evento}"`);
                 return true;
             }
             
@@ -1788,7 +1798,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
                         nombreCortoVisitante.includes(equipo2Evento.substring(0, 3));
                     
                     if (coincideLocal && coincideVisitante) {
-                        console.log(`  ✅ Match encontrado (flexible): "${evento}"`);
+                        _log(`  ✅ Match encontrado (flexible): "${evento}"`);
                         return true;
                     }
                 }
@@ -1798,7 +1808,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         }
         
         if (!resultado) {
-            console.log(`  ❌ No se encontró coincidencia en ${transmisiones.length} transmisiones`);
+            _log(`  ❌ No se encontró coincidencia en ${transmisiones.length} transmisiones`);
         }
         
         return resultado;
@@ -1822,7 +1832,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
             fuente: 'golazolvhd'
         }));
         canalesCombinados = [...canalesCombinados, ...canalesAPI1];
-        console.log(`✅ Encontrados ${canalesAPI1.length} canales en API 1 (golazolvhd)`);
+        _log(`✅ Encontrados ${canalesAPI1.length} canales en API 1 (golazolvhd)`);
     }
     
     if (transmisionAPI2) {
@@ -1832,7 +1842,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
             fuente: 'ellink'
         }));
         canalesCombinados = [...canalesCombinados, ...canalesAPI2];
-        console.log(`✅ Encontrados ${canalesAPI2.length} canales en API 2 (ellink)`);
+        _log(`✅ Encontrados ${canalesAPI2.length} canales en API 2 (ellink)`);
     }
     
     if (transmisionAPI3) {
@@ -1842,7 +1852,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
             fuente: 'voodc'
         }));
         canalesCombinados = [...canalesCombinados, ...canalesAPI3];
-        console.log(`✅ Encontrados ${canalesAPI3.length} canales en API 3 (voodc)`);
+        _log(`✅ Encontrados ${canalesAPI3.length} canales en API 3 (voodc)`);
     }
     
     if (transmisionAPI4) {
@@ -1852,7 +1862,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
             fuente: 'ftvhd'
         }));
         canalesCombinados = [...canalesCombinados, ...canalesAPI4];
-        console.log(`✅ Encontrados ${canalesAPI4.length} canales en API 4 (ftvhd)`);
+        _log(`✅ Encontrados ${canalesAPI4.length} canales en API 4 (ftvhd)`);
     }
     
     if (transmisionAPI5) {
@@ -1862,16 +1872,16 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
             fuente: 'donromans'
         }));
         canalesCombinados = [...canalesCombinados, ...canalesAPI5];
-        console.log(`✅ Encontrados ${canalesAPI5.length} canales en API 5 (donromans)`);
+        _log(`✅ Encontrados ${canalesAPI5.length} canales en API 5 (donromans)`);
     }
     
     if (canalesCombinados.length === 0) {
         showToast('Por favor espera 30 segundos mientras cargamos los links disponibles');
-        console.log(`❌ No se encontró transmisión para: ${partido.local.nombre} vs ${partido.visitante.nombre}`);
+        _log(`❌ No se encontró transmisión para: ${partido.local.nombre} vs ${partido.visitante.nombre}`);
         return;
     }
     
-    console.log(`📺 Total canales combinados: ${canalesCombinados.length}`);
+    _log(`📺 Total canales combinados: ${canalesCombinados.length}`);
     
     const partidoNombre = `${partido.local.nombreCorto} vs ${partido.visitante.nombreCorto}`;
     
@@ -1891,7 +1901,7 @@ function showChannelSelector(transmision, partidoNombre) {
     const title = document.getElementById('channelSelectorTitle');
     
     if (!modal || !body || !title) {
-        console.error("❌ Error: No se encontraron los elementos del modal en el DOM");
+        _log("❌ Error: No se encontraron los elementos del modal en el DOM");
         return;
     }
     
@@ -2102,28 +2112,27 @@ let statsCache = {};
 // Función para obtener estadísticas reales desde la API
 async function fetchRealMatchStats(eventId) {
     if (!eventId) return null;
-    
+
+    // Return cache if less than 55 seconds old
+    const cached = statsCache[eventId];
+    if (cached && (Date.now() - cached.timestamp) < 55000) {
+        return cached.data;
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+
     try {
-        console.log(`📊 Cargando estadísticas del partido ${eventId}...`);
-        const response = await fetch(`https://ultragol-api-3.vercel.app/estadisticas/partido/${eventId}`);
-        
-        if (!response.ok) {
-            console.warn(`⚠️ Error al cargar estadísticas: ${response.status}`);
-            return null;
-        }
-        
+        const response = await fetch(`https://ultragol-api-3.vercel.app/estadisticas/partido/${eventId}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (!response.ok) return null;
+
         const data = await response.json();
-        console.log(`✅ Estadísticas cargadas para partido ${eventId}:`, data);
-        
-        // Guardar en cache
-        statsCache[eventId] = {
-            data: data,
-            timestamp: Date.now()
-        };
-        
+        statsCache[eventId] = { data, timestamp: Date.now() };
         return data;
     } catch (error) {
-        console.error(`❌ Error al obtener estadísticas del partido ${eventId}:`, error);
+        clearTimeout(timeoutId);
         return null;
     }
 }
@@ -2399,7 +2408,7 @@ async function updateStatsInDOM(eventId, partido) {
     const apiData = await fetchRealMatchStats(eventId);
     
     if (!apiData) {
-        console.log('📊 No hay datos de API, usando estadísticas generadas');
+        _log('📊 No hay datos de API, usando estadísticas generadas');
         return;
     }
     
@@ -2523,7 +2532,7 @@ async function updateStatsInDOM(eventId, partido) {
         }
     }
     
-    console.log('✅ Estadísticas actualizadas en el DOM');
+    _log('✅ Estadísticas actualizadas en el DOM');
 }
 
 // Función para iniciar la actualización automática de estadísticas
@@ -2536,15 +2545,14 @@ function startStatsAutoUpdate(eventId, partido) {
     // Cargar estadísticas inmediatamente
     updateStatsInDOM(eventId, partido);
     
-    // Configurar actualización automática cada 30 segundos
+    // Configurar actualización automática cada 60 segundos
     statsUpdateInterval = setInterval(() => {
-        if (currentStatsEventId === eventId) {
-            console.log('🔄 Actualizando estadísticas automáticamente...');
+        if (currentStatsEventId === eventId && !document.hidden) {
             updateStatsInDOM(eventId, partido);
         }
-    }, 30000); // 30 segundos
+    }, 60000);
     
-    console.log(`⏱️ Auto-actualización de estadísticas iniciada para partido ${eventId}`);
+    _log(`⏱️ Auto-actualización de estadísticas iniciada para partido ${eventId}`);
 }
 
 // Función para detener la actualización automática
@@ -2553,7 +2561,7 @@ function stopStatsAutoUpdate() {
         clearInterval(statsUpdateInterval);
         statsUpdateInterval = null;
         currentStatsEventId = null;
-        console.log('⏹️ Auto-actualización de estadísticas detenida');
+        _log('⏹️ Auto-actualización de estadísticas detenida');
     }
 }
 
@@ -2800,11 +2808,11 @@ async function fetchStatsForMatch(partidoNombre) {
     }
     
     if (!ligaCodigo) {
-        console.log('📊 No se pudo detectar la liga para:', partidoNombre);
+        _log('📊 No se pudo detectar la liga para:', partidoNombre);
         return null;
     }
     
-    console.log('📊 Buscando partido en datos cargados...');
+    _log('📊 Buscando partido en datos cargados...');
     return null;
 }
 
@@ -3013,7 +3021,7 @@ function switchStatsTab(tabId, button) {
 // Inicializar listeners de tabs
 function initStatsTabsListeners() {
     // Los listeners ya están en los onclick de los botones
-    console.log('📊 Tabs de estadísticas inicializados');
+    _log('📊 Tabs de estadísticas inicializados');
 }
 
 function closeChannelSelector() {
@@ -3081,20 +3089,20 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
         let partido = findPartidoByName(displayTitle);
         
         if (partido && partido.id) {
-            console.log(`📊 Partido encontrado localmente con ID: ${partido.id}, cargando estadísticas...`);
+            _log(`📊 Partido encontrado localmente con ID: ${partido.id}, cargando estadísticas...`);
             startStatsAutoUpdate(partido.id, partido);
         } else {
             // Si no se encuentra localmente, buscar en la API de la liga correspondiente
-            console.log('📊 Buscando partido en API externa...');
+            _log('📊 Buscando partido en API externa...');
             fetchStatsForMatch(title).then(partidoRemoto => {
                 if (partidoRemoto && partidoRemoto.id) {
-                    console.log(`📊 Partido encontrado en API: ${partidoRemoto.id}`);
+                    _log(`📊 Partido encontrado en API: ${partidoRemoto.id}`);
                     startStatsAutoUpdate(partidoRemoto.id, partidoRemoto);
                 } else {
-                    console.log('📊 No se encontró partido, mostrando estadísticas generadas');
+                    _log('📊 No se encontró partido, mostrando estadísticas generadas');
                 }
             }).catch(err => {
-                console.warn('📊 Error buscando estadísticas:', err);
+                _log('📊 Error buscando estadísticas:', err);
             });
         }
     }
@@ -3106,7 +3114,7 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     };
     
     iframe.onerror = () => {
-        console.error('Error cargando stream:', embedUrl);
+        _log('Error cargando stream:', embedUrl);
         if (loader) {
             loader.innerHTML = `
                 <div style="text-align: center; color: white;">
@@ -3131,7 +3139,7 @@ function navigateBack() {
         return;
     }
     
-    console.log(`⬅️ Navegando hacia atrás desde: ${currentModal.id}`);
+    _log(`⬅️ Navegando hacia atrás desde: ${currentModal.id}`);
     
     // Remover el modal actual del historial
     modalNavigation.popModal();
@@ -3150,12 +3158,12 @@ function navigateBack() {
     
     if (!previousModal) {
         // No hay modal anterior, cerrar todo
-        console.log('✅ No hay modal anterior, todo cerrado');
+        _log('✅ No hay modal anterior, todo cerrado');
         return;
     }
     
     // Restaurar el modal anterior
-    console.log(`🔄 Restaurando modal anterior: ${previousModal.id}`);
+    _log(`🔄 Restaurando modal anterior: ${previousModal.id}`);
     
     if (previousModal.id === 'channelSelector') {
         // Restaurar el selector de canales con los datos guardados
@@ -3229,7 +3237,7 @@ function closeAllModals() {
     closeChannelSelectorOnly();
     closeImportantMatchesModalOnly();
     modalNavigation.resetHistory();
-    console.log('🚪 Todos los modales cerrados');
+    _log('🚪 Todos los modales cerrados');
 }
 
 // Función legacy - mantener por compatibilidad
@@ -3356,9 +3364,9 @@ function _startBackgroundAudioKeepAlive() {
         radioOscillator.frequency.value = 440;
         radioOscillator.connect(radioGainNode);
         radioOscillator.start();
-        console.log('🎵 Background audio keep-alive started (Web Audio API)');
+        _log('🎵 Background audio keep-alive started (Web Audio API)');
     } catch (e) {
-        console.warn('Web Audio API unavailable, falling back to silent element:', e);
+        _log('Web Audio API unavailable, falling back to silent element:', e);
         _startSilentAudioFallback();
     }
     _setupMediaSession();
@@ -3391,7 +3399,7 @@ function _startSilentAudioFallback() {
         radioAudioElement.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
         document.body.appendChild(radioAudioElement);
     }
-    radioAudioElement.play().catch(e => console.log('Audio play error:', e));
+    radioAudioElement.play().catch(e => _log('Audio play error:', e));
 }
 
 function _setupMediaSession() {
@@ -3488,14 +3496,14 @@ async function requestWakeLock() {
     try {
         if ('wakeLock' in navigator) {
             wakeLock = await navigator.wakeLock.request('screen');
-            console.log('Wake Lock activado');
+            _log('Wake Lock activado');
             
             wakeLock.addEventListener('release', () => {
-                console.log('Wake Lock liberado');
+                _log('Wake Lock liberado');
             });
         }
     } catch (err) {
-        console.log('Wake Lock no disponible:', err);
+        _log('Wake Lock no disponible:', err);
     }
 }
 
@@ -4310,7 +4318,7 @@ async function performSearch(query) {
     
     // Obtener aliases del término de búsqueda
     const searchAliases = obtenerAliases(searchTerm);
-    console.log(`🔍 Buscando: "${searchTerm}" → aliases: [${searchAliases.join(', ')}]`);
+    _log(`🔍 Buscando: "${searchTerm}" → aliases: [${searchAliases.join(', ')}]`);
     
     // Función para verificar si un nombre coincide con la búsqueda (con abreviaciones)
     const coincideConBusqueda = (nombre) => {
@@ -4840,7 +4848,7 @@ function _combinarCanalesDeAPIs(eventoRef, tituloMostrar, fallbackTransmision) {
             if (t.canales && t.canales.length > 0) {
                 const etiquetados = t.canales.map(c => ({ ...c, fuente }));
                 canalesCombinados = [...canalesCombinados, ...etiquetados];
-                console.log(`✅ ${etiquetados.length} canales en ${nombre} para "${t.evento || t.titulo}"`);
+                _log(`✅ ${etiquetados.length} canales en ${nombre} para "${t.evento || t.titulo}"`);
             }
         }
     }
@@ -4854,7 +4862,7 @@ function _combinarCanalesDeAPIs(eventoRef, tituloMostrar, fallbackTransmision) {
         return true;
     });
 
-    console.log(`📺 Total canales combinados de todas las APIs: ${canalesCombinados.length}`);
+    _log(`📺 Total canales combinados de todas las APIs: ${canalesCombinados.length}`);
 
     if (canalesCombinados.length > 0) {
         showChannelSelector({ evento: tituloMostrar, titulo: tituloMostrar, canales: canalesCombinados }, tituloMostrar);
@@ -4999,7 +5007,7 @@ async function loadReplays() {
             container.innerHTML = '<div class="no-matches" style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">No hay videos disponibles</div>';
         }
     } catch (error) {
-        console.error('Error loading replays:', error);
+        _log('Error loading replays:', error);
         container.innerHTML = '<div class="error-message">Error al cargar los mejores momentos</div>';
     }
 }
@@ -5308,7 +5316,7 @@ async function loadStandings() {
         `;
 
     } catch (error) {
-        console.error('Error loading standings:', error);
+        _log('Error loading standings:', error);
         standingsTable.innerHTML = '<div class="standings-loading">Error al cargar la tabla. Intenta de nuevo.</div>';
     }
 }
@@ -5345,7 +5353,7 @@ async function loadNews() {
             </div>
         `).join('');
     } catch (error) {
-        console.error('Error loading news:', error);
+        _log('Error loading news:', error);
         const newsGrid = document.getElementById('newsGrid');
         if (newsGrid) {
             newsGrid.innerHTML = '<div class="news-loading">Error al cargar noticias</div>';
@@ -5410,7 +5418,7 @@ async function loadResults() {
         // Si no hay filtro (Todas las Ligas), mostramos todo.
         displayCategorizedResults(data.resultados, currentLeague);
     } catch (error) {
-        console.error('Error cargando resultados:', error);
+        _log('Error cargando resultados:', error);
         container.innerHTML = '<div class="error-message">Error al cargar resultados globales.</div>';
     }
 }
@@ -5704,7 +5712,7 @@ async function loadImportantMatches() {
         
         renderImportantMatches();
     } catch (error) {
-        console.error('Error cargando partidos importantes:', error);
+        _log('Error cargando partidos importantes:', error);
         showNoMatchesMessage();
     }
 }
@@ -6340,7 +6348,7 @@ async function loadLineups() {
         const data = await response.json();
         lineupsData = data;
         
-        console.log('✅ Alineaciones cargadas:', data);
+        _log('✅ Alineaciones cargadas:', data);
         
         renderMatchSelector();
         
@@ -6350,7 +6358,7 @@ async function loadLineups() {
         
         return data;
     } catch (error) {
-        console.error('❌ Error cargando alineaciones:', error);
+        _log('❌ Error cargando alineaciones:', error);
         const selectorContainer = document.getElementById('lineupsMatchSelector');
         const lineupsContainer = document.getElementById('lineupsContainer');
         
@@ -6608,7 +6616,7 @@ async function shareStream() {
     const baseUrl = window.location.origin + window.location.pathname;
     const shareUrl = `${baseUrl}?id=${shortId}`;
     
-    console.log(`🔗 URL corta generada: ${shareUrl}`);
+    _log(`🔗 URL corta generada: ${shareUrl}`);
     
     // Mensaje creativo sin duplicar el link
     const mensajesCreativos = [
@@ -6746,25 +6754,25 @@ function checkSharedStream() {
         return;
     }
     
-    console.log('🔍 checkSharedStream - ch:', channelParam ? 'SÍ' : 'NO');
+    _log('🔍 checkSharedStream - ch:', channelParam ? 'SÍ' : 'NO');
     
     if (channelParam) {
-        console.log('🔗 Detectado parámetro ch:', channelParam.length + ' caracteres');
+        _log('🔗 Detectado parámetro ch:', channelParam.length + ' caracteres');
         
         // Verificar que LZString esté disponible
         if (typeof LZString === 'undefined') {
-            console.error('❌ LZString no está disponible, reintentando en 500ms...');
+            _log('❌ LZString no está disponible, reintentando en 500ms...');
             setTimeout(() => checkSharedStream(), 500);
             return;
         }
         
         try {
             const decompressed = LZString.decompressFromEncodedURIComponent(channelParam);
-            console.log('🔓 Resultado decompresión:', decompressed ? 'OK (' + decompressed.length + ' chars)' : 'FALLÓ');
+            _log('🔓 Resultado decompresión:', decompressed ? 'OK (' + decompressed.length + ' chars)' : 'FALLÓ');
             
             if (decompressed) {
                 const shareData = JSON.parse(decompressed);
-                console.log('✅ Canales compartidos decodificados:', shareData.t, '- Canales:', shareData.c.length);
+                _log('✅ Canales compartidos decodificados:', shareData.t, '- Canales:', shareData.c.length);
                 
                 const transmision = {
                     evento: shareData.t,
@@ -6778,7 +6786,7 @@ function checkSharedStream() {
                 };
                 
                 setTimeout(() => {
-                    console.log('🚀 Abriendo modal de canales compartidos...');
+                    _log('🚀 Abriendo modal de canales compartidos...');
                     showChannelSelector(transmision, shareData.t);
                     showToast('Abriendo canales compartidos... 📺');
                     
@@ -6786,11 +6794,11 @@ function checkSharedStream() {
                     window.history.replaceState({}, document.title, cleanUrl);
                 }, 1500);
             } else {
-                console.error('❌ Decompresión retornó null - datos corruptos');
+                _log('❌ Decompresión retornó null - datos corruptos');
                 showToast('Error: Link de canales inválido');
             }
         } catch (error) {
-            console.error('❌ Error al procesar canales compartidos:', error.message);
+            _log('❌ Error al procesar canales compartidos:', error.message);
             showToast('Error: Link de canales inválido');
         }
         return;
@@ -6803,7 +6811,7 @@ function checkSharedStream() {
             const cached = streamCache[shortId];
             
             if (cached && cached.u && cached.t) {
-                console.log('✅ Transmisión encontrada en cache:', shortId);
+                _log('✅ Transmisión encontrada en cache:', shortId);
                 
                 setTimeout(() => {
                     playStreamInModal(cached.u, cached.t, false);
@@ -6815,11 +6823,11 @@ function checkSharedStream() {
                 }, 1000);
                 return;
             } else {
-                console.log('⚠️ Link compartido no encontrado en cache');
+                _log('⚠️ Link compartido no encontrado en cache');
                 showToast('Este link ya expiró o no está disponible');
             }
         } catch (error) {
-            console.error('❌ Error al procesar link corto:', error);
+            _log('❌ Error al procesar link corto:', error);
         }
     }
     
@@ -6833,11 +6841,11 @@ function checkSharedStream() {
                 const decompressed = LZString.decompressFromEncodedURIComponent(streamParam);
                 if (decompressed) {
                     shareData = JSON.parse(decompressed);
-                    console.log('✅ URL comprimida decodificada exitosamente');
+                    _log('✅ URL comprimida decodificada exitosamente');
                 }
             } catch (e) {
                 // Si falla, intentar el formato antiguo base64 (compatibilidad)
-                console.log('⚠️ Intentando formato antiguo base64...');
+                _log('⚠️ Intentando formato antiguo base64...');
                 shareData = JSON.parse(atob(streamParam));
             }
             
@@ -6857,7 +6865,7 @@ function checkSharedStream() {
                 }, 1000);
             }
         } catch (error) {
-            console.error('❌ Error al procesar link compartido:', error);
+            _log('❌ Error al procesar link compartido:', error);
             showToast('Error: Link inválido o corrupto');
         }
     }
@@ -6934,7 +6942,7 @@ async function shareChannelModal() {
         const { id } = await resp.json();
         const shareUrl = `${window.location.origin}${window.location.pathname}?match=${id}`;
         
-        console.log('🔗 URL corta generada:', shareUrl);
+        _log('🔗 URL corta generada:', shareUrl);
         
         if (navigator.share) {
             await navigator.share({
@@ -6949,7 +6957,7 @@ async function shareChannelModal() {
         }
     } catch (error) {
         if (error.name !== 'AbortError') {
-            console.error('Error al compartir:', error);
+            _log('Error al compartir:', error);
             showToast('No se pudo compartir');
         }
     }
@@ -6983,7 +6991,7 @@ function openQRModal() {
             const compressed = LZString.compressToEncodedURIComponent(JSON.stringify(shareData));
             urlToShare = `${window.location.origin}${window.location.pathname}?s=${compressed}`;
         } catch (error) {
-            console.error('Error al crear link compartible:', error);
+            _log('Error al crear link compartible:', error);
         }
     }
     
@@ -7007,7 +7015,7 @@ function openQRModal() {
     // Mostrar el modal con animación
     modal.classList.add('active');
     
-    console.log('✅ QR Code generado:', urlToShare);
+    _log('✅ QR Code generado:', urlToShare);
     showToast('Código QR generado correctamente');
 }
 
@@ -7087,11 +7095,11 @@ function downloadQRCode() {
             URL.revokeObjectURL(url);
             
             showToast('Código QR descargado exitosamente');
-            console.log('✅ QR Code descargado:', link.download);
+            _log('✅ QR Code descargado:', link.download);
         }, 'image/png');
         
     } catch (error) {
-        console.error('Error al descargar QR:', error);
+        _log('Error al descargar QR:', error);
         showToast('Error al descargar el código QR');
     }
 }
