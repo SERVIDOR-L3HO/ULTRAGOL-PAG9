@@ -1942,12 +1942,13 @@ function showChannelSelector(transmision, partidoNombre) {
             const numLabel    = String(serverNum).padStart(2, '0');
 
             const safeEnlace = enlace.replace(/'/g, "\\'");
+            const safeCanalNombre = canalNombre.replace(/'/g, "\\'");
             cardsHtml += `
                 <div class="sv-card ${isFeatured}" style="animation-delay:${delay}"
                      tabindex="0" role="button"
                      aria-label="Servidor ${serverNum}: ${canalNombre}"
-                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playChannelFromSelector('${safeEnlace}','${safeNombre}')}"
-                     onclick="playChannelFromSelector('${safeEnlace}','${safeNombre}')">
+                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playChannelFromSelector('${safeEnlace}','${safeNombre}','${safeCanalNombre}')}"
+                     onclick="playChannelFromSelector('${safeEnlace}','${safeNombre}','${safeCanalNombre}')">
                     <div class="sv-num">
                         ${numLabel}
                         <div class="sv-online"></div>
@@ -2010,15 +2011,87 @@ function showChannelSelector(transmision, partidoNombre) {
     }, 120);
 }
 
-function playChannelFromSelector(url, title) {
+function playChannelFromSelector(url, title, channelName) {
     if (!url || url === 'undefined') {
         showToast('Error: Nodo de transmisión no válido');
         return;
     }
     const modal = document.getElementById('channelSelectorModal');
+    // Intentar obtener nombre del canal desde la tarjeta si no se pasó
+    if (!channelName && modal) {
+        const featured = modal.querySelector('.sv-card-featured .sv-name, .sv-card .sv-name');
+        if (featured) channelName = featured.textContent.trim();
+    }
+    saveRecentChannel(url, title, channelName || '');
     if (modal) modal.classList.remove('active');
     playStreamInModal(url, title);
 }
+
+// ── HISTORIAL DE CANALES VISTOS ──────────────────────────────────────────────
+const RECIENTES_KEY = 'ultragol_recientes';
+const RECIENTES_MAX = 10;
+
+function saveRecentChannel(url, title, channelName) {
+    if (!url || !title) return;
+    let items = getRecentChannels();
+    // Eliminar duplicado por url
+    items = items.filter(i => i.url !== url);
+    items.unshift({ url, title, channel: channelName || '', ts: Date.now() });
+    items = items.slice(0, RECIENTES_MAX);
+    try { localStorage.setItem(RECIENTES_KEY, JSON.stringify(items)); } catch (_) {}
+    renderRecentChannels();
+}
+
+function getRecentChannels() {
+    try {
+        const raw = localStorage.getItem(RECIENTES_KEY);
+        return raw ? JSON.parse(raw) : [];
+    } catch (_) { return []; }
+}
+
+function clearRecentChannels() {
+    try { localStorage.removeItem(RECIENTES_KEY); } catch (_) {}
+    renderRecentChannels();
+    showToast('Historial borrado');
+}
+
+function _timeAgo(ts) {
+    const diff = Math.floor((Date.now() - ts) / 1000);
+    if (diff < 60)  return 'hace un momento';
+    if (diff < 3600) return `hace ${Math.floor(diff / 60)}m`;
+    if (diff < 86400) return `hace ${Math.floor(diff / 3600)}h`;
+    return `hace ${Math.floor(diff / 86400)}d`;
+}
+
+function renderRecentChannels() {
+    const section = document.getElementById('recentesSection');
+    const track   = document.getElementById('recientesTrack');
+    if (!section || !track) return;
+
+    const items = getRecentChannels();
+    if (items.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+    track.innerHTML = items.map(item => {
+        const safeUrl   = item.url.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const safeTitle = (item.title || '').replace(/'/g, "\\'");
+        return `
+            <div class="rc-card" onclick="playStreamInModal('${safeUrl}','${safeTitle}')">
+                <div class="rc-match">${item.title || 'Partido'}</div>
+                <div class="rc-channel"><i class="fas fa-tower-broadcast" style="font-size:9px;margin-right:4px;opacity:.5"></i>${item.channel || 'Canal'}</div>
+                <div class="rc-footer">
+                    <span class="rc-time">${_timeAgo(item.ts)}</span>
+                    <div class="rc-play"><i class="fas fa-play" style="margin-left:1px"></i></div>
+                </div>
+            </div>`;
+    }).join('');
+}
+
+// Inicializar sección recientes al cargar
+document.addEventListener('DOMContentLoaded', () => { renderRecentChannels(); });
 
 
 // ==================== FUNCIONES DE ESTADÍSTICAS EN TIEMPO REAL ====================

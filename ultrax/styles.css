@@ -4005,6 +4005,141 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 }
 
 /* ══════════════════════════════════════════════
+   VISTOS RECIENTEMENTE
+   ══════════════════════════════════════════════ */
+
+.recientes-section {
+    padding: 14px 14px 4px;
+    margin-top: 6px;
+}
+
+.recientes-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.recientes-icon {
+    color: #ff6b35;
+    font-size: 14px;
+}
+
+.recientes-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    flex: 1;
+}
+
+.recientes-clear {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.25);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+}
+
+.recientes-clear:hover {
+    color: #f87171;
+    background: rgba(248,113,113,0.1);
+}
+
+.recientes-track {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.recientes-track::-webkit-scrollbar { display: none; }
+
+.rc-card {
+    flex: 0 0 155px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    padding: 12px 12px 10px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.rc-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #ff6b35, #ff4000);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.rc-card:hover {
+    background: rgba(255,107,53,0.1);
+    border-color: rgba(255,107,53,0.3);
+    transform: translateY(-2px);
+}
+
+.rc-card:hover::before { opacity: 1; }
+
+.rc-match {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
+
+.rc-channel {
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 8px;
+}
+
+.rc-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rc-time {
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+}
+
+.rc-play {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b35, #ff4000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(255,69,0,0.4);
+    transition: transform 0.18s, box-shadow 0.18s;
+}
+
+.rc-card:hover .rc-play {
+    transform: scale(1.15);
+    box-shadow: 0 5px 16px rgba(255,69,0,0.6);
+}
+
+/* ══════════════════════════════════════════════
    TABLA DE POSICIONES — Premium Redesign
    ══════════════════════════════════════════════ */
 
