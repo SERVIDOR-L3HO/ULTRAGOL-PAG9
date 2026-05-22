@@ -1,7 +1,5 @@
-const _log = process?.env?.NODE_ENV === 'production' ? () => {} : (() => {
-    const _isDev = location.hostname.includes('localhost') || location.hostname.includes('replit.dev') || location.hostname.includes('127.0.0.1');
-    return _isDev ? console.log.bind(console) : () => {};
-})();
+const _isDev = location.hostname.includes('localhost') || location.hostname.includes('replit.dev') || location.hostname.includes('127.0.0.1');
+const _log = _isDev ? console.log.bind(console) : () => {};
 
 let currentStreamUrl = '';
 let currentStreamTitle = '';
