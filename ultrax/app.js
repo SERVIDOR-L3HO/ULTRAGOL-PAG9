@@ -567,17 +567,22 @@ async function loadTransmisiones() {
                 })
         ]);
         
-        // Convertir API 2 (transmisiones3 - e1link) que usa "enlaces" a "canales" pero manteniendo la estructura de array
+        // Convertir API 2 (transmisiones3 - e1link) que usa "enlacesDetalle" → un canal por enlace
         const transmisionesNormalizadasAPI2 = (data2.transmisiones || []).map(t => {
-            const canalesNormalizados = [{
-                numero: '',
-                nombre: t.canal || 'Canal',
-                enlaces: t.enlaces || [],
-                tipoAPI: 'e1link'
-            }];
-            
+            const detalles = t.enlacesDetalle || t.enlaces || [];
+            const canalesNormalizados = detalles
+                .filter(e => e && e.url)
+                .map(e => ({
+                    numero: '',
+                    nombre: e.nombre || 'Canal',
+                    url: e.url,
+                    tipoAPI: 'e1link'
+                }));
+
             return {
                 ...t,
+                evento: t.titulo || t.evento,
+                titulo: t.titulo || t.evento,
                 canales: canalesNormalizados,
                 tipoAPI: 'e1link'
             };
@@ -674,15 +679,20 @@ async function loadTransmisiones() {
             };
         });
         
-        // Marcar transmisiones API 1 con su tipo
-        const transmisionesAPI1Marcadas = (data1.transmisiones || []).map(t => ({
-            ...t,
-            tipoAPI: 'rereyano',
-            canales: (t.canales || []).map(c => ({
-                ...c,
-                tipoAPI: 'rereyano'
-            }))
-        }));
+        // Marcar transmisiones API 1 con su tipo — expandir principal/backup/wrapper como canales separados
+        const transmisionesAPI1Marcadas = (data1.transmisiones || []).map(t => {
+            const canalesExpand = [];
+            (t.canales || []).forEach(c => {
+                if (c.links) {
+                    if (c.links.principal) canalesExpand.push({ ...c, nombre: c.nombre || 'Canal', url: c.links.principal, tipoAPI: 'rereyano' });
+                    if (c.links.backup)    canalesExpand.push({ ...c, nombre: `${c.nombre || 'Canal'} OP2`, url: c.links.backup, tipoAPI: 'rereyano' });
+                    if (c.links.wrapper)   canalesExpand.push({ ...c, nombre: `${c.nombre || 'Canal'} OP3`, url: c.links.wrapper, tipoAPI: 'rereyano' });
+                } else {
+                    canalesExpand.push({ ...c, tipoAPI: 'rereyano' });
+                }
+            });
+            return { ...t, tipoAPI: 'rereyano', canales: canalesExpand };
+        });
         
         // Normalizar transmisiones API 6 (streamed.pk usa "fuentes", JSON local usa "canales")
         const transmisionesAPI6Marcadas = (data6.transmisiones || []).map(t => {
