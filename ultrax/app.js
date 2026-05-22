@@ -1941,12 +1941,13 @@ function showChannelSelector(transmision, partidoNombre) {
             const safeNombre  = partidoNombre.replace(/'/g, "\\'");
             const numLabel    = String(serverNum).padStart(2, '0');
 
+            const safeEnlace = enlace.replace(/'/g, "\\'");
             cardsHtml += `
                 <div class="sv-card ${isFeatured}" style="animation-delay:${delay}"
                      tabindex="0" role="button"
                      aria-label="Servidor ${serverNum}: ${canalNombre}"
-                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playChannelFromSelector('${enlace}','${safeNombre}')}"
-                     onclick="playChannelFromSelector('${enlace}','${safeNombre}')">
+                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playChannelFromSelector('${safeEnlace}','${safeNombre}')}"
+                     onclick="playChannelFromSelector('${safeEnlace}','${safeNombre}')">
                     <div class="sv-num">
                         ${numLabel}
                         <div class="sv-online"></div>
@@ -1961,6 +1962,9 @@ function showChannelSelector(transmision, partidoNombre) {
                         <div class="sv-wave">
                             <span></span><span></span><span></span><span></span><span></span>
                         </div>
+                    </div>
+                    <div class="sv-copy" title="Copiar link" onclick="event.stopPropagation();copyChannelLink(this,'${safeEnlace}')">
+                        <i class="fas fa-link"></i>
                     </div>
                     <div class="sv-play">
                         <i class="fas fa-play" style="margin-left:2px;"></i>
@@ -6590,6 +6594,31 @@ function copyToClipboard(text) {
         });
     } else {
         fallbackCopyToClipboard(text);
+    }
+}
+
+// Copiar link de un canal desde el modal de señales
+function copyChannelLink(btn, url) {
+    if (!url) return;
+    const icon = btn.querySelector('i');
+    const doReset = () => {
+        btn.classList.remove('copied');
+        if (icon) { icon.className = 'fas fa-link'; }
+    };
+    const onSuccess = () => {
+        btn.classList.add('copied');
+        if (icon) { icon.className = 'fas fa-check'; }
+        showToast('¡Link copiado!');
+        setTimeout(doReset, 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(onSuccess).catch(() => {
+            fallbackCopyToClipboard(url);
+            onSuccess();
+        });
+    } else {
+        fallbackCopyToClipboard(url);
+        onSuccess();
     }
 }
 

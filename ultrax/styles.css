@@ -960,6 +960,35 @@ body {
     box-shadow: 0 6px 24px rgba(255,69,0,0.55);
 }
 
+.sv-copy {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 13px;
+    transition: all 0.2s ease;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #555;
+    cursor: pointer;
+    margin-right: 6px;
+}
+
+.sv-copy:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.2);
+    color: #ccc;
+    transform: scale(1.1);
+}
+
+.sv-copy.copied {
+    background: rgba(74,222,128,0.15);
+    border-color: rgba(74,222,128,0.35);
+    color: #4ade80;
+}
+
 /* ---- Footer ---- */
 .sv-footer {
     margin-top: 18px;
