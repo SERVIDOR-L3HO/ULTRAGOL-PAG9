@@ -14,6 +14,7 @@ let transmisionesAPI3 = null;
 let transmisionesAPI4 = null;
 let transmisionesAPI5 = null;
 let transmisionesAPI6 = null;
+let transmisionesAPI7 = null;
 let updateInterval = null;
 let currentFeaturedIndex = 0;
 let featuredMatches = [];
@@ -527,11 +528,11 @@ async function loadMarcadores() {
 }
 
 
-// Función para cargar transmisiones desde las 5 APIs
+// Función para cargar transmisiones desde las 7 APIs
 async function loadTransmisiones() {
     try {
-        // Cargar las 6 APIs en paralelo con manejo individual de errores y timeouts
-        const [data1, data2, data3, data4, data5, data6] = await Promise.all([
+        // Cargar las 7 APIs en paralelo con manejo individual de errores y timeouts
+        const [data1, data2, data3, data4, data5, data6, data7] = await Promise.all([
             fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones', 8000)
                 .then(res => res.json())
                 .catch(err => {
@@ -566,6 +567,12 @@ async function loadTransmisiones() {
                 .then(res => res.json())
                 .catch(err => {
                     _log('⚠️ Error cargando API 6 (external):', err.message);
+                    return { transmisiones: [] };
+                }),
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones7', 8000)
+                .then(res => res.json())
+                .catch(err => {
+                    _log('⚠️ Error cargando API 7 (transmisiones7):', err.message);
                     return { transmisiones: [] };
                 })
         ]);
@@ -720,6 +727,24 @@ async function loadTransmisiones() {
                 canales: canalesNormalizados
             };
         });
+
+        // Normalizar transmisiones API 7 (misma estructura que transmisiones4: canales con url directo)
+        const transmisionesNormalizadasAPI7 = (data7.transmisiones || []).map(t => {
+            const canalesNormalizados = (t.canales || []).map(canal => ({
+                numero: '',
+                nombre: canal.nombre || 'Canal',
+                enlaces: canal.url ? [{ url: canal.url, calidad: 'HD' }] : [],
+                tipoAPI: 'transmisiones7'
+            }));
+
+            return {
+                ...t,
+                evento: t.evento || t.titulo,
+                titulo: t.titulo || t.evento,
+                canales: canalesNormalizados,
+                tipoAPI: 'transmisiones7'
+            };
+        });
         
         // Guardar datos separados de cada API
         transmisionesAPI1 = {
@@ -746,15 +771,20 @@ async function loadTransmisiones() {
             ...data6,
             transmisiones: transmisionesAPI6Marcadas
         };
+        transmisionesAPI7 = {
+            ...data7,
+            transmisiones: transmisionesNormalizadasAPI7
+        };
         
-        // Combinar las transmisiones de las 6 APIs (partidos pueden repetirse)
+        // Combinar las transmisiones de las 7 APIs (partidos pueden repetirse)
         const transmisionesCombinadas = [
             ...transmisionesAPI1Marcadas,
             ...transmisionesNormalizadasAPI2,
             ...transmisionesNormalizadasAPI3,
             ...transmisionesNormalizadasAPI4,
             ...transmisionesNormalizadasAPI5,
-            ...transmisionesAPI6Marcadas
+            ...transmisionesAPI6Marcadas,
+            ...transmisionesNormalizadasAPI7
         ];
         
         // Crear el objeto combinado
@@ -767,7 +797,8 @@ async function loadTransmisiones() {
         _log('✅ Transmisiones cargadas desde API 3 (voodc):', data3.transmisiones?.length || 0);
         _log('✅ Transmisiones cargadas desde API 4 (transmisiones4):', data4.transmisiones?.length || 0);
         _log('✅ Transmisiones cargadas desde API 5 (donromans):', data5.matches?.length || 0);
-        _log('✅ Transmisiones cargadas desde API 6 (local):', data6.transmisiones?.length || 0);
+        _log('✅ Transmisiones cargadas desde API 6 (external):', data6.transmisiones?.length || 0);
+        _log('✅ Transmisiones cargadas desde API 7 (transmisiones7):', data7.transmisiones?.length || 0);
         
         // Log detallado de API 5 para debugging
         const totalCanalesAPI5 = transmisionesNormalizadasAPI5.reduce((sum, t) => sum + (t.canales?.length || 0), 0);
@@ -1036,6 +1067,7 @@ async function _fmpShare(index, title) {
         { data: transmisionesAPI4, fuente: 'transmisiones4'  },
         { data: transmisionesAPI5, fuente: 'donromans'       },
         { data: transmisionesAPI6, fuente: 'transmisiones6'  },
+        { data: transmisionesAPI7, fuente: 'transmisiones7'  },
     ];
     for (const { data, fuente } of apis) {
         if (!data?.transmisiones) continue;
@@ -1104,6 +1136,7 @@ function openFeaturedMatchChannels(index) {
         { data: transmisionesAPI4, fuente: 'transmisiones4'  },
         { data: transmisionesAPI5, fuente: 'donromans'       },
         { data: transmisionesAPI6, fuente: 'transmisiones6'  },
+        { data: transmisionesAPI7, fuente: 'transmisiones7'  },
     ];
 
     let canalesCombinados = [];
@@ -1812,14 +1845,16 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         return resultado;
     };
     
-    // Buscar en las 5 APIs
+    // Buscar en las 7 APIs
     const transmisionAPI1 = transmisionesAPI1 ? buscarTransmision(transmisionesAPI1.transmisiones) : null;
     const transmisionAPI2 = transmisionesAPI2 ? buscarTransmision(transmisionesAPI2.transmisiones) : null;
     const transmisionAPI3 = transmisionesAPI3 ? buscarTransmision(transmisionesAPI3.transmisiones) : null;
     const transmisionAPI4 = transmisionesAPI4 ? buscarTransmision(transmisionesAPI4.transmisiones) : null;
     const transmisionAPI5 = transmisionesAPI5 ? buscarTransmision(transmisionesAPI5.transmisiones) : null;
+    const transmisionAPI6 = transmisionesAPI6 ? buscarTransmision(transmisionesAPI6.transmisiones) : null;
+    const transmisionAPI7 = transmisionesAPI7 ? buscarTransmision(transmisionesAPI7.transmisiones) : null;
     
-    // Combinar canales de las 5 APIs
+    // Combinar canales de las 7 APIs
     let canalesCombinados = [];
     let eventoNombre = '';
     
@@ -1871,6 +1906,26 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         }));
         canalesCombinados = [...canalesCombinados, ...canalesAPI5];
         _log(`✅ Encontrados ${canalesAPI5.length} canales en API 5 (donromans)`);
+    }
+
+    if (transmisionAPI6) {
+        if (!eventoNombre) eventoNombre = transmisionAPI6.evento || transmisionAPI6.titulo;
+        const canalesAPI6 = (transmisionAPI6.canales || []).map(canal => ({
+            ...canal,
+            fuente: 'transmisiones6'
+        }));
+        canalesCombinados = [...canalesCombinados, ...canalesAPI6];
+        _log(`✅ Encontrados ${canalesAPI6.length} canales en API 6 (transmisiones6)`);
+    }
+
+    if (transmisionAPI7) {
+        if (!eventoNombre) eventoNombre = transmisionAPI7.evento || transmisionAPI7.titulo;
+        const canalesAPI7 = (transmisionAPI7.canales || []).map(canal => ({
+            ...canal,
+            fuente: 'transmisiones7'
+        }));
+        canalesCombinados = [...canalesCombinados, ...canalesAPI7];
+        _log(`✅ Encontrados ${canalesAPI7.length} canales en API 7 (transmisiones7)`);
     }
     
     if (canalesCombinados.length === 0) {
