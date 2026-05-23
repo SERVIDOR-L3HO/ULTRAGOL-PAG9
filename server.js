@@ -2427,6 +2427,53 @@ app.get('/knexo', (req, res) => {
     res.sendFile(path.join(__dirname, 'knexo.html'));
 });
 
+// ── UltraWidget agenda proxy (fetches all 7 APIs server-side) ────────────────
+let agendaCache = null;
+let agendaCacheTime = 0;
+const AGENDA_TTL = 4 * 60 * 1000; // 4 min cache
+
+async function fetchAgendaAPI(url) {
+    try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 12000);
+        const r = await fetch(url, { signal: ctrl.signal, headers: { 'User-Agent': 'UltraWidget/1.0' } });
+        clearTimeout(timer);
+        if (!r.ok) return {};
+        return await r.json();
+    } catch (e) { return {}; }
+}
+
+app.get('/api/ultrawidget-agenda', async (req, res) => {
+    res.setHeader('Cache-Control', 'no-cache');
+    const now = Date.now();
+    if (agendaCache && (now - agendaCacheTime) < AGENDA_TTL) {
+        return res.json(agendaCache);
+    }
+    const BASE = 'https://ultragol-api-3.vercel.app';
+    const [d1, d2, d3, d4, d5, d6, d7] = await Promise.all([
+        fetchAgendaAPI(`${BASE}/transmisiones`),
+        fetchAgendaAPI(`${BASE}/transmisiones2`),
+        fetchAgendaAPI(`${BASE}/transmisiones3`),
+        fetchAgendaAPI(`${BASE}/transmisiones4`),
+        fetchAgendaAPI(`${BASE}/transmisiones5`),
+        fetchAgendaAPI(`${BASE}/transmisiones6`),
+        fetchAgendaAPI(`${BASE}/transmisiones7`),
+    ]);
+    const payload = {
+        api1: d1.transmisiones || [],
+        api2: d2.transmisiones || [],
+        api3: d3.transmisiones || [],
+        api4: d4.transmisiones || [],
+        api5: d5.matches || [],
+        api6: d6.transmisiones || [],
+        api7: d7.transmisiones || [],
+        ts: now,
+    };
+    agendaCache = payload;
+    agendaCacheTime = now;
+    res.json(payload);
+});
+
 app.get('/ultrawidget', (req, res) => {
     res.sendFile(path.join(__dirname, 'ultrawidget', 'index.html'));
 });
