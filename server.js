@@ -2427,6 +2427,17 @@ app.get('/knexo', (req, res) => {
     res.sendFile(path.join(__dirname, 'knexo.html'));
 });
 
+app.get('/ultrawidget', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ultrawidget', 'index.html'));
+});
+app.get(['/ultrawidget/', '/ultrawidget/index.html'], (req, res) => {
+    res.sendFile(path.join(__dirname, 'ultrawidget', 'index.html'));
+});
+app.use('/ultrawidget', express.static(path.join(__dirname, 'ultrawidget'), {
+    index: false,
+    setHeaders: (res) => res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
+}));
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 UltraGol server started on port ${PORT}`);
     console.log(`🌐 Server available at: http://0.0.0.0:${PORT}`);
