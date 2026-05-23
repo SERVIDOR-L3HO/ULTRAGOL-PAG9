@@ -1,6 +1,12 @@
 const _isDev = location.hostname.includes('localhost') || location.hostname.includes('replit.dev') || location.hostname.includes('127.0.0.1');
 const _log = _isDev ? console.log.bind(console) : () => {};
 
+function decodeStreamUrl(url) {
+    if (!url || typeof url !== 'string') return url;
+    if (url.startsWith('http')) return url;
+    try { return atob(url); } catch(e) { return url; }
+}
+
 let currentStreamUrl = '';
 let currentStreamTitle = '';
 let activeTab = 'live';
@@ -585,7 +591,7 @@ async function loadTransmisiones() {
                 .map(e => ({
                     numero: '',
                     nombre: e.nombre || 'Canal',
-                    url: e.url,
+                    url: decodeStreamUrl(e.url),
                     tipoAPI: 'e1link'
                 }));
 
@@ -603,7 +609,7 @@ async function loadTransmisiones() {
             const canalesNormalizados = [{
                 numero: '',
                 nombre: t.deporte || 'Canal',
-                enlaces: t.url ? [{ url: t.url, calidad: 'HD' }] : [],
+                enlaces: t.url ? [{ url: decodeStreamUrl(t.url), calidad: 'HD' }] : [],
                 tipoAPI: 'voodc'
             }];
             
@@ -622,7 +628,7 @@ async function loadTransmisiones() {
             const canalesNormalizados = (t.canales || []).map(canal => ({
                 numero: '',
                 nombre: canal.nombre || 'Canal',
-                enlaces: canal.url ? [{ url: canal.url, calidad: 'HD' }] : [],
+                enlaces: canal.url ? [{ url: decodeStreamUrl(canal.url), calidad: 'HD' }] : [],
                 tipoAPI: 'transmisiones4'
             }));
             
@@ -649,7 +655,7 @@ async function loadTransmisiones() {
                                     numero: '',
                                     nombre: stream.stream_source || stream.platform || `Canal ${idx + 1}`,
                                     enlaces: [{
-                                        url: stream.match_url,
+                                        url: decodeStreamUrl(stream.match_url),
                                         calidad: stream.stream_quality === 'hd' ? 'HD' : 'SD',
                                         platform: stream.platform,
                                         source: stream.stream_source
@@ -694,11 +700,11 @@ async function loadTransmisiones() {
             const canalesExpand = [];
             (t.canales || []).forEach(c => {
                 if (c.links) {
-                    if (c.links.principal) canalesExpand.push({ ...c, nombre: c.nombre || 'Canal', url: c.links.principal, tipoAPI: 'rereyano' });
-                    if (c.links.backup)    canalesExpand.push({ ...c, nombre: `${c.nombre || 'Canal'} OP2`, url: c.links.backup, tipoAPI: 'rereyano' });
-                    if (c.links.wrapper)   canalesExpand.push({ ...c, nombre: `${c.nombre || 'Canal'} OP3`, url: c.links.wrapper, tipoAPI: 'rereyano' });
+                    if (c.links.principal) canalesExpand.push({ ...c, nombre: c.nombre || 'Canal', url: decodeStreamUrl(c.links.principal), tipoAPI: 'rereyano' });
+                    if (c.links.backup)    canalesExpand.push({ ...c, nombre: `${c.nombre || 'Canal'} OP2`, url: decodeStreamUrl(c.links.backup), tipoAPI: 'rereyano' });
+                    if (c.links.wrapper)   canalesExpand.push({ ...c, nombre: `${c.nombre || 'Canal'} OP3`, url: decodeStreamUrl(c.links.wrapper), tipoAPI: 'rereyano' });
                 } else {
-                    canalesExpand.push({ ...c, tipoAPI: 'rereyano' });
+                    canalesExpand.push({ ...c, url: decodeStreamUrl(c.url), tipoAPI: 'rereyano' });
                 }
             });
             return { ...t, tipoAPI: 'rereyano', canales: canalesExpand };
@@ -710,13 +716,13 @@ async function loadTransmisiones() {
 
             if (t.canales && t.canales.length > 0) {
                 // Formato JSON local: ya tiene canales
-                canalesNormalizados = t.canales.map(c => ({ ...c, tipoAPI: 'transmisiones6' }));
+                canalesNormalizados = t.canales.map(c => ({ ...c, url: decodeStreamUrl(c.url), tipoAPI: 'transmisiones6' }));
             } else if (t.fuentes && t.fuentes.length > 0) {
                 // Formato API externa (streamed.pk): usa "fuentes" → convertir a canales
                 canalesNormalizados = t.fuentes.map(f => ({
                     numero: '',
                     nombre: f.fuente || 'Canal',
-                    enlaces: f.url ? [{ url: f.url, calidad: 'HD' }] : [],
+                    enlaces: f.url ? [{ url: decodeStreamUrl(f.url), calidad: 'HD' }] : [],
                     tipoAPI: 'transmisiones6'
                 }));
             }
@@ -733,7 +739,7 @@ async function loadTransmisiones() {
             const canalesNormalizados = (t.canales || []).map(canal => ({
                 numero: '',
                 nombre: canal.nombre || 'Canal',
-                enlaces: canal.url ? [{ url: canal.url, calidad: 'HD' }] : [],
+                enlaces: canal.url ? [{ url: decodeStreamUrl(canal.url), calidad: 'HD' }] : [],
                 tipoAPI: 'transmisiones7'
             }));
 
@@ -3099,6 +3105,8 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     const videoContainer = modal.querySelector('.player-video-container');
     const modalTitle = document.getElementById('modalTitle');
     const statsContainer = document.getElementById('playerStatsContainer');
+
+    streamUrl = decodeStreamUrl(streamUrl);
     
     // Guardar en historial antes de abrir
     modalNavigation.pushModal('player', { streamUrl, title, isYouTube });
