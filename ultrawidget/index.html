@@ -109,15 +109,15 @@ html,body{height:100%;background:var(--bg);color:var(--t1);font-family:'Inter',s
 .chip.on .chip-count{background:rgba(255,255,255,.12);color:inherit}
 
 /* ────── LAYOUT ────── */
-.page{display:flex;min-height:calc(100vh - 56px - 45px - 52px)}
+.page{display:flex;min-height:calc(100vh - 56px - 52px)}
 
 /* ────── SIDEBAR ────── */
 .sidebar{
   width:220px;flex-shrink:0;
   border-right:1px solid var(--border);
   padding:16px 0;
-  position:sticky;top:calc(56px + 45px + 52px);
-  height:calc(100vh - 56px - 45px - 52px);
+  position:sticky;top:calc(56px + 52px);
+  height:calc(100vh - 56px - 52px);
   overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--s4) transparent;
 }
 .sb-sec{padding:0 12px;margin-bottom:20px}
@@ -411,7 +411,10 @@ body.modal-open{overflow:hidden}
 @media(max-width:860px){.sidebar{display:none}}
 @media(max-width:600px){
   .ev-grid{grid-template-columns:1fr}
-  .topbar-right .pill-green,.topbar-right .pill-blue{display:none}
+  .topbar-right .pill-blue{display:none}
+  .search-wrap{min-width:0;max-width:none}
+  #searchInput{font-size:13px}
+  .logo-name{display:none}
 }
 </style>
 </head>
@@ -420,32 +423,23 @@ body.modal-open{overflow:hidden}
 <!-- TOPBAR -->
 <header class="topbar">
   <a href="/" class="logo">
-    <div class="logo-icon">📡</div>
+    <img src="/assets/logos/l3ho-logo.png" alt="L3HO" class="logo-icon" style="object-fit:contain;background:none;border-radius:9px;">
     <div class="logo-name">Ultra<b>Widget</b></div>
   </a>
   <div class="search-wrap">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-    <input id="searchInput" type="search" placeholder="Equipo, partido, liga…" autocomplete="off">
+    <input id="searchInput" type="search" placeholder="Buscar partido…" autocomplete="off">
   </div>
   <div class="topbar-right">
     <span class="pill pill-live"><span class="pulsedot"></span><span id="cntLive">0</span> en vivo</span>
     <span class="pill pill-green" id="cntEvPill">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 6h13M8 12h13M8 18h13"/></svg>
-      <span id="cntEv">0</span> eventos
-    </span>
-    <span class="pill pill-blue" id="cntChPill">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="15" rx="2"/><path d="M17 7V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v2"/></svg>
-      <span id="cntCh">0</span> canales
+      <span id="cntEv">0</span>
     </span>
   </div>
 </header>
 
-<!-- SOURCES BAR -->
-<div class="sources-row" id="sourcesRow">
-  <div class="src-chip"><span class="src-dot" style="background:#4361ee"></span>Cargando…</div>
-</div>
-
-<!-- FILTER CHIPS -->
+<!-- STATUS FILTER BAR -->
 <div class="filter-row" id="filterRow">
   <button class="chip on" data-f="all" onclick="setStatus('all',this)">
     Todos <span class="chip-count" id="fc-all">0</span>
@@ -765,21 +759,11 @@ async function loadAll(){
 function updateStats(data){
   const live=events.filter(e=>e.status==='live').length;
   const tot=events.length;
-  const chs=events.reduce((s,e)=>s+e.channels.length,0);
   document.getElementById('cntLive').textContent=live;
   document.getElementById('cntEv').textContent=tot;
-  document.getElementById('cntCh').textContent=chs;
   document.getElementById('fc-all').textContent=tot;
   document.getElementById('fc-up').textContent=events.filter(e=>e.status==='upcoming').length;
   document.getElementById('fc-fin').textContent=events.filter(e=>e.status==='finished').length;
-
-  const colors=['#4361ee','#7c3aed','#0891b2','#059669','#d97706','#dc2626','#6366f1'];
-  const labels=['API1','API2','API3','API4','API5','API6','API7'];
-  const counts=[(data.api1||[]).length,(data.api2||[]).length,(data.api3||[]).length,(data.api4||[]).length,(data.api5||[]).length,(data.api6||[]).length,(data.api7||[]).length];
-  const now=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'});
-  document.getElementById('sourcesRow').innerHTML=
-    labels.map((l,i)=>`<div class="src-chip"><span class="src-dot" style="background:${colors[i]}"></span>${l} (${counts[i]})</div>`).join('')+
-    `<span class="src-time" style="margin-left:auto">🕐 ${now}</span>`;
 }
 
 function buildSidebar(){
