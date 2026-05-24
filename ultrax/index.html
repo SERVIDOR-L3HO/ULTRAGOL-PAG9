@@ -66,7 +66,6 @@
         } catch(e) {}
     })();
     </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3612607805789879" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="app-container">
@@ -1149,39 +1148,6 @@
         });
     </script>
 
-    <!-- Script para procesar anuncios de Google -->
-    <script>
-        (function() {
-            function initializeAds() {
-                if (window.adsbygoogle !== undefined) {
-                    try {
-                        window.adsbygoogle.push({});
-                        console.log('✅ Anuncios procesados correctamente');
-                    } catch (e) {
-                        console.error('Error al procesar anuncios:', e);
-                    }
-                }
-            }
-
-            // Inicializar cuando el DOM esté listo
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initializeAds);
-            } else {
-                initializeAds();
-            }
-
-            // Reintentar cada 5 segundos
-            setInterval(() => {
-                if (window.adsbygoogle !== undefined && document.querySelectorAll('.adsbygoogle').length > 0) {
-                    try {
-                        window.adsbygoogle.push({});
-                    } catch (e) {
-                        // Error silencioso
-                    }
-                }
-            }, 5000);
-        })();
-    </script>
     <script>
         function updateCountdown() {
             const worldCupDate = new Date('June 11, 2026 00:00:00').getTime();
