@@ -4793,87 +4793,85 @@ function displaySearchResults(results, query) {
         html += `</div>`;
     }
     
-    // Mostrar transmisiones encontradas (deduplicadas, con logos y servidores)
+    // Mostrar transmisiones agrupadas por deporte — diseño grid 2 columnas
     if (results.importantMatches.length > 0) {
         const deporteIconos = {
             'fútbol': 'fas fa-futbol', 'futbol': 'fas fa-futbol',
-            'baloncesto': 'fas fa-basketball-ball', 'basketball': 'fas fa-basketball-ball',
+            'baloncesto': 'fas fa-basketball-ball', 'basketball': 'fas fa-basketball-ball', 'nba': 'fas fa-basketball-ball',
             'hockey': 'fas fa-hockey-puck',
             'béisbol': 'fas fa-baseball-ball', 'beisbol': 'fas fa-baseball-ball',
             'tenis': 'fas fa-table-tennis',
+            'ufc': 'fas fa-fist-raised', 'mma': 'fas fa-fist-raised',
+            'nfl': 'fas fa-football-ball', 'fútbol americano': 'fas fa-football-ball', 'futbol americano': 'fas fa-football-ball',
+            'golf': 'fas fa-golf-ball',
+            'ciclismo': 'fas fa-bicycle',
+            'boxeo': 'fas fa-fist-raised',
         };
 
-        html += `<div class="search-section">
-            <div class="search-section-title">
-                <div class="search-section-icon">
-                    <i class="fas fa-broadcast-tower"></i>
-                </div>
-                <span>Transmisiones</span>
-                <span class="search-section-badge">${results.importantMatches.length}</span>
-            </div>`;
-
-        results.importantMatches.forEach((transmision) => {
-            const estadoAPI = (transmision.estado || '').toLowerCase().trim();
-            const isLive = estadoAPI.includes('vivo') || estadoAPI.includes('live');
-            const isPorComenzar = estadoAPI.includes('por comenzar') || estadoAPI.includes('comenzar');
-            const canalesCount = transmision.canales?.length || 0;
-            const hasChannels = canalesCount > 0;
-            const deporte = (transmision.deporte || 'Fútbol');
-            const deporteKey = deporte.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            const deporteIcon = deporteIconos[deporteKey] || 'fas fa-trophy';
-            const liga = transmision.liga || deporte;
-            const hora = transmision.hora || '';
-            const eventName = transmision.evento || transmision.titulo || 'Partido';
-            const eq1 = transmision.equipo1 || '';
-            const eq2 = transmision.equipo2 || '';
-            const logo1 = transmision.logo1 || '';
-            const logo2 = transmision.logo2 || '';
-            const hasLogos = logo1 || logo2;
-            const safeEvent = eventName.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-
-            let statusBadge = '';
-            if (isLive) {
-                statusBadge = '<span class="smp-badge-live"><span class="smp-live-dot"></span> EN VIVO</span>';
-            } else if (isPorComenzar) {
-                statusBadge = '<span class="smp-badge-soon"><i class="fas fa-hourglass-half"></i> POR COMENZAR</span>';
-            } else {
-                statusBadge = `<span class="smp-badge-scheduled"><i class="far fa-clock"></i> ${hora || 'PRÓXIMO'}</span>`;
-            }
-
-            html += `
-                <div class="smp-card ${isLive ? 'smp-card-live' : ''}"
-                     tabindex="0" role="button"
-                     aria-label="${eventName}"
-                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectImportantMatchByName('${safeEvent}')}"
-                     onclick='selectImportantMatchByName("${safeEvent}")'>
-                    <div class="smp-logos-col">
-                        ${hasLogos ? `
-                            <img class="smp-team-logo" src="${logo1}" alt="${eq1}" onerror="this.style.display='none'">
-                            <div class="smp-sport-icon"><i class="${deporteIcon}"></i></div>
-                            <img class="smp-team-logo" src="${logo2}" alt="${eq2}" onerror="this.style.display='none'">
-                        ` : `<div class="smp-sport-icon smp-sport-icon-only"><i class="${deporteIcon}"></i></div>`}
-                    </div>
-                    <div class="smp-info-col">
-                        <div class="smp-badges-row">
-                            <span class="smp-badge-liga">${liga}</span>
-                            ${statusBadge}
-                        </div>
-                        ${eq1 && eq2 ? `<div class="smp-teams-row">${eq1} <span class="smp-vs">vs</span> ${eq2}</div>` : ''}
-                        <div class="smp-event-name">${eventName}</div>
-                        <div class="smp-footer-row">
-                            <span class="smp-servers-count ${!hasChannels ? 'smp-no-servers' : ''}">
-                                <i class="fas fa-server"></i>
-                                ${hasChannels ? `${canalesCount} servidor${canalesCount !== 1 ? 'es' : ''}` : 'Sin servidores'}
-                            </span>
-                            ${hasChannels ? `<button class="smp-play-btn" onclick='event.stopPropagation(); selectImportantMatchByName("${safeEvent}")'>
-                                <i class="fas fa-play"></i> Ver
-                            </button>` : ''}
-                        </div>
-                    </div>
-                </div>`;
+        // Agrupar por deporte
+        const bySport = {};
+        results.importantMatches.forEach(t => {
+            const sport = t.deporte || 'Fútbol';
+            if (!bySport[sport]) bySport[sport] = [];
+            bySport[sport].push(t);
         });
 
-        html += `</div>`;
+        Object.entries(bySport).forEach(([sport, items]) => {
+            const sportKey = sport.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            const sportIcon = deporteIconos[sportKey] || 'fas fa-trophy';
+            const hasLive = items.some(i => {
+                const s = (i.estado || '').toLowerCase();
+                return s.includes('vivo') || s.includes('live');
+            });
+
+            html += `
+            <div class="sr-group">
+                <div class="sr-group-header">
+                    <div class="sr-group-bar"></div>
+                    <i class="${sportIcon}"></i>
+                    <span class="sr-group-name">${sport.toUpperCase()}</span>
+                </div>
+                <div class="sr-group-sub">${hasLive ? '<span class="sr-live-indicator"><span class="sr-live-dot"></span>EN VIVO</span>' : 'PRÓXIMOS EVENTOS'}</div>
+                <div class="sr-grid">`;
+
+            items.forEach(transmision => {
+                const estadoAPI = (transmision.estado || '').toLowerCase().trim();
+                const isLive = estadoAPI.includes('vivo') || estadoAPI.includes('live');
+                const hora = transmision.hora || '';
+                const eventName = transmision.evento || transmision.titulo || 'Partido';
+                const eq1 = transmision.equipo1 || '';
+                const eq2 = transmision.equipo2 || '';
+                const logo1 = transmision.logo1 || '';
+                const logo2 = transmision.logo2 || '';
+                const liga = transmision.liga || sport;
+                const canalesCount = transmision.canales?.length || 0;
+                const safeEvent = eventName.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const displayTitle = eq1 && eq2 ? `${eq1} vs ${eq2}` : eventName;
+
+                html += `
+                <div class="sr-card ${isLive ? 'sr-card-live' : ''}" onclick='selectImportantMatchByName("${safeEvent}")'>
+                    <div class="sr-thumb">
+                        <div class="sr-thumb-bg"></div>
+                        ${logo1 || logo2 ? `
+                        <div class="sr-thumb-logos">
+                            ${logo1 ? `<img src="${logo1}" alt="${eq1}" onerror="this.style.display='none'">` : `<div class="sr-thumb-logo-placeholder"><i class="${sportIcon}"></i></div>`}
+                            <div class="sr-thumb-vs"><i class="fas fa-bolt"></i></div>
+                            ${logo2 ? `<img src="${logo2}" alt="${eq2}" onerror="this.style.display='none'">` : `<div class="sr-thumb-logo-placeholder"><i class="${sportIcon}"></i></div>`}
+                        </div>` : `
+                        <div class="sr-thumb-icon-only"><i class="${sportIcon}"></i></div>`}
+                        ${isLive ? `<div class="sr-thumb-live"><span class="sr-live-dot"></span>EN VIVO</div>` : hora ? `<div class="sr-thumb-time"><i class="far fa-clock"></i> ${hora}</div>` : ''}
+                        ${canalesCount > 0 ? `<div class="sr-thumb-servers"><i class="fas fa-play"></i> ${canalesCount}</div>` : ''}
+                        <div class="sr-thumb-overlay"></div>
+                    </div>
+                    <div class="sr-card-body">
+                        <div class="sr-card-liga">${liga}</div>
+                        <div class="sr-card-title">${displayTitle}</div>
+                    </div>
+                </div>`;
+            });
+
+            html += `</div></div>`;
+        });
     }
     
     // Mostrar equipos

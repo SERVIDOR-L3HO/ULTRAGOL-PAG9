@@ -14443,3 +14443,243 @@ body.dark-mode .news-content p {
         border-radius: 28px 28px 0 0 !important;
     }
 }
+
+/* ================================================================
+   RESULTADOS DE BÚSQUEDA — Grid 2 columnas agrupado por deporte
+   ================================================================ */
+
+/* Grupo por deporte */
+.sr-group {
+    padding: 0 16px 28px;
+}
+
+/* Encabezado del deporte */
+.sr-group-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+.sr-group-bar {
+    width: 4px;
+    height: 20px;
+    background: #FF6B00;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+.sr-group-header i {
+    font-size: 14px;
+    color: #fff;
+}
+.sr-group-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
+/* Subtítulo */
+.sr-group-sub {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    margin-left: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.sr-live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #ff4444;
+}
+.sr-live-dot {
+    width: 6px;
+    height: 6px;
+    background: #ff3b3b;
+    border-radius: 50%;
+    display: inline-block;
+    animation: srLiveBlink 1.1s ease-in-out infinite;
+    flex-shrink: 0;
+}
+@keyframes srLiveBlink { 0%,100%{opacity:1;}50%{opacity:0.2;} }
+
+/* Grid 2 columnas */
+.sr-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* Card */
+.sr-card {
+    cursor: pointer;
+    border-radius: 14px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    transition: transform 0.15s, border-color 0.15s;
+    -webkit-tap-highlight-color: transparent;
+}
+.sr-card:active {
+    transform: scale(0.97);
+    border-color: rgba(255,107,0,0.35);
+}
+.sr-card-live {
+    border-color: rgba(255,59,59,0.28);
+}
+
+/* Thumbnail */
+.sr-thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #111;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sr-thumb-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255,107,0,0.07) 0%, rgba(0,0,0,0) 70%);
+}
+.sr-thumb-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
+    pointer-events: none;
+}
+
+/* Logos de equipo en el thumbnail */
+.sr-thumb-logos {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    width: 100%;
+}
+.sr-thumb-logos img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+    flex-shrink: 0;
+}
+.sr-thumb-logo-placeholder {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.06);
+    border-radius: 10px;
+}
+.sr-thumb-logo-placeholder i {
+    font-size: 18px;
+    color: rgba(255,255,255,0.3);
+}
+.sr-thumb-vs {
+    font-size: 10px;
+    color: rgba(255,107,0,0.7);
+    flex-shrink: 0;
+}
+.sr-thumb-vs i { font-size: 12px; }
+
+/* Sin logos — ícono centrado */
+.sr-thumb-icon-only {
+    position: relative;
+    z-index: 1;
+    font-size: 32px;
+    color: rgba(255,255,255,0.12);
+}
+
+/* Badge EN VIVO dentro del thumb */
+.sr-thumb-live {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(255,44,44,0.88);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    padding: 3px 7px;
+    border-radius: 50px;
+    text-transform: uppercase;
+    backdrop-filter: blur(4px);
+}
+
+/* Hora dentro del thumb */
+.sr-thumb-time {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2;
+    background: rgba(0,0,0,0.65);
+    color: rgba(255,255,255,0.7);
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 50px;
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* Número de servidores */
+.sr-thumb-servers {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    z-index: 2;
+    background: rgba(255,107,0,0.85);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 3px 7px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    backdrop-filter: blur(4px);
+}
+
+/* Info debajo del thumb */
+.sr-card-body {
+    padding: 8px 10px 10px;
+}
+.sr-card-liga {
+    font-size: 10px;
+    font-weight: 700;
+    color: #FF6B00;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sr-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
