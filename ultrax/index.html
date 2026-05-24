@@ -824,40 +824,56 @@
         </div>
     </div>
 
-    <!-- Modal de Búsqueda Profesional -->
+    <!-- Buscador: Canvas Browser Style -->
     <div id="searchModal" class="search-modal">
         <div class="search-modal-overlay" onclick="closeSearchModal()"></div>
         <div class="search-modal-container">
-            <div class="search-modal-header">
-                <div class="search-header-top">
-                    <h2 class="search-modal-title">
-                        <i class="fas fa-compass"></i>
-                        Explora UltraGol
-                    </h2>
-                    <button class="close-search-modal" onclick="closeSearchModal()">
-                        <i class="fas fa-times"></i>
-                    </button>
+            <!-- Handle -->
+            <div class="sb-handle-bar"></div>
+
+            <!-- Top brand row -->
+            <div class="sb-header">
+                <div class="sb-logo">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="11" fill="#FF6B00"/>
+                        <circle cx="12" cy="12" r="5" fill="rgba(0,0,0,0.25)"/>
+                        <path d="M12 3 L14.5 8.5 L20.5 9 L16.5 13 L17.5 19 L12 16 L6.5 19 L7.5 13 L3.5 9 L9.5 8.5Z" fill="white" opacity="0.9"/>
+                    </svg>
+                    <span>UltraGol</span>
                 </div>
-                <div class="search-input-wrapper">
-                    <div class="search-input-icon">
-                        <i class="fas fa-search"></i>
-                    </div>
-                    <input type="search" id="searchInput" class="search-input" placeholder="Busca equipos, ligas, partidos..." autocomplete="off" inputmode="text">
-                    <button class="clear-search-btn" onclick="clearSearch()" style="display: none;">
+                <button class="sb-close-btn close-search-modal" onclick="closeSearchModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Address Bar -->
+            <div class="sb-address-row">
+                <div class="sb-address-bar">
+                    <i class="fas fa-search sb-addr-icon"></i>
+                    <input type="search" id="searchInput" class="search-input"
+                        placeholder="Busca equipos, ligas, partidos..."
+                        autocomplete="off" inputmode="text">
+                    <button class="clear-search-btn" onclick="clearSearch()" style="display:none">
                         <i class="fas fa-times-circle"></i>
                     </button>
                     <button id="voiceSearchBtn" class="voice-search-btn" onclick="startVoiceSearch()" title="Buscar por voz">
                         <i class="fas fa-microphone"></i>
                     </button>
                 </div>
+            </div>
+
+            <!-- Sport Chips -->
+            <div class="sb-chips-row">
                 <div class="search-sport-chips">
                     <button class="sport-chip active" onclick="filterBySport('todos', this)">Todos</button>
                     <button class="sport-chip" onclick="filterBySport('fútbol', this)"><i class="fas fa-futbol"></i> Fútbol</button>
                     <button class="sport-chip" onclick="filterBySport('basket', this)"><i class="fas fa-basketball-ball"></i> NBA</button>
-                    <button class="sport-chip" onclick="filterBySport('box', this)"><i class="fas fa-fist-raised"></i> UFC/Box</button>
+                    <button class="sport-chip" onclick="filterBySport('box', this)"><i class="fas fa-fist-raised"></i> UFC</button>
                     <button class="sport-chip" onclick="filterBySport('americano', this)"><i class="fas fa-football-ball"></i> NFL</button>
                 </div>
             </div>
+
+            <!-- Results -->
             <div class="search-modal-body" id="searchResults"></div>
         </div>
     </div>
