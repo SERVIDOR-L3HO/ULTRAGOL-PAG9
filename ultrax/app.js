@@ -1979,15 +1979,22 @@ function showChannelSelector(transmision, partidoNombre) {
     const totalCanales = transmision.canales ? transmision.canales.length : 0;
 
     const servidorMap = {
+        'transmisiones':  'SERVIDOR 1',
+        'marcadores':     'SERVIDOR 1',
         'e1link':         'SERVIDOR 1',
         'ellink':         'SERVIDOR 1',
+        'transmisiones2': 'SERVIDOR 2',
         'rereyano':       'SERVIDOR 2',
         'golazolvhd':     'SERVIDOR 2',
-        'transmisiones4': 'SERVIDOR 3',
+        'transmisiones3': 'SERVIDOR 3',
         'voodc':          'SERVIDOR 3',
+        'transmisiones4': 'SERVIDOR 4',
         'ftvhd':          'SERVIDOR 4',
+        'transmisiones5': 'SERVIDOR 5',
         'donromans':      'SERVIDOR 5',
         'transmisiones6': 'SERVIDOR 6',
+        'transmisiones7': 'SERVIDOR 7',
+        'transmisiones8': 'SERVIDOR 8',
     };
 
     let cardsHtml = '';
