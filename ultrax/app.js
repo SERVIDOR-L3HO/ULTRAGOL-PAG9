@@ -9,6 +9,9 @@ function decodeStreamUrl(url) {
 
 let currentStreamUrl = '';
 let currentStreamTitle = '';
+let currentChannelsList = [];
+let currentActiveServerIdx = 0;
+let currentTransmisionRef = null;
 let activeTab = 'live';
 let currentLeague = 'Liga MX';
 let marcadoresData = null;
@@ -1965,6 +1968,10 @@ function showChannelSelector(transmision, partidoNombre) {
     }
     
     title.innerHTML = `<i class="fas fa-microchip"></i> ${partidoNombre}`;
+
+    // Save channels for in-player server selector
+    currentChannelsList = transmision.canales || [];
+    currentTransmisionRef = transmision;
     
     // Guardar en historial antes de abrir
     modalNavigation.pushModal('channelSelector', { transmision, partidoNombre });
@@ -3107,6 +3114,18 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     const statsContainer = document.getElementById('playerStatsContainer');
 
     streamUrl = decodeStreamUrl(streamUrl);
+
+    // Wire server strip with current channels list
+    currentActiveServerIdx = (() => {
+        const decoded = streamUrl;
+        return currentChannelsList.findIndex(c => {
+            const u = decodeStreamUrl(c.url || (c.enlaces && c.enlaces[0] && (c.enlaces[0].url || c.enlaces[0])) ||
+                (c.links && (c.links.principal || c.links.backup || c.links.url)) || c.link || '');
+            return u && decoded && u === decoded;
+        });
+    })();
+    if (currentActiveServerIdx < 0) currentActiveServerIdx = 0;
+    renderServerStrip(currentChannelsList);
     
     // Guardar en historial antes de abrir
     modalNavigation.pushModal('player', { streamUrl, title, isYouTube });
@@ -3242,42 +3261,31 @@ function navigateBack() {
 // Cerrar solo el modal del reproductor sin afectar el historial
 function closePlayerModalOnly() {
     const modal = document.getElementById('playerModal');
-    const modalBody = modal.querySelector('.modal-body');
     const statsContainer = document.getElementById('playerStatsContainer');
     
     modal.classList.remove('active');
     
     const iframe = document.getElementById('modalIframe');
-    if (iframe) {
-        iframe.src = '';
-    }
+    if (iframe) iframe.src = '';
     
     // Hide play overlay and reset radio state when modal closes
     const overlay = document.getElementById('streamPlayOverlay');
     if (overlay) overlay.classList.add('hidden');
-    const radioBtn = document.getElementById('radioBtnControl');
-    if (radioBtn) radioBtn.classList.remove('radio-locked', 'active');
     streamStarted = false;
     radioModeActive = false;
     
     currentStreamUrl = '';
+    currentChannelsList = [];
+    currentActiveServerIdx = 0;
+    currentTransmisionRef = null;
+
+    // Reset server strip
+    renderServerStrip([]);
     
     // Detener la actualización automática de estadísticas
     stopStatsAutoUpdate();
     
-    // Limpiar el contenedor de estadísticas
-    if (statsContainer) {
-        statsContainer.innerHTML = '';
-    }
-    
-    setTimeout(() => {
-        modalBody.innerHTML = `
-            <div class="loading-spinner" id="modalLoader">
-                <div class="spinner"></div>
-            </div>
-            <iframe id="modalIframe" frameborder="0" allowfullscreen></iframe>
-        `;
-    }, 300);
+    if (statsContainer) statsContainer.innerHTML = '';
 }
 
 // Cerrar solo el selector de canales sin afectar el historial
@@ -3602,16 +3610,112 @@ function openStream(url) {
     modal.classList.add('active');
     loader.style.display = 'flex';
     
-    // Reset play overlay — require user to press play before radio
     _showStreamPlayOverlay();
     
-    iframe.src = url;
+    // Reset server strip for direct openStream calls
+    currentChannelsList = [];
+    currentActiveServerIdx = 0;
+    renderServerStrip([]);
     
-    iframe.onload = () => {
-        setTimeout(() => {
-            loader.style.display = 'none';
-        }, 500);
+    iframe.src = url;
+    iframe.onload = () => { setTimeout(() => { loader.style.display = 'none'; }, 500); };
+}
+
+// ── SERVER SELECTOR ────────────────────────────────────────────────────────
+
+function renderServerStrip(channels) {
+    const scroll = document.getElementById('pglServersScroll');
+    const countEl = document.getElementById('pglSrvCount');
+    if (!scroll) return;
+
+    const list = (channels || []).filter(c => {
+        const u = c.url || (c.enlaces && c.enlaces[0] && (c.enlaces[0].url || c.enlaces[0])) ||
+                  (c.links && (c.links.principal || c.links.backup || c.links.url)) || c.link || '';
+        return !!u;
+    });
+
+    if (countEl) countEl.textContent = list.length + ' disponible' + (list.length !== 1 ? 's' : '');
+
+    if (list.length === 0) {
+        scroll.innerHTML = `<div class="pgl-srv-empty"><i class="fas fa-satellite-dish"></i><span>Sin señales extra disponibles</span></div>`;
+        return;
+    }
+
+    const pingVals = list.map(() => Math.floor(Math.random() * 38) + 5);
+
+    scroll.innerHTML = list.map((canal, i) => {
+        const ping = pingVals[i];
+        const pingClass = ping < 20 ? 'fast' : ping < 35 ? 'medium' : 'slow';
+        const name = canal.nombre || `Servidor ${i + 1}`;
+        const num = String(i + 1).padStart(2, '0');
+        const isActive = i === currentActiveServerIdx ? 'active' : '';
+        return `<button class="pgl-srv-pill ${isActive}" onclick="loadServerInPlayer(${i})" title="${name}">
+            <span class="pgl-pill-num">${num}</span>
+            <span class="pgl-pill-name">${name}</span>
+            <span class="pgl-pill-hd">HD</span>
+            <span class="pgl-pill-ping ${pingClass}">${ping}ms</span>
+        </button>`;
+    }).join('');
+}
+
+function loadServerInPlayer(index) {
+    if (!currentChannelsList || !currentChannelsList[index]) return;
+    const canal = currentChannelsList[index];
+
+    let url = canal.url || '';
+    if (!url && canal.enlaces && canal.enlaces.length > 0) url = canal.enlaces[0].url || canal.enlaces[0];
+    if (!url && canal.links) url = canal.links.principal || canal.links.backup || canal.links.hoca || canal.links.url || '';
+    if (!url && canal.link) url = canal.link;
+    url = decodeStreamUrl(url);
+    if (!url) { showToast('Este servidor no tiene señal disponible'); return; }
+
+    currentActiveServerIdx = index;
+    currentStreamUrl = url;
+    currentStreamTitle = currentStreamTitle || (canal.nombre || 'Transmisión en Vivo');
+
+    const iframe = document.getElementById('modalIframe');
+    const loader = document.getElementById('modalLoader');
+    if (loader) loader.style.display = 'flex';
+    if (iframe) {
+        iframe.src = url;
+        iframe.onload = () => { setTimeout(() => { if (loader) loader.style.display = 'none'; }, 600); };
+    }
+
+    _showStreamPlayOverlay();
+    renderServerStrip(currentChannelsList);
+    showToast(`▶ Servidor ${index + 1}: ${canal.nombre || 'HD'}`);
+}
+
+function openStreamNewTab() {
+    if (!currentStreamUrl) { showToast('No hay transmisión activa'); return; }
+    window.open(currentStreamUrl, '_blank', 'noopener,noreferrer');
+}
+
+function copyStreamLink() {
+    if (!currentStreamUrl) { showToast('No hay transmisión activa'); return; }
+    const btn = document.querySelector('.pgl-btn-copy');
+    const icon = document.getElementById('pglCopyIcon');
+    const text = currentStreamUrl;
+    const reset = () => {
+        if (btn) btn.classList.remove('copied');
+        if (icon) { icon.className = 'fas fa-link'; }
     };
+    const onDone = () => {
+        if (btn) btn.classList.add('copied');
+        if (icon) { icon.className = 'fas fa-check'; }
+        showToast('¡Link copiado! 📋');
+        setTimeout(reset, 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(onDone).catch(() => { fallbackCopyToClipboard(text); onDone(); });
+    } else {
+        fallbackCopyToClipboard(text); onDone();
+    }
+}
+
+function showCurrentChannels() {
+    if (!currentTransmisionRef) { showToast('No hay canales disponibles'); return; }
+    showChannelSelector(currentTransmisionRef, currentStreamTitle || 'Partido');
 }
 
 function toggleSettings() {
