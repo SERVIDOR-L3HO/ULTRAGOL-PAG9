@@ -4040,10 +4040,6 @@ function showSearchWelcome() {
     resultsContainer.innerHTML = `
         <div class="sw-root">
             ${historyHtml}
-            <div class="sw-section">
-                <div class="sw-section-head"><span><i class="fas fa-trophy"></i> Ligas</span></div>
-                <div class="sw-list">${leagueRows}</div>
-            </div>
         </div>
     `;
 }
