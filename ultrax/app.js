@@ -24,6 +24,7 @@ let transmisionesAPI4 = null;
 let transmisionesAPI5 = null;
 let transmisionesAPI6 = null;
 let transmisionesAPI7 = null;
+let transmisionesAPI8 = null;
 let updateInterval = null;
 let currentFeaturedIndex = 0;
 let featuredMatches = [];
@@ -541,7 +542,7 @@ async function loadMarcadores() {
 async function loadTransmisiones() {
     try {
         // Cargar las 7 APIs en paralelo con manejo individual de errores y timeouts
-        const [data1, data2, data3, data4, data5, data6, data7] = await Promise.all([
+        const [data1, data2, data3, data4, data5, data6, data7, data8] = await Promise.all([
             fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones', 8000)
                 .then(res => res.json())
                 .catch(err => {
@@ -582,6 +583,12 @@ async function loadTransmisiones() {
                 .then(res => res.json())
                 .catch(err => {
                     _log('⚠️ Error cargando API 7 (transmisiones7):', err.message);
+                    return { transmisiones: [] };
+                }),
+            fetchWithTimeout('https://ultragol-api-3.vercel.app/transmisiones8', 8000)
+                .then(res => res.json())
+                .catch(err => {
+                    _log('⚠️ Error cargando API 8 (transmisiones8):', err.message);
                     return { transmisiones: [] };
                 })
         ]);
@@ -754,6 +761,24 @@ async function loadTransmisiones() {
                 tipoAPI: 'transmisiones7'
             };
         });
+
+        // Normalizar transmisiones API 8 (misma estructura que transmisiones7)
+        const transmisionesNormalizadasAPI8 = (data8.transmisiones || []).map(t => {
+            const canalesNormalizados = (t.canales || []).map(canal => ({
+                numero: '',
+                nombre: canal.nombre || 'Canal',
+                enlaces: canal.url ? [{ url: decodeStreamUrl(canal.url), calidad: 'HD' }] : [],
+                tipoAPI: 'transmisiones8'
+            }));
+
+            return {
+                ...t,
+                evento: t.evento || t.titulo,
+                titulo: t.titulo || t.evento,
+                canales: canalesNormalizados,
+                tipoAPI: 'transmisiones8'
+            };
+        });
         
         // Guardar datos separados de cada API
         transmisionesAPI1 = {
@@ -784,8 +809,12 @@ async function loadTransmisiones() {
             ...data7,
             transmisiones: transmisionesNormalizadasAPI7
         };
+        transmisionesAPI8 = {
+            ...data8,
+            transmisiones: transmisionesNormalizadasAPI8
+        };
         
-        // Combinar las transmisiones de las 7 APIs (partidos pueden repetirse)
+        // Combinar las transmisiones de las 8 APIs (partidos pueden repetirse)
         const transmisionesCombinadas = [
             ...transmisionesAPI1Marcadas,
             ...transmisionesNormalizadasAPI2,
@@ -793,7 +822,8 @@ async function loadTransmisiones() {
             ...transmisionesNormalizadasAPI4,
             ...transmisionesNormalizadasAPI5,
             ...transmisionesAPI6Marcadas,
-            ...transmisionesNormalizadasAPI7
+            ...transmisionesNormalizadasAPI7,
+            ...transmisionesNormalizadasAPI8
         ];
         
         // Crear el objeto combinado
@@ -808,6 +838,7 @@ async function loadTransmisiones() {
         _log('✅ Transmisiones cargadas desde API 5 (donromans):', data5.matches?.length || 0);
         _log('✅ Transmisiones cargadas desde API 6 (external):', data6.transmisiones?.length || 0);
         _log('✅ Transmisiones cargadas desde API 7 (transmisiones7):', data7.transmisiones?.length || 0);
+        _log('✅ Transmisiones cargadas desde API 8 (transmisiones8):', data8.transmisiones?.length || 0);
         
         // Log detallado de API 5 para debugging
         const totalCanalesAPI5 = transmisionesNormalizadasAPI5.reduce((sum, t) => sum + (t.canales?.length || 0), 0);
@@ -1077,6 +1108,7 @@ async function _fmpShare(index, title) {
         { data: transmisionesAPI5, fuente: 'donromans'       },
         { data: transmisionesAPI6, fuente: 'transmisiones6'  },
         { data: transmisionesAPI7, fuente: 'transmisiones7'  },
+        { data: transmisionesAPI8, fuente: 'transmisiones8'  },
     ];
     for (const { data, fuente } of apis) {
         if (!data?.transmisiones) continue;
@@ -1146,6 +1178,7 @@ function openFeaturedMatchChannels(index) {
         { data: transmisionesAPI5, fuente: 'donromans'       },
         { data: transmisionesAPI6, fuente: 'transmisiones6'  },
         { data: transmisionesAPI7, fuente: 'transmisiones7'  },
+        { data: transmisionesAPI8, fuente: 'transmisiones8'  },
     ];
 
     let canalesCombinados = [];
@@ -1862,8 +1895,9 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
     const transmisionAPI5 = transmisionesAPI5 ? buscarTransmision(transmisionesAPI5.transmisiones) : null;
     const transmisionAPI6 = transmisionesAPI6 ? buscarTransmision(transmisionesAPI6.transmisiones) : null;
     const transmisionAPI7 = transmisionesAPI7 ? buscarTransmision(transmisionesAPI7.transmisiones) : null;
+    const transmisionAPI8 = transmisionesAPI8 ? buscarTransmision(transmisionesAPI8.transmisiones) : null;
     
-    // Combinar canales de las 7 APIs
+    // Combinar canales de las 8 APIs
     let canalesCombinados = [];
     let eventoNombre = '';
     
@@ -1935,6 +1969,16 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
         }));
         canalesCombinados = [...canalesCombinados, ...canalesAPI7];
         _log(`✅ Encontrados ${canalesAPI7.length} canales en API 7 (transmisiones7)`);
+    }
+
+    if (transmisionAPI8) {
+        if (!eventoNombre) eventoNombre = transmisionAPI8.evento || transmisionAPI8.titulo;
+        const canalesAPI8 = (transmisionAPI8.canales || []).map(canal => ({
+            ...canal,
+            fuente: 'transmisiones8'
+        }));
+        canalesCombinados = [...canalesCombinados, ...canalesAPI8];
+        _log(`✅ Encontrados ${canalesAPI8.length} canales en API 8 (transmisiones8)`);
     }
     
     if (canalesCombinados.length === 0) {
