@@ -14445,12 +14445,12 @@ body.dark-mode .news-content p {
 }
 
 /* ================================================================
-   RESULTADOS DE BÚSQUEDA — Grid 2 columnas agrupado por deporte
+   RESULTADOS DE BÚSQUEDA — Grid premium 2 columnas por deporte
    ================================================================ */
 
 /* Grupo por deporte */
 .sr-group {
-    padding: 0 16px 28px;
+    padding: 0 14px 32px;
 }
 
 /* Encabezado del deporte */
@@ -14458,35 +14458,37 @@ body.dark-mode .news-content p {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 .sr-group-bar {
-    width: 4px;
-    height: 20px;
-    background: #FF6B00;
+    width: 3px;
+    height: 22px;
+    background: linear-gradient(180deg, #FF6B00, #FF4500);
     border-radius: 2px;
     flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(255,107,0,0.5);
 }
 .sr-group-header i {
-    font-size: 14px;
-    color: #fff;
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
 }
 .sr-group-name {
-    font-size: 16px;
-    font-weight: 800;
+    font-size: 17px;
+    font-weight: 900;
     color: #fff;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
 /* Subtítulo */
 .sr-group-sub {
-    font-size: 11px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 0.8px;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.28);
+    letter-spacing: 1.2px;
     text-transform: uppercase;
-    margin-bottom: 12px;
-    margin-left: 14px;
+    margin-bottom: 14px;
+    margin-left: 13px;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -14496,6 +14498,7 @@ body.dark-mode .news-content p {
     align-items: center;
     gap: 5px;
     color: #ff4444;
+    font-weight: 800;
 }
 .sr-live-dot {
     width: 6px;
@@ -14503,10 +14506,14 @@ body.dark-mode .news-content p {
     background: #ff3b3b;
     border-radius: 50%;
     display: inline-block;
-    animation: srLiveBlink 1.1s ease-in-out infinite;
+    box-shadow: 0 0 6px rgba(255,59,59,0.7);
+    animation: srLivePulse 1.2s ease-in-out infinite;
     flex-shrink: 0;
 }
-@keyframes srLiveBlink { 0%,100%{opacity:1;}50%{opacity:0.2;} }
+@keyframes srLivePulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,59,59,0.7); }
+    50%      { box-shadow: 0 0 0 5px rgba(255,59,59,0); }
+}
 
 /* Grid 2 columnas */
 .sr-grid {
@@ -14515,171 +14522,241 @@ body.dark-mode .news-content p {
     gap: 10px;
 }
 
-/* Card */
+/* ---- CARD ---- */
 .sr-card {
     cursor: pointer;
-    border-radius: 14px;
+    border-radius: 18px;
     overflow: hidden;
-    background: rgba(255,255,255,0.04);
+    background: #0d0d0d;
     border: 1px solid rgba(255,255,255,0.07);
-    transition: transform 0.15s, border-color 0.15s;
+    transition: transform 0.2s cubic-bezier(0.34,1.4,0.64,1), box-shadow 0.2s;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
     -webkit-tap-highlight-color: transparent;
+    position: relative;
 }
 .sr-card:active {
-    transform: scale(0.97);
-    border-color: rgba(255,107,0,0.35);
+    transform: scale(0.94);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.6);
 }
 .sr-card-live {
-    border-color: rgba(255,59,59,0.28);
+    border-color: rgba(255,59,59,0.22);
+    box-shadow: 0 4px 24px rgba(255,59,59,0.1);
 }
 
-/* Thumbnail */
+/* ---- THUMBNAIL ---- */
 .sr-thumb {
     position: relative;
     width: 100%;
-    aspect-ratio: 16/10;
-    background: #111;
+    aspect-ratio: 4/3;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #0d0d0d;
 }
+
+/* Fondo: campo estilizado con cuadrícula y gradiente */
 .sr-thumb-bg {
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at center, rgba(255,107,0,0.07) 0%, rgba(0,0,0,0) 70%);
+    background:
+        radial-gradient(ellipse 90% 70% at 50% 110%, rgba(255,107,0,0.15) 0%, transparent 65%),
+        radial-gradient(ellipse 70% 50% at 20% -10%, rgba(255,107,0,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% -10%, rgba(255,200,0,0.04) 0%, transparent 55%),
+        linear-gradient(160deg, #111 0%, #0a0a0a 50%, #111 100%);
 }
+/* Cuadrícula tipo cancha */
+.sr-thumb-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 20px 20px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+/* Círculo central */
+.sr-thumb-bg::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,107,0,0.08);
+    box-shadow: 0 0 0 16px rgba(255,107,0,0.03);
+}
+
+/* Degradado inferior que cubre la cuadrícula bajo los logos */
 .sr-thumb-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 30%, rgba(0,0,0,0.82) 100%);
     pointer-events: none;
+    z-index: 3;
 }
 
-/* Logos de equipo en el thumbnail */
+/* ---- Logos de equipo ---- */
 .sr-thumb-logos {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 10px;
+    gap: 8px;
+    padding: 8px;
     width: 100%;
 }
+/* Círculo blanco detrás de cada logo */
 .sr-thumb-logos img {
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
     object-fit: contain;
-    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
     flex-shrink: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.92);
+    padding: 5px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.08);
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
 }
 .sr-thumb-logo-placeholder {
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: rgba(255,255,255,0.06);
-    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
 }
 .sr-thumb-logo-placeholder i {
-    font-size: 18px;
-    color: rgba(255,255,255,0.3);
+    font-size: 20px;
+    color: rgba(255,255,255,0.22);
 }
-.sr-thumb-vs {
-    font-size: 10px;
-    color: rgba(255,107,0,0.7);
-    flex-shrink: 0;
-}
-.sr-thumb-vs i { font-size: 12px; }
 
-/* Sin logos — ícono centrado */
+/* VS separador */
+.sr-thumb-vs {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+.sr-thumb-vs i {
+    font-size: 11px;
+    color: #FF6B00;
+    filter: drop-shadow(0 0 4px rgba(255,107,0,0.6));
+}
+
+/* Sin logos — ícono grande centrado */
 .sr-thumb-icon-only {
     position: relative;
-    z-index: 1;
-    font-size: 32px;
-    color: rgba(255,255,255,0.12);
+    z-index: 2;
+    font-size: 38px;
+    color: rgba(255,255,255,0.08);
+    filter: drop-shadow(0 0 20px rgba(255,107,0,0.12));
 }
 
-/* Badge EN VIVO dentro del thumb */
+/* ---- Badges flotantes ---- */
 .sr-thumb-live {
     position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 2;
+    top: 9px;
+    left: 9px;
+    z-index: 4;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, #e00, #ff3333);
+    color: #fff;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    padding: 4px 9px;
+    border-radius: 50px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 10px rgba(220,0,0,0.5);
+}
+.sr-thumb-live .sr-live-dot {
+    width: 5px;
+    height: 5px;
+    flex-shrink: 0;
+}
+
+.sr-thumb-time {
+    position: absolute;
+    top: 9px;
+    left: 9px;
+    z-index: 4;
+    background: rgba(0,0,0,0.7);
+    color: rgba(255,255,255,0.75);
+    font-size: 8px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 50px;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.08);
     display: flex;
     align-items: center;
     gap: 4px;
-    background: rgba(255,44,44,0.88);
-    color: #fff;
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 0.6px;
-    padding: 3px 7px;
-    border-radius: 50px;
-    text-transform: uppercase;
-    backdrop-filter: blur(4px);
 }
 
-/* Hora dentro del thumb */
-.sr-thumb-time {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 2;
-    background: rgba(0,0,0,0.65);
-    color: rgba(255,255,255,0.7);
-    font-size: 9px;
-    font-weight: 700;
-    padding: 3px 7px;
-    border-radius: 50px;
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-
-/* Número de servidores */
 .sr-thumb-servers {
     position: absolute;
-    bottom: 8px;
-    right: 8px;
-    z-index: 2;
-    background: rgba(255,107,0,0.85);
+    bottom: 9px;
+    right: 9px;
+    z-index: 4;
+    background: linear-gradient(135deg, #FF6B00, #FF4500);
     color: #fff;
     font-size: 9px;
-    font-weight: 800;
-    padding: 3px 7px;
+    font-weight: 900;
+    padding: 4px 9px;
     border-radius: 50px;
     display: flex;
     align-items: center;
-    gap: 3px;
-    backdrop-filter: blur(4px);
+    gap: 4px;
+    box-shadow: 0 2px 10px rgba(255,107,0,0.45);
 }
 
-/* Info debajo del thumb */
+/* ---- Info debajo del thumb ---- */
 .sr-card-body {
-    padding: 8px 10px 10px;
+    padding: 10px 11px 12px;
+    background: #0d0d0d;
+    position: relative;
+}
+/* Borde superior sutil naranja */
+.sr-card-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 11px;
+    right: 11px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,107,0,0.2), transparent);
 }
 .sr-card-liga {
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 9px;
+    font-weight: 800;
     color: #FF6B00;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 3px;
+    letter-spacing: 0.8px;
+    margin-bottom: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    opacity: 0.9;
 }
 .sr-card-title {
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 800;
     color: #fff;
-    line-height: 1.3;
+    line-height: 1.35;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    letter-spacing: -0.1px;
 }
