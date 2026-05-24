@@ -1086,7 +1086,7 @@ function normalizeTransmision(item, fuente) {
 
 // Fetch and merge all transmission sources + marcadores
 async function fetchAllPartidos() {
-    const [marc, t2, t3, t4, t5, t6, t7] = await Promise.all([
+    const [marc, t2, t3, t4, t5, t6, t7, t8] = await Promise.all([
         safeFetch(apiUrl('/marcadores')),
         safeFetch(apiUrl('/transmisiones2')),
         safeFetch(apiUrl('/transmisiones3')),
@@ -1094,6 +1094,7 @@ async function fetchAllPartidos() {
         safeFetch(apiUrl('/transmisiones5')),
         safeFetch(apiUrl('/transmisiones6')),
         safeFetch(apiUrl('/transmisiones7')),
+        safeFetch(apiUrl('/transmisiones8')),
     ]);
 
     const map = new Map();
@@ -1105,6 +1106,7 @@ async function fetchAllPartidos() {
         { data: t5, key: 'transmisiones5' },
         { data: t6, key: 'transmisiones6' },
         { data: t7, key: 'transmisiones7' },
+        { data: t8, key: 'transmisiones8' },
     ];
 
     for (const { data, key } of sources) {
@@ -2451,7 +2453,7 @@ app.get('/api/ultrawidget-agenda', async (req, res) => {
         return res.json(agendaCache);
     }
     const BASE = 'https://ultragol-api-3.vercel.app';
-    const [d1, d2, d3, d4, d5, d6, d7] = await Promise.all([
+    const [d1, d2, d3, d4, d5, d6, d7, d8] = await Promise.all([
         fetchAgendaAPI(`${BASE}/transmisiones`),
         fetchAgendaAPI(`${BASE}/transmisiones2`),
         fetchAgendaAPI(`${BASE}/transmisiones3`),
@@ -2459,6 +2461,7 @@ app.get('/api/ultrawidget-agenda', async (req, res) => {
         fetchAgendaAPI(`${BASE}/transmisiones5`),
         fetchAgendaAPI(`${BASE}/transmisiones6`),
         fetchAgendaAPI(`${BASE}/transmisiones7`),
+        fetchAgendaAPI(`${BASE}/transmisiones8`),
     ]);
     const payload = {
         api1: d1.transmisiones || [],
@@ -2468,6 +2471,7 @@ app.get('/api/ultrawidget-agenda', async (req, res) => {
         api5: d5.matches || [],
         api6: d6.transmisiones || [],
         api7: d7.transmisiones || [],
+        api8: d8.transmisiones || [],
         ts: now,
     };
     agendaCache = payload;
