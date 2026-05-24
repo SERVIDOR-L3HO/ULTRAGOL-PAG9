@@ -4041,25 +4041,8 @@ function showSearchWelcome() {
         <div class="sw-root">
             ${historyHtml}
             <div class="sw-section">
-                <div class="sw-section-head"><i class="fas fa-fire" style="color:#FF4500"></i> Tendencias</div>
-                <div class="sw-chips-scroll">
-                    <span class="sw-chip sw-chip-live" onclick="quickSearch('en vivo')"><span class="sw-live-dot"></span> En Vivo</span>
-                    <span class="sw-chip" onclick="quickSearch('Liga MX')">Liga MX</span>
-                    <span class="sw-chip" onclick="quickSearch('Champions')">Champions</span>
-                    <span class="sw-chip" onclick="quickSearch('Premier')">Premier</span>
-                    <span class="sw-chip" onclick="quickSearch('NBA')">NBA</span>
-                    <span class="sw-chip" onclick="quickSearch('UFC')">UFC</span>
-                    <span class="sw-chip" onclick="quickSearch('Copa MX')">Copa MX</span>
-                    <span class="sw-chip" onclick="quickSearch('NFL')">NFL</span>
-                </div>
-            </div>
-            <div class="sw-section">
-                <div class="sw-section-head"><i class="fas fa-trophy" style="color:#FFD700"></i> Ligas</div>
+                <div class="sw-section-head"><span><i class="fas fa-trophy"></i> Ligas</span></div>
                 <div class="sw-list">${leagueRows}</div>
-            </div>
-            <div class="sw-section">
-                <div class="sw-section-head"><i class="fas fa-shield-alt" style="color:#FF4500"></i> Equipos</div>
-                <div class="sw-teams-scroll">${teamChips}</div>
             </div>
         </div>
     `;
