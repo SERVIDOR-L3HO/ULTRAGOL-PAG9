@@ -630,7 +630,7 @@
                 </div>
             </div>
 
-            <!-- Action buttons -->
+            <!-- Action buttons — 3 only -->
             <div class="pgl-actions">
                 <button class="pgl-btn pgl-btn-reload" onclick="refreshStream()" title="Recargar señal">
                     <div class="pgl-btn-icon"><i class="fas fa-redo-alt"></i></div>
@@ -644,24 +644,15 @@
                     <div class="pgl-btn-icon"><i class="fas fa-expand"></i></div>
                     <span>Pantalla</span>
                 </button>
-                <button class="pgl-btn pgl-btn-tab" onclick="openStreamNewTab()" title="Abrir en nueva pestaña">
-                    <div class="pgl-btn-icon"><i class="fas fa-external-link-alt"></i></div>
-                    <span>Nueva pestaña</span>
-                </button>
-                <button class="pgl-btn pgl-btn-copy" onclick="copyStreamLink()" title="Copiar enlace">
-                    <div class="pgl-btn-icon"><i class="fas fa-link" id="pglCopyIcon"></i></div>
-                    <span>Copiar link</span>
-                </button>
-                <button class="pgl-btn pgl-btn-channels" onclick="showCurrentChannels()" title="Ver todos los canales">
-                    <div class="pgl-btn-icon"><i class="fas fa-list"></i></div>
-                    <span>Canales</span>
-                </button>
             </div>
 
-            <!-- Stats -->
-            <div class="pgl-stats-wrapper">
+            <!-- Stats — hidden, kept for JS compatibility -->
+            <div style="display:none">
                 <div class="player-stats-section" id="playerStatsContainer"></div>
             </div>
+
+            <!-- Hidden utility elements for JS compatibility -->
+            <span id="pglCopyIcon" style="display:none"></span>
         </div>
 
     </div>
