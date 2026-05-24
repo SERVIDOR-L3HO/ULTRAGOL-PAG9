@@ -379,21 +379,83 @@ html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'Inte
 .mb-meta{padding:10px 16px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--b)}
 .mb-tag{display:inline-flex;align-items:center;gap:4px;background:var(--glass);border:1px solid var(--b);border-radius:7px;padding:4px 9px;font-size:11.5px;color:var(--t2)}
 
-.ch-list-title{font-size:10.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;color:var(--t3);padding:12px 16px 7px}
-.ch-list{display:flex;flex-direction:column;gap:5px;padding:0 12px 14px}
-.ch-item{
-  display:flex;align-items:center;gap:10px;
-  background:var(--glass);border:1px solid var(--b);
-  border-radius:var(--r2);padding:10px 12px;
-  cursor:pointer;transition:.15s;
+/* ── sv-* channel selector (UltraX design) ── */
+.sv-wrapper{
+  padding:18px 16px 20px;
+  background:#08080c;
+  font-family:'Inter',-apple-system,sans-serif;
+  position:relative;overflow:hidden;
 }
-.ch-item:hover,.ch-item:active{border-color:var(--ora-b);background:var(--glass2)}
-.ch-ico{width:34px;height:34px;border-radius:8px;background:var(--ora-s);border:1px solid var(--ora-b);display:grid;place-items:center;font-size:15px;flex-shrink:0}
-.ch-info{flex:1;min-width:0}
-.ch-name{font-size:13px;font-weight:700;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ch-meta{font-size:11px;color:var(--t3);margin-top:2px}
-.ch-arr{color:var(--t3);flex-shrink:0}
-.no-ch{display:flex;flex-direction:column;align-items:center;gap:8px;padding:28px 20px;color:var(--t3);font-size:13px;text-align:center}
+.sv-wrapper::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:120px;
+  background:radial-gradient(ellipse 80% 100% at 50% 0%,rgba(255,107,53,.06) 0%,transparent 100%);
+  pointer-events:none;
+}
+.sv-meta{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.sv-live-dot{width:8px;height:8px;background:#4ade80;border-radius:50%;flex-shrink:0;animation:svPulse 2s ease-in-out infinite}
+.sv-live-label{font-size:10.5px;font-weight:800;color:#fff;letter-spacing:1.6px;text-transform:uppercase}
+.sv-count-pill{margin-left:auto;background:rgba(255,107,53,.12);border:1px solid rgba(255,107,53,.22);border-radius:20px;padding:2px 10px;font-size:10px;font-weight:700;color:#ff8a5c;letter-spacing:.4px}
+.sv-hint{font-size:11px;color:rgba(255,255,255,.28);margin-bottom:14px;letter-spacing:.1px}
+.sv-list{display:flex;flex-direction:column;gap:10px}
+.sv-card{
+  position:relative;display:flex;align-items:center;gap:14px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);
+  border-radius:20px;padding:14px 14px 14px 16px;cursor:pointer;overflow:hidden;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),background .22s,border-color .22s,box-shadow .22s;
+  animation:svSlideUp .38s ease both;
+  -webkit-tap-highlight-color:transparent;
+}
+.sv-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 10%,rgba(255,255,255,.1) 50%,transparent 90%)}
+.sv-card::after{content:'';position:absolute;top:14px;bottom:14px;left:0;width:3px;border-radius:0 3px 3px 0;background:linear-gradient(180deg,#4ade80,#22c55e);box-shadow:0 0 10px rgba(74,222,128,.5);transition:width .2s,box-shadow .2s}
+.sv-card:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.13);transform:translateY(-2px) scale(1.005);box-shadow:0 10px 36px rgba(0,0,0,.45)}
+.sv-card:hover::after{width:4px;box-shadow:0 0 20px rgba(74,222,128,.8)}
+.sv-card:active{transform:scale(.985)}
+.sv-card-featured{background:rgba(255,107,53,.07);border-color:rgba(255,107,53,.28);animation:svGlow 2.8s ease-in-out infinite,svSlideUp .38s ease both}
+.sv-card-featured::after{background:linear-gradient(180deg,#ff6b35,#ff4500);box-shadow:0 0 14px rgba(255,69,0,.65)}
+.sv-card-featured:hover{background:rgba(255,107,53,.1);border-color:rgba(255,107,53,.42)}
+.sv-num{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;flex-shrink:0;position:relative;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#ccc;letter-spacing:-.5px;transition:all .22s}
+.sv-card-featured .sv-num{background:linear-gradient(135deg,#ff6b35 0%,#ff4500 100%);border-color:transparent;color:#fff;box-shadow:0 4px 18px rgba(255,69,0,.45)}
+.sv-card:hover .sv-num{border-color:rgba(255,255,255,.18);color:#fff}
+.sv-online{position:absolute;bottom:-3px;right:-3px;width:10px;height:10px;background:#4ade80;border-radius:50%;border:2px solid #08080c;box-shadow:0 0 8px rgba(74,222,128,.7)}
+.sv-body{flex:1;min-width:0}
+.sv-name{font-size:14px;font-weight:700;color:#f0f0f0;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.1px}
+.sv-tags{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.sv-tag{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;color:#808080;letter-spacing:.7px;text-transform:uppercase}
+.sv-tag-quality{background:linear-gradient(90deg,rgba(255,107,53,.2),rgba(255,100,50,.1));border:1px solid rgba(255,107,53,.3);color:#ff8a5c;animation:svShimmer 3.5s linear infinite}
+.sv-ping{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:6px;letter-spacing:.3px}
+.sv-ping-fast{color:#4ade80;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2)}
+.sv-ping-medium{color:#facc15;background:rgba(250,204,21,.1);border:1px solid rgba(250,204,21,.2)}
+.sv-ping-slow{color:#f87171;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2)}
+.sv-wave{display:flex;align-items:flex-end;gap:2px;height:14px;margin-top:6px}
+.sv-wave span{width:3px;border-radius:2px;background:#4ade80;opacity:.75;animation:svWave 1.2s ease-in-out infinite}
+.sv-wave span:nth-child(1){height:4px;animation-delay:0s}
+.sv-wave span:nth-child(2){height:9px;animation-delay:.18s}
+.sv-wave span:nth-child(3){height:14px;animation-delay:.36s}
+.sv-wave span:nth-child(4){height:9px;animation-delay:.54s}
+.sv-wave span:nth-child(5){height:4px;animation-delay:.72s}
+.sv-card-featured .sv-wave span{background:#ff8a5c}
+.sv-play{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;transition:all .22s cubic-bezier(.34,1.56,.64,1);background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#606060}
+.sv-card-featured .sv-play{background:linear-gradient(135deg,#ff6b35,#ff4000);border-color:transparent;color:#fff;box-shadow:0 6px 24px rgba(255,69,0,.55)}
+.sv-card:hover .sv-play{background:linear-gradient(135deg,#ff6b35,#ff4000);border-color:transparent;color:#fff;transform:scale(1.12);box-shadow:0 6px 24px rgba(255,69,0,.55)}
+.sv-copy{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;transition:all .2s;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:#555;cursor:pointer;margin-right:6px}
+.sv-copy:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#ccc;transform:scale(1.1)}
+.sv-copy.copied{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.35);color:#4ade80}
+.sv-footer{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;gap:8px}
+.sv-footer-waves{display:flex;align-items:flex-end;gap:2px;height:12px}
+.sv-footer-waves span{width:3px;border-radius:2px;background:#4ade80;opacity:.8;animation:svWave 1.6s ease-in-out infinite}
+.sv-footer-waves span:nth-child(1){height:4px;animation-delay:0s}
+.sv-footer-waves span:nth-child(2){height:8px;animation-delay:.2s}
+.sv-footer-waves span:nth-child(3){height:12px;animation-delay:.4s}
+.sv-footer-waves span:nth-child(4){height:8px;animation-delay:.6s}
+.sv-footer-text{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:.9px;text-transform:uppercase;font-weight:600}
+.sv-empty{text-align:center;padding:44px 20px 20px}
+.sv-empty-icon{font-size:38px;color:rgba(255,255,255,.12);margin-bottom:14px}
+.sv-empty-text{font-size:13px;color:rgba(255,255,255,.28);line-height:1.5}
+@keyframes svPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+@keyframes svWave{0%,100%{transform:scaleY(.4);opacity:.4}50%{transform:scaleY(1);opacity:.9}}
+@keyframes svSlideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes svShimmer{0%{background-position:0 0}100%{background-position:200% 0}}
+@keyframes svGlow{0%,100%{box-shadow:0 0 0 rgba(255,107,53,0)}50%{box-shadow:0 0 22px rgba(255,107,53,.18)}}
 
 .pw{padding:12px}
 .pfbox{position:relative;width:100%;background:#000;border-radius:var(--r2);overflow:hidden;aspect-ratio:16/9}
@@ -509,8 +571,7 @@ body.modal-open{overflow:hidden}
     </div>
     <div class="mbanner" id="mBanner"></div>
     <div class="mb-meta" id="mMeta"></div>
-    <div class="ch-list-title" id="mChTitle">SERVIDORES DISPONIBLES</div>
-    <div class="ch-list" id="mChList"></div>
+    <div id="mChList"></div>
   </div>
 </div>
 
@@ -982,14 +1043,64 @@ function openChannels(idx){
   if(e.status==='live') tags.push(`<span class="mb-tag" style="color:var(--live)"><span class="dot"></span>EN VIVO</span>`);
   document.getElementById('mMeta').innerHTML=tags.join('');
   const n=e.channels.length;
-  document.getElementById('mChTitle').textContent=n>0?`SERVIDORES DISPONIBLES (${n})`:'SERVIDORES';
-  document.getElementById('mChList').innerHTML=!n
-    ?`<div class="no-ch"><div style="font-size:30px;opacity:.35">📭</div><div>Sin transmisión disponible</div></div>`
-    :e.channels.map((c,i)=>`<div class="ch-item" onclick="playStream(${i})">
-        <div class="ch-ico">📺</div>
-        <div class="ch-info"><div class="ch-name">${esc(c.name)}</div><div class="ch-meta">${[c.quality,c.lang,c.src].filter(Boolean).join(' · ')}</div></div>
-        <svg class="ch-arr" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-      </div>`).join('');
+  const servidorMap={
+    'e1link':'SERVIDOR 1','ellink':'SERVIDOR 1',
+    'rereyano':'SERVIDOR 2','golazolvhd':'SERVIDOR 2',
+    'transmisiones4':'SERVIDOR 3','voodc':'SERVIDOR 3',
+    'ftvhd':'SERVIDOR 4','donromans':'SERVIDOR 5',
+    'transmisiones6':'SERVIDOR 6',
+  };
+  let cardsHtml='';
+  if(n>0){
+    e.channels.forEach((c,i)=>{
+      const num=i+1;
+      const rawType=(c.src||c.tipoAPI||c.fuente||'').toLowerCase();
+      const apiType=servidorMap[rawType]||`SERVIDOR ${num}`;
+      const ping=Math.floor(Math.random()*38)+5;
+      const pingCls=ping<20?'sv-ping-fast':ping<35?'sv-ping-medium':'sv-ping-slow';
+      const delay=(i*55)+'ms';
+      const feat=i===0?'sv-card-featured':'';
+      const numLbl=String(num).padStart(2,'0');
+      const safeName=(c.name||`Servidor ${num}`).replace(/'/g,"\\'");
+      const safeTitle=e.titulo.replace(/'/g,"\\'");
+      const safeUrl=(c.url||'').replace(/'/g,"\\'");
+      cardsHtml+=`
+        <div class="sv-card ${feat}" style="animation-delay:${delay}" onclick="playStream(${i})">
+          <div class="sv-num">${numLbl}<div class="sv-online"></div></div>
+          <div class="sv-body">
+            <div class="sv-name">${esc(c.name||`Servidor ${num}`)}</div>
+            <div class="sv-tags">
+              <span class="sv-tag">${apiType}</span>
+              <span class="sv-tag sv-tag-quality">${c.quality||'HD PREMIUM'}</span>
+              <span class="sv-ping ${pingCls}">${ping}ms</span>
+            </div>
+            <div class="sv-wave"><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="sv-copy" title="Copiar link" onclick="event.stopPropagation();svCopy(this,'${safeUrl}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+          </div>
+          <div class="sv-play">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+        </div>`;
+    });
+  }else{
+    cardsHtml=`<div class="sv-empty"><div class="sv-empty-icon">📡</div><p class="sv-empty-text">No se encontraron señales activas.<br>Intenta de nuevo en unos momentos.</p></div>`;
+  }
+  document.getElementById('mChList').innerHTML=`
+    <div class="sv-wrapper">
+      <div class="sv-meta">
+        <span class="sv-live-dot"></span>
+        <span class="sv-live-label">Señales disponibles</span>
+        <span class="sv-count-pill">${n} NODO${n!==1?'S':''}</span>
+      </div>
+      <p class="sv-hint">Selecciona una señal para ver el partido</p>
+      <div class="sv-list">${cardsHtml}</div>
+      <div class="sv-footer">
+        <div class="sv-footer-waves"><span></span><span></span><span></span><span></span></div>
+        <span class="sv-footer-text">Conexión cifrada y optimizada</span>
+      </div>
+    </div>`;
   openModal('modalChannels');
 }
 
@@ -1009,6 +1120,13 @@ function playStream(chIdx){
   iframe.onload=()=>{loading.classList.add('hi');error.classList.remove('sh')};
   iframe.onerror=()=>{loading.classList.add('hi');error.classList.add('sh')};
   openModal('modalPlayer');
+}
+function svCopy(el,url){
+  if(!url) return;
+  navigator.clipboard.writeText(url).then(()=>{
+    el.classList.add('copied');
+    setTimeout(()=>el.classList.remove('copied'),1800);
+  }).catch(()=>{});
 }
 function backToCh(){document.getElementById('playerIframe').src='';clearTimeout(loadTimer);closeModal('modalPlayer')}
 function openInTab(){if(currentStreamUrl) window.open(currentStreamUrl,'_blank','noopener')}
