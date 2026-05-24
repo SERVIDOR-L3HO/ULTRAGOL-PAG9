@@ -4652,20 +4652,6 @@ async function performSearch(query) {
     const leagues = ['Liga MX', 'Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Champions League', 'Copa Libertadores'];
     results.leagues = leagues.filter(league => league.toLowerCase().includes(searchTerm));
     
-    // Esperar perfil de equipo o partido (si aplica) antes de renderizar
-    if (teamProfilePromise) {
-        const profile = await teamProfilePromise;
-        if (profile && profile.ok && profile.team) {
-            _currentTeamProfile = profile;
-        }
-    }
-    if (matchProfilePromise) {
-        const mp = await matchProfilePromise;
-        if (mp && mp.ok && (mp.home || mp.away)) {
-            _currentMatchProfile = mp;
-        }
-    }
-
     // Mostrar resultados
     displaySearchResults(results, searchTerm);
 }
@@ -4674,29 +4660,9 @@ function displaySearchResults(results, query) {
     const resultsContainer = document.getElementById('searchResults');
     let html = '';
 
-    // Render match profile header (priority over team profile when both exist)
-    if (_currentMatchProfile && _currentMatchProfile.ok) {
-        html += renderMatchProfileHeader(_currentMatchProfile);
-    } else if (_currentTeamProfile && _currentTeamProfile.ok) {
-        html += renderTeamProfileHeader(_currentTeamProfile);
-    }
-    
     const totalResults = results.matches.length + results.teams.length + results.leagues.length + results.importantMatches.length;
     
     if (totalResults === 0) {
-        // If we have any profile, show it with a "no transmissions" notice instead
-        if ((_currentMatchProfile && _currentMatchProfile.ok) || (_currentTeamProfile && _currentTeamProfile.ok)) {
-            html += `
-                <div class="tp-no-tx">
-                    <i class="fas fa-broadcast-tower"></i>
-                    <div>
-                        <strong>Sin transmisiones disponibles</strong>
-                        <p>No encontramos transmisiones en vivo para "${query}" ahora mismo.</p>
-                    </div>
-                </div>`;
-            resultsContainer.innerHTML = html;
-            return;
-        }
         resultsContainer.innerHTML = `
             <div class="search-no-results">
                 <div class="no-results-icon">
