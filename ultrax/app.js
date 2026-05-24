@@ -3219,31 +3219,22 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     iframe.src = embedUrl;
     iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen; microphone; camera';
     
-    // Agregar sección de estadísticas
+    // Deferir carga de estadísticas para no bloquear el render del player
     if (statsContainer) {
-        statsContainer.innerHTML = generateMatchStatsSection(displayTitle);
-        initStatsTabsListeners();
-        
-        // Buscar el partido localmente primero
-        let partido = findPartidoByName(displayTitle);
-        
-        if (partido && partido.id) {
-            _log(`📊 Partido encontrado localmente con ID: ${partido.id}, cargando estadísticas...`);
-            startStatsAutoUpdate(partido.id, partido);
-        } else {
-            // Si no se encuentra localmente, buscar en la API de la liga correspondiente
-            _log('📊 Buscando partido en API externa...');
-            fetchStatsForMatch(title).then(partidoRemoto => {
-                if (partidoRemoto && partidoRemoto.id) {
-                    _log(`📊 Partido encontrado en API: ${partidoRemoto.id}`);
-                    startStatsAutoUpdate(partidoRemoto.id, partidoRemoto);
-                } else {
-                    _log('📊 No se encontró partido, mostrando estadísticas generadas');
-                }
-            }).catch(err => {
-                _log('📊 Error buscando estadísticas:', err);
-            });
-        }
+        setTimeout(() => {
+            statsContainer.innerHTML = generateMatchStatsSection(displayTitle);
+            initStatsTabsListeners();
+            let partido = findPartidoByName(displayTitle);
+            if (partido && partido.id) {
+                startStatsAutoUpdate(partido.id, partido);
+            } else {
+                fetchStatsForMatch(title).then(partidoRemoto => {
+                    if (partidoRemoto && partidoRemoto.id) {
+                        startStatsAutoUpdate(partidoRemoto.id, partidoRemoto);
+                    }
+                }).catch(() => {});
+            }
+        }, 800);
     }
     
     iframe.onload = () => {
