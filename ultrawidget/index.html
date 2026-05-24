@@ -31,20 +31,36 @@
 }
 html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 
-/* sport bg gradients */
-.sport-soccer   {background:linear-gradient(135deg,#0d2e0d 0%,#1a4d1a 40%,#0f3d0f 100%)}
-.sport-basket   {background:linear-gradient(135deg,#2d1500 0%,#5c2d00 40%,#3d1f00 100%)}
-.sport-baseball {background:linear-gradient(135deg,#0d2e12 0%,#1a4d22 40%,#0f3d18 100%)}
-.sport-tennis   {background:linear-gradient(135deg,#3d1a00 0%,#7a3400 40%,#5c2800 100%)}
-.sport-f1       {background:linear-gradient(135deg,#0a0a22 0%,#14144a 40%,#0d0d33 100%)}
-.sport-boxing   {background:linear-gradient(135deg,#2d0000 0%,#5c0000 40%,#3d0000 100%)}
-.sport-american {background:linear-gradient(135deg,#0d2e12 0%,#1d5c24 40%,#0f3d18 100%)}
-.sport-rugby    {background:linear-gradient(135deg,#1a1200 0%,#3d2c00 40%,#2d1e00 100%)}
-.sport-mma      {background:linear-gradient(135deg,#1a0022 0%,#380044 40%,#28003a 100%)}
-.sport-golf     {background:linear-gradient(135deg,#0d2e14 0%,#1a5c2a 40%,#0f3d1c 100%)}
-.sport-hockey   {background:linear-gradient(135deg,#00142e 0%,#002b5c 40%,#001e44 100%)}
-.sport-cycling  {background:linear-gradient(135deg,#1a1200 0%,#3d2c0a 40%,#2d1e00 100%)}
-.sport-other    {background:linear-gradient(135deg,#0e0e1a 0%,#1e1e33 40%,#121222 100%)}
+/* sport real photo backgrounds */
+.sp-bg{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  filter:brightness(.38) saturate(.9);
+}
+.sp-soccer   .sp-bg{background-image:url('/ultrawidget/bg/soccer.jpg')}
+.sp-basket   .sp-bg{background-image:url('/ultrawidget/bg/basket.jpg')}
+.sp-baseball .sp-bg{background-image:url('/ultrawidget/bg/baseball.jpg')}
+.sp-tennis   .sp-bg{background-image:url('/ultrawidget/bg/tennis.jpg')}
+.sp-f1       .sp-bg{background-image:url('/ultrawidget/bg/f1.jpg')}
+.sp-boxing   .sp-bg{background-image:url('/ultrawidget/bg/boxing.jpg')}
+.sp-american .sp-bg{background-image:url('/ultrawidget/bg/american.jpg')}
+.sp-rugby    .sp-bg{background-image:url('/ultrawidget/bg/rugby.jpg')}
+.sp-mma      .sp-bg{background-image:url('/ultrawidget/bg/mma.jpg')}
+.sp-golf     .sp-bg{background-image:url('/ultrawidget/bg/golf.jpg')}
+.sp-hockey   .sp-bg{background-image:url('/ultrawidget/bg/hockey.jpg')}
+.sp-cycling  .sp-bg{background-image:url('/ultrawidget/bg/cycling.jpg')}
+.sp-other    .sp-bg{background:linear-gradient(135deg,#0e0e1a,#1e1e33)}
+/* gradient overlay on top of photo */
+.sp-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    to right,
+    rgba(0,0,0,.88) 0%,
+    rgba(0,0,0,.55) 45%,
+    rgba(0,0,0,.55) 55%,
+    rgba(0,0,0,.88) 100%
+  );
+}
 
 /* ── TOPBAR ── */
 .topbar{
@@ -194,21 +210,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:'Inte
 .mcard.live-card{border-color:rgba(244,63,94,.25)}
 .mcard.live-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--live),var(--ora));z-index:2}
 
-/* bg overlay */
-.mcard-bg{
-  position:absolute;inset:0;
-  opacity:.55;
-}
-.mcard-bg::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(to right, rgba(0,0,0,.82) 0%, rgba(0,0,0,.5) 50%, rgba(0,0,0,.82) 100%);
-}
-/* subtle pattern overlay */
-.mcard-bg::before{
-  content:'';position:absolute;inset:0;z-index:1;
-  background-image:radial-gradient(circle at 20% 50%,rgba(255,255,255,.03) 0%,transparent 50%),
-                   radial-gradient(circle at 80% 50%,rgba(255,255,255,.03) 0%,transparent 50%);
-}
+/* bg already handled by .sp-bg and .sp-overlay classes */
 
 /* card content above bg */
 .mcard-inner{
@@ -580,9 +582,9 @@ const MONTH_MAP={ene:'01',feb:'02',mar:'03',abr:'04',may:'05',jun:'06',jul:'07',
 const WD_MAP={sunday:0,monday:1,tuesday:2,wednesday:3,thursday:4,friday:5,saturday:6,domingo:0,lunes:1,martes:2,miercoles:3,jueves:4,viernes:5,sabado:6};
 
 function sportClass(s){
-  if(!s) return 'other';
+  if(!s) return 'sp-other';
   const k=s.toLowerCase().trim();
-  return SPORT_CLASS[k]||'other';
+  return 'sp-'+(SPORT_CLASS[k]||'other');
 }
 function sportIcon(s){
   if(!s) return '🏆';
@@ -856,9 +858,11 @@ function imgErr(el,cls){const d=document.createElement('div');d.className=cls;d.
 
 function logoEl(url,name,sport,small){
   const sz=small?32:36;
-  const fb=`<div class="team-logo-fb" style="width:${sz}px;height:${sz}px">${sportIcon(sport)}</div>`;
-  if(!url||url.startsWith('data:')||url.length<10) return fb;
-  return`<img class="team-logo" style="width:${sz}px;height:${sz}px" src="${esc(url)}" alt="${esc(name)}" loading="lazy" data-sport="${esc(sport||'')}" onerror="imgErr(this,'team-logo-fb')">`;
+  const safeN=esc(name||'');
+  if(!url||url.startsWith('data:')||url.length<10){
+    return`<div class="team-logo-fb" data-team-name="${safeN}" data-sz="${sz}" data-sport="${esc(sport||'')}" style="width:${sz}px;height:${sz}px">${sportIcon(sport)}</div>`;
+  }
+  return`<img class="team-logo" style="width:${sz}px;height:${sz}px" src="${esc(url)}" alt="${safeN}" loading="lazy" data-sport="${esc(sport||'')}" onerror="imgErr(this,'team-logo-fb')">`;
 }
 
 /* ─── RENDER CARD ─── */
@@ -896,8 +900,9 @@ function renderCard(e,idx){
     ${n>0?n+' canal'+(n>1?'es':''):'Sin canales'}
   </span>`;
 
-  return`<div class="mcard${isLive?' live-card':''}" onclick="openChannels(${idx})">
-    <div class="mcard-bg sport-${sc}"></div>
+  return`<div class="mcard ${sc}${isLive?' live-card':''}" data-idx="${idx}" onclick="openChannels(${idx})">
+    <div class="sp-bg"></div>
+    <div class="sp-overlay"></div>
     <div class="mcard-inner">
       <div class="mcard-top">
         <span class="stag">${sportIcon(e.deporte)} ${esc(e.deporte||'Deporte')}</span>
@@ -1016,8 +1021,56 @@ function closeModal(id){
 function onBdClick(e,id){if(e.target.id===id) closeModal(id)}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('modalPlayer');closeModal('modalChannels')}});
 document.getElementById('searchInput').addEventListener('input',renderAll);
-setInterval(loadAll,5*60*1000);
-loadAll();
+/* ─── AUTO LOGO LOADER ─── */
+const pendingLogos = new Map(); // teamName → Set of img element IDs
+
+function logoElWithId(url, name, sport, small, elId) {
+  const sz = small ? 32 : 36;
+  const fb = `<div class="team-logo-fb" id="${elId}-fb" style="width:${sz}px;height:${sz}px">${sportIcon(sport)}</div>`;
+  if (!url || url.startsWith('data:') || url.length < 10) {
+    // Queue for async logo lookup
+    if (name && name.trim()) {
+      if (!pendingLogos.has(name)) pendingLogos.set(name, []);
+      pendingLogos.get(name).push({ elId, sz, sport });
+    }
+    return fb;
+  }
+  return `<img class="team-logo" id="${elId}" style="width:${sz}px;height:${sz}px" src="${esc(url)}" alt="${esc(name)}" loading="lazy" data-sport="${esc(sport||'')}" onerror="imgErr(this,'team-logo-fb')">`;
+}
+
+async function loadPendingLogos() {
+  // Collect all unique team names currently missing logos in the DOM
+  const missing = new Map();
+  document.querySelectorAll('.team-logo-fb[data-team-name]').forEach(el => {
+    const n = el.getAttribute('data-team-name');
+    if(n && !missing.has(n)) missing.set(n, el.getAttribute('data-sport')||'');
+  });
+  if(!missing.size) return;
+  const teams = [...missing.entries()];
+  // Batch 6 at a time
+  for(let i=0; i<teams.length; i+=6){
+    await Promise.all(teams.slice(i,i+6).map(async([name,sport])=>{
+      try{
+        const r=await fetch(`/api/team-logo?team=${encodeURIComponent(name)}`);
+        const data=await r.json();
+        if(!data.url) return;
+        document.querySelectorAll(`.team-logo-fb[data-team-name="${CSS.escape(name)}"]`).forEach(el=>{
+          if(!el.parentNode) return;
+          const img=new Image();
+          img.className='team-logo';
+          img.src=data.url;
+          img.alt=name;
+          img.style.cssText=`width:${el.getAttribute('data-sz')||36}px;height:${el.getAttribute('data-sz')||36}px;border-radius:8px;object-fit:contain;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.12);padding:3px;`;
+          img.onerror=()=>{};
+          img.onload=()=>el.parentNode&&el.parentNode.replaceChild(img,el);
+        });
+      }catch(e){}
+    }));
+  }
+}
+
+setInterval(loadAll, 5*60*1000);
+loadAll().then(()=>setTimeout(loadPendingLogos, 800));
 </script>
 </body>
 </html>

@@ -2427,6 +2427,7 @@ app.get('/knexo', (req, res) => {
     res.sendFile(path.join(__dirname, 'knexo.html'));
 });
 
+
 // ── UltraWidget agenda proxy (fetches all 7 APIs server-side) ────────────────
 let agendaCache = null;
 let agendaCacheTime = 0;
