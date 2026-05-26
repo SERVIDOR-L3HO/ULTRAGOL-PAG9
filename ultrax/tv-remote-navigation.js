@@ -12,11 +12,10 @@ class TVRemoteNavigation {
 
     checkIfTV() {
         const isTVScreen = window.matchMedia('(min-width: 1920px)').matches;
-        const hasNoPointer = window.matchMedia('(hover: none)').matches && 
-                           window.matchMedia('(pointer: coarse)').matches;
         const isSmartTV = /SMART-TV|SmartTV|TV|Tizen|WebOS|NetCast|NETTV|Freebox/i.test(navigator.userAgent);
+        const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
-        return isTVScreen || isSmartTV || hasNoPointer;
+        return (isTVScreen || isSmartTV) && !isMobile;
     }
 
     init() {

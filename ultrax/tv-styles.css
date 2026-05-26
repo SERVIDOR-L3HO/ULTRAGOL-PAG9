@@ -498,15 +498,15 @@ body.tv-mode *:focus { outline: revert; }
     background: rgba(255,107,53,0.08) !important;
 }
 
-/* Botones de modal */
-.back-modal-btn:focus-visible,
-.close-channel-selector:focus-visible,
-.close-important-modal:focus-visible,
-.close-search-modal:focus-visible,
-.nav-btn:focus-visible,
-.nav-reels-btn:focus-visible,
-.icon-btn:focus-visible,
-.lbar-btn:focus-visible {
+/* Botones de modal - solo en modo TV, nunca en móvil */
+body.tv-mode .back-modal-btn:focus-visible,
+body.tv-mode .close-channel-selector:focus-visible,
+body.tv-mode .close-important-modal:focus-visible,
+body.tv-mode .close-search-modal:focus-visible,
+body.tv-mode .nav-btn:focus-visible,
+body.tv-mode .nav-reels-btn:focus-visible,
+body.tv-mode .icon-btn:focus-visible,
+body.tv-mode .lbar-btn:focus-visible {
     outline: 3px solid #ff6b35 !important;
     outline-offset: 3px !important;
 }
@@ -533,7 +533,7 @@ body.tv-detected .tv-toggle-btn {
     display: flex;
 }
 .tv-toggle-btn:hover { background: rgba(255,107,53,0.2); border-color: rgba(255,107,53,.5); }
-.tv-toggle-btn:focus-visible { outline: 3px solid #ff6b35 !important; outline-offset: 3px !important; }
+body.tv-mode .tv-toggle-btn:focus-visible { outline: 3px solid #ff6b35 !important; outline-offset: 3px !important; }
 body.tv-mode .tv-toggle-btn {
     background: rgba(255,107,53,0.28);
     border-color: rgba(255,107,53,0.7);
