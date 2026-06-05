@@ -25,49 +25,74 @@ body {
 }
 
 /* Banner Copa Mundial 2026 */
-/* ── Copa Mundial 2026 Banner ───────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   COPA MUNDIAL 2026 — Glass + Football Pitch card
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 .world-cup-banner {
     position: relative;
-    margin: 15px;
-    border-radius: 22px;
-    background: linear-gradient(135deg, #0d0221 0%, #1a0540 30%, #6b0f1a 70%, #c8102e 100%);
+    margin: 14px 15px;
+    border-radius: 24px;
+    background: linear-gradient(145deg, #053a1c 0%, #0a5c2c 35%, #074020 65%, #021a0d 100%);
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 8px 32px rgba(200, 16, 46, 0.45), 0 0 0 1px rgba(255,255,255,0.07);
     cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-    padding: 22px 16px 18px;
+    padding: 0;
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06) inset,
+        0 12px 40px rgba(0,0,0,0.6),
+        0 4px 16px rgba(0,150,60,0.25);
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 .world-cup-banner:active {
-    transform: scale(0.978);
+    transform: scale(0.975);
 }
 
-.banner-overlay {
+/* ── Cancha SVG de fondo ── */
+.wc-pitch-bg {
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800') center/cover;
-    opacity: 0.12;
-    mix-blend-mode: luminosity;
+    inset: 0;
+    pointer-events: none;
+}
+.wc-pitch-svg {
+    width: 100%; height: 100%;
+    opacity: 1;
 }
 
-/* Shimmer sweep */
-.world-cup-banner::after {
-    content: '';
+/* ── Gradiente de color encima de la cancha ── */
+.wc-bg-gradient {
     position: absolute;
-    top: 0; left: -60%;
-    width: 40%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-    animation: wcShimmer 3.5s ease-in-out infinite;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 70% 60% at 50% 110%, rgba(0,200,80,0.18) 0%, transparent 70%),
+        linear-gradient(170deg,
+            rgba(5,25,12,0.82) 0%,
+            rgba(8,45,20,0.7) 40%,
+            rgba(5,20,10,0.88) 100%);
+    pointer-events: none;
+}
+
+/* ── Shimmer diagonal ── */
+.wc-shimmer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        115deg,
+        transparent 0%,
+        transparent 38%,
+        rgba(255,255,255,0.055) 50%,
+        transparent 62%,
+        transparent 100%
+    );
+    animation: wcShimmer 4s ease-in-out infinite;
     pointer-events: none;
 }
 @keyframes wcShimmer {
-    0%   { left: -60%; }
-    100% { left: 120%; }
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
 }
 
-/* Particles */
+/* ── Partículas doradas ── */
 .wc-particles {
     position: absolute;
     inset: 0;
@@ -76,203 +101,332 @@ body {
 }
 .wc-particle {
     position: absolute;
-    bottom: -10px;
-    width: 5px; height: 5px;
+    bottom: -8px;
     border-radius: 50%;
-    background: rgba(255, 215, 0, 0.55);
-    animation: wcFloat 5s ease-in infinite;
+    background: rgba(255, 215, 0, 0.6);
+    animation: wcFloat 6s ease-in infinite;
 }
-.wc-particle:nth-child(1) { left: 10%;  animation-delay: 0s;   width: 4px; height: 4px; }
-.wc-particle:nth-child(2) { left: 25%;  animation-delay: 0.8s; width: 6px; height: 6px; background: rgba(255,255,255,0.3); }
-.wc-particle:nth-child(3) { left: 45%;  animation-delay: 1.4s; }
-.wc-particle:nth-child(4) { left: 62%;  animation-delay: 0.3s; width: 3px; height: 3px; }
-.wc-particle:nth-child(5) { left: 78%;  animation-delay: 2s;   background: rgba(255,215,0,0.4); }
-.wc-particle:nth-child(6) { left: 90%;  animation-delay: 1s;   width: 5px; height: 5px; }
+.wc-particle:nth-child(1) { left: 8%;  width:3px; height:3px; animation-delay:0s; }
+.wc-particle:nth-child(2) { left:20%;  width:5px; height:5px; animation-delay:1.1s; background:rgba(255,255,255,0.35); }
+.wc-particle:nth-child(3) { left:35%;  width:4px; height:4px; animation-delay:0.5s; }
+.wc-particle:nth-child(4) { left:52%;  width:3px; height:3px; animation-delay:2.2s; }
+.wc-particle:nth-child(5) { left:68%;  width:5px; height:5px; animation-delay:0.8s; background:rgba(255,215,0,0.45); }
+.wc-particle:nth-child(6) { left:80%;  width:3px; height:3px; animation-delay:1.6s; }
+.wc-particle:nth-child(7) { left:90%;  width:4px; height:4px; animation-delay:3s;   background:rgba(255,255,255,0.25); }
+.wc-particle:nth-child(8) { left:45%;  width:6px; height:6px; animation-delay:0.3s; background:rgba(255,220,50,0.4); }
 @keyframes wcFloat {
-    0%   { transform: translateY(0) scale(1); opacity: 0.8; }
-    80%  { opacity: 0.3; }
-    100% { transform: translateY(-220px) scale(0.4); opacity: 0; }
+    0%   { transform: translateY(0) scale(1); opacity: 0.9; }
+    70%  { opacity: 0.4; }
+    100% { transform: translateY(-260px) scale(0.3); opacity: 0; }
 }
 
-/* Lock overlay (top-right corner) */
+/* ── Candado — esquina superior derecha ── */
 .wc-lock-overlay {
     position: absolute;
-    top: 12px; right: 14px;
-    z-index: 5;
+    top: 13px; right: 13px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
 }
 .wc-lock-icon {
-    width: 32px; height: 32px;
-    background: rgba(0,0,0,0.55);
-    border: 1.5px solid rgba(255,255,255,0.25);
+    width: 36px; height: 36px;
+    background: rgba(0,0,0,0.45);
+    border: 1.5px solid rgba(255,255,255,0.28);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(6px);
-    animation: wcLockPulse 2.4s ease-in-out infinite;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: wcLockPulse 2.5s ease-in-out infinite;
 }
-.wc-lock-icon svg { width: 17px; height: 17px; }
+.wc-lock-icon svg { width: 18px; height: 18px; }
 @keyframes wcLockPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.2); }
-    50%       { box-shadow: 0 0 0 6px rgba(255,255,255,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.25), 0 0 8px rgba(255,255,255,0.05); }
+    50%       { box-shadow: 0 0 0 7px rgba(255,255,255,0),  0 0 16px rgba(255,255,255,0.08); }
+}
+.wc-lock-label {
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
 }
 
-/* Badge */
+/* ── Contenido ── */
+.banner-content {
+    position: relative;
+    z-index: 4;
+    text-align: center;
+    width: 100%;
+    padding: 18px 16px 16px;
+}
+
+/* Trofeo + badge row */
+.wc-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+.wc-trophy {
+    font-size: 28px;
+    filter: drop-shadow(0 0 8px rgba(255,215,0,0.6));
+    animation: wcTrophyFloat 3s ease-in-out infinite;
+}
+@keyframes wcTrophyFloat {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-4px); }
+}
 .wc-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: rgba(255,215,0,0.18);
-    border: 1px solid rgba(255,215,0,0.4);
+    gap: 5px;
+    background: rgba(255,215,0,0.14);
+    border: 1px solid rgba(255,215,0,0.45);
     color: #ffd700;
-    font-size: 9px;
-    font-weight: 700;
+    font-size: 8.5px;
+    font-weight: 800;
     letter-spacing: 1.5px;
     padding: 4px 10px;
     border-radius: 20px;
-    margin-bottom: 8px;
     text-transform: uppercase;
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
 }
 .wc-badge-dot {
-    width: 6px; height: 6px;
+    width: 5px; height: 5px;
     border-radius: 50%;
     background: #ffd700;
-    animation: wcDotBlink 1.2s ease-in-out infinite;
+    animation: wcDotBlink 1.1s ease-in-out infinite;
 }
 @keyframes wcDotBlink {
     0%, 100% { opacity: 1; }
-    50%       { opacity: 0.2; }
+    50%       { opacity: 0.15; }
 }
 
-.banner-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    width: 100%;
+/* Título en panel de vidrio */
+.wc-title-glass {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 16px;
+    padding: 10px 18px;
+    margin: 0 auto 10px;
+    display: inline-block;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.04) inset;
 }
-
+.wc-title-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.wc-ball-icon {
+    font-size: 22px;
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.3));
+}
 .banner-title {
-    font-size: 26px;
+    font-size: 20px;
     font-weight: 900;
     color: #fff;
-    letter-spacing: 1px;
-    text-shadow: 0 3px 12px rgba(0,0,0,0.6);
-    margin-bottom: 4px;
-    line-height: 1.2;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    line-height: 1.1;
+    text-align: left;
+    margin: 0;
 }
 .banner-title-year {
+    font-size: 13px;
+    font-weight: 700;
     color: #ffd700;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(255,215,0,0.5);
+    display: block;
+    text-align: left;
 }
 
-.banner-subtitle {
-    font-size: 12px;
+/* Sedes */
+.wc-hosts {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 13px;
+}
+.wc-host {
+    font-size: 11px;
     color: rgba(255,255,255,0.75);
-    margin-bottom: 16px;
-    font-weight: 400;
+    font-weight: 500;
+}
+.wc-host-sep {
+    color: rgba(255,255,255,0.25);
+    font-size: 10px;
 }
 
+/* ── Countdown glass ── */
 .countdown-container {
     display: flex;
+    align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 4px;
     margin-bottom: 12px;
 }
-
 .countdown-item {
-    background: rgba(0,0,0,0.5);
-    padding: 9px 10px 7px;
-    border-radius: 12px;
-    min-width: 58px;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.08);
+    padding: 8px 10px 6px;
+    border-radius: 13px;
+    min-width: 52px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.16);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04) inset;
 }
-
+.countdown-sep {
+    font-size: 20px;
+    font-weight: 900;
+    color: rgba(255,255,255,0.3);
+    line-height: 1;
+    margin-bottom: 10px;
+}
 .countdown-val {
     display: block;
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 900;
     color: #fff;
     line-height: 1;
+    text-shadow: 0 0 12px rgba(255,255,255,0.3);
 }
-
 .countdown-label {
     display: block;
-    font-size: 9px;
-    color: rgba(255,255,255,0.5);
+    font-size: 8.5px;
+    color: rgba(255,255,255,0.45);
     text-transform: uppercase;
     margin-top: 3px;
     letter-spacing: 0.5px;
 }
 
 .wc-tap-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     font-size: 10px;
-    color: rgba(255,255,255,0.45);
+    color: rgba(255,255,255,0.38);
     letter-spacing: 0.3px;
 }
 
-/* ── Copa Mundial Modal ──────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODAL — glass bottom sheet
+   ═══════════════════════════════════════════════════════════════════════════ */
 .wc-modal-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.75);
+    background: rgba(0,0,0,0.7);
     z-index: 9999;
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.22s ease;
 }
 .wc-modal-backdrop.wc-open {
     opacity: 1;
     pointer-events: all;
 }
 .wc-modal {
-    background: linear-gradient(160deg, #0f0225 0%, #1b0738 50%, #250a1a 100%);
-    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(8, 20, 12, 0.88);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgba(255,255,255,0.12);
     border-bottom: none;
-    border-radius: 24px 24px 0 0;
-    padding: 28px 22px 36px;
+    border-radius: 28px 28px 0 0;
+    padding: 10px 20px 38px;
     width: 100%;
     max-width: 480px;
     position: relative;
-    transform: translateY(40px);
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    transform: translateY(50px);
+    transition: transform 0.32s cubic-bezier(0.34,1.38,0.64,1);
     text-align: center;
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05) inset;
 }
 .wc-modal-backdrop.wc-open .wc-modal {
     transform: translateY(0);
 }
+.wc-modal-handle {
+    width: 38px; height: 4px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 4px;
+    margin: 10px auto 18px;
+}
 .wc-modal-close {
     position: absolute;
-    top: 16px; right: 18px;
-    background: rgba(255,255,255,0.08);
-    border: none;
-    color: #fff;
-    font-size: 14px;
+    top: 20px; right: 18px;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
     width: 30px; height: 30px;
     border-radius: 50%;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(8px);
 }
-.wc-modal-lock {
-    margin: 0 auto 14px;
-    width: 56px; height: 56px;
-    background: rgba(255,215,0,0.1);
-    border: 1.5px solid rgba(255,215,0,0.35);
+
+/* Modal header panel (pitch lines + lock) */
+.wc-modal-header {
+    position: relative;
+    background: rgba(5,40,18,0.7);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 18px;
+    height: 90px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 4px;
+}
+.wc-modal-pitch-lines {
+    position: absolute;
+    inset: 0;
+}
+.wc-modal-pitch-lines svg {
+    width: 100%; height: 100%;
+}
+.wc-modal-lock-big {
+    position: relative;
+    z-index: 2;
+    width: 48px; height: 48px;
+    background: rgba(0,0,0,0.45);
+    border: 1.5px solid rgba(255,215,0,0.5);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    animation: wcLockPulse 2s ease-in-out infinite;
+    backdrop-filter: blur(8px);
+    animation: wcLockPulse 2.2s ease-in-out infinite;
 }
-.wc-modal-lock svg { width: 30px; height: 30px; }
+.wc-modal-lock-big svg { width: 26px; height: 26px; }
+.wc-modal-trophy-row {
+    position: relative;
+    z-index: 2;
+    font-size: 16px;
+    letter-spacing: 6px;
+    filter: drop-shadow(0 0 6px rgba(255,215,0,0.5));
+}
+
 .wc-modal-badge {
     display: inline-block;
-    background: rgba(255,50,50,0.2);
-    border: 1px solid rgba(255,80,80,0.4);
-    color: #ff6b6b;
+    background: rgba(200,16,46,0.18);
+    border: 1px solid rgba(200,16,46,0.4);
+    color: #ff7070;
     font-size: 9px;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: 1.5px;
-    padding: 3px 10px;
+    padding: 4px 12px;
     border-radius: 20px;
     margin-bottom: 10px;
 }
@@ -280,30 +434,33 @@ body {
     font-size: 22px;
     font-weight: 900;
     color: #fff;
-    margin-bottom: 8px;
-    letter-spacing: 0.5px;
+    margin-bottom: 7px;
+    letter-spacing: 0.3px;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.5);
 }
 .wc-modal-desc {
     font-size: 13px;
-    color: rgba(255,255,255,0.6);
-    line-height: 1.6;
-    margin-bottom: 18px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.65;
+    margin-bottom: 16px;
 }
 .wc-modal-features {
     text-align: left;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
 }
 .wc-feat {
     display: flex;
     align-items: center;
     gap: 10px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 13px;
     padding: 10px 14px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 .wc-feat-icon {
     font-size: 18px;
@@ -311,30 +468,41 @@ body {
 }
 .wc-feat span:last-child {
     font-size: 13px;
-    color: rgba(255,255,255,0.8);
+    color: rgba(255,255,255,0.78);
     font-weight: 500;
 }
+
+/* Timer box */
+.wc-modal-timer-box {
+    background: rgba(255,215,0,0.07);
+    border: 1px solid rgba(255,215,0,0.22);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
 .wc-modal-countdown-label {
-    font-size: 10px;
-    color: rgba(255,255,255,0.4);
+    font-size: 9px;
+    color: rgba(255,255,255,0.35);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
+    letter-spacing: 1.5px;
+    margin-bottom: 5px;
 }
 .wc-modal-timer {
-    font-size: 20px;
-    font-weight: 800;
+    font-size: 22px;
+    font-weight: 900;
     color: #ffd700;
-    letter-spacing: 2px;
-    margin-bottom: 22px;
-    text-shadow: 0 0 12px rgba(255,215,0,0.4);
+    letter-spacing: 3px;
+    text-shadow: 0 0 16px rgba(255,215,0,0.5);
+    margin: 0;
 }
 .wc-modal-btn {
     width: 100%;
     padding: 15px;
-    background: linear-gradient(135deg, #c8102e 0%, #8b0000 100%);
-    border: none;
-    border-radius: 14px;
+    background: linear-gradient(135deg, #0d6e34 0%, #05421e 100%);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
     color: #fff;
     font-size: 14px;
     font-weight: 700;
