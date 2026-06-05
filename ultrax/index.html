@@ -170,14 +170,32 @@
         </div>
 
     <!-- Banner Copa Mundial 2026 -->
-    <div class="world-cup-banner">
+    <div class="world-cup-banner" onclick="openWorldCupModal()">
         <div class="banner-overlay"></div>
+        <div class="wc-particles">
+            <span class="wc-particle"></span><span class="wc-particle"></span>
+            <span class="wc-particle"></span><span class="wc-particle"></span>
+            <span class="wc-particle"></span><span class="wc-particle"></span>
+        </div>
+        <div class="wc-lock-overlay">
+            <div class="wc-lock-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="5" y="11" width="14" height="10" rx="2" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="1.5"/>
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                    <circle cx="12" cy="16" r="1.5" fill="white"/>
+                </svg>
+            </div>
+        </div>
         <div class="banner-content">
-            <h2 class="banner-title">COPA MUNDIAL 2026</h2>
+            <div class="wc-badge">
+                <span class="wc-badge-dot"></span>
+                PRÓXIMAMENTE
+            </div>
+            <h2 class="banner-title">⚽ COPA MUNDIAL <span class="banner-title-year">2026</span></h2>
             <p class="banner-subtitle">El evento más esperado del mundo está por comenzar.</p>
             <div class="countdown-container">
                 <div class="countdown-item">
-                    <span class="countdown-val" id="days">160</span>
+                    <span class="countdown-val" id="days">5</span>
                     <span class="countdown-label">Días</span>
                 </div>
                 <div class="countdown-item">
@@ -193,6 +211,41 @@
                     <span class="countdown-label">Seg</span>
                 </div>
             </div>
+            <div class="wc-tap-hint">🔒 Toca para más información</div>
+        </div>
+    </div>
+
+    <!-- Modal Copa Mundial Bloqueado -->
+    <div class="wc-modal-backdrop" id="wcModal" onclick="closeWorldCupModal()">
+        <div class="wc-modal" onclick="event.stopPropagation()">
+            <button class="wc-modal-close" onclick="closeWorldCupModal()">✕</button>
+            <div class="wc-modal-lock">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="11" width="16" height="11" rx="3" fill="url(#lockGrad)" stroke="rgba(255,200,0,0.6)" stroke-width="1.5"/>
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="#ffd700" stroke-width="2" stroke-linecap="round"/>
+                    <circle cx="12" cy="17" r="2" fill="#ffd700"/>
+                    <line x1="12" y1="17" x2="12" y2="19.5" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="lockGrad" x1="4" y1="11" x2="20" y2="22" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#1a1a2e"/>
+                            <stop offset="1" stop-color="#16213e"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="wc-modal-badge">CONTENIDO BLOQUEADO</div>
+            <h3 class="wc-modal-title">Copa Mundial 2026</h3>
+            <p class="wc-modal-desc">Este espacio se desbloqueará cuando arranque el Mundial. Aquí encontrarás todo lo que necesitas:</p>
+            <div class="wc-modal-features">
+                <div class="wc-feat"><span class="wc-feat-icon">📺</span><span>Transmisiones en vivo de todos los partidos</span></div>
+                <div class="wc-feat"><span class="wc-feat-icon">📊</span><span>Estadísticas y resultados en tiempo real</span></div>
+                <div class="wc-feat"><span class="wc-feat-icon">🏟️</span><span>Alineaciones, goles y tarjetas al instante</span></div>
+                <div class="wc-feat"><span class="wc-feat-icon">🏆</span><span>Tabla de grupos y bracket del torneo</span></div>
+                <div class="wc-feat"><span class="wc-feat-icon">🎯</span><span>Noticias y análisis del Mundial</span></div>
+            </div>
+            <div class="wc-modal-countdown-label">Se desbloquea en</div>
+            <div class="wc-modal-timer" id="wcModalTimer">— — —</div>
+            <button class="wc-modal-btn" onclick="closeWorldCupModal()">Entendido, espero el Mundial 🔥</button>
         </div>
     </div>
 
@@ -1165,28 +1218,52 @@
     </script>
 
     <script>
+        const WC_DATE = new Date('June 11, 2026 00:00:00').getTime();
+
         function updateCountdown() {
-            const worldCupDate = new Date('June 11, 2026 00:00:00').getTime();
-            const now = new Date().getTime();
-            const gap = worldCupDate - now;
-
-            const second = 1000;
-            const minute = second * 60;
-            const hour = minute * 60;
-            const day = hour * 24;
-
+            const now = Date.now();
+            const gap = WC_DATE - now;
+            if (gap <= 0) {
+                ['days','hours','mins','secs'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerText = '00';
+                });
+                return;
+            }
+            const second = 1000, minute = second * 60, hour = minute * 60, day = hour * 24;
             const d = Math.floor(gap / day);
             const h = Math.floor((gap % day) / hour);
             const m = Math.floor((gap % hour) / minute);
             const s = Math.floor((gap % minute) / second);
+            const pad = n => n < 10 ? '0' + n : n;
+            document.getElementById('days').innerText  = d;
+            document.getElementById('hours').innerText = pad(h);
+            document.getElementById('mins').innerText  = pad(m);
+            document.getElementById('secs').innerText  = pad(s);
 
-            document.getElementById('days').innerText = d;
-            document.getElementById('hours').innerText = h < 10 ? '0' + h : h;
-            document.getElementById('mins').innerText = m < 10 ? '0' + m : m;
-            document.getElementById('secs').innerText = s < 10 ? '0' + s : s;
+            const timerEl = document.getElementById('wcModalTimer');
+            if (timerEl) timerEl.innerText = `${d}d  ${pad(h)}h  ${pad(m)}m  ${pad(s)}s`;
         }
         setInterval(updateCountdown, 1000);
         updateCountdown();
+
+        function openWorldCupModal() {
+            const backdrop = document.getElementById('wcModal');
+            if (!backdrop) return;
+            backdrop.classList.add('wc-open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeWorldCupModal() {
+            const backdrop = document.getElementById('wcModal');
+            if (!backdrop) return;
+            backdrop.classList.remove('wc-open');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeWorldCupModal();
+        });
     </script>
     <script src="https://www.paypal.com/sdk/js?client-id=YOUR_LIVE_CLIENT_ID_HERE&currency=USD"></script>
     <script src="js/donaciones.js"></script>
