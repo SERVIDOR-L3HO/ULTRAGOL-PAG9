@@ -33,15 +33,15 @@ body {
     position: relative;
     margin: 14px 15px;
     border-radius: 24px;
-    background: linear-gradient(145deg, #053a1c 0%, #0a5c2c 35%, #074020 65%, #021a0d 100%);
+    background: linear-gradient(145deg, #05080f 0%, #0a1128 35%, #12073a 65%, #1a0c1e 100%);
     overflow: hidden;
     cursor: pointer;
     padding: 0;
     border: 1px solid rgba(255,255,255,0.12);
     box-shadow:
         0 0 0 1px rgba(255,255,255,0.06) inset,
-        0 12px 40px rgba(0,0,0,0.6),
-        0 4px 16px rgba(0,150,60,0.25);
+        0 12px 40px rgba(0,0,0,0.65),
+        0 4px 20px rgba(80,50,200,0.2);
     transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 .world-cup-banner:active {
@@ -64,11 +64,12 @@ body {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(ellipse 70% 60% at 50% 110%, rgba(0,200,80,0.18) 0%, transparent 70%),
-        linear-gradient(170deg,
-            rgba(5,25,12,0.82) 0%,
-            rgba(8,45,20,0.7) 40%,
-            rgba(5,20,10,0.88) 100%);
+        radial-gradient(ellipse 65% 55% at 50% 105%, rgba(100,60,255,0.15) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 30% at 15% 50%, rgba(200,16,46,0.12) 0%, transparent 60%),
+        linear-gradient(160deg,
+            rgba(5,8,15,0.85) 0%,
+            rgba(10,17,40,0.72) 45%,
+            rgba(18,7,58,0.88) 100%);
     pointer-events: none;
 }
 
@@ -512,6 +513,77 @@ body {
     transition: opacity 0.2s;
 }
 .wc-modal-btn:active { opacity: 0.85; }
+
+/* ── Carrusel de banderas ─────────────────────────────────────────────────── */
+.wc-flags-wrap {
+    width: calc(100% + 32px);
+    margin: 10px -16px 10px;
+    overflow: hidden;
+    position: relative;
+}
+.wc-flags-wrap::before,
+.wc-flags-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 28px;
+    z-index: 2;
+    pointer-events: none;
+}
+.wc-flags-wrap::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(5,8,15,0.85), transparent);
+}
+.wc-flags-wrap::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(18,7,58,0.85), transparent);
+}
+.wc-flags-track {
+    display: flex;
+    gap: 6px;
+    padding: 4px 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.wc-flags-track::-webkit-scrollbar { display: none; }
+.wc-flag {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    scroll-snap-align: start;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 5px 7px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: default;
+    transition: background 0.15s, transform 0.15s;
+}
+.wc-flag:active {
+    background: rgba(255,255,255,0.12);
+    transform: scale(0.94);
+}
+.wc-flag > :first-child {
+    font-size: 20px;
+    line-height: 1;
+}
+.wc-flag span {
+    font-size: 7.5px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    max-width: 46px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    text-align: center;
+}
 
 /* ── Sponsors Strip ─────────────────────────────────────────────────────────── */
 .sponsors-strip {
