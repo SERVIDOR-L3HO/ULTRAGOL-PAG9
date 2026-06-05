@@ -900,29 +900,32 @@ app.get('/api/geo', async (req, res) => {
     }
 });
 
-// ── Gemini AI proxy (keeps API key server-side) ───────────────────────────────
+// ── Gemini AI proxy (via Replit AI Integrations — no user key needed) ─────────
 app.post('/api/gemini/chat', express.json(), async (req, res) => {
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const GEMINI_API_KEY = process.env.AI_INTEGRATIONS_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+    const GEMINI_BASE_URL = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
     if (!GEMINI_API_KEY) {
         return res.status(503).json({ error: 'Gemini AI not configured' });
     }
     const { prompt, generationConfig } = req.body || {};
     if (!prompt) return res.status(400).json({ error: 'prompt required' });
     try {
-        const r = await fetch(
-            `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                    generationConfig: generationConfig || {
-                        temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 1024
-                    }
-                }),
-                signal: AbortSignal.timeout(30000)
-            }
-        );
+        const baseUrl = GEMINI_BASE_URL
+            ? `${GEMINI_BASE_URL}/models/gemini-2.5-flash:generateContent`
+            : `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        const headers = { 'Content-Type': 'application/json' };
+        if (GEMINI_BASE_URL) headers['Authorization'] = `Bearer ${GEMINI_API_KEY}`;
+        const r = await fetch(baseUrl, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: generationConfig || {
+                    temperature: 0.7, topK: 40, topP: 0.95, maxOutputTokens: 1024
+                }
+            }),
+            signal: AbortSignal.timeout(30000)
+        });
         const data = await r.json();
         if (!r.ok) return res.status(r.status).json(data);
         res.json(data);
