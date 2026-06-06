@@ -273,7 +273,7 @@ app.post('/api/turnstile/verify', async (req, res) => {
 });
 
 // UltraGol API Proxy (para evitar problemas de CORS)
-const API_BASE_URL = 'https://ultragol-api-3-six.vercel.app';
+const API_BASE_URL = 'https://ultra-gol.vercel.app';
 const ULTRAGOL_API_KEY = process.env.ULTRAGOL_API_KEY || '';
 
 function apiUrl(endpoint) {
@@ -851,29 +851,29 @@ app.get('/api/notifications', async (req, res) => {
 
 app.get('/api/ultragol/transmisiones3', async (req, res) => {
     try {
-        const response = await fetch(apiUrl('/transmisiones3'));
+        const response = await fetch(apiUrl('/gol-3'));
         const data = await response.json();
         res.json(data);
     } catch (error) {
-        console.error('Error proxying transmisiones3:', error);
-        res.status(500).json({ error: 'Error al obtener transmisiones3' });
+        console.error('Error proxying gol-3:', error);
+        res.status(500).json({ error: 'Error al obtener gol-3' });
     }
 });
 
 app.get('/api/ultragol/transmisiones6', async (req, res) => {
     try {
-        const response = await fetch(apiUrl('/transmisiones6'));
+        const response = await fetch(apiUrl('/gol-6'));
         const data = await response.json();
         res.json(data);
     } catch (error) {
-        console.warn('⚠️ API externa transmisiones6 no disponible, usando JSON local:', error.message);
+        console.warn('⚠️ API externa gol-6 no disponible, usando JSON local:', error.message);
         try {
             const fs = require('fs');
             const data = JSON.parse(fs.readFileSync(path.join(__dirname, 'ultrax', 'transmisiones6.json'), 'utf8'));
             res.json(data);
         } catch (localError) {
             console.error('Error al leer transmisiones6.json local:', localError);
-            res.status(500).json({ error: 'Error al obtener transmisiones6' });
+            res.status(500).json({ error: 'Error al obtener gol-6' });
         }
     }
 });
@@ -1091,13 +1091,13 @@ function normalizeTransmision(item, fuente) {
 async function fetchAllPartidos() {
     const [marc, t2, t3, t4, t5, t6, t7, t8] = await Promise.all([
         safeFetch(apiUrl('/marcadores')),
-        safeFetch(apiUrl('/transmisiones2')),
-        safeFetch(apiUrl('/transmisiones3')),
-        safeFetch(apiUrl('/transmisiones4')),
-        safeFetch(apiUrl('/transmisiones5')),
-        safeFetch(apiUrl('/transmisiones6')),
-        safeFetch(apiUrl('/transmisiones7')),
-        safeFetch(apiUrl('/transmisiones8')),
+        safeFetch(apiUrl('/gol-2')),
+        safeFetch(apiUrl('/gol-3')),
+        safeFetch(apiUrl('/gol-4')),
+        safeFetch(apiUrl('/gol-5')),
+        safeFetch(apiUrl('/gol-6')),
+        safeFetch(apiUrl('/gol-7')),
+        safeFetch(apiUrl('/gol-8')),
     ]);
 
     const map = new Map();
@@ -2455,16 +2455,16 @@ app.get('/api/ultrawidget-agenda', async (req, res) => {
     if (agendaCache && (now - agendaCacheTime) < AGENDA_TTL) {
         return res.json(agendaCache);
     }
-    const BASE = 'https://ultragol-api-3-six.vercel.app';
+    const BASE = 'https://ultra-gol.vercel.app';
     const [d1, d2, d3, d4, d5, d6, d7, d8] = await Promise.all([
-        fetchAgendaAPI(`${BASE}/transmisiones`),
-        fetchAgendaAPI(`${BASE}/transmisiones2`),
-        fetchAgendaAPI(`${BASE}/transmisiones3`),
-        fetchAgendaAPI(`${BASE}/transmisiones4`),
-        fetchAgendaAPI(`${BASE}/transmisiones5`),
-        fetchAgendaAPI(`${BASE}/transmisiones6`),
-        fetchAgendaAPI(`${BASE}/transmisiones7`),
-        fetchAgendaAPI(`${BASE}/transmisiones8`),
+        fetchAgendaAPI(`${BASE}/gol-1`),
+        fetchAgendaAPI(`${BASE}/gol-2`),
+        fetchAgendaAPI(`${BASE}/gol-3`),
+        fetchAgendaAPI(`${BASE}/gol-4`),
+        fetchAgendaAPI(`${BASE}/gol-5`),
+        fetchAgendaAPI(`${BASE}/gol-6`),
+        fetchAgendaAPI(`${BASE}/gol-7`),
+        fetchAgendaAPI(`${BASE}/gol-8`),
     ]);
     const payload = {
         api1: d1.transmisiones || [],

@@ -37,7 +37,7 @@ let streakData = {
     claimedRewards: []
 };
 
-const API_BASE = 'https://ultragol-api-3-six.vercel.app';
+const API_BASE = 'https://ultra-gol.vercel.app';
 
 // Función para hacer fetch con timeout
 async function fetchWithTimeout(url, timeout = 8000) {
@@ -547,52 +547,52 @@ async function loadTransmisiones() {
     try {
         // Cargar las 7 APIs en paralelo con manejo individual de errores y timeouts
         const [data1, data2, data3, data4, data5, data6, data7, data8] = await Promise.all([
-            fetchWithTimeout('https://ultragol-api-3-six.vercel.app/transmisiones', 8000)
+            fetchWithTimeout(`${API_BASE}/gol-1`, 8000)
                 .then(res => res.json())
                 .catch(err => {
                     _log('⚠️ Error cargando API 1 (rereyano):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetchWithTimeout('https://ultragol-api-3-six.vercel.app/transmisiones3', 8000)
+            fetchWithTimeout(`${API_BASE}/gol-3`, 8000)
                 .then(res => res.json())
                 .catch(err => {
                     _log('⚠️ Error cargando API 2 (e1link):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetchWithTimeout('https://ultragol-api-3-six.vercel.app/transmisiones2', 8000)
+            fetchWithTimeout(`${API_BASE}/gol-2`, 8000)
                 .then(res => res.json())
                 .catch(err => {
                     _log('⚠️ Error cargando API 3 (voodc):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetchWithTimeout('https://ultragol-api-3-six.vercel.app/transmisiones4', 8000)
+            fetchWithTimeout(`${API_BASE}/gol-4`, 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    _log('⚠️ Error cargando API 4 (transmisiones4):', err.message);
+                    _log('⚠️ Error cargando API 4 (gol-4):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetchWithTimeout('https://ultragol-api-3-six.vercel.app/transmisiones5', 8000)
+            fetchWithTimeout(`${API_BASE}/gol-5`, 8000)
                 .then(res => res.json())
                 .catch(err => {
                     _log('⚠️ Error cargando API 5 (donromans):', err.message);
                     return { matches: [] };
                 }),
-            fetchWithTimeout('https://ultragol-api-3-six.vercel.app/transmisiones6', 8000)
+            fetchWithTimeout(`${API_BASE}/gol-6`, 8000)
                 .then(res => res.json())
                 .catch(err => {
                     _log('⚠️ Error cargando API 6 (external):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetchWithTimeout('https://ultragol-api-3-six.vercel.app/transmisiones7', 8000)
+            fetchWithTimeout(`${API_BASE}/gol-7`, 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    _log('⚠️ Error cargando API 7 (transmisiones7):', err.message);
+                    _log('⚠️ Error cargando API 7 (gol-7):', err.message);
                     return { transmisiones: [] };
                 }),
-            fetchWithTimeout('https://ultragol-api-3-six.vercel.app/transmisiones8', 8000)
+            fetchWithTimeout(`${API_BASE}/gol-8`, 8000)
                 .then(res => res.json())
                 .catch(err => {
-                    _log('⚠️ Error cargando API 8 (transmisiones8):', err.message);
+                    _log('⚠️ Error cargando API 8 (gol-8):', err.message);
                     return { transmisiones: [] };
                 })
         ]);
@@ -2248,7 +2248,7 @@ async function fetchRealMatchStats(eventId) {
     const timeoutId = setTimeout(() => controller.abort(), 6000);
 
     try {
-        const response = await fetch(`https://ultragol-api-3-six.vercel.app/estadisticas/partido/${eventId}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE}/estadisticas/partido/${eventId}`, { signal: controller.signal });
         clearTimeout(timeoutId);
 
         if (!response.ok) return null;
@@ -5119,7 +5119,7 @@ async function loadReplays() {
     container.innerHTML = '<div class="loading-spinner">Cargando mejores momentos de Liga MX...</div>';
     
     try {
-        const response = await fetch('https://ultragol-api-3-six.vercel.app/videos');
+        const response = await fetch(`${API_BASE}/videos`);
         const data = await response.json();
         
         let allVideos = [];
@@ -5384,7 +5384,7 @@ async function loadStandings() {
             return;
         }
 
-        const response = await fetchWithTimeout(`https://ultragol-api-3-six.vercel.app${endpoint}`, 8000);
+        const response = await fetchWithTimeout(`${API_BASE}${endpoint}`, 8000);
         const data = await response.json();
 
         if (!data.tabla || data.tabla.length === 0) {
@@ -5483,7 +5483,7 @@ async function loadNews() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
         const endpoint = leagueConfig ? leagueConfig.noticias : '/noticias';
-        const response = await fetchWithTimeout(`https://ultragol-api-3-six.vercel.app${endpoint}`, 8000);
+        const response = await fetchWithTimeout(`${API_BASE}${endpoint}`, 8000);
         const data = await response.json();
         
         const newsGrid = document.getElementById('newsGrid');
@@ -6502,7 +6502,7 @@ async function loadLineups() {
     try {
         const leagueConfig = leaguesConfig[currentLeague];
         const endpoint = leagueConfig ? leagueConfig.alineaciones : '/alineaciones';
-        const response = await fetch(`https://ultragol-api-3-six.vercel.app${endpoint}`);
+        const response = await fetch(`${API_BASE}${endpoint}`);
         const data = await response.json();
         lineupsData = data;
         
