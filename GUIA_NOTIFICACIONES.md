@@ -27,7 +27,7 @@ He corregido el error "Error al mostrar selector de equipos" y mejorado todo el 
 ### 3. **Carga de Equipos Robusta**
 - Timeout de 5 segundos para la API
 - Múltiples intentos de fallback:
-  1. API externa (`https://ultragol-api-3-six.vercel.app/Equipos`)
+  1. API externa (`https://ultragol-api-3--olivia32809.replit.app/Equipos`)
   2. Archivo local (`/data/teams.json`)
   3. Archivo local alternativo (`./data/teams.json`)
 - Validación de estructura de datos
@@ -188,7 +188,7 @@ Luego recarga la página.
 
 ## 📝 Notas Técnicas
 
-- **API:** Se conecta a `https://ultragol-api-3-six.vercel.app/notificaciones/ligamx`
+- **API:** Se conecta a `https://ultragol-api-3--olivia32809.replit.app/notificaciones/ligamx`
 - **Polling:** Intervalo de 60 segundos
 - **LocalStorage:** Guarda `selectedTeam`, `notificationPermission`, `lastNotificationId`, `notificationModalShown`
 - **Timeout:** 5 segundos para cada solicitud a la API

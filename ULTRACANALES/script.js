@@ -1,5 +1,5 @@
 /* ===================== ULTRACANALES — HOME SCRIPT ===================== */
-const API_URL = 'https://ultragol-api-3-six.vercel.app/canales';
+const API_URL = 'https://ultragol-api-3--olivia32809.replit.app/canales';
 
 const CAT_META = {
     'Sports':               { label: 'Deportes',          icon: '🏆' },
