@@ -1,5 +1,5 @@
 let currentLeague = 'Liga MX';
-const API_BASE = 'https://ultragol-api-3--olivia32809.replit.app';
+const API_BASE = 'https://ultragol-api-3-six.vercel.app';
 
 const leaguesConfig = {
     'Liga MX':       { noticias: '/noticias' },

@@ -59,4 +59,4 @@ Preferred communication style: Simple, everyday language.
 - **Stripe API Reference:** [https://stripe.com/docs/api](https://stripe.com/docs/api)
 - **Express.js Guide:** [https://expressjs.com/](https://expressjs.com/)
 - **PWA Fundamentals:** [https://web.dev/pwq/](https://web.dev/pwq/)
-- **ULTRAGOL Statistics API:** [https://ultragol-api-3--olivia32809.replit.app/](https://ultragol-api-3--olivia32809.replit.app/)
+- **ULTRAGOL Statistics API:** [https://ultragol-api-3-six.vercel.app/](https://ultragol-api-3-six.vercel.app/)
