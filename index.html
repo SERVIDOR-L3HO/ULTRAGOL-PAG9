@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>UltraGol — Streaming Deportivo en Vivo</title>
-    <meta name="description" content="La mejor plataforma de streaming deportivo. Liga MX, Premier League, NBA, F1 y más en un solo lugar.">
+    <title>UltraGol — Streaming Gratis: Deportes, Películas, Música y más</title>
+    <meta name="description" content="Tu plataforma de entretenimiento total. Deportes en vivo, películas, series, anime, doramas, música y TV — todo 100% gratis.">
     <link rel="icon" type="image/png" href="ULTRA/favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">
@@ -15,6 +15,10 @@
             --red: #e8173a;
             --red2: #ff3d5a;
             --orange: #ff6b1a;
+            --purple: #7c3aed;
+            --blue: #2563eb;
+            --green: #16a34a;
+            --pink: #db2777;
             --bg: #07080f;
             --bg2: #0d0f1a;
             --surface: rgba(255,255,255,0.04);
@@ -33,7 +37,6 @@
             overflow-x: hidden;
         }
 
-        /* ── NOISE TEXTURE ── */
         body::before {
             content: '';
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -46,17 +49,16 @@
         .bg-layer {
             position: fixed; inset: 0; z-index: 0;
             background:
-                linear-gradient(180deg, rgba(7,8,15,0) 0%, rgba(7,8,15,0.6) 50%, var(--bg) 90%),
+                linear-gradient(180deg, rgba(7,8,15,0.1) 0%, rgba(7,8,15,0.65) 50%, var(--bg) 88%),
                 url('assets/images/stadium-bg.jpg') center 30% / cover no-repeat;
         }
         .bg-glow {
             position: fixed; inset: 0; z-index: 1; pointer-events: none;
             background:
-                radial-gradient(ellipse 70% 50% at 15% 10%, rgba(232,23,58,0.13) 0%, transparent 65%),
-                radial-gradient(ellipse 50% 60% at 85% 85%, rgba(255,107,26,0.09) 0%, transparent 60%),
+                radial-gradient(ellipse 70% 50% at 15% 10%, rgba(232,23,58,0.15) 0%, transparent 65%),
+                radial-gradient(ellipse 50% 60% at 85% 85%, rgba(124,58,237,0.09) 0%, transparent 60%),
                 radial-gradient(ellipse 40% 40% at 50% 50%, rgba(60,30,80,0.15) 0%, transparent 70%);
         }
-        /* Animated orbs */
         .orb {
             position: fixed; border-radius: 50%; pointer-events: none; z-index: 1;
             filter: blur(80px);
@@ -70,8 +72,14 @@
         .orb-2 {
             width: 400px; height: 400px;
             bottom: 10%; right: -80px;
-            background: radial-gradient(circle, rgba(255,107,26,0.12) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
             animation: orbFloat2 22s ease-in-out infinite;
+        }
+        .orb-3 {
+            width: 350px; height: 350px;
+            top: 40%; left: 50%;
+            background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%);
+            animation: orbFloat3 28s ease-in-out infinite;
         }
         @keyframes orbFloat1 {
             0%,100% { transform: translate(0,0) scale(1); }
@@ -81,6 +89,10 @@
         @keyframes orbFloat2 {
             0%,100% { transform: translate(0,0) scale(1); }
             50%      { transform: translate(-50px,-40px) scale(1.08); }
+        }
+        @keyframes orbFloat3 {
+            0%,100% { transform: translate(-50%,-50%) scale(1); }
+            40%      { transform: translate(-45%,-55%) scale(1.1); }
         }
 
         /* ── NAV ── */
@@ -134,7 +146,6 @@
             padding: 130px 24px 60px;
         }
 
-        /* Live badge */
         .live-badge {
             display: inline-flex; align-items: center; gap: 8px;
             background: rgba(232,23,58,0.12);
@@ -153,53 +164,57 @@
             animation: livePulse 1.2s infinite;
         }
 
-        /* Main headline */
         .hero-headline {
             font-family: 'Barlow Condensed', 'Inter', sans-serif;
-            font-size: clamp(3.4rem, 11vw, 8.5rem);
+            font-size: clamp(3.2rem, 10.5vw, 8.5rem);
             font-weight: 900;
             line-height: 0.92;
             letter-spacing: -1px;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             animation: fadeSlideDown 0.8s ease 0.1s both;
         }
-        .hero-headline .line-accent {
+        .hero-headline .line-white {
+            display: block; color: #fff; -webkit-text-fill-color: #fff;
+        }
+        .hero-headline .line-gradient {
             display: block;
-            background: linear-gradient(90deg, #e8173a 0%, #ff6b1a 60%, #ff9a3c 100%);
+            background: linear-gradient(90deg, #e8173a 0%, #ff6b1a 40%, #f59e0b 70%, #7c3aed 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            background-size: 200% 100%;
+            animation: gradientShift 4s ease-in-out infinite alternate;
         }
-        .hero-headline .line-white {
-            display: block;
-            color: #fff;
-            -webkit-text-fill-color: #fff;
+        @keyframes gradientShift {
+            0%   { background-position: 0% 0%; }
+            100% { background-position: 100% 0%; }
         }
 
-        /* Subheadline */
-        .hero-sub-headline {
+        .hero-categories {
+            display: flex; align-items: center; justify-content: center;
+            flex-wrap: wrap; gap: 8px 16px;
             font-family: 'Barlow Condensed', 'Inter', sans-serif;
-            font-size: clamp(1rem, 3vw, 1.55rem);
-            font-weight: 700;
-            letter-spacing: 3px;
+            font-size: clamp(0.85rem, 2.5vw, 1.2rem);
+            font-weight: 700; letter-spacing: 2.5px;
             text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
-            margin-bottom: 28px;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 32px;
             animation: fadeSlideDown 0.8s ease 0.2s both;
         }
+        .hero-categories .cat-sep { color: rgba(255,255,255,0.12); }
+        .hero-categories .cat-highlight { color: rgba(255,255,255,0.7); }
 
         .hero-desc {
             font-size: clamp(0.88rem, 2vw, 1.05rem);
             color: var(--muted);
-            max-width: 440px;
+            max-width: 420px;
             line-height: 1.75;
             margin-bottom: 44px;
             animation: fadeSlideDown 0.8s ease 0.3s both;
         }
-        .hero-desc strong { color: rgba(255,255,255,0.8); font-weight: 600; }
+        .hero-desc strong { color: rgba(255,255,255,0.85); font-weight: 700; }
 
-        /* CTA Buttons */
         .hero-ctas {
             display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
             margin-bottom: 60px;
@@ -215,8 +230,7 @@
             display: inline-flex; align-items: center; gap: 10px;
             box-shadow: 0 8px 30px rgba(232,23,58,0.45);
             transition: transform 0.2s, box-shadow 0.2s;
-            overflow: hidden;
-            letter-spacing: 0.3px;
+            overflow: hidden; letter-spacing: 0.3px;
         }
         .btn-primary::before {
             content: '';
@@ -225,10 +239,7 @@
             transform: skewX(-20deg);
             animation: btnShine 3.5s ease-in-out infinite;
         }
-        @keyframes btnShine {
-            0%,40% { left: -100%; }
-            60%,100% { left: 160%; }
-        }
+        @keyframes btnShine { 0%,40%{left:-100%} 60%,100%{left:160%} }
         .btn-primary:hover {
             transform: translateY(-3px) scale(1.02);
             box-shadow: 0 16px 40px rgba(232,23,58,0.6);
@@ -259,14 +270,11 @@
             transform: translateY(-2px);
         }
 
-        /* Live matches ticker */
         .live-ticker {
-            width: 100%;
-            max-width: 640px;
+            width: 100%; max-width: 640px;
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 16px;
-            padding: 14px 20px;
+            border-radius: 16px; padding: 14px 20px;
             display: flex; align-items: center; gap: 14px;
             overflow: hidden;
             animation: fadeSlideUp 0.8s ease 0.5s both;
@@ -278,10 +286,7 @@
             border-right: 1px solid rgba(255,255,255,0.1);
             padding-right: 14px;
         }
-        .ticker-track {
-            display: flex; gap: 24px;
-            overflow: hidden; flex: 1;
-        }
+        .ticker-track { display: flex; gap: 24px; overflow: hidden; flex: 1; }
         .ticker-items {
             display: flex; gap: 24px;
             animation: tickerScroll 20s linear infinite;
@@ -317,7 +322,6 @@
             display: flex; flex-direction: column; align-items: center;
             padding: 32px 20px;
             border-right: 1px solid var(--border);
-            position: relative;
             transition: background 0.3s;
         }
         .stat-item:last-child { border-right: none; }
@@ -327,25 +331,16 @@
             font-size: 2.8rem; font-weight: 900;
             background: linear-gradient(135deg, #fff 20%, var(--red));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text;
-            line-height: 1;
-            letter-spacing: -1px;
+            background-clip: text; line-height: 1; letter-spacing: -1px;
         }
-        .stat-label {
-            font-size: 0.7rem; color: var(--muted);
-            margin-top: 6px; letter-spacing: 0.8px;
-            text-transform: uppercase; font-weight: 600;
-        }
-        .stat-icon {
-            font-size: 0.85rem; color: var(--red);
-            margin-bottom: 10px; opacity: 0.7;
-        }
+        .stat-label { font-size: 0.7rem; color: var(--muted); margin-top: 6px; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 600; }
+        .stat-icon { font-size: 0.85rem; color: var(--red); margin-bottom: 10px; opacity: 0.7; }
 
         /* ── SECTION COMMONS ── */
         .section {
             position: relative; z-index: 2;
             padding: 100px 24px;
-            max-width: 1140px; margin: 0 auto;
+            max-width: 1200px; margin: 0 auto;
         }
         .section-eyebrow {
             display: inline-flex; align-items: center; gap: 8px;
@@ -353,7 +348,6 @@
             letter-spacing: 2.5px; text-transform: uppercase;
             margin-bottom: 16px;
         }
-        .section-eyebrow i { font-size: 0.7rem; }
         .section-title {
             font-family: 'Barlow Condensed', 'Inter', sans-serif;
             font-size: clamp(2rem, 5vw, 3.2rem);
@@ -362,69 +356,258 @@
             margin-bottom: 16px;
         }
         .section-title span { color: var(--red); }
-        .section-sub {
-            color: var(--muted); font-size: 1rem;
-            line-height: 1.75; max-width: 480px;
+        .section-sub { color: var(--muted); font-size: 1rem; line-height: 1.75; max-width: 480px; }
+
+        /* ── SERVICES CAROUSEL ── */
+        .services-wrap {
+            position: relative; z-index: 2;
+            padding: 90px 0 100px;
+        }
+        .services-header {
+            text-align: center;
+            padding: 0 24px;
+            margin-bottom: 56px;
+        }
+        .services-header .section-sub { margin: 0 auto; }
+
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .carousel-track-outer {
+            overflow: hidden;
+            padding: 16px 0 32px;
+        }
+        .carousel-track {
+            display: flex;
+            gap: 20px;
+            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            padding: 0 max(24px, calc((100vw - 1200px) / 2));
+            will-change: transform;
         }
 
-        /* ── FEATURES — 3-column asymmetric ── */
-        .features-layout {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr;
-            gap: 16px;
-            margin-top: 56px;
+        /* Service Cards */
+        .service-card {
+            flex: 0 0 320px;
+            min-height: 420px;
+            border-radius: 28px;
+            padding: 40px 32px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s;
+            border: 1px solid rgba(255,255,255,0.07);
+            text-decoration: none;
+            display: flex; flex-direction: column;
         }
-        .feature-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 36px 28px;
-            transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), border-color 0.3s, background 0.3s;
-            position: relative; overflow: hidden;
+        .service-card:hover {
+            transform: translateY(-10px) scale(1.02);
         }
-        .feature-card::before {
+
+        /* Card backgrounds */
+        .sc-sports {
+            background: linear-gradient(145deg, #0d0f1a 0%, #160a10 60%, #0d0f1a 100%);
+        }
+        .sc-sports::before {
             content: '';
-            position: absolute; top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, transparent, var(--red), transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
+            position: absolute; inset: 0;
+            background: linear-gradient(145deg, rgba(232,23,58,0.18) 0%, rgba(255,107,26,0.1) 50%, transparent 80%);
         }
-        .feature-card:hover {
-            transform: translateY(-8px);
-            border-color: rgba(232,23,58,0.25);
-            background: rgba(232,23,58,0.05);
+        .sc-sports:hover { box-shadow: 0 30px 80px rgba(232,23,58,0.3); border-color: rgba(232,23,58,0.35); }
+
+        .sc-movies {
+            background: linear-gradient(145deg, #0d0f1a 0%, #0a0d1f 60%, #0d0f1a 100%);
         }
-        .feature-card:hover::before { opacity: 1; }
-        .feature-card.featured {
-            background: linear-gradient(145deg, rgba(232,23,58,0.1) 0%, rgba(255,107,26,0.05) 100%);
-            border-color: rgba(232,23,58,0.22);
+        .sc-movies::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(145deg, rgba(124,58,237,0.18) 0%, rgba(37,99,235,0.1) 50%, transparent 80%);
         }
-        .feature-card.featured::before { opacity: 0.6; }
-        .feature-icon-wrap {
-            width: 54px; height: 54px; border-radius: 16px;
-            background: rgba(232,23,58,0.12);
-            border: 1px solid rgba(232,23,58,0.2);
+        .sc-movies:hover { box-shadow: 0 30px 80px rgba(124,58,237,0.3); border-color: rgba(124,58,237,0.35); }
+
+        .sc-anime {
+            background: linear-gradient(145deg, #0d0f1a 0%, #120a14 60%, #0d0f1a 100%);
+        }
+        .sc-anime::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(145deg, rgba(219,39,119,0.18) 0%, rgba(124,58,237,0.1) 50%, transparent 80%);
+        }
+        .sc-anime:hover { box-shadow: 0 30px 80px rgba(219,39,119,0.3); border-color: rgba(219,39,119,0.35); }
+
+        .sc-music {
+            background: linear-gradient(145deg, #0d0f1a 0%, #0a120d 60%, #0d0f1a 100%);
+        }
+        .sc-music::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(145deg, rgba(22,163,74,0.18) 0%, rgba(20,184,166,0.1) 50%, transparent 80%);
+        }
+        .sc-music:hover { box-shadow: 0 30px 80px rgba(22,163,74,0.3); border-color: rgba(22,163,74,0.35); }
+
+        .sc-tv {
+            background: linear-gradient(145deg, #0d0f1a 0%, #0a0e14 60%, #0d0f1a 100%);
+        }
+        .sc-tv::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(145deg, rgba(245,158,11,0.18) 0%, rgba(239,68,68,0.08) 50%, transparent 80%);
+        }
+        .sc-tv:hover { box-shadow: 0 30px 80px rgba(245,158,11,0.3); border-color: rgba(245,158,11,0.35); }
+
+        .sc-bg-emoji {
+            position: absolute;
+            right: -10px; bottom: -10px;
+            font-size: 9rem;
+            opacity: 0.07;
+            line-height: 1;
+            pointer-events: none;
+            transition: transform 0.35s, opacity 0.35s;
+            user-select: none;
+        }
+        .service-card:hover .sc-bg-emoji {
+            transform: scale(1.12) rotate(-5deg);
+            opacity: 0.12;
+        }
+
+        .sc-icon-wrap {
+            width: 60px; height: 60px;
+            border-radius: 18px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem; color: var(--red);
-            margin-bottom: 22px;
+            font-size: 1.6rem;
+            margin-bottom: 24px;
+            position: relative; z-index: 1;
         }
-        .feature-card.featured .feature-icon-wrap {
-            background: rgba(232,23,58,0.2);
-            border-color: rgba(232,23,58,0.35);
+        .sc-sports .sc-icon-wrap    { background: rgba(232,23,58,0.18); border: 1px solid rgba(232,23,58,0.3); color: #ff3d5a; }
+        .sc-movies .sc-icon-wrap    { background: rgba(124,58,237,0.18); border: 1px solid rgba(124,58,237,0.3); color: #a78bfa; }
+        .sc-anime  .sc-icon-wrap    { background: rgba(219,39,119,0.18); border: 1px solid rgba(219,39,119,0.3); color: #f472b6; }
+        .sc-music  .sc-icon-wrap    { background: rgba(22,163,74,0.18); border: 1px solid rgba(22,163,74,0.3); color: #4ade80; }
+        .sc-tv     .sc-icon-wrap    { background: rgba(245,158,11,0.18); border: 1px solid rgba(245,158,11,0.3); color: #fbbf24; }
+
+        .sc-tag {
+            display: inline-block;
+            font-size: 0.62rem; font-weight: 800; letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 4px 12px; border-radius: 50px;
+            margin-bottom: 14px;
+            position: relative; z-index: 1;
         }
-        .feature-card h3 {
+        .sc-sports .sc-tag { background: rgba(232,23,58,0.15); color: #ff6b7d; border: 1px solid rgba(232,23,58,0.25); }
+        .sc-movies .sc-tag { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.25); }
+        .sc-anime  .sc-tag { background: rgba(219,39,119,0.15); color: #f472b6; border: 1px solid rgba(219,39,119,0.25); }
+        .sc-music  .sc-tag { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.25); }
+        .sc-tv     .sc-tag { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+
+        .sc-title {
             font-family: 'Barlow Condensed', 'Inter', sans-serif;
-            font-size: 1.35rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 0.3px;
-            margin-bottom: 10px;
+            font-size: 2rem; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 0px;
+            line-height: 1.0;
+            margin-bottom: 14px;
+            position: relative; z-index: 1;
         }
-        .feature-card p { font-size: 0.88rem; color: var(--muted); line-height: 1.65; }
-        .feature-row { grid-column: 1 / -1; }
-        .feature-row-inner {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
+        .sc-desc {
+            font-size: 0.9rem; color: rgba(255,255,255,0.55);
+            line-height: 1.65;
+            position: relative; z-index: 1;
+            flex: 1;
         }
+
+        .sc-chips {
+            display: flex; flex-wrap: wrap; gap: 6px;
+            margin-top: 24px;
+            position: relative; z-index: 1;
+        }
+        .sc-chip {
+            font-size: 0.68rem; font-weight: 600;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 4px 10px; border-radius: 50px;
+            color: rgba(255,255,255,0.55);
+        }
+
+        .sc-cta {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 28px;
+            font-size: 0.82rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            position: relative; z-index: 1;
+            transition: gap 0.2s;
+        }
+        .service-card:hover .sc-cta { gap: 12px; }
+        .sc-sports .sc-cta { color: #ff6b7d; }
+        .sc-movies .sc-cta { color: #a78bfa; }
+        .sc-anime  .sc-cta { color: #f472b6; }
+        .sc-music  .sc-cta { color: #4ade80; }
+        .sc-tv     .sc-cta { color: #fbbf24; }
+
+        /* Carousel nav dots */
+        .carousel-dots {
+            display: flex; align-items: center; justify-content: center;
+            gap: 8px; margin-top: 32px;
+        }
+        .c-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+            border: none; cursor: pointer;
+            transition: background 0.3s, width 0.3s, border-radius 0.3s;
+        }
+        .c-dot.active {
+            width: 28px; border-radius: 4px;
+            background: var(--red);
+        }
+
+        /* Carousel arrows */
+        .carousel-arrows {
+            display: flex; gap: 10px; justify-content: center;
+            margin-top: 20px;
+        }
+        .c-arrow {
+            width: 44px; height: 44px; border-radius: 50%;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 0.85rem; color: rgba(255,255,255,0.7);
+            transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+        }
+        .c-arrow:hover {
+            background: rgba(232,23,58,0.15);
+            border-color: rgba(232,23,58,0.4);
+            color: #ff6b7d;
+            transform: scale(1.08);
+        }
+
+        /* ── FREE BADGE STRIP ── */
+        .free-strip {
+            position: relative; z-index: 2;
+            background: linear-gradient(90deg, #e8173a 0%, #ff6b1a 50%, #7c3aed 100%);
+            padding: 18px 24px;
+            text-align: center;
+            overflow: hidden;
+        }
+        .free-strip::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                rgba(255,255,255,0) 0px,
+                rgba(255,255,255,0) 40px,
+                rgba(255,255,255,0.04) 40px,
+                rgba(255,255,255,0.04) 42px
+            );
+        }
+        .free-strip-inner {
+            display: flex; align-items: center; justify-content: center;
+            gap: 32px; flex-wrap: wrap;
+            position: relative; z-index: 1;
+        }
+        .free-item {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.82rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: rgba(255,255,255,0.95);
+        }
+        .free-item i { font-size: 1rem; }
 
         /* ── LEAGUES MARQUEE ── */
         .leagues-section {
@@ -435,11 +618,7 @@
             background: rgba(255,255,255,0.015);
             overflow: hidden;
         }
-        .leagues-header {
-            text-align: center;
-            padding: 0 24px;
-            margin-bottom: 48px;
-        }
+        .leagues-header { text-align: center; padding: 0 24px; margin-bottom: 48px; }
         .leagues-marquee-wrap { position: relative; }
         .leagues-marquee-wrap::before,
         .leagues-marquee-wrap::after {
@@ -447,14 +626,8 @@
             position: absolute; top: 0; bottom: 0; width: 120px; z-index: 2;
             pointer-events: none;
         }
-        .leagues-marquee-wrap::before {
-            left: 0;
-            background: linear-gradient(90deg, var(--bg2), transparent);
-        }
-        .leagues-marquee-wrap::after {
-            right: 0;
-            background: linear-gradient(-90deg, var(--bg2), transparent);
-        }
+        .leagues-marquee-wrap::before { left: 0; background: linear-gradient(90deg, var(--bg2), transparent); }
+        .leagues-marquee-wrap::after  { right: 0; background: linear-gradient(-90deg, var(--bg2), transparent); }
         .leagues-track {
             display: flex; gap: 14px;
             animation: marqueeScroll 26s linear infinite;
@@ -463,55 +636,31 @@
         .leagues-track:hover { animation-play-state: paused; }
         .league-pill {
             display: inline-flex; align-items: center; gap: 10px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 50px;
-            padding: 11px 22px;
-            font-size: 0.86rem; font-weight: 600;
-            white-space: nowrap;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 50px; padding: 11px 22px;
+            font-size: 0.86rem; font-weight: 600; white-space: nowrap;
             transition: border-color 0.25s, color 0.25s, background 0.25s;
-            cursor: default;
         }
-        .league-pill:hover {
-            border-color: rgba(232,23,58,0.5);
-            color: var(--red2);
-            background: rgba(232,23,58,0.07);
-        }
+        .league-pill:hover { border-color: rgba(232,23,58,0.5); color: var(--red2); background: rgba(232,23,58,0.07); }
         .league-pill img { width: 22px; height: 22px; object-fit: contain; border-radius: 50%; }
         .league-pill i { font-size: 0.85rem; color: var(--red); }
-        @keyframes marqueeScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+        @keyframes marqueeScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
 
-        /* ── SOCIAL PROOF STRIP ── */
+        /* ── SOCIAL PROOF ── */
         .proof-strip {
             position: relative; z-index: 2;
             padding: 60px 24px;
             max-width: 1140px; margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 1px;
             background: var(--border);
             border: 1px solid var(--border);
-            border-radius: 24px;
-            overflow: hidden;
-            margin-bottom: 0;
+            border-radius: 24px; overflow: hidden;
         }
-        .proof-item {
-            background: var(--bg2);
-            padding: 36px 32px;
-            display: flex; flex-direction: column; gap: 10px;
-        }
+        .proof-item { background: var(--bg2); padding: 36px 32px; display: flex; flex-direction: column; gap: 10px; }
         .proof-stars { color: #f59e0b; font-size: 0.85rem; letter-spacing: 2px; }
-        .proof-quote {
-            font-size: 0.95rem; line-height: 1.65;
-            color: rgba(255,255,255,0.75); font-style: italic;
-        }
-        .proof-author {
-            font-size: 0.78rem; font-weight: 700;
-            color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px;
-        }
+        .proof-quote { font-size: 0.95rem; line-height: 1.65; color: rgba(255,255,255,0.75); font-style: italic; }
+        .proof-author { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
 
         /* ── CTA FINAL ── */
         .cta-section {
@@ -521,61 +670,39 @@
         }
         .cta-card {
             position: relative;
-            background: linear-gradient(145deg, rgba(232,23,58,0.1) 0%, rgba(255,107,26,0.06) 50%, rgba(99,40,130,0.06) 100%);
+            background: linear-gradient(145deg, rgba(232,23,58,0.1) 0%, rgba(255,107,26,0.06) 40%, rgba(124,58,237,0.08) 100%);
             border: 1px solid rgba(232,23,58,0.18);
-            border-radius: 32px;
-            padding: 80px 40px;
-            max-width: 740px; margin: 0 auto;
-            overflow: hidden;
+            border-radius: 32px; padding: 80px 40px;
+            max-width: 780px; margin: 0 auto; overflow: hidden;
         }
         .cta-card::before {
             content: '';
             position: absolute; top: -100px; right: -100px;
             width: 300px; height: 300px; border-radius: 50%;
             background: radial-gradient(circle, rgba(232,23,58,0.2) 0%, transparent 70%);
-            pointer-events: none;
         }
         .cta-card::after {
             content: '';
             position: absolute; bottom: -80px; left: -80px;
             width: 240px; height: 240px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,107,26,0.15) 0%, transparent 70%);
-            pointer-events: none;
+            background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
         }
-        .cta-eyebrow {
-            display: inline-block;
-            font-size: 0.7rem; font-weight: 700; letter-spacing: 2px;
-            text-transform: uppercase; color: var(--red);
-            margin-bottom: 20px;
-        }
+        .cta-eyebrow { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 20px; }
         .cta-card h2 {
             font-family: 'Barlow Condensed', 'Inter', sans-serif;
-            font-size: clamp(2rem, 5vw, 3.4rem);
+            font-size: clamp(2rem, 5vw, 3.8rem);
             font-weight: 900; text-transform: uppercase;
-            line-height: 1.05; margin-bottom: 18px;
+            line-height: 1.0; margin-bottom: 18px;
         }
-        .cta-card h2 span {
-            background: linear-gradient(90deg, #e8173a, #ff6b1a);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .cta-card p {
-            color: var(--muted); margin-bottom: 40px;
-            font-size: 1rem; line-height: 1.7; max-width: 480px; margin-left: auto; margin-right: auto;
-        }
-        .cta-note {
-            margin-top: 20px;
-            font-size: 0.78rem; color: var(--muted);
-            display: flex; align-items: center; justify-content: center; gap: 6px;
-        }
+        .cta-card h2 span { background: linear-gradient(90deg, #e8173a, #ff6b1a, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .cta-card > p { color: var(--muted); margin-bottom: 40px; font-size: 1rem; line-height: 1.7; max-width: 500px; margin-left: auto; margin-right: auto; }
+        .cta-note { margin-top: 20px; font-size: 0.78rem; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 6px; }
         .cta-note i { color: #22c55e; }
 
         /* ── FOOTER ── */
         footer {
             position: relative; z-index: 2;
-            text-align: center;
-            padding: 32px 24px;
+            text-align: center; padding: 32px 24px;
             border-top: 1px solid var(--border);
             color: var(--muted); font-size: 0.78rem;
         }
@@ -584,18 +711,9 @@
         .footer-links { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
 
         /* ── ANIMATIONS ── */
-        @keyframes fadeSlideDown {
-            from { opacity: 0; transform: translateY(-24px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        .reveal {
-            opacity: 0; transform: translateY(36px);
-            transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1);
-        }
+        @keyframes fadeSlideDown { from{opacity:0;transform:translateY(-24px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeSlideUp   { from{opacity:0;transform:translateY(24px)}  to{opacity:1;transform:translateY(0)} }
+        .reveal { opacity: 0; transform: translateY(36px); transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1); }
         .reveal.visible { opacity: 1; transform: translateY(0); }
         .reveal-delay-1 { transition-delay: 0.1s; }
         .reveal-delay-2 { transition-delay: 0.2s; }
@@ -604,24 +722,21 @@
 
         /* ── RESPONSIVE ── */
         @media (max-width: 900px) {
-            .features-layout { grid-template-columns: 1fr 1fr; }
-            .feature-row-inner { grid-template-columns: 1fr; }
             .proof-strip { grid-template-columns: 1fr; }
             .stats-strip { grid-template-columns: repeat(2, 1fr); }
             .stats-strip .stat-item:nth-child(2) { border-right: none; }
-            .stats-strip .stat-item:nth-child(3) { border-top: 1px solid var(--border); }
         }
         @media (max-width: 600px) {
             nav { padding: 14px 18px; }
             .hero { padding: 110px 18px 50px; }
-            .hero-headline { letter-spacing: -0.5px; }
-            .features-layout { grid-template-columns: 1fr; }
             .section { padding: 70px 18px; }
             .cta-card { padding: 52px 22px; }
             .stats-strip { grid-template-columns: repeat(2, 1fr); }
             .proof-strip { border-radius: 18px; }
             .live-ticker { display: none; }
             .nav-live-count { display: none; }
+            .service-card { flex: 0 0 280px; min-height: 380px; }
+            .free-strip-inner { gap: 16px; }
         }
     </style>
     <link rel="stylesheet" href="css/tour.css">
@@ -632,6 +747,7 @@
     <div class="bg-glow"></div>
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 
     <!-- NAV -->
     <nav id="mainNav">
@@ -653,28 +769,42 @@
     <div class="hero">
         <div class="live-badge">
             <span class="live-dot"></span>
-            Transmisiones en vivo ahora
+            Todo gratis · Sin registro · Sin límites
         </div>
 
         <h1 class="hero-headline">
-            <span class="line-white">El gol</span>
-            <span class="line-accent">se ve aquí.</span>
+            <span class="line-white">Todo lo que</span>
+            <span class="line-gradient">quieres ver.</span>
         </h1>
 
-        <p class="hero-sub-headline">Liga MX · Premier · NBA · F1 · UFC</p>
+        <div class="hero-categories">
+            <span class="cat-highlight">Deportes</span>
+            <span class="cat-sep">·</span>
+            <span>Películas</span>
+            <span class="cat-sep">·</span>
+            <span>Series</span>
+            <span class="cat-sep">·</span>
+            <span>Anime</span>
+            <span class="cat-sep">·</span>
+            <span>Doramas</span>
+            <span class="cat-sep">·</span>
+            <span>Música</span>
+            <span class="cat-sep">·</span>
+            <span>TV</span>
+        </div>
 
         <p class="hero-desc">
-            <strong>Gratis. Sin registros. Sin esperas.</strong><br>
-            Todos los partidos que importan, en tiempo real y desde cualquier dispositivo.
+            <strong>100% gratis. Sin registros. Sin esperas.</strong><br>
+            Una sola plataforma con todo el entretenimiento que necesitas, desde cualquier dispositivo.
         </p>
 
         <div class="hero-ctas">
             <a href="ULTRA/index.html" class="btn-primary">
                 <div class="btn-ring"></div>
-                <i class="fas fa-play"></i> Ver en vivo ahora
+                <i class="fas fa-play"></i> Empezar ahora — Es gratis
             </a>
-            <a href="ULTRA/index.html#goleadores" class="btn-ghost">
-                <i class="fas fa-trophy"></i> Tablas y estadísticas
+            <a href="#servicios" class="btn-ghost">
+                <i class="fas fa-th-large"></i> Ver todos los servicios
             </a>
         </div>
 
@@ -689,6 +819,16 @@
         </div>
     </div>
 
+    <!-- FREE STRIP -->
+    <div class="free-strip">
+        <div class="free-strip-inner">
+            <div class="free-item"><i class="fas fa-check-circle"></i> Sin suscripción</div>
+            <div class="free-item"><i class="fas fa-check-circle"></i> Sin tarjeta de crédito</div>
+            <div class="free-item"><i class="fas fa-check-circle"></i> Sin registro</div>
+            <div class="free-item"><i class="fas fa-check-circle"></i> Disponible ahora</div>
+        </div>
+    </div>
+
     <!-- STATS STRIP -->
     <div class="stats-strip">
         <div class="stat-item">
@@ -697,9 +837,9 @@
             <span class="stat-label">Ligas en vivo</span>
         </div>
         <div class="stat-item">
-            <div class="stat-icon"><i class="fas fa-tv"></i></div>
-            <span class="stat-num" data-count="250" data-suffix="+">250+</span>
-            <span class="stat-label">Canales disponibles</span>
+            <div class="stat-icon"><i class="fas fa-film"></i></div>
+            <span class="stat-num" data-count="10000" data-suffix="+">10K+</span>
+            <span class="stat-label">Títulos disponibles</span>
         </div>
         <div class="stat-item">
             <div class="stat-icon"><i class="fas fa-clock"></i></div>
@@ -713,52 +853,123 @@
         </div>
     </div>
 
-    <!-- FEATURES -->
-    <section class="section">
-        <div class="section-eyebrow reveal"><i class="fas fa-bolt"></i> Por qué UltraGol</div>
-        <h2 class="section-title reveal reveal-delay-1">La plataforma<br><span>que los fanáticos</span> eligieron</h2>
-        <p class="section-sub reveal reveal-delay-2">Construida para los que viven el deporte. Rápida, confiable y siempre un paso adelante.</p>
+    <!-- SERVICES CAROUSEL -->
+    <div class="services-wrap" id="servicios">
+        <div class="services-header">
+            <div class="section-eyebrow reveal"><i class="fas fa-th-large"></i> Nuestros servicios</div>
+            <h2 class="section-title reveal reveal-delay-1">Todo el entretenimiento<br><span>en un solo lugar</span></h2>
+            <p class="section-sub reveal reveal-delay-2">Deportes, cine, series, anime, música y televisión — todo gratis, todo en un solo lugar, sin complicaciones.</p>
+        </div>
 
-        <div class="features-layout">
-            <!-- Featured card -->
-            <div class="feature-card featured reveal reveal-delay-1">
-                <div class="feature-icon-wrap"><i class="fas fa-satellite-dish"></i></div>
-                <h3>Streaming en Vivo</h3>
-                <p>Accede a cientos de canales deportivos en tiempo real. Liga MX, Champions, NBA y más — sin costo, sin límites, sin esperas.</p>
+        <div class="carousel-container reveal">
+            <div class="carousel-track-outer">
+                <div class="carousel-track" id="carouselTrack">
+
+                    <!-- DEPORTES -->
+                    <a href="ULTRA/index.html" class="service-card sc-sports">
+                        <span class="sc-bg-emoji">⚽</span>
+                        <div class="sc-icon-wrap"><i class="fas fa-satellite-dish"></i></div>
+                        <span class="sc-tag">En vivo ahora</span>
+                        <h3 class="sc-title">Deportes<br>en Vivo</h3>
+                        <p class="sc-desc">Liga MX, Premier League, NBA, F1, UFC, Champions League y más. Todos los partidos que importan, en tiempo real.</p>
+                        <div class="sc-chips">
+                            <span class="sc-chip">Liga MX</span>
+                            <span class="sc-chip">Premier</span>
+                            <span class="sc-chip">NBA</span>
+                            <span class="sc-chip">F1</span>
+                            <span class="sc-chip">UFC</span>
+                            <span class="sc-chip">Champions</span>
+                        </div>
+                        <span class="sc-cta">Ver deportes <i class="fas fa-arrow-right"></i></span>
+                    </a>
+
+                    <!-- PELÍCULAS & SERIES -->
+                    <a href="#" class="service-card sc-movies">
+                        <span class="sc-bg-emoji">🎬</span>
+                        <div class="sc-icon-wrap"><i class="fas fa-film"></i></div>
+                        <span class="sc-tag">Miles de títulos</span>
+                        <h3 class="sc-title">Películas<br>& Series</h3>
+                        <p class="sc-desc">Las últimas películas de estreno y tus series favoritas en alta calidad. Catálogo actualizado constantemente.</p>
+                        <div class="sc-chips">
+                            <span class="sc-chip">Acción</span>
+                            <span class="sc-chip">Comedia</span>
+                            <span class="sc-chip">Drama</span>
+                            <span class="sc-chip">Terror</span>
+                            <span class="sc-chip">Sci-Fi</span>
+                            <span class="sc-chip">Thriller</span>
+                        </div>
+                        <span class="sc-cta">Ver catálogo <i class="fas fa-arrow-right"></i></span>
+                    </a>
+
+                    <!-- ANIME & DORAMAS -->
+                    <a href="#" class="service-card sc-anime">
+                        <span class="sc-bg-emoji">🌸</span>
+                        <div class="sc-icon-wrap"><i class="fas fa-star"></i></div>
+                        <span class="sc-tag">Subtitulado</span>
+                        <h3 class="sc-title">Anime<br>& Doramas</h3>
+                        <p class="sc-desc">Los animes más populares de temporada y los mejores doramas coreanos, japoneses y chinos subtitulados al español.</p>
+                        <div class="sc-chips">
+                            <span class="sc-chip">Shonen</span>
+                            <span class="sc-chip">Isekai</span>
+                            <span class="sc-chip">K-Drama</span>
+                            <span class="sc-chip">Romance</span>
+                            <span class="sc-chip">Acción</span>
+                            <span class="sc-chip">Slice of Life</span>
+                        </div>
+                        <span class="sc-cta">Ver anime <i class="fas fa-arrow-right"></i></span>
+                    </a>
+
+                    <!-- MÚSICA -->
+                    <a href="#" class="service-card sc-music">
+                        <span class="sc-bg-emoji">🎵</span>
+                        <div class="sc-icon-wrap"><i class="fas fa-music"></i></div>
+                        <span class="sc-tag">Sin interrupciones</span>
+                        <h3 class="sc-title">Música<br>sin límites</h3>
+                        <p class="sc-desc">Escucha tu música favorita, descubre nuevos artistas y disfruta de listas de reproducción ilimitadas completamente gratis.</p>
+                        <div class="sc-chips">
+                            <span class="sc-chip">Pop</span>
+                            <span class="sc-chip">Reggaeton</span>
+                            <span class="sc-chip">Rock</span>
+                            <span class="sc-chip">Hip Hop</span>
+                            <span class="sc-chip">Cumbia</span>
+                            <span class="sc-chip">Electrónica</span>
+                        </div>
+                        <span class="sc-cta">Escuchar <i class="fas fa-arrow-right"></i></span>
+                    </a>
+
+                    <!-- TV -->
+                    <a href="ULTRA/index.html" class="service-card sc-tv">
+                        <span class="sc-bg-emoji">📺</span>
+                        <div class="sc-icon-wrap"><i class="fas fa-tv"></i></div>
+                        <span class="sc-tag">250+ canales</span>
+                        <h3 class="sc-title">TV en<br>Directo</h3>
+                        <p class="sc-desc">Más de 250 canales de televisión en vivo incluyendo noticias, entretenimiento, infantil, documentales y mucho más.</p>
+                        <div class="sc-chips">
+                            <span class="sc-chip">Noticias</span>
+                            <span class="sc-chip">Entretenimiento</span>
+                            <span class="sc-chip">Infantil</span>
+                            <span class="sc-chip">Documentales</span>
+                            <span class="sc-chip">Telenovelas</span>
+                        </div>
+                        <span class="sc-cta">Ver canales <i class="fas fa-arrow-right"></i></span>
+                    </a>
+
+                </div>
             </div>
-            <div class="feature-card reveal reveal-delay-2">
-                <div class="feature-icon-wrap"><i class="fas fa-chart-line"></i></div>
-                <h3>Marcadores al Instante</h3>
-                <p>Resultados en vivo para todos los partidos simultáneos.</p>
-            </div>
-            <div class="feature-card reveal reveal-delay-3">
-                <div class="feature-icon-wrap"><i class="fas fa-mobile-alt"></i></div>
-                <h3>App en tu Teléfono</h3>
-                <p>Instálala como nativa en Android o iPhone. Sin descargas.</p>
-            </div>
-            <!-- Second row -->
-            <div class="feature-card reveal reveal-delay-1">
-                <div class="feature-icon-wrap"><i class="fas fa-newspaper"></i></div>
-                <h3>Noticias Deportivas</h3>
-                <p>Transferencias, resultados y lo más importante del fútbol mundial.</p>
-            </div>
-            <div class="feature-card reveal reveal-delay-2">
-                <div class="feature-icon-wrap"><i class="fas fa-futbol"></i></div>
-                <h3>Goleadores</h3>
-                <p>Ranking en tiempo real de la Liga MX y las principales ligas.</p>
-            </div>
-            <div class="feature-card reveal reveal-delay-3">
-                <div class="feature-icon-wrap"><i class="fas fa-bell"></i></div>
-                <h3>Alertas de Goles</h3>
-                <p>Notificaciones push de tus equipos favoritos al instante.</p>
+
+            <!-- Dots & Arrows -->
+            <div class="carousel-dots" id="carouselDots"></div>
+            <div class="carousel-arrows">
+                <button class="c-arrow" id="prevBtn" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
+                <button class="c-arrow" id="nextBtn" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
             </div>
         </div>
-    </section>
+    </div>
 
     <!-- LEAGUES MARQUEE -->
     <div class="leagues-section">
         <div class="leagues-header">
-            <div class="section-eyebrow reveal" style="display:inline-flex;"><i class="fas fa-globe"></i> Cobertura</div>
+            <div class="section-eyebrow reveal" style="display:inline-flex;"><i class="fas fa-globe"></i> Cobertura deportiva</div>
             <h2 class="section-title reveal reveal-delay-1">Las mejores ligas,<br><span>todas aquí</span></h2>
         </div>
         <div class="leagues-marquee-wrap">
@@ -775,7 +986,6 @@
                 <div class="league-pill"><i class="fas fa-hand-fist"></i> UFC</div>
                 <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/2.png" alt="">Champions</div>
                 <div class="league-pill"><i class="fas fa-volleyball"></i> Voleibol</div>
-                <!-- duplicated for infinite loop -->
                 <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/193.png" alt="">Liga MX</div>
                 <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" alt="">Premier League</div>
                 <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/15.png" alt="">La Liga</div>
@@ -797,17 +1007,17 @@
         <div class="proof-strip reveal">
             <div class="proof-item">
                 <div class="proof-stars">★★★★★</div>
-                <p class="proof-quote">"La única app donde veo a mis Chivas sin pagar nada. Increíble calidad."</p>
+                <p class="proof-quote">"Deportes, películas y anime todo en un lugar y gratis. No puedo creerlo, es increíble."</p>
                 <span class="proof-author">— Carlos M., Guadalajara</span>
             </div>
             <div class="proof-item">
                 <div class="proof-stars">★★★★★</div>
-                <p class="proof-quote">"Ya no necesito cable. UltraGol tiene todo lo que quiero ver en tiempo real."</p>
+                <p class="proof-quote">"Ya no necesito Netflix ni cable. UltraGol tiene todo lo que quiero ver sin pagar nada."</p>
                 <span class="proof-author">— Fernanda R., CDMX</span>
             </div>
             <div class="proof-item">
                 <div class="proof-stars">★★★★★</div>
-                <p class="proof-quote">"El marcador en vivo es perfectísimo. Me entero de los goles antes que mis amigos."</p>
+                <p class="proof-quote">"Los doramas coreanos y los partidos de fútbol en el mismo sitio. Perfecto para toda la familia."</p>
                 <span class="proof-author">— Diego V., Monterrey</span>
             </div>
         </div>
@@ -816,14 +1026,14 @@
     <!-- CTA FINAL -->
     <div class="cta-section">
         <div class="cta-card reveal">
-            <span class="cta-eyebrow">Empieza ahora</span>
-            <h2>Tu deporte.<br><span>Sin límites.</span></h2>
-            <p>Sin suscripciones. Sin anuncios molestos. Solo el deporte que amas, cuando quieras y desde donde estés.</p>
+            <span class="cta-eyebrow">Empieza ahora — Es gratis</span>
+            <h2>Tu entretenimiento.<br><span>Sin límites. Sin costo.</span></h2>
+            <p>Sin suscripciones. Sin tarjeta de crédito. Sin registro. Solo abre la página y empieza a disfrutar todo el contenido que quieras.</p>
             <a href="ULTRA/index.html" class="btn-primary" style="position:relative;display:inline-flex;margin:0 auto;">
                 <div class="btn-ring"></div>
                 <i class="fas fa-play"></i> Entrar a UltraGol — Es gratis
             </a>
-            <p class="cta-note"><i class="fas fa-check-circle"></i> Sin registro · Sin tarjeta · Disponible ahora</p>
+            <p class="cta-note"><i class="fas fa-check-circle"></i> Sin registro · Sin tarjeta · Sin límites · Disponible ahora</p>
         </div>
     </div>
 
@@ -838,7 +1048,7 @@
     </footer>
 
     <script>
-        // Nav scroll effect
+        // Nav scroll
         const nav = document.getElementById('mainNav');
         window.addEventListener('scroll', () => {
             nav.classList.toggle('scrolled', window.scrollY > 50);
@@ -847,35 +1057,31 @@
         // Reveal on scroll
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(e => {
-                if (e.isIntersecting) {
-                    e.target.classList.add('visible');
-                    observer.unobserve(e.target);
-                }
+                if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
             });
         }, { threshold: 0.12 });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-        // Animated stat counters
+        // Animated counters
         function animateCounter(el, target, suffix) {
             const duration = 1600;
             const startTime = performance.now();
             function update(now) {
                 const t = Math.min((now - startTime) / duration, 1);
                 const ease = 1 - Math.pow(1 - t, 3);
-                el.textContent = Math.round(ease * target) + suffix;
+                const val = Math.round(ease * target);
+                el.textContent = val >= 1000 ? (val / 1000).toFixed(0) + 'K' + suffix : val + suffix;
                 if (t < 1) requestAnimationFrame(update);
             }
             requestAnimationFrame(update);
         }
-
         const statsObserver = new IntersectionObserver((entries) => {
             entries.forEach(e => {
                 if (!e.isIntersecting) return;
                 e.target.querySelectorAll('.stat-num').forEach(el => {
                     const count = el.dataset.count;
                     const suffix = el.dataset.suffix || '';
-                    const special = el.dataset.special;
-                    if (special) return;
+                    if (el.dataset.special) return;
                     if (count) animateCounter(el, parseInt(count), suffix);
                 });
                 statsObserver.unobserve(e.target);
@@ -884,7 +1090,71 @@
         const strip = document.querySelector('.stats-strip');
         if (strip) statsObserver.observe(strip);
 
-        // ── LIVE TICKER — Real matches from the 6 league APIs ──────────────────
+        // ── SERVICES CAROUSEL ─────────────────────────────────────────────────
+        (function() {
+            const track = document.getElementById('carouselTrack');
+            const dotsContainer = document.getElementById('carouselDots');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            if (!track) return;
+
+            const cards = track.querySelectorAll('.service-card');
+            const total = cards.length;
+            let current = 0;
+            let autoTimer = null;
+
+            // Build dots
+            cards.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.className = 'c-dot' + (i === 0 ? ' active' : '');
+                dot.addEventListener('click', () => goTo(i));
+                dotsContainer.appendChild(dot);
+            });
+
+            function getCardWidth() {
+                if (!cards[0]) return 340;
+                return cards[0].getBoundingClientRect().width + 20; // +gap
+            }
+
+            function goTo(idx) {
+                current = (idx + total) % total;
+                const cardW = getCardWidth();
+                const padding = parseFloat(getComputedStyle(track).paddingLeft) || 24;
+                track.style.transform = `translateX(-${current * cardW}px)`;
+                dotsContainer.querySelectorAll('.c-dot').forEach((d, i) => {
+                    d.classList.toggle('active', i === current);
+                });
+            }
+
+            prevBtn.addEventListener('click', () => { goTo(current - 1); resetAuto(); });
+            nextBtn.addEventListener('click', () => { goTo(current + 1); resetAuto(); });
+
+            function startAuto() { autoTimer = setInterval(() => goTo(current + 1), 3800); }
+            function resetAuto() { clearInterval(autoTimer); startAuto(); }
+            startAuto();
+
+            // Touch/swipe support
+            let startX = 0;
+            track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+            track.addEventListener('touchend', e => {
+                const diff = startX - e.changedTouches[0].clientX;
+                if (Math.abs(diff) > 40) { diff > 0 ? goTo(current + 1) : goTo(current - 1); resetAuto(); }
+            }, { passive: true });
+
+            // Drag support
+            let isDragging = false, dragStartX = 0;
+            track.addEventListener('mousedown', e => { isDragging = true; dragStartX = e.clientX; track.style.cursor = 'grabbing'; });
+            window.addEventListener('mouseup', e => {
+                if (!isDragging) return;
+                const diff = dragStartX - e.clientX;
+                if (Math.abs(diff) > 40) { diff > 0 ? goTo(current + 1) : goTo(current - 1); resetAuto(); }
+                isDragging = false; track.style.cursor = '';
+            });
+
+            window.addEventListener('resize', () => goTo(current));
+        })();
+
+        // ── LIVE TICKER ──────────────────────────────────────────────────────
         const API = 'https://ultra-gol.vercel.app';
         const LIGA_ENDPOINTS = [
             { nombre: 'Liga MX',        url: `${API}/marcadores` },
@@ -894,24 +1164,16 @@
             { nombre: 'Bundesliga',     url: `${API}/bundesliga/marcadores` },
             { nombre: 'Ligue 1',        url: `${API}/ligue1/marcadores` },
         ];
-
         function getTeamName(p, side) {
-            if (side === 'local')
-                return p.local?.nombreCorto || p.local?.nombre || p.equipo1 || '?';
+            if (side === 'local') return p.local?.nombreCorto || p.local?.nombre || p.equipo1 || '?';
             return p.visitante?.nombreCorto || p.visitante?.nombre || p.equipo2 || '?';
         }
-
         function getScore(p) {
             const gl = p.marcador?.local    ?? p.golesLocal    ?? p.goles_local    ?? '0';
             const gv = p.marcador?.visitante ?? p.golesVisitante ?? p.goles_visitante ?? '0';
             return `${gl} - ${gv}`;
         }
-
-        function getMinute(p) {
-            const m = p.reloj || p.minuto || '';
-            return m ? `${m}'` : 'EN VIVO';
-        }
-
+        function getMinute(p) { const m = p.reloj || p.minuto || ''; return m ? `${m}'` : 'EN VIVO'; }
         async function fetchLeague(cfg) {
             try {
                 const r = await fetch(cfg.url, { signal: AbortSignal.timeout(7000) });
@@ -920,61 +1182,42 @@
                 return partidos.map(p => ({ ...p, _liga: cfg.nombre }));
             } catch { return []; }
         }
-
         async function loadTicker() {
             const all = await Promise.all(LIGA_ENDPOINTS.map(fetchLeague));
             const flat = all.flat();
-
-            // Priority: live first, then upcoming (programado), skip finished if we have live
             const live     = flat.filter(p => p.estado?.enVivo);
             const upcoming = flat.filter(p => p.estado?.programado && !p.estado?.finalizado);
             const finished = flat.filter(p => p.estado?.finalizado);
-
-            let matches = live.length  ? live
-                        : upcoming.length ? upcoming.slice(0, 8)
-                        : finished.slice(-6);
-
+            let matches = live.length ? live : upcoming.length ? upcoming.slice(0, 8) : finished.slice(-6);
             const tickerLabel = document.getElementById('tickerLabel');
             const tickerItems = document.getElementById('tickerItems');
-
             if (!matches.length) {
                 tickerLabel.textContent = 'Próximos';
                 tickerItems.innerHTML = '<span class="ticker-match" style="color:rgba(255,255,255,0.4)">Sin partidos en este momento — vuelve pronto</span>';
                 return;
             }
-
             tickerLabel.textContent = live.length ? `${live.length} En vivo` : 'Próximos';
-
-            // Build items × 2 for seamless infinite loop
             const buildItem = (p) => {
-                const home  = getTeamName(p, 'local');
-                const away  = getTeamName(p, 'visitante');
+                const home   = getTeamName(p, 'local');
+                const away   = getTeamName(p, 'visitante');
                 const isLive = p.estado?.enVivo;
-                const label  = isLive ? getMinute(p)
-                             : p.estado?.finalizado ? 'FT'
-                             : (p.hora || p.time || '');
+                const label  = isLive ? getMinute(p) : p.estado?.finalizado ? 'FT' : (p.hora || p.time || '');
                 const score  = isLive || p.estado?.finalizado ? getScore(p) : p._liga;
                 return `<span class="ticker-match">${home} <span style="color:rgba(255,255,255,0.35)">vs</span> ${away} <span class="score">${score}${label ? ' · ' + label : ''}</span></span>`;
             };
-
             const html = matches.map(buildItem).join('') + matches.map(buildItem).join('');
             tickerItems.innerHTML = html;
-
-            // Reset animation so it re-fires cleanly
             tickerItems.style.animation = 'none';
-            tickerItems.offsetHeight; // reflow
+            tickerItems.offsetHeight;
             const duration = Math.max(18, matches.length * 5);
             tickerItems.style.animation = `tickerScroll ${duration}s linear infinite`;
         }
-
         loadTicker();
-        setInterval(loadTicker, 60000); // refresh every 60 s
+        setInterval(loadTicker, 60000);
 
-        // ── Live viewer count (social proof) ────────────────────────────────────
+        // Live count
         function updateLiveCount() {
-            const base = 1240;
-            const variance = Math.floor(Math.random() * 180) - 90;
-            const count = base + variance;
+            const count = 1240 + Math.floor(Math.random() * 180) - 90;
             const el = document.getElementById('liveCount');
             if (el) el.textContent = count.toLocaleString('es-MX');
         }
@@ -983,7 +1226,6 @@
     </script>
     <script src="js/tour.js"></script>
 
-    <!-- Cloudflare Turnstile -->
     <div id="_cf_ts" style="display:none"></div>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script>
@@ -992,17 +1234,10 @@
         function runTS() {
             if (typeof turnstile === 'undefined') { setTimeout(runTS, 300); return; }
             turnstile.render('#_cf_ts', {
-                sitekey: '0x4AAAAAAdMXFUj4xnnJf5fN',
-                size: 'invisible',
-                execution: 'execute',
+                sitekey: '0x4AAAAAAdMXFUj4xnnJf5fN', size: 'invisible', execution: 'execute',
                 callback: function(token) {
-                    fetch('/api/turnstile/verify', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ token })
-                    }).then(function(r){return r.json();}).then(function(d){
-                        if (d.success) sessionStorage.setItem('_hv','1');
-                    }).catch(function(){});
+                    fetch('/api/turnstile/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) })
+                        .then(function(r){return r.json();}).then(function(d){ if (d.success) sessionStorage.setItem('_hv','1'); }).catch(function(){});
                 }
             });
             turnstile.execute('#_cf_ts');
