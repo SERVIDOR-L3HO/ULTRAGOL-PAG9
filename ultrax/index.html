@@ -388,21 +388,19 @@
     </div>
 
     <!-- Patrocinadores -->
-    <div class="sponsors-strip" onclick="openSponsorModal()">
+    <div class="sponsors-strip">
         <div class="sponsors-strip-header">
             <span class="sponsors-label">
                 <span class="sponsors-dot"></span>
                 PATROCINADORES OFICIALES
             </span>
-            <span class="sponsors-cta-hint">¿Quieres aparecer aquí? <strong>Únete →</strong></span>
+            <span class="sponsors-cta-hint" onclick="openSponsorModal()">¿Quieres aparecer aquí? <strong>Únete →</strong></span>
         </div>
         <div class="sponsors-track-wrapper">
             <div class="sponsors-track">
-                <div class="sponsor-slot">
-                    <div class="sponsor-slot-inner">
-                        <span class="slot-plus">+</span>
-                        <span class="slot-text">TU MARCA</span>
-                    </div>
+                <!-- Patrocinador real: Los Pap's -->
+                <div class="sponsor-slot sponsor-slot-active" onclick="openTacosModal()">
+                    <img src="/assets/patrocinador-tacos.jpg" alt="De Todo Un Poco - Los Pap's" class="sponsor-logo-img">
                 </div>
                 <div class="sponsor-slot">
                     <div class="sponsor-slot-inner">
@@ -435,11 +433,8 @@
                     </div>
                 </div>
                 <!-- duplicados loop infinito -->
-                <div class="sponsor-slot">
-                    <div class="sponsor-slot-inner">
-                        <span class="slot-plus">+</span>
-                        <span class="slot-text">TU MARCA</span>
-                    </div>
+                <div class="sponsor-slot sponsor-slot-active" onclick="openTacosModal()">
+                    <img src="/assets/patrocinador-tacos.jpg" alt="De Todo Un Poco - Los Pap's" class="sponsor-logo-img">
                 </div>
                 <div class="sponsor-slot">
                     <div class="sponsor-slot-inner">
@@ -471,6 +466,51 @@
                         <span class="slot-text">TU LOGO</span>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tacos Los Pap's -->
+    <div class="tacos-modal-overlay" id="tacosModal" onclick="closeTacosModal(event)">
+        <div class="tacos-modal-card">
+            <button class="tacos-modal-close" onclick="closeTacosModal()">✕</button>
+
+            <div class="tacos-modal-logo-wrap">
+                <img src="/assets/patrocinador-tacos.jpg" alt="De Todo Un Poco - Los Pap's" class="tacos-modal-logo">
+            </div>
+
+            <div class="tacos-modal-body">
+                <div class="tacos-modal-badge">🌮 Patrocinador Oficial</div>
+                <h2 class="tacos-modal-title">De Todo Un Poco<br><span>Los Pap's</span></h2>
+                <p class="tacos-modal-desc">¡La mejor taquería del área! Tacos, burritos, quesadillas y mucho más. Comida auténtica, sabor único. Perfecta para ver el partido con amigos.</p>
+
+                <div class="tacos-modal-info">
+                    <div class="tacos-info-row">
+                        <span class="tacos-info-icon">📍</span>
+                        <div>
+                            <strong>Ubicación</strong>
+                            <span>Ver en Google Maps</span>
+                        </div>
+                    </div>
+                    <div class="tacos-info-row">
+                        <span class="tacos-info-icon">🕐</span>
+                        <div>
+                            <strong>Horario</strong>
+                            <span>Lun–Dom: 12:00 pm – 11:00 pm</span>
+                        </div>
+                    </div>
+                    <div class="tacos-info-row">
+                        <span class="tacos-info-icon">🌮</span>
+                        <div>
+                            <strong>Especialidad</strong>
+                            <span>Tacos, Burritos, Quesadillas</span>
+                        </div>
+                    </div>
+                </div>
+
+                <a class="tacos-modal-btn" href="https://maps.google.com/?q=De+Todo+Un+Poco+Los+Paps+tacos" target="_blank" rel="noopener">
+                    <span>📍</span> Ver ubicación en Maps
+                </a>
             </div>
         </div>
     </div>

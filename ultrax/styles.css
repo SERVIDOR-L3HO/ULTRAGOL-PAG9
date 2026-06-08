@@ -699,6 +699,188 @@ body {
     text-transform: uppercase;
 }
 
+/* Slot con patrocinador real */
+.sponsor-slot-active {
+    width: 130px;
+    height: 60px;
+    border: 2px solid rgba(255,165,0,0.55);
+    background: rgba(0,0,0,0.4);
+    cursor: pointer;
+    overflow: hidden;
+    padding: 4px;
+    position: relative;
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(255,140,0,0.25);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+.sponsor-slot-active:hover,
+.sponsor-slot-active:active {
+    transform: scale(1.07);
+    border-color: rgba(255,165,0,0.9);
+    box-shadow: 0 0 22px rgba(255,140,0,0.5);
+}
+.sponsor-logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+    display: block;
+}
+
+/* ── Modal Tacos Los Pap's ──────────────────────────────────────────────────── */
+.tacos-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0,0,0,0.88);
+    backdrop-filter: blur(6px);
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0;
+}
+.tacos-modal-overlay.open {
+    display: flex;
+}
+.tacos-modal-card {
+    background: #141414;
+    border-radius: 24px 24px 0 0;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+    animation: tacos-slide-up 0.32s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes tacos-slide-up {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+}
+.tacos-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    transition: background 0.15s;
+}
+.tacos-modal-close:hover { background: rgba(255,255,255,0.2); }
+
+.tacos-modal-logo-wrap {
+    width: 100%;
+    background: #0d0d0d;
+    border-radius: 24px 24px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 20px 20px;
+}
+.tacos-modal-logo {
+    width: 140px;
+    height: 140px;
+    object-fit: contain;
+    border-radius: 50%;
+    border: 3px solid rgba(255,140,0,0.45);
+    box-shadow: 0 0 28px rgba(255,100,0,0.3);
+}
+
+.tacos-modal-body {
+    padding: 20px 20px 24px;
+}
+.tacos-modal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,140,0,0.15);
+    border: 1px solid rgba(255,140,0,0.35);
+    color: #ffaa33;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+}
+.tacos-modal-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #fff;
+    margin: 0 0 8px;
+    line-height: 1.2;
+}
+.tacos-modal-title span {
+    color: #ff8c00;
+}
+.tacos-modal-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.55;
+    margin: 0 0 18px;
+}
+.tacos-modal-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 22px;
+}
+.tacos-info-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    padding: 12px 14px;
+}
+.tacos-info-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+.tacos-info-row div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+.tacos-info-row strong {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+}
+.tacos-info-row span {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+}
+.tacos-modal-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #ff6b00, #ff9500);
+    border: none;
+    border-radius: 14px;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(255,100,0,0.4);
+    transition: opacity 0.15s, transform 0.15s;
+}
+.tacos-modal-btn:hover { opacity: 0.9; transform: scale(1.01); }
+
 /* ── Sponsor Modal ───────────────────────────────────────────────────────────── */
 .sponsor-modal-overlay {
     display: none;

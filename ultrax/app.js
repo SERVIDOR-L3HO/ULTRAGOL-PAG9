@@ -5817,6 +5817,23 @@ function closeSponsorModal(e) {
     }
 }
 
+function openTacosModal() {
+    const modal = document.getElementById('tacosModal');
+    if (modal) {
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeTacosModal(e) {
+    if (e && e.target !== document.getElementById('tacosModal') && !e.target.classList.contains('tacos-modal-close')) return;
+    const modal = document.getElementById('tacosModal');
+    if (modal) {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+    }
+}
+
 // ── Auto-show sponsor modal for international visitors ──────────────────────
 (async function initIntlSponsorPromo() {
     // Only trigger once per session, never for returning closers
