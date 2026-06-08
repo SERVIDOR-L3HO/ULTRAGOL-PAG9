@@ -7,7 +7,7 @@
     <meta name="description" content="Tu plataforma de entretenimiento total. Deportes en vivo, películas, series, anime, doramas, música y TV — todo 100% gratis.">
     <link rel="icon" type="image/png" href="ULTRA/favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&family=Nunito:wght@400;600;700;800;900;1000&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -15,739 +15,624 @@
             --red: #e8173a;
             --red2: #ff3d5a;
             --orange: #ff6b1a;
+            --yellow: #f59e0b;
             --purple: #7c3aed;
             --blue: #2563eb;
+            --cyan: #06b6d4;
             --green: #16a34a;
-            --pink: #db2777;
-            --bg: #07080f;
-            --bg2: #0d0f1a;
-            --surface: rgba(255,255,255,0.04);
-            --border: rgba(255,255,255,0.07);
+            --pink: #ec4899;
+            --bg: #08090f;
+            --bg2: #0e1018;
+            --surface: rgba(255,255,255,0.045);
+            --border: rgba(255,255,255,0.08);
             --text: #ffffff;
-            --muted: rgba(255,255,255,0.45);
+            --muted: rgba(255,255,255,0.5);
         }
 
         html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Nunito', 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        body::before {
-            content: '';
+        /* ── STARFIELD BG ── */
+        .stars-canvas {
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
-            opacity: 0.025;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            background-size: 180px;
+            opacity: 0.6;
         }
 
         /* ── BACKGROUND ── */
         .bg-layer {
             position: fixed; inset: 0; z-index: 0;
             background:
-                linear-gradient(180deg, rgba(7,8,15,0.1) 0%, rgba(7,8,15,0.65) 50%, var(--bg) 88%),
+                linear-gradient(180deg, rgba(8,9,15,0.15) 0%, rgba(8,9,15,0.6) 45%, var(--bg) 85%),
                 url('assets/images/stadium-bg.jpg') center 30% / cover no-repeat;
         }
-        .bg-glow {
-            position: fixed; inset: 0; z-index: 1; pointer-events: none;
-            background:
-                radial-gradient(ellipse 70% 50% at 15% 10%, rgba(232,23,58,0.15) 0%, transparent 65%),
-                radial-gradient(ellipse 50% 60% at 85% 85%, rgba(124,58,237,0.09) 0%, transparent 60%),
-                radial-gradient(ellipse 40% 40% at 50% 50%, rgba(60,30,80,0.15) 0%, transparent 70%);
+
+        /* Floating decorative elements */
+        .deco-float {
+            position: fixed; pointer-events: none; z-index: 1;
+            animation: floatDeco linear infinite;
+            font-size: 2rem;
+            opacity: 0;
+            user-select: none;
         }
-        .orb {
+        @keyframes floatDeco {
+            0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            5%   { opacity: 0.35; }
+            90%  { opacity: 0.25; }
+            100% { transform: translateY(-15vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Big glow blobs */
+        .blob {
             position: fixed; border-radius: 50%; pointer-events: none; z-index: 1;
-            filter: blur(80px);
+            filter: blur(90px); mix-blend-mode: screen;
         }
-        .orb-1 {
-            width: 500px; height: 500px;
-            top: -120px; left: -100px;
-            background: radial-gradient(circle, rgba(232,23,58,0.18) 0%, transparent 70%);
-            animation: orbFloat1 18s ease-in-out infinite;
-        }
-        .orb-2 {
-            width: 400px; height: 400px;
-            bottom: 10%; right: -80px;
-            background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
-            animation: orbFloat2 22s ease-in-out infinite;
-        }
-        .orb-3 {
-            width: 350px; height: 350px;
-            top: 40%; left: 50%;
-            background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%);
-            animation: orbFloat3 28s ease-in-out infinite;
-        }
-        @keyframes orbFloat1 {
-            0%,100% { transform: translate(0,0) scale(1); }
-            33%      { transform: translate(60px,40px) scale(1.05); }
-            66%      { transform: translate(-30px,70px) scale(0.95); }
-        }
-        @keyframes orbFloat2 {
-            0%,100% { transform: translate(0,0) scale(1); }
-            50%      { transform: translate(-50px,-40px) scale(1.08); }
-        }
-        @keyframes orbFloat3 {
-            0%,100% { transform: translate(-50%,-50%) scale(1); }
-            40%      { transform: translate(-45%,-55%) scale(1.1); }
-        }
+        .blob-1 { width:600px;height:600px; top:-150px; left:-150px; background:radial-gradient(circle, rgba(232,23,58,0.22) 0%, transparent 70%); animation: b1 20s ease-in-out infinite; }
+        .blob-2 { width:500px;height:500px; bottom:0;   right:-100px; background:radial-gradient(circle, rgba(124,58,237,0.18) 0%, transparent 70%); animation: b2 25s ease-in-out infinite; }
+        .blob-3 { width:400px;height:400px; top:40%;    left:30%;    background:radial-gradient(circle, rgba(6,182,212,0.1) 0%, transparent 70%); animation: b3 30s ease-in-out infinite; }
+        @keyframes b1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(80px,60px)} }
+        @keyframes b2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-60px,-50px)} }
+        @keyframes b3 { 0%,100%{transform:translate(-50%,-50%)} 50%{transform:translate(-45%,-55%) scale(1.2)} }
 
         /* ── NAV ── */
         nav {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 32px;
+            position: fixed; top:0; left:0; right:0; z-index:300;
+            display:flex; align-items:center; justify-content:space-between;
+            padding: 16px 36px;
             transition: background 0.4s, border-color 0.4s;
         }
         nav.scrolled {
-            background: rgba(7,8,15,0.88);
-            backdrop-filter: blur(20px);
+            background: rgba(8,9,15,0.92);
+            backdrop-filter: blur(24px);
             border-bottom: 1px solid var(--border);
         }
-        .nav-brand img { height: 34px; filter: brightness(1.1); }
-        .nav-right { display: flex; align-items: center; gap: 14px; }
+        .nav-brand img { height: 34px; filter: brightness(1.15); }
+        .nav-right { display:flex; align-items:center; gap:14px; }
         .nav-live-count {
-            display: flex; align-items: center; gap: 6px;
-            font-size: 0.75rem; font-weight: 600; color: var(--muted);
-            letter-spacing: 0.3px;
+            display:flex; align-items:center; gap:6px;
+            font-size:0.75rem; font-weight:700; color:var(--muted);
         }
         .nav-live-dot {
-            width: 6px; height: 6px; border-radius: 50%;
-            background: #22c55e;
-            box-shadow: 0 0 6px rgba(34,197,94,0.8);
+            width:7px; height:7px; border-radius:50%;
+            background:#22c55e;
+            box-shadow: 0 0 8px rgba(34,197,94,0.9);
             animation: livePulse 1.4s infinite;
         }
-        @keyframes livePulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        @keyframes livePulse { 0%,100%{opacity:1} 50%{opacity:0.25} }
         .nav-cta {
-            background: var(--red);
-            color: #fff;
-            padding: 9px 22px; border-radius: 50px;
-            text-decoration: none; font-weight: 700; font-size: 0.82rem;
-            letter-spacing: 0.4px; text-transform: uppercase;
-            box-shadow: 0 4px 18px rgba(232,23,58,0.4);
-            transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+            background: linear-gradient(135deg, #e8173a, #ff6b1a);
+            color:#fff; padding:10px 24px; border-radius:50px;
+            text-decoration:none; font-weight:800; font-size:0.82rem;
+            letter-spacing:0.3px;
+            box-shadow: 0 4px 20px rgba(232,23,58,0.45);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .nav-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 28px rgba(232,23,58,0.6);
-            background: var(--red2);
-        }
+        .nav-cta:hover { transform:translateY(-2px); box-shadow: 0 8px 30px rgba(232,23,58,0.65); }
 
         /* ── HERO ── */
         .hero {
-            position: relative; z-index: 2;
-            min-height: 100vh;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            text-align: center;
-            padding: 130px 24px 60px;
+            position:relative; z-index:2;
+            min-height:100vh;
+            display:flex; flex-direction:column;
+            align-items:center; justify-content:center;
+            text-align:center;
+            padding: 140px 24px 70px;
         }
 
-        .live-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: rgba(232,23,58,0.12);
-            border: 1px solid rgba(232,23,58,0.35);
-            padding: 6px 16px; border-radius: 50px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px;
-            text-transform: uppercase; color: #ff6b7d;
-            margin-bottom: 32px;
+        /* Popcorn badge */
+        .hero-badge {
+            display:inline-flex; align-items:center; gap:10px;
+            background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(232,23,58,0.12));
+            border: 1px solid rgba(245,158,11,0.3);
+            padding: 8px 20px 8px 14px; border-radius:50px;
+            font-family:'Nunito', sans-serif;
+            font-size:0.78rem; font-weight:800; letter-spacing:1px;
+            text-transform:uppercase; color:#fbbf24;
+            margin-bottom:36px;
             animation: fadeSlideDown 0.8s ease both;
         }
-        .live-dot {
-            width: 7px; height: 7px; border-radius: 50%;
-            background: #e8173a;
-            box-shadow: 0 0 8px rgba(232,23,58,0.9);
-            animation: livePulse 1.2s infinite;
-        }
+        .hero-badge .badge-icon { font-size:1.3rem; animation: bounceIcon 2s ease-in-out infinite; }
+        @keyframes bounceIcon { 0%,100%{transform:scale(1) rotate(-5deg)} 50%{transform:scale(1.2) rotate(5deg)} }
 
-        .hero-headline {
-            font-family: 'Barlow Condensed', 'Inter', sans-serif;
-            font-size: clamp(3.2rem, 10.5vw, 8.5rem);
-            font-weight: 900;
-            line-height: 0.92;
-            letter-spacing: -1px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
+        /* Headline */
+        .hero-hl {
+            font-family:'Barlow Condensed', 'Nunito', sans-serif;
+            font-size: clamp(3.4rem, 11vw, 9rem);
+            font-weight:900; line-height:0.9;
+            letter-spacing:-2px; text-transform:uppercase;
+            margin-bottom:16px;
             animation: fadeSlideDown 0.8s ease 0.1s both;
         }
-        .hero-headline .line-white {
-            display: block; color: #fff; -webkit-text-fill-color: #fff;
+        .hl-free {
+            display:block; color:#fff;
+            -webkit-text-fill-color: #fff;
+            text-shadow: 0 0 60px rgba(255,255,255,0.15);
         }
-        .hero-headline .line-gradient {
-            display: block;
-            background: linear-gradient(90deg, #e8173a 0%, #ff6b1a 40%, #f59e0b 70%, #7c3aed 100%);
+        .hl-main {
+            display:block;
+            background: linear-gradient(90deg, #ff6b1a 0%, #e8173a 30%, #ec4899 60%, #7c3aed 90%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            background-size: 200% 100%;
-            animation: gradientShift 4s ease-in-out infinite alternate;
+            background-size: 200%;
+            animation: hlShift 5s ease infinite alternate;
         }
-        @keyframes gradientShift {
-            0%   { background-position: 0% 0%; }
-            100% { background-position: 100% 0%; }
-        }
+        @keyframes hlShift { 0%{background-position:0%} 100%{background-position:100%} }
 
-        .hero-categories {
-            display: flex; align-items: center; justify-content: center;
-            flex-wrap: wrap; gap: 8px 16px;
-            font-family: 'Barlow Condensed', 'Inter', sans-serif;
-            font-size: clamp(0.85rem, 2.5vw, 1.2rem);
-            font-weight: 700; letter-spacing: 2.5px;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.3);
-            margin-bottom: 32px;
-            animation: fadeSlideDown 0.8s ease 0.2s both;
+        /* Category pills row */
+        .cat-row {
+            display:flex; align-items:center; justify-content:center;
+            flex-wrap:wrap; gap:8px;
+            margin-bottom:36px;
+            animation: fadeSlideUp 0.8s ease 0.25s both;
         }
-        .hero-categories .cat-sep { color: rgba(255,255,255,0.12); }
-        .hero-categories .cat-highlight { color: rgba(255,255,255,0.7); }
-
-        .hero-desc {
-            font-size: clamp(0.88rem, 2vw, 1.05rem);
-            color: var(--muted);
-            max-width: 420px;
-            line-height: 1.75;
-            margin-bottom: 44px;
-            animation: fadeSlideDown 0.8s ease 0.3s both;
+        .cat-pill {
+            display:inline-flex; align-items:center; gap:7px;
+            padding: 9px 18px; border-radius:50px;
+            font-size:0.8rem; font-weight:800; letter-spacing:0.3px;
+            border: 1.5px solid; cursor:default;
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: pillPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
         }
-        .hero-desc strong { color: rgba(255,255,255,0.85); font-weight: 700; }
+        .cat-pill:hover { transform:translateY(-3px) scale(1.05); }
+        .cat-pill:nth-child(1) { animation-delay: 0.3s; }
+        .cat-pill:nth-child(2) { animation-delay: 0.38s; }
+        .cat-pill:nth-child(3) { animation-delay: 0.46s; }
+        .cat-pill:nth-child(4) { animation-delay: 0.54s; }
+        .cat-pill:nth-child(5) { animation-delay: 0.62s; }
+        .cat-pill:nth-child(6) { animation-delay: 0.70s; }
+        .cat-pill:nth-child(7) { animation-delay: 0.78s; }
+        @keyframes pillPop { from{opacity:0;transform:scale(0.7) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
 
-        .hero-ctas {
-            display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
-            margin-bottom: 60px;
+        .cp-sports { background:rgba(232,23,58,0.12); border-color:rgba(232,23,58,0.4); color:#ff6b7d; }
+        .cp-sports:hover { box-shadow: 0 8px 24px rgba(232,23,58,0.3); }
+        .cp-movies { background:rgba(124,58,237,0.12); border-color:rgba(124,58,237,0.4); color:#a78bfa; }
+        .cp-movies:hover { box-shadow: 0 8px 24px rgba(124,58,237,0.3); }
+        .cp-series { background:rgba(37,99,235,0.12); border-color:rgba(37,99,235,0.4); color:#60a5fa; }
+        .cp-series:hover { box-shadow: 0 8px 24px rgba(37,99,235,0.3); }
+        .cp-anime  { background:rgba(236,72,153,0.12); border-color:rgba(236,72,153,0.4); color:#f9a8d4; }
+        .cp-anime:hover  { box-shadow: 0 8px 24px rgba(236,72,153,0.3); }
+        .cp-doramas{ background:rgba(249,115,22,0.12); border-color:rgba(249,115,22,0.4); color:#fdba74; }
+        .cp-music  { background:rgba(22,163,74,0.12); border-color:rgba(22,163,74,0.4); color:#4ade80; }
+        .cp-music:hover  { box-shadow: 0 8px 24px rgba(22,163,74,0.3); }
+        .cp-tv     { background:rgba(245,158,11,0.12); border-color:rgba(245,158,11,0.4); color:#fbbf24; }
+        .cp-tv:hover { box-shadow: 0 8px 24px rgba(245,158,11,0.3); }
+
+        .hero-sub {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: var(--muted); max-width:480px; line-height:1.7;
+            margin-bottom:48px;
             animation: fadeSlideUp 0.8s ease 0.4s both;
         }
-        .btn-primary {
-            position: relative;
-            background: linear-gradient(135deg, #e8173a 0%, #c41030 100%);
-            color: #fff; border: none;
-            padding: 16px 38px; border-radius: 50px;
-            font-size: 0.95rem; font-weight: 700;
-            text-decoration: none;
-            display: inline-flex; align-items: center; gap: 10px;
-            box-shadow: 0 8px 30px rgba(232,23,58,0.45);
-            transition: transform 0.2s, box-shadow 0.2s;
-            overflow: hidden; letter-spacing: 0.3px;
-        }
-        .btn-primary::before {
-            content: '';
-            position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent);
-            transform: skewX(-20deg);
-            animation: btnShine 3.5s ease-in-out infinite;
-        }
-        @keyframes btnShine { 0%,40%{left:-100%} 60%,100%{left:160%} }
-        .btn-primary:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 16px 40px rgba(232,23,58,0.6);
-        }
-        .btn-primary .btn-ring {
-            position: absolute; inset: -2px; border-radius: 50px;
-            border: 2px solid rgba(232,23,58,0.5);
-            animation: ringPulse 2.5s ease-out infinite;
-        }
-        @keyframes ringPulse {
-            0% { transform:scale(1); opacity:0.6; }
-            100% { transform:scale(1.15,1.5); opacity:0; }
-        }
-        .btn-ghost {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.12);
-            color: rgba(255,255,255,0.85);
-            padding: 16px 32px; border-radius: 50px;
-            font-size: 0.95rem; font-weight: 600;
-            text-decoration: none;
-            display: inline-flex; align-items: center; gap: 10px;
-            backdrop-filter: blur(10px);
-            transition: background 0.2s, border-color 0.2s, transform 0.2s;
-        }
-        .btn-ghost:hover {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.25);
-            transform: translateY(-2px);
-        }
+        .hero-sub strong { color:rgba(255,255,255,0.9); font-weight:800; }
 
-        .live-ticker {
-            width: 100%; max-width: 640px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.09);
-            border-radius: 16px; padding: 14px 20px;
-            display: flex; align-items: center; gap: 14px;
-            overflow: hidden;
+        /* CTA buttons */
+        .hero-ctas {
+            display:flex; gap:14px; flex-wrap:wrap; justify-content:center;
+            margin-bottom:64px;
             animation: fadeSlideUp 0.8s ease 0.5s both;
         }
+        .btn-hero {
+            position:relative;
+            background: linear-gradient(135deg, #e8173a 0%, #ff6b1a 100%);
+            color:#fff; border:none;
+            padding: 17px 40px; border-radius:50px;
+            font-family:'Nunito',sans-serif;
+            font-size:1rem; font-weight:900;
+            text-decoration:none;
+            display:inline-flex; align-items:center; gap:10px;
+            box-shadow: 0 8px 32px rgba(232,23,58,0.5), 0 0 0 0 rgba(232,23,58,0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            overflow:hidden;
+            animation: heroBtnPulse 3s ease-in-out infinite;
+        }
+        @keyframes heroBtnPulse {
+            0%,100% { box-shadow: 0 8px 32px rgba(232,23,58,0.5), 0 0 0 0 rgba(232,23,58,0.35); }
+            50%     { box-shadow: 0 8px 32px rgba(232,23,58,0.5), 0 0 0 14px rgba(232,23,58,0); }
+        }
+        .btn-hero::before {
+            content:'';
+            position:absolute; top:0; left:-100%; width:60%; height:100%;
+            background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);
+            transform:skewX(-20deg);
+            animation:btnShine 3s ease-in-out infinite;
+        }
+        @keyframes btnShine { 0%,45%{left:-100%} 65%,100%{left:160%} }
+        .btn-hero:hover { transform:translateY(-4px) scale(1.03); }
+
+        .btn-outline {
+            background: rgba(255,255,255,0.06);
+            border: 1.5px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.88);
+            padding: 17px 32px; border-radius:50px;
+            font-family:'Nunito',sans-serif;
+            font-size:1rem; font-weight:800;
+            text-decoration:none;
+            display:inline-flex; align-items:center; gap:10px;
+            backdrop-filter:blur(12px);
+            transition: all 0.25s;
+        }
+        .btn-outline:hover { background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.28); transform:translateY(-3px); }
+
+        /* Ticker */
+        .live-ticker {
+            width:100%; max-width:660px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius:18px; padding:14px 22px;
+            display:flex; align-items:center; gap:16px;
+            overflow:hidden;
+            animation: fadeSlideUp 0.8s ease 0.6s both;
+        }
         .ticker-label {
-            flex-shrink: 0;
-            font-size: 0.65rem; font-weight: 800; letter-spacing: 1.5px;
-            text-transform: uppercase; color: #e8173a;
-            border-right: 1px solid rgba(255,255,255,0.1);
-            padding-right: 14px;
+            flex-shrink:0; font-size:0.62rem; font-weight:800; letter-spacing:1.8px;
+            text-transform:uppercase; color:#e8173a;
+            border-right:1px solid rgba(255,255,255,0.1); padding-right:16px;
         }
-        .ticker-track { display: flex; gap: 24px; overflow: hidden; flex: 1; }
-        .ticker-items {
-            display: flex; gap: 24px;
-            animation: tickerScroll 20s linear infinite;
-            white-space: nowrap;
+        .ticker-track { display:flex; gap:24px; overflow:hidden; flex:1; }
+        .ticker-items { display:flex; gap:24px; animation:tickerScroll 20s linear infinite; white-space:nowrap; }
+        .ticker-match { display:inline-flex; align-items:center; gap:8px; font-size:0.8rem; color:rgba(255,255,255,0.7); font-weight:600; }
+        .ticker-match .score { background:rgba(232,23,58,0.2); border:1px solid rgba(232,23,58,0.3); color:#ff6b7d; font-weight:800; font-size:0.72rem; padding:2px 9px; border-radius:6px; }
+        @keyframes tickerScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+        /* ── POPCORN BANNER ── */
+        .popcorn-banner {
+            position:relative; z-index:2;
+            background: linear-gradient(90deg, #e8173a 0%, #ff6b1a 35%, #ec4899 65%, #7c3aed 100%);
+            padding: 0;
+            overflow:hidden;
         }
-        .ticker-match {
-            display: inline-flex; align-items: center; gap: 8px;
-            font-size: 0.78rem; color: rgba(255,255,255,0.7); font-weight: 500;
+        .popcorn-banner::before {
+            content:'';
+            position:absolute; inset:0;
+            background: repeating-linear-gradient(
+                -45deg,
+                rgba(255,255,255,0) 0px,
+                rgba(255,255,255,0) 10px,
+                rgba(255,255,255,0.04) 10px,
+                rgba(255,255,255,0.04) 12px
+            );
         }
-        .ticker-match .score {
-            background: rgba(232,23,58,0.2);
-            border: 1px solid rgba(232,23,58,0.3);
-            color: #ff6b7d;
-            font-weight: 800; font-size: 0.72rem;
-            padding: 2px 8px; border-radius: 6px;
+        .pb-inner {
+            position:relative; z-index:1;
+            display:flex; align-items:center; justify-content:center;
+            flex-wrap:wrap; gap:0;
         }
-        @keyframes tickerScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+        .pb-item {
+            display:flex; align-items:center; gap:10px;
+            padding: 16px 28px;
+            font-family:'Nunito',sans-serif;
+            font-size:0.85rem; font-weight:900;
+            text-transform:uppercase; letter-spacing:0.8px;
+            color:#fff;
+            border-right: 1px solid rgba(255,255,255,0.2);
         }
+        .pb-item:last-child { border-right:none; }
+        .pb-item .pb-emoji { font-size:1.3rem; }
 
         /* ── STATS STRIP ── */
         .stats-strip {
-            position: relative; z-index: 2;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            border-top: 1px solid var(--border);
+            position:relative; z-index:2;
+            display:grid; grid-template-columns:repeat(4,1fr);
+            background:var(--bg2);
             border-bottom: 1px solid var(--border);
-            background: rgba(255,255,255,0.018);
-            backdrop-filter: blur(16px);
         }
         .stat-item {
-            display: flex; flex-direction: column; align-items: center;
-            padding: 32px 20px;
-            border-right: 1px solid var(--border);
+            display:flex; flex-direction:column; align-items:center;
+            padding:36px 20px;
+            border-right:1px solid var(--border);
             transition: background 0.3s;
+            cursor:default;
         }
-        .stat-item:last-child { border-right: none; }
-        .stat-item:hover { background: rgba(232,23,58,0.04); }
+        .stat-item:last-child { border-right:none; }
+        .stat-item:hover { background:rgba(255,255,255,0.025); }
+        .stat-emoji { font-size:1.8rem; margin-bottom:10px; }
         .stat-num {
-            font-family: 'Barlow Condensed', 'Inter', sans-serif;
-            font-size: 2.8rem; font-weight: 900;
-            background: linear-gradient(135deg, #fff 20%, var(--red));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; line-height: 1; letter-spacing: -1px;
+            font-family:'Barlow Condensed','Nunito',sans-serif;
+            font-size:2.8rem; font-weight:900;
+            background:linear-gradient(135deg,#fff 20%,var(--orange));
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text; line-height:1; letter-spacing:-1px;
         }
-        .stat-label { font-size: 0.7rem; color: var(--muted); margin-top: 6px; letter-spacing: 0.8px; text-transform: uppercase; font-weight: 600; }
-        .stat-icon { font-size: 0.85rem; color: var(--red); margin-bottom: 10px; opacity: 0.7; }
+        .stat-label { font-size:0.72rem; color:var(--muted); margin-top:6px; letter-spacing:0.5px; font-weight:700; }
 
         /* ── SECTION COMMONS ── */
-        .section {
-            position: relative; z-index: 2;
-            padding: 100px 24px;
-            max-width: 1200px; margin: 0 auto;
+        .section { position:relative; z-index:2; padding:100px 24px; max-width:1200px; margin:0 auto; }
+        .eyebrow {
+            display:inline-flex; align-items:center; gap:8px;
+            font-size:0.72rem; font-weight:800; letter-spacing:2.5px;
+            text-transform:uppercase; margin-bottom:14px;
+            color:var(--orange);
         }
-        .section-eyebrow {
-            display: inline-flex; align-items: center; gap: 8px;
-            color: var(--red); font-size: 0.72rem; font-weight: 700;
-            letter-spacing: 2.5px; text-transform: uppercase;
-            margin-bottom: 16px;
+        .sec-title {
+            font-family:'Barlow Condensed','Nunito',sans-serif;
+            font-size:clamp(2rem,5.5vw,3.6rem); font-weight:900;
+            text-transform:uppercase; letter-spacing:-0.5px; line-height:1.0;
+            margin-bottom:16px;
         }
-        .section-title {
-            font-family: 'Barlow Condensed', 'Inter', sans-serif;
-            font-size: clamp(2rem, 5vw, 3.2rem);
-            font-weight: 900; text-transform: uppercase;
-            letter-spacing: -0.5px; line-height: 1.05;
-            margin-bottom: 16px;
-        }
-        .section-title span { color: var(--red); }
-        .section-sub { color: var(--muted); font-size: 1rem; line-height: 1.75; max-width: 480px; }
+        .sec-sub { color:var(--muted); font-size:1.05rem; line-height:1.75; max-width:500px; font-weight:500; }
 
         /* ── SERVICES CAROUSEL ── */
-        .services-wrap {
-            position: relative; z-index: 2;
-            padding: 90px 0 100px;
-        }
-        .services-header {
-            text-align: center;
-            padding: 0 24px;
-            margin-bottom: 56px;
-        }
-        .services-header .section-sub { margin: 0 auto; }
+        .services-wrap { position:relative; z-index:2; padding:90px 0 100px; background:var(--bg2); }
+        .services-header { text-align:center; padding:0 24px; margin-bottom:60px; }
+        .services-header .sec-sub { margin:0 auto; }
 
-        .carousel-container {
-            position: relative;
-            overflow: hidden;
-        }
-        .carousel-track-outer {
-            overflow: hidden;
-            padding: 16px 0 32px;
-        }
+        .carousel-outer { overflow:hidden; padding:12px 0 36px; }
         .carousel-track {
-            display: flex;
-            gap: 20px;
-            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            padding: 0 max(24px, calc((100vw - 1200px) / 2));
-            will-change: transform;
+            display:flex; gap:22px;
+            transition: transform 0.55s cubic-bezier(0.25,0.46,0.45,0.94);
+            padding: 0 max(24px, calc((100vw - 1180px)/2));
+            will-change:transform;
         }
 
         /* Service Cards */
-        .service-card {
-            flex: 0 0 320px;
-            min-height: 420px;
-            border-radius: 28px;
-            padding: 40px 32px;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s;
-            border: 1px solid rgba(255,255,255,0.07);
-            text-decoration: none;
-            display: flex; flex-direction: column;
+        .sc {
+            flex:0 0 310px; min-height:440px;
+            border-radius:32px; padding:38px 30px;
+            position:relative; overflow:hidden;
+            cursor:pointer; text-decoration:none; display:flex; flex-direction:column;
+            border: 1.5px solid rgba(255,255,255,0.07);
+            transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.35s, border-color 0.35s;
         }
-        .service-card:hover {
-            transform: translateY(-10px) scale(1.02);
-        }
+        .sc:hover { transform:translateY(-12px) scale(1.025); }
 
-        /* Card backgrounds */
-        .sc-sports {
-            background: linear-gradient(145deg, #0d0f1a 0%, #160a10 60%, #0d0f1a 100%);
-        }
-        .sc-sports::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(145deg, rgba(232,23,58,0.18) 0%, rgba(255,107,26,0.1) 50%, transparent 80%);
-        }
-        .sc-sports:hover { box-shadow: 0 30px 80px rgba(232,23,58,0.3); border-color: rgba(232,23,58,0.35); }
+        /* Card specific themes */
+        .sc-sports  { background:linear-gradient(155deg,#13050a,#0d0108,#13050a); }
+        .sc-sports:hover  { box-shadow:0 30px 80px rgba(232,23,58,0.35); border-color:rgba(232,23,58,0.5); }
+        .sc-movies  { background:linear-gradient(155deg,#0c0b14,#09091a,#0c0b14); }
+        .sc-movies:hover  { box-shadow:0 30px 80px rgba(124,58,237,0.35); border-color:rgba(124,58,237,0.5); }
+        .sc-anime   { background:linear-gradient(155deg,#130612,#0e0410,#130612); }
+        .sc-anime:hover   { box-shadow:0 30px 80px rgba(236,72,153,0.35); border-color:rgba(236,72,153,0.5); }
+        .sc-doramas { background:linear-gradient(155deg,#130b05,#0d0803,#130b05); }
+        .sc-doramas:hover { box-shadow:0 30px 80px rgba(249,115,22,0.35); border-color:rgba(249,115,22,0.5); }
+        .sc-music   { background:linear-gradient(155deg,#031309,#020d05,#031309); }
+        .sc-music:hover   { box-shadow:0 30px 80px rgba(22,163,74,0.35); border-color:rgba(22,163,74,0.5); }
+        .sc-tv      { background:linear-gradient(155deg,#0d0d03,#090902,#0d0d03); }
+        .sc-tv:hover      { box-shadow:0 30px 80px rgba(245,158,11,0.35); border-color:rgba(245,158,11,0.5); }
 
-        .sc-movies {
-            background: linear-gradient(145deg, #0d0f1a 0%, #0a0d1f 60%, #0d0f1a 100%);
+        /* Glow overlays */
+        .sc::before {
+            content:''; position:absolute; inset:0; border-radius:32px; pointer-events:none;
+            opacity:0.35; transition:opacity 0.35s;
         }
-        .sc-movies::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(145deg, rgba(124,58,237,0.18) 0%, rgba(37,99,235,0.1) 50%, transparent 80%);
-        }
-        .sc-movies:hover { box-shadow: 0 30px 80px rgba(124,58,237,0.3); border-color: rgba(124,58,237,0.35); }
+        .sc:hover::before { opacity:0.7; }
+        .sc-sports::before  { background:radial-gradient(ellipse 80% 60% at 20% 0%, rgba(232,23,58,0.25) 0%, transparent 70%); }
+        .sc-movies::before  { background:radial-gradient(ellipse 80% 60% at 20% 0%, rgba(124,58,237,0.25) 0%, transparent 70%); }
+        .sc-anime::before   { background:radial-gradient(ellipse 80% 60% at 20% 0%, rgba(236,72,153,0.25) 0%, transparent 70%); }
+        .sc-doramas::before { background:radial-gradient(ellipse 80% 60% at 20% 0%, rgba(249,115,22,0.25) 0%, transparent 70%); }
+        .sc-music::before   { background:radial-gradient(ellipse 80% 60% at 20% 0%, rgba(22,163,74,0.25) 0%, transparent 70%); }
+        .sc-tv::before      { background:radial-gradient(ellipse 80% 60% at 20% 0%, rgba(245,158,11,0.25) 0%, transparent 70%); }
 
-        .sc-anime {
-            background: linear-gradient(145deg, #0d0f1a 0%, #120a14 60%, #0d0f1a 100%);
+        /* Big BG emoji */
+        .sc-emoji-bg {
+            position:absolute; right:-8px; bottom:-12px;
+            font-size:8rem; opacity:0.08; line-height:1;
+            pointer-events:none; user-select:none;
+            transition: transform 0.4s, opacity 0.4s;
+            filter: saturate(0);
         }
-        .sc-anime::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(145deg, rgba(219,39,119,0.18) 0%, rgba(124,58,237,0.1) 50%, transparent 80%);
-        }
-        .sc-anime:hover { box-shadow: 0 30px 80px rgba(219,39,119,0.3); border-color: rgba(219,39,119,0.35); }
+        .sc:hover .sc-emoji-bg { transform:scale(1.15) rotate(-6deg); opacity:0.16; filter:saturate(1); }
 
-        .sc-music {
-            background: linear-gradient(145deg, #0d0f1a 0%, #0a120d 60%, #0d0f1a 100%);
+        /* Card content */
+        .sc-icon {
+            width:58px; height:58px; border-radius:20px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.5rem; margin-bottom:20px;
+            position:relative; z-index:1;
         }
-        .sc-music::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(145deg, rgba(22,163,74,0.18) 0%, rgba(20,184,166,0.1) 50%, transparent 80%);
-        }
-        .sc-music:hover { box-shadow: 0 30px 80px rgba(22,163,74,0.3); border-color: rgba(22,163,74,0.35); }
+        .sc-sports .sc-icon  { background:rgba(232,23,58,0.18); border:1.5px solid rgba(232,23,58,0.35); }
+        .sc-movies .sc-icon  { background:rgba(124,58,237,0.18); border:1.5px solid rgba(124,58,237,0.35); }
+        .sc-anime  .sc-icon  { background:rgba(236,72,153,0.18); border:1.5px solid rgba(236,72,153,0.35); }
+        .sc-doramas .sc-icon { background:rgba(249,115,22,0.18); border:1.5px solid rgba(249,115,22,0.35); }
+        .sc-music  .sc-icon  { background:rgba(22,163,74,0.18);  border:1.5px solid rgba(22,163,74,0.35); }
+        .sc-tv     .sc-icon  { background:rgba(245,158,11,0.18); border:1.5px solid rgba(245,158,11,0.35); }
 
-        .sc-tv {
-            background: linear-gradient(145deg, #0d0f1a 0%, #0a0e14 60%, #0d0f1a 100%);
+        .sc-label {
+            display:inline-block; font-size:0.62rem; font-weight:900; letter-spacing:2px;
+            text-transform:uppercase; padding:4px 12px; border-radius:50px;
+            margin-bottom:14px; position:relative; z-index:1;
         }
-        .sc-tv::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: linear-gradient(145deg, rgba(245,158,11,0.18) 0%, rgba(239,68,68,0.08) 50%, transparent 80%);
-        }
-        .sc-tv:hover { box-shadow: 0 30px 80px rgba(245,158,11,0.3); border-color: rgba(245,158,11,0.35); }
-
-        .sc-bg-emoji {
-            position: absolute;
-            right: -10px; bottom: -10px;
-            font-size: 9rem;
-            opacity: 0.07;
-            line-height: 1;
-            pointer-events: none;
-            transition: transform 0.35s, opacity 0.35s;
-            user-select: none;
-        }
-        .service-card:hover .sc-bg-emoji {
-            transform: scale(1.12) rotate(-5deg);
-            opacity: 0.12;
-        }
-
-        .sc-icon-wrap {
-            width: 60px; height: 60px;
-            border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.6rem;
-            margin-bottom: 24px;
-            position: relative; z-index: 1;
-        }
-        .sc-sports .sc-icon-wrap    { background: rgba(232,23,58,0.18); border: 1px solid rgba(232,23,58,0.3); color: #ff3d5a; }
-        .sc-movies .sc-icon-wrap    { background: rgba(124,58,237,0.18); border: 1px solid rgba(124,58,237,0.3); color: #a78bfa; }
-        .sc-anime  .sc-icon-wrap    { background: rgba(219,39,119,0.18); border: 1px solid rgba(219,39,119,0.3); color: #f472b6; }
-        .sc-music  .sc-icon-wrap    { background: rgba(22,163,74,0.18); border: 1px solid rgba(22,163,74,0.3); color: #4ade80; }
-        .sc-tv     .sc-icon-wrap    { background: rgba(245,158,11,0.18); border: 1px solid rgba(245,158,11,0.3); color: #fbbf24; }
-
-        .sc-tag {
-            display: inline-block;
-            font-size: 0.62rem; font-weight: 800; letter-spacing: 2px;
-            text-transform: uppercase;
-            padding: 4px 12px; border-radius: 50px;
-            margin-bottom: 14px;
-            position: relative; z-index: 1;
-        }
-        .sc-sports .sc-tag { background: rgba(232,23,58,0.15); color: #ff6b7d; border: 1px solid rgba(232,23,58,0.25); }
-        .sc-movies .sc-tag { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.25); }
-        .sc-anime  .sc-tag { background: rgba(219,39,119,0.15); color: #f472b6; border: 1px solid rgba(219,39,119,0.25); }
-        .sc-music  .sc-tag { background: rgba(22,163,74,0.15); color: #4ade80; border: 1px solid rgba(22,163,74,0.25); }
-        .sc-tv     .sc-tag { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+        .sc-sports .sc-label  { background:rgba(232,23,58,0.15); color:#ff6b7d; border:1px solid rgba(232,23,58,0.3); }
+        .sc-movies .sc-label  { background:rgba(124,58,237,0.15); color:#a78bfa; border:1px solid rgba(124,58,237,0.3); }
+        .sc-anime  .sc-label  { background:rgba(236,72,153,0.15); color:#f9a8d4; border:1px solid rgba(236,72,153,0.3); }
+        .sc-doramas .sc-label { background:rgba(249,115,22,0.15); color:#fdba74; border:1px solid rgba(249,115,22,0.3); }
+        .sc-music  .sc-label  { background:rgba(22,163,74,0.15); color:#4ade80; border:1px solid rgba(22,163,74,0.3); }
+        .sc-tv     .sc-label  { background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); }
 
         .sc-title {
-            font-family: 'Barlow Condensed', 'Inter', sans-serif;
-            font-size: 2rem; font-weight: 900;
-            text-transform: uppercase; letter-spacing: 0px;
-            line-height: 1.0;
-            margin-bottom: 14px;
-            position: relative; z-index: 1;
+            font-family:'Barlow Condensed','Nunito',sans-serif;
+            font-size:2.1rem; font-weight:900;
+            text-transform:uppercase; line-height:0.95;
+            margin-bottom:14px; position:relative; z-index:1;
         }
-        .sc-desc {
-            font-size: 0.9rem; color: rgba(255,255,255,0.55);
-            line-height: 1.65;
-            position: relative; z-index: 1;
-            flex: 1;
-        }
+        .sc-desc { font-size:0.9rem; color:rgba(255,255,255,0.52); line-height:1.65; position:relative; z-index:1; flex:1; font-weight:500; }
 
-        .sc-chips {
-            display: flex; flex-wrap: wrap; gap: 6px;
-            margin-top: 24px;
-            position: relative; z-index: 1;
-        }
-        .sc-chip {
-            font-size: 0.68rem; font-weight: 600;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 4px 10px; border-radius: 50px;
-            color: rgba(255,255,255,0.55);
-        }
+        .sc-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:20px; position:relative; z-index:1; }
+        .sc-tag { font-size:0.67rem; font-weight:700; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); padding:4px 10px; border-radius:50px; color:rgba(255,255,255,0.5); }
 
-        .sc-cta {
-            display: inline-flex; align-items: center; gap: 8px;
-            margin-top: 28px;
-            font-size: 0.82rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.8px;
-            position: relative; z-index: 1;
+        .sc-link {
+            display:inline-flex; align-items:center; gap:8px;
+            margin-top:26px; font-size:0.82rem; font-weight:900;
+            text-transform:uppercase; letter-spacing:1px;
+            position:relative; z-index:1;
             transition: gap 0.2s;
         }
-        .service-card:hover .sc-cta { gap: 12px; }
-        .sc-sports .sc-cta { color: #ff6b7d; }
-        .sc-movies .sc-cta { color: #a78bfa; }
-        .sc-anime  .sc-cta { color: #f472b6; }
-        .sc-music  .sc-cta { color: #4ade80; }
-        .sc-tv     .sc-cta { color: #fbbf24; }
+        .sc:hover .sc-link { gap:14px; }
+        .sc-sports .sc-link  { color:#ff6b7d; }
+        .sc-movies .sc-link  { color:#a78bfa; }
+        .sc-anime  .sc-link  { color:#f9a8d4; }
+        .sc-doramas .sc-link { color:#fdba74; }
+        .sc-music  .sc-link  { color:#4ade80; }
+        .sc-tv     .sc-link  { color:#fbbf24; }
 
-        /* Carousel nav dots */
-        .carousel-dots {
-            display: flex; align-items: center; justify-content: center;
-            gap: 8px; margin-top: 32px;
+        /* Carousel controls */
+        .carousel-controls {
+            display:flex; flex-direction:column; align-items:center; gap:16px;
+            margin-top:8px;
         }
+        .carousel-dots { display:flex; align-items:center; gap:8px; }
         .c-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: rgba(255,255,255,0.18);
-            border: none; cursor: pointer;
-            transition: background 0.3s, width 0.3s, border-radius 0.3s;
+            width:8px; height:8px; border-radius:50%;
+            background:rgba(255,255,255,0.18); border:none; cursor:pointer;
+            transition: all 0.3s;
         }
-        .c-dot.active {
-            width: 28px; border-radius: 4px;
-            background: var(--red);
-        }
-
-        /* Carousel arrows */
-        .carousel-arrows {
-            display: flex; gap: 10px; justify-content: center;
-            margin-top: 20px;
-        }
+        .c-dot.active { width:32px; border-radius:4px; background:linear-gradient(90deg,#e8173a,#ff6b1a); }
+        .carousel-arrows { display:flex; gap:10px; }
         .c-arrow {
-            width: 44px; height: 44px; border-radius: 50%;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 0.85rem; color: rgba(255,255,255,0.7);
-            transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+            width:46px; height:46px; border-radius:50%;
+            background:rgba(255,255,255,0.07);
+            border:1.5px solid rgba(255,255,255,0.12);
+            display:flex; align-items:center; justify-content:center;
+            cursor:pointer; font-size:0.85rem; color:rgba(255,255,255,0.7);
+            transition: all 0.22s;
         }
-        .c-arrow:hover {
-            background: rgba(232,23,58,0.15);
-            border-color: rgba(232,23,58,0.4);
-            color: #ff6b7d;
-            transform: scale(1.08);
-        }
+        .c-arrow:hover { background:rgba(232,23,58,0.18); border-color:rgba(232,23,58,0.5); color:#ff6b7d; transform:scale(1.1); }
 
-        /* ── FREE BADGE STRIP ── */
-        .free-strip {
-            position: relative; z-index: 2;
-            background: linear-gradient(90deg, #e8173a 0%, #ff6b1a 50%, #7c3aed 100%);
-            padding: 18px 24px;
-            text-align: center;
-            overflow: hidden;
+        /* ── CONTENT MARQUEE ── */
+        .marquee-section {
+            position:relative; z-index:2;
+            padding:70px 0;
+            border-top:1px solid var(--border);
+            border-bottom:1px solid var(--border);
+            overflow:hidden;
         }
-        .free-strip::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: repeating-linear-gradient(
-                90deg,
-                rgba(255,255,255,0) 0px,
-                rgba(255,255,255,0) 40px,
-                rgba(255,255,255,0.04) 40px,
-                rgba(255,255,255,0.04) 42px
-            );
+        .marquee-header { text-align:center; padding:0 24px; margin-bottom:48px; }
+        .marquee-wrap { position:relative; overflow:hidden; }
+        .marquee-wrap::before,
+        .marquee-wrap::after {
+            content:''; position:absolute; top:0; bottom:0; width:100px; z-index:2; pointer-events:none;
         }
-        .free-strip-inner {
-            display: flex; align-items: center; justify-content: center;
-            gap: 32px; flex-wrap: wrap;
-            position: relative; z-index: 1;
+        .marquee-wrap::before { left:0; background:linear-gradient(90deg,var(--bg),transparent); }
+        .marquee-wrap::after  { right:0; background:linear-gradient(-90deg,var(--bg),transparent); }
+        .marquee-row { display:flex; gap:14px; animation:mScroll 30s linear infinite; width:max-content; margin-bottom:14px; }
+        .marquee-row.reverse { animation:mScrollR 28s linear infinite; }
+        @keyframes mScroll  { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+        @keyframes mScrollR { 0%{transform:translateX(-50%)} 100%{transform:translateX(0)} }
+        .marquee-row:hover { animation-play-state:paused; }
+        .m-pill {
+            display:inline-flex; align-items:center; gap:10px;
+            background:var(--surface); border:1px solid var(--border);
+            border-radius:50px; padding:11px 22px;
+            font-size:0.85rem; font-weight:700; white-space:nowrap;
+            transition: all 0.22s; cursor:default;
         }
-        .free-item {
-            display: flex; align-items: center; gap: 8px;
-            font-size: 0.82rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 1px;
-            color: rgba(255,255,255,0.95);
-        }
-        .free-item i { font-size: 1rem; }
-
-        /* ── LEAGUES MARQUEE ── */
-        .leagues-section {
-            position: relative; z-index: 2;
-            padding: 70px 0;
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            background: rgba(255,255,255,0.015);
-            overflow: hidden;
-        }
-        .leagues-header { text-align: center; padding: 0 24px; margin-bottom: 48px; }
-        .leagues-marquee-wrap { position: relative; }
-        .leagues-marquee-wrap::before,
-        .leagues-marquee-wrap::after {
-            content: '';
-            position: absolute; top: 0; bottom: 0; width: 120px; z-index: 2;
-            pointer-events: none;
-        }
-        .leagues-marquee-wrap::before { left: 0; background: linear-gradient(90deg, var(--bg2), transparent); }
-        .leagues-marquee-wrap::after  { right: 0; background: linear-gradient(-90deg, var(--bg2), transparent); }
-        .leagues-track {
-            display: flex; gap: 14px;
-            animation: marqueeScroll 26s linear infinite;
-            width: max-content;
-        }
-        .leagues-track:hover { animation-play-state: paused; }
-        .league-pill {
-            display: inline-flex; align-items: center; gap: 10px;
-            background: var(--surface); border: 1px solid var(--border);
-            border-radius: 50px; padding: 11px 22px;
-            font-size: 0.86rem; font-weight: 600; white-space: nowrap;
-            transition: border-color 0.25s, color 0.25s, background 0.25s;
-        }
-        .league-pill:hover { border-color: rgba(232,23,58,0.5); color: var(--red2); background: rgba(232,23,58,0.07); }
-        .league-pill img { width: 22px; height: 22px; object-fit: contain; border-radius: 50%; }
-        .league-pill i { font-size: 0.85rem; color: var(--red); }
-        @keyframes marqueeScroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+        .m-pill:hover { transform:scale(1.06); }
+        .m-pill img { width:22px; height:22px; object-fit:contain; border-radius:50%; }
+        .m-pill .m-emoji { font-size:1rem; }
+        .mp-red:hover    { border-color:rgba(232,23,58,0.5); background:rgba(232,23,58,0.08); color:#ff6b7d; }
+        .mp-purple:hover { border-color:rgba(124,58,237,0.5); background:rgba(124,58,237,0.08); color:#a78bfa; }
+        .mp-pink:hover   { border-color:rgba(236,72,153,0.5); background:rgba(236,72,153,0.08); color:#f9a8d4; }
+        .mp-green:hover  { border-color:rgba(22,163,74,0.5); background:rgba(22,163,74,0.08); color:#4ade80; }
+        .mp-yellow:hover { border-color:rgba(245,158,11,0.5); background:rgba(245,158,11,0.08); color:#fbbf24; }
 
         /* ── SOCIAL PROOF ── */
-        .proof-strip {
-            position: relative; z-index: 2;
-            padding: 60px 24px;
-            max-width: 1140px; margin: 0 auto;
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            background: var(--border);
-            border: 1px solid var(--border);
-            border-radius: 24px; overflow: hidden;
+        .reviews-section { position:relative; z-index:2; padding:80px 24px; }
+        .reviews-grid {
+            max-width:1140px; margin:56px auto 0;
+            display:grid; grid-template-columns:repeat(3,1fr); gap:16px;
         }
-        .proof-item { background: var(--bg2); padding: 36px 32px; display: flex; flex-direction: column; gap: 10px; }
-        .proof-stars { color: #f59e0b; font-size: 0.85rem; letter-spacing: 2px; }
-        .proof-quote { font-size: 0.95rem; line-height: 1.65; color: rgba(255,255,255,0.75); font-style: italic; }
-        .proof-author { font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+        .review-card {
+            background:var(--bg2); border:1px solid var(--border);
+            border-radius:24px; padding:32px 28px;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .review-card:hover { transform:translateY(-6px); border-color:rgba(255,255,255,0.15); }
+        .review-stars { font-size:1rem; margin-bottom:14px; letter-spacing:2px; }
+        .review-text { font-size:0.95rem; line-height:1.7; color:rgba(255,255,255,0.75); font-style:italic; margin-bottom:18px; font-weight:500; }
+        .review-author { display:flex; align-items:center; gap:10px; }
+        .review-avatar {
+            width:36px; height:36px; border-radius:50%;
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.1rem; flex-shrink:0;
+        }
+        .review-name { font-size:0.8rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; color:var(--muted); }
 
         /* ── CTA FINAL ── */
-        .cta-section {
-            position: relative; z-index: 2;
-            padding: 100px 24px 120px;
-            text-align: center;
-        }
+        .cta-section { position:relative; z-index:2; padding:100px 24px 130px; text-align:center; }
         .cta-card {
-            position: relative;
-            background: linear-gradient(145deg, rgba(232,23,58,0.1) 0%, rgba(255,107,26,0.06) 40%, rgba(124,58,237,0.08) 100%);
-            border: 1px solid rgba(232,23,58,0.18);
-            border-radius: 32px; padding: 80px 40px;
-            max-width: 780px; margin: 0 auto; overflow: hidden;
+            position:relative; overflow:hidden;
+            background:var(--bg2);
+            border:1.5px solid rgba(255,255,255,0.08);
+            border-radius:36px; padding:90px 48px;
+            max-width:820px; margin:0 auto;
         }
         .cta-card::before {
-            content: '';
-            position: absolute; top: -100px; right: -100px;
-            width: 300px; height: 300px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(232,23,58,0.2) 0%, transparent 70%);
+            content:''; position:absolute; inset:0;
+            background:
+                radial-gradient(ellipse 70% 60% at 10% 20%, rgba(232,23,58,0.18) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 60% at 90% 80%, rgba(124,58,237,0.15) 0%, transparent 60%);
+            pointer-events:none;
         }
-        .cta-card::after {
-            content: '';
-            position: absolute; bottom: -80px; left: -80px;
-            width: 240px; height: 240px; border-radius: 50%;
-            background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
-        }
-        .cta-eyebrow { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--red); margin-bottom: 20px; }
+        .cta-popcorn { font-size:5rem; display:block; margin-bottom:8px; animation:bounceIcon 2.5s ease-in-out infinite; }
+        .cta-eyebrow { display:inline-block; font-size:0.72rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--orange); margin-bottom:20px; }
         .cta-card h2 {
-            font-family: 'Barlow Condensed', 'Inter', sans-serif;
-            font-size: clamp(2rem, 5vw, 3.8rem);
-            font-weight: 900; text-transform: uppercase;
-            line-height: 1.0; margin-bottom: 18px;
+            font-family:'Barlow Condensed','Nunito',sans-serif;
+            font-size:clamp(2.2rem,5.5vw,4.2rem); font-weight:900;
+            text-transform:uppercase; line-height:0.95; margin-bottom:20px;
+            position:relative; z-index:1;
         }
-        .cta-card h2 span { background: linear-gradient(90deg, #e8173a, #ff6b1a, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .cta-card > p { color: var(--muted); margin-bottom: 40px; font-size: 1rem; line-height: 1.7; max-width: 500px; margin-left: auto; margin-right: auto; }
-        .cta-note { margin-top: 20px; font-size: 0.78rem; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 6px; }
-        .cta-note i { color: #22c55e; }
+        .cta-card h2 .grad {
+            background:linear-gradient(90deg,#e8173a,#ff6b1a,#ec4899,#7c3aed);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        }
+        .cta-card p { color:var(--muted); font-size:1.05rem; line-height:1.7; max-width:520px; margin:0 auto 44px; position:relative; z-index:1; font-weight:500; }
+        .cta-note { margin-top:22px; font-size:0.8rem; color:var(--muted); display:flex; align-items:center; justify-content:center; gap:8px; font-weight:600; position:relative; z-index:1; }
+        .cta-note i { color:#22c55e; }
 
         /* ── FOOTER ── */
         footer {
-            position: relative; z-index: 2;
-            text-align: center; padding: 32px 24px;
-            border-top: 1px solid var(--border);
-            color: var(--muted); font-size: 0.78rem;
+            position:relative; z-index:2; text-align:center;
+            padding:36px 24px; border-top:1px solid var(--border);
+            color:var(--muted); font-size:0.8rem;
         }
-        footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
-        footer a:hover { color: var(--red2); }
-        .footer-links { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+        footer a { color:var(--muted); text-decoration:none; transition:color 0.2s; }
+        footer a:hover { color:var(--orange); }
+        .footer-links { display:flex; gap:24px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
 
         /* ── ANIMATIONS ── */
-        @keyframes fadeSlideDown { from{opacity:0;transform:translateY(-24px)} to{opacity:1;transform:translateY(0)} }
-        @keyframes fadeSlideUp   { from{opacity:0;transform:translateY(24px)}  to{opacity:1;transform:translateY(0)} }
-        .reveal { opacity: 0; transform: translateY(36px); transition: opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1); }
-        .reveal.visible { opacity: 1; transform: translateY(0); }
-        .reveal-delay-1 { transition-delay: 0.1s; }
-        .reveal-delay-2 { transition-delay: 0.2s; }
-        .reveal-delay-3 { transition-delay: 0.3s; }
-        .reveal-delay-4 { transition-delay: 0.4s; }
+        @keyframes fadeSlideDown { from{opacity:0;transform:translateY(-28px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeSlideUp   { from{opacity:0;transform:translateY(28px)}  to{opacity:1;transform:translateY(0)} }
+        .reveal { opacity:0; transform:translateY(40px); transition:opacity 0.75s cubic-bezier(0.16,1,0.3,1), transform 0.75s cubic-bezier(0.16,1,0.3,1); }
+        .reveal.visible { opacity:1; transform:translateY(0); }
+        .reveal-d1 { transition-delay:0.1s; }
+        .reveal-d2 { transition-delay:0.2s; }
+        .reveal-d3 { transition-delay:0.3s; }
 
         /* ── RESPONSIVE ── */
-        @media (max-width: 900px) {
-            .proof-strip { grid-template-columns: 1fr; }
-            .stats-strip { grid-template-columns: repeat(2, 1fr); }
-            .stats-strip .stat-item:nth-child(2) { border-right: none; }
+        @media (max-width:960px) {
+            .reviews-grid { grid-template-columns:1fr 1fr; }
+            .stats-strip { grid-template-columns:repeat(2,1fr); }
+            .stats-strip .stat-item:nth-child(2) { border-right:none; }
         }
-        @media (max-width: 600px) {
-            nav { padding: 14px 18px; }
-            .hero { padding: 110px 18px 50px; }
-            .section { padding: 70px 18px; }
-            .cta-card { padding: 52px 22px; }
-            .stats-strip { grid-template-columns: repeat(2, 1fr); }
-            .proof-strip { border-radius: 18px; }
-            .live-ticker { display: none; }
-            .nav-live-count { display: none; }
-            .service-card { flex: 0 0 280px; min-height: 380px; }
-            .free-strip-inner { gap: 16px; }
+        @media (max-width:640px) {
+            nav { padding:14px 18px; }
+            .hero { padding:120px 18px 60px; }
+            .pb-item { padding:12px 16px; font-size:0.75rem; }
+            .reviews-grid { grid-template-columns:1fr; }
+            .cta-card { padding:60px 24px; }
+            .live-ticker { display:none; }
+            .nav-live-count { display:none; }
+            .sc { flex:0 0 280px; min-height:400px; }
         }
     </style>
     <link rel="stylesheet" href="css/tour.css">
 </head>
 <body>
 
+    <canvas class="stars-canvas" id="starsCanvas"></canvas>
     <div class="bg-layer"></div>
-    <div class="bg-glow"></div>
-    <div class="orb orb-1"></div>
-    <div class="orb orb-2"></div>
-    <div class="orb orb-3"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <!-- Floating deco elements (popcorn, stars, etc.) -->
+    <div id="decoContainer"></div>
 
     <!-- NAV -->
     <nav id="mainNav">
@@ -767,87 +652,81 @@
 
     <!-- HERO -->
     <div class="hero">
-        <div class="live-badge">
-            <span class="live-dot"></span>
+        <div class="hero-badge">
+            <span class="badge-icon">🍿</span>
             Todo gratis · Sin registro · Sin límites
         </div>
 
-        <h1 class="hero-headline">
-            <span class="line-white">Todo lo que</span>
-            <span class="line-gradient">quieres ver.</span>
+        <h1 class="hero-hl">
+            <span class="hl-free">Todo lo que</span>
+            <span class="hl-main">quieres ver.</span>
         </h1>
 
-        <div class="hero-categories">
-            <span class="cat-highlight">Deportes</span>
-            <span class="cat-sep">·</span>
-            <span>Películas</span>
-            <span class="cat-sep">·</span>
-            <span>Series</span>
-            <span class="cat-sep">·</span>
-            <span>Anime</span>
-            <span class="cat-sep">·</span>
-            <span>Doramas</span>
-            <span class="cat-sep">·</span>
-            <span>Música</span>
-            <span class="cat-sep">·</span>
-            <span>TV</span>
+        <!-- Category pills -->
+        <div class="cat-row">
+            <span class="cat-pill cp-sports"><i class="fas fa-futbol"></i> Deportes</span>
+            <span class="cat-pill cp-movies">🎬 Películas</span>
+            <span class="cat-pill cp-series">📺 Series</span>
+            <span class="cat-pill cp-anime">⚡ Anime</span>
+            <span class="cat-pill cp-doramas">🌸 Doramas</span>
+            <span class="cat-pill cp-music">🎵 Música</span>
+            <span class="cat-pill cp-tv">📡 TV en vivo</span>
         </div>
 
-        <p class="hero-desc">
+        <p class="hero-sub">
             <strong>100% gratis. Sin registros. Sin esperas.</strong><br>
-            Una sola plataforma con todo el entretenimiento que necesitas, desde cualquier dispositivo.
+            Una sola plataforma con todo el entretenimiento para toda la familia, desde cualquier dispositivo.
         </p>
 
         <div class="hero-ctas">
-            <a href="ULTRA/index.html" class="btn-primary">
-                <div class="btn-ring"></div>
+            <a href="ULTRA/index.html" class="btn-hero">
                 <i class="fas fa-play"></i> Empezar ahora — Es gratis
             </a>
-            <a href="#servicios" class="btn-ghost">
-                <i class="fas fa-th-large"></i> Ver todos los servicios
+            <a href="#servicios" class="btn-outline">
+                🍿 Ver todos los servicios
             </a>
         </div>
 
-        <!-- Live ticker -->
         <div class="live-ticker" id="liveTicker">
             <span class="ticker-label" id="tickerLabel">Cargando…</span>
             <div class="ticker-track">
                 <div class="ticker-items" id="tickerItems">
-                    <span class="ticker-match" style="color:rgba(255,255,255,0.35);font-style:italic">Conectando con la API…</span>
+                    <span class="ticker-match" style="color:rgba(255,255,255,0.35);font-style:italic">Conectando…</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- FREE STRIP -->
-    <div class="free-strip">
-        <div class="free-strip-inner">
-            <div class="free-item"><i class="fas fa-check-circle"></i> Sin suscripción</div>
-            <div class="free-item"><i class="fas fa-check-circle"></i> Sin tarjeta de crédito</div>
-            <div class="free-item"><i class="fas fa-check-circle"></i> Sin registro</div>
-            <div class="free-item"><i class="fas fa-check-circle"></i> Disponible ahora</div>
+    <!-- POPCORN BANNER -->
+    <div class="popcorn-banner">
+        <div class="pb-inner">
+            <div class="pb-item"><span class="pb-emoji">🍿</span> Sin suscripción</div>
+            <div class="pb-item"><span class="pb-emoji">✅</span> Sin tarjeta de crédito</div>
+            <div class="pb-item"><span class="pb-emoji">🔓</span> Sin registro</div>
+            <div class="pb-item"><span class="pb-emoji">⚡</span> Disponible ahora</div>
+            <div class="pb-item"><span class="pb-emoji">📱</span> En todos los dispositivos</div>
         </div>
     </div>
 
     <!-- STATS STRIP -->
     <div class="stats-strip">
         <div class="stat-item">
-            <div class="stat-icon"><i class="fas fa-satellite-dish"></i></div>
+            <div class="stat-emoji">⚽</div>
             <span class="stat-num" data-count="6" data-suffix="+">6+</span>
-            <span class="stat-label">Ligas en vivo</span>
+            <span class="stat-label">Ligas deportivas</span>
         </div>
         <div class="stat-item">
-            <div class="stat-icon"><i class="fas fa-film"></i></div>
+            <div class="stat-emoji">🎬</div>
             <span class="stat-num" data-count="10000" data-suffix="+">10K+</span>
             <span class="stat-label">Títulos disponibles</span>
         </div>
         <div class="stat-item">
-            <div class="stat-icon"><i class="fas fa-clock"></i></div>
-            <span class="stat-num" data-special="24/7">24/7</span>
-            <span class="stat-label">Cobertura continua</span>
+            <div class="stat-emoji">📺</div>
+            <span class="stat-num" data-count="250" data-suffix="+">250+</span>
+            <span class="stat-label">Canales en vivo</span>
         </div>
         <div class="stat-item">
-            <div class="stat-icon"><i class="fas fa-lock-open"></i></div>
+            <div class="stat-emoji">🎁</div>
             <span class="stat-num" data-count="100" data-suffix="%">100%</span>
             <span class="stat-label">Gratis, siempre</span>
         </div>
@@ -856,169 +735,200 @@
     <!-- SERVICES CAROUSEL -->
     <div class="services-wrap" id="servicios">
         <div class="services-header">
-            <div class="section-eyebrow reveal"><i class="fas fa-th-large"></i> Nuestros servicios</div>
-            <h2 class="section-title reveal reveal-delay-1">Todo el entretenimiento<br><span>en un solo lugar</span></h2>
-            <p class="section-sub reveal reveal-delay-2">Deportes, cine, series, anime, música y televisión — todo gratis, todo en un solo lugar, sin complicaciones.</p>
+            <div class="eyebrow reveal">🍿 Nuestros servicios</div>
+            <h2 class="sec-title reveal reveal-d1">Todo el entretenimiento<br><span style="background:linear-gradient(90deg,#e8173a,#ff6b1a,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">en un solo lugar</span></h2>
+            <p class="sec-sub reveal reveal-d2">Deportes, cine, series, anime, doramas, música y televisión — todo gratis y sin complicaciones para toda la familia.</p>
         </div>
 
-        <div class="carousel-container reveal">
-            <div class="carousel-track-outer">
+        <div class="reveal">
+            <div class="carousel-outer">
                 <div class="carousel-track" id="carouselTrack">
 
                     <!-- DEPORTES -->
-                    <a href="ULTRA/index.html" class="service-card sc-sports">
-                        <span class="sc-bg-emoji">⚽</span>
-                        <div class="sc-icon-wrap"><i class="fas fa-satellite-dish"></i></div>
-                        <span class="sc-tag">En vivo ahora</span>
+                    <a href="ULTRA/index.html" class="sc sc-sports">
+                        <span class="sc-emoji-bg">⚽</span>
+                        <div class="sc-icon">⚽</div>
+                        <span class="sc-label">🔴 En vivo ahora</span>
                         <h3 class="sc-title">Deportes<br>en Vivo</h3>
-                        <p class="sc-desc">Liga MX, Premier League, NBA, F1, UFC, Champions League y más. Todos los partidos que importan, en tiempo real.</p>
-                        <div class="sc-chips">
-                            <span class="sc-chip">Liga MX</span>
-                            <span class="sc-chip">Premier</span>
-                            <span class="sc-chip">NBA</span>
-                            <span class="sc-chip">F1</span>
-                            <span class="sc-chip">UFC</span>
-                            <span class="sc-chip">Champions</span>
+                        <p class="sc-desc">Liga MX, Premier League, NBA, F1, UFC y Champions League. Todos los partidos que importan, en tiempo real sin pagar nada.</p>
+                        <div class="sc-tags">
+                            <span class="sc-tag">⚽ Liga MX</span>
+                            <span class="sc-tag">🏀 NBA</span>
+                            <span class="sc-tag">🏎️ F1</span>
+                            <span class="sc-tag">🥊 UFC</span>
                         </div>
-                        <span class="sc-cta">Ver deportes <i class="fas fa-arrow-right"></i></span>
+                        <span class="sc-link">Ver deportes <i class="fas fa-arrow-right"></i></span>
                     </a>
 
-                    <!-- PELÍCULAS & SERIES -->
-                    <a href="#" class="service-card sc-movies">
-                        <span class="sc-bg-emoji">🎬</span>
-                        <div class="sc-icon-wrap"><i class="fas fa-film"></i></div>
-                        <span class="sc-tag">Miles de títulos</span>
+                    <!-- PELÍCULAS -->
+                    <a href="#" class="sc sc-movies">
+                        <span class="sc-emoji-bg">🎬</span>
+                        <div class="sc-icon">🎬</div>
+                        <span class="sc-label">🟣 Miles de títulos</span>
                         <h3 class="sc-title">Películas<br>& Series</h3>
-                        <p class="sc-desc">Las últimas películas de estreno y tus series favoritas en alta calidad. Catálogo actualizado constantemente.</p>
-                        <div class="sc-chips">
-                            <span class="sc-chip">Acción</span>
-                            <span class="sc-chip">Comedia</span>
-                            <span class="sc-chip">Drama</span>
-                            <span class="sc-chip">Terror</span>
-                            <span class="sc-chip">Sci-Fi</span>
-                            <span class="sc-chip">Thriller</span>
+                        <p class="sc-desc">Las últimas películas y tus series favoritas en alta calidad. Acción, comedia, drama, terror — para toda la familia.</p>
+                        <div class="sc-tags">
+                            <span class="sc-tag">🎭 Drama</span>
+                            <span class="sc-tag">💥 Acción</span>
+                            <span class="sc-tag">😂 Comedia</span>
+                            <span class="sc-tag">👻 Terror</span>
                         </div>
-                        <span class="sc-cta">Ver catálogo <i class="fas fa-arrow-right"></i></span>
+                        <span class="sc-link">Ver catálogo <i class="fas fa-arrow-right"></i></span>
                     </a>
 
                     <!-- ANIME & DORAMAS -->
-                    <a href="#" class="service-card sc-anime">
-                        <span class="sc-bg-emoji">🌸</span>
-                        <div class="sc-icon-wrap"><i class="fas fa-star"></i></div>
-                        <span class="sc-tag">Subtitulado</span>
+                    <a href="#" class="sc sc-anime">
+                        <span class="sc-emoji-bg">🌸</span>
+                        <div class="sc-icon">⚡</div>
+                        <span class="sc-label">🌸 Subtitulado</span>
                         <h3 class="sc-title">Anime<br>& Doramas</h3>
-                        <p class="sc-desc">Los animes más populares de temporada y los mejores doramas coreanos, japoneses y chinos subtitulados al español.</p>
-                        <div class="sc-chips">
-                            <span class="sc-chip">Shonen</span>
-                            <span class="sc-chip">Isekai</span>
-                            <span class="sc-chip">K-Drama</span>
-                            <span class="sc-chip">Romance</span>
-                            <span class="sc-chip">Acción</span>
-                            <span class="sc-chip">Slice of Life</span>
+                        <p class="sc-desc">Los mejores animes de temporada y los doramas coreanos, japoneses y chinos más populares, todos subtitulados al español.</p>
+                        <div class="sc-tags">
+                            <span class="sc-tag">⚡ Shonen</span>
+                            <span class="sc-tag">🌀 Isekai</span>
+                            <span class="sc-tag">💖 K-Drama</span>
+                            <span class="sc-tag">🌸 Romance</span>
                         </div>
-                        <span class="sc-cta">Ver anime <i class="fas fa-arrow-right"></i></span>
+                        <span class="sc-link">Ver anime <i class="fas fa-arrow-right"></i></span>
                     </a>
 
                     <!-- MÚSICA -->
-                    <a href="#" class="service-card sc-music">
-                        <span class="sc-bg-emoji">🎵</span>
-                        <div class="sc-icon-wrap"><i class="fas fa-music"></i></div>
-                        <span class="sc-tag">Sin interrupciones</span>
+                    <a href="#" class="sc sc-music">
+                        <span class="sc-emoji-bg">🎵</span>
+                        <div class="sc-icon">🎵</div>
+                        <span class="sc-label">🟢 Sin interrupciones</span>
                         <h3 class="sc-title">Música<br>sin límites</h3>
-                        <p class="sc-desc">Escucha tu música favorita, descubre nuevos artistas y disfruta de listas de reproducción ilimitadas completamente gratis.</p>
-                        <div class="sc-chips">
-                            <span class="sc-chip">Pop</span>
-                            <span class="sc-chip">Reggaeton</span>
-                            <span class="sc-chip">Rock</span>
-                            <span class="sc-chip">Hip Hop</span>
-                            <span class="sc-chip">Cumbia</span>
-                            <span class="sc-chip">Electrónica</span>
+                        <p class="sc-desc">Escucha tu música favorita gratis, descubre nuevos artistas y disfruta playlists ilimitadas de todos los géneros.</p>
+                        <div class="sc-tags">
+                            <span class="sc-tag">🎤 Reggaeton</span>
+                            <span class="sc-tag">🎸 Rock</span>
+                            <span class="sc-tag">🎺 Cumbia</span>
+                            <span class="sc-tag">🎧 Pop</span>
                         </div>
-                        <span class="sc-cta">Escuchar <i class="fas fa-arrow-right"></i></span>
+                        <span class="sc-link">Escuchar <i class="fas fa-arrow-right"></i></span>
                     </a>
 
                     <!-- TV -->
-                    <a href="ULTRA/index.html" class="service-card sc-tv">
-                        <span class="sc-bg-emoji">📺</span>
-                        <div class="sc-icon-wrap"><i class="fas fa-tv"></i></div>
-                        <span class="sc-tag">250+ canales</span>
+                    <a href="ULTRA/index.html" class="sc sc-tv">
+                        <span class="sc-emoji-bg">📺</span>
+                        <div class="sc-icon">📺</div>
+                        <span class="sc-label">🟡 250+ canales</span>
                         <h3 class="sc-title">TV en<br>Directo</h3>
-                        <p class="sc-desc">Más de 250 canales de televisión en vivo incluyendo noticias, entretenimiento, infantil, documentales y mucho más.</p>
-                        <div class="sc-chips">
-                            <span class="sc-chip">Noticias</span>
-                            <span class="sc-chip">Entretenimiento</span>
-                            <span class="sc-chip">Infantil</span>
-                            <span class="sc-chip">Documentales</span>
-                            <span class="sc-chip">Telenovelas</span>
+                        <p class="sc-desc">Más de 250 canales en vivo: noticias, entretenimiento, deportes, infantil, documentales y mucho más para toda la familia.</p>
+                        <div class="sc-tags">
+                            <span class="sc-tag">📰 Noticias</span>
+                            <span class="sc-tag">🧒 Infantil</span>
+                            <span class="sc-tag">🎭 Telenovelas</span>
+                            <span class="sc-tag">🌍 Docs</span>
                         </div>
-                        <span class="sc-cta">Ver canales <i class="fas fa-arrow-right"></i></span>
+                        <span class="sc-link">Ver canales <i class="fas fa-arrow-right"></i></span>
                     </a>
 
                 </div>
             </div>
 
-            <!-- Dots & Arrows -->
-            <div class="carousel-dots" id="carouselDots"></div>
-            <div class="carousel-arrows">
-                <button class="c-arrow" id="prevBtn" aria-label="Anterior"><i class="fas fa-chevron-left"></i></button>
-                <button class="c-arrow" id="nextBtn" aria-label="Siguiente"><i class="fas fa-chevron-right"></i></button>
+            <div class="carousel-controls">
+                <div class="carousel-dots" id="carouselDots"></div>
+                <div class="carousel-arrows">
+                    <button class="c-arrow" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+                    <button class="c-arrow" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- LEAGUES MARQUEE -->
-    <div class="leagues-section">
-        <div class="leagues-header">
-            <div class="section-eyebrow reveal" style="display:inline-flex;"><i class="fas fa-globe"></i> Cobertura deportiva</div>
-            <h2 class="section-title reveal reveal-delay-1">Las mejores ligas,<br><span>todas aquí</span></h2>
+    <!-- MARQUEE: LEAGUES & CONTENT -->
+    <div class="marquee-section">
+        <div class="marquee-header">
+            <div class="eyebrow reveal" style="display:inline-flex; color:#fbbf24;">⭐ Contenido disponible</div>
+            <h2 class="sec-title reveal reveal-d1">Lo mejor de todo,<br><span style="color:var(--orange)">siempre gratis</span></h2>
         </div>
-        <div class="leagues-marquee-wrap">
-            <div class="leagues-track" id="leaguesTrack">
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/193.png" alt="">Liga MX</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" alt="">Premier League</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/15.png" alt="">La Liga</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/12.png" alt="">Serie A</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/10.png" alt="">Bundesliga</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/9.png" alt="">Ligue 1</div>
-                <div class="league-pill"><i class="fas fa-basketball"></i> NBA</div>
-                <div class="league-pill"><i class="fas fa-flag-checkered"></i> Fórmula 1</div>
-                <div class="league-pill"><i class="fas fa-baseball"></i> MLB</div>
-                <div class="league-pill"><i class="fas fa-hand-fist"></i> UFC</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/2.png" alt="">Champions</div>
-                <div class="league-pill"><i class="fas fa-volleyball"></i> Voleibol</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/193.png" alt="">Liga MX</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" alt="">Premier League</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/15.png" alt="">La Liga</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/12.png" alt="">Serie A</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/10.png" alt="">Bundesliga</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/9.png" alt="">Ligue 1</div>
-                <div class="league-pill"><i class="fas fa-basketball"></i> NBA</div>
-                <div class="league-pill"><i class="fas fa-flag-checkered"></i> Fórmula 1</div>
-                <div class="league-pill"><i class="fas fa-baseball"></i> MLB</div>
-                <div class="league-pill"><i class="fas fa-hand-fist"></i> UFC</div>
-                <div class="league-pill"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/2.png" alt="">Champions</div>
-                <div class="league-pill"><i class="fas fa-volleyball"></i> Voleibol</div>
+        <div class="marquee-wrap">
+            <!-- Row 1: Sports leagues -->
+            <div class="marquee-row">
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/193.png" alt="">Liga MX</div>
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" alt="">Premier League</div>
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/15.png" alt="">La Liga</div>
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/12.png" alt="">Serie A</div>
+                <div class="m-pill mp-red"><i class="fas fa-basketball" style="color:#e8173a"></i> NBA</div>
+                <div class="m-pill mp-red"><i class="fas fa-flag-checkered" style="color:#e8173a"></i> Fórmula 1</div>
+                <div class="m-pill mp-red"><i class="fas fa-hand-fist" style="color:#e8173a"></i> UFC</div>
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/2.png" alt="">Champions</div>
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/10.png" alt="">Bundesliga</div>
+                <div class="m-pill mp-red"><i class="fas fa-baseball" style="color:#e8173a"></i> MLB</div>
+                <!-- duplicate -->
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/193.png" alt="">Liga MX</div>
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/23.png" alt="">Premier League</div>
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/15.png" alt="">La Liga</div>
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/12.png" alt="">Serie A</div>
+                <div class="m-pill mp-red"><i class="fas fa-basketball" style="color:#e8173a"></i> NBA</div>
+                <div class="m-pill mp-red"><i class="fas fa-flag-checkered" style="color:#e8173a"></i> Fórmula 1</div>
+                <div class="m-pill mp-red"><i class="fas fa-hand-fist" style="color:#e8173a"></i> UFC</div>
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/2.png" alt="">Champions</div>
+                <div class="m-pill mp-red"><img src="https://a.espncdn.com/i/leaguelogos/soccer/500/10.png" alt="">Bundesliga</div>
+                <div class="m-pill mp-red"><i class="fas fa-baseball" style="color:#e8173a"></i> MLB</div>
+            </div>
+            <!-- Row 2: Entertainment -->
+            <div class="marquee-row reverse">
+                <div class="m-pill mp-purple"><span class="m-emoji">🎬</span> Acción</div>
+                <div class="m-pill mp-pink"><span class="m-emoji">🌸</span> Anime</div>
+                <div class="m-pill mp-purple"><span class="m-emoji">😂</span> Comedia</div>
+                <div class="m-pill mp-pink"><span class="m-emoji">💖</span> K-Drama</div>
+                <div class="m-pill mp-purple"><span class="m-emoji">👻</span> Terror</div>
+                <div class="m-pill mp-pink"><span class="m-emoji">⚡</span> Shonen</div>
+                <div class="m-pill mp-green"><span class="m-emoji">🎵</span> Reggaeton</div>
+                <div class="m-pill mp-yellow"><span class="m-emoji">📺</span> Telenovelas</div>
+                <div class="m-pill mp-purple"><span class="m-emoji">🚀</span> Sci-Fi</div>
+                <div class="m-pill mp-green"><span class="m-emoji">🎸</span> Rock</div>
+                <div class="m-pill mp-pink"><span class="m-emoji">🌀</span> Isekai</div>
+                <div class="m-pill mp-yellow"><span class="m-emoji">📰</span> Noticias</div>
+                <!-- duplicate -->
+                <div class="m-pill mp-purple"><span class="m-emoji">🎬</span> Acción</div>
+                <div class="m-pill mp-pink"><span class="m-emoji">🌸</span> Anime</div>
+                <div class="m-pill mp-purple"><span class="m-emoji">😂</span> Comedia</div>
+                <div class="m-pill mp-pink"><span class="m-emoji">💖</span> K-Drama</div>
+                <div class="m-pill mp-purple"><span class="m-emoji">👻</span> Terror</div>
+                <div class="m-pill mp-pink"><span class="m-emoji">⚡</span> Shonen</div>
+                <div class="m-pill mp-green"><span class="m-emoji">🎵</span> Reggaeton</div>
+                <div class="m-pill mp-yellow"><span class="m-emoji">📺</span> Telenovelas</div>
+                <div class="m-pill mp-purple"><span class="m-emoji">🚀</span> Sci-Fi</div>
+                <div class="m-pill mp-green"><span class="m-emoji">🎸</span> Rock</div>
+                <div class="m-pill mp-pink"><span class="m-emoji">🌀</span> Isekai</div>
+                <div class="m-pill mp-yellow"><span class="m-emoji">📰</span> Noticias</div>
             </div>
         </div>
     </div>
 
-    <!-- SOCIAL PROOF -->
-    <div style="position:relative;z-index:2;padding:80px 24px 0;">
-        <div class="proof-strip reveal">
-            <div class="proof-item">
-                <div class="proof-stars">★★★★★</div>
-                <p class="proof-quote">"Deportes, películas y anime todo en un lugar y gratis. No puedo creerlo, es increíble."</p>
-                <span class="proof-author">— Carlos M., Guadalajara</span>
+    <!-- REVIEWS -->
+    <div class="reviews-section">
+        <div style="text-align:center; max-width:1140px; margin:0 auto;">
+            <div class="eyebrow reveal" style="color:#fbbf24; justify-content:center; display:inline-flex;">⭐ Lo que dicen nuestros usuarios</div>
+            <h2 class="sec-title reveal reveal-d1" style="text-align:center; max-width:600px; margin:0 auto;">Millones ya<br><span style="color:var(--orange)">disfrutan gratis</span></h2>
+        </div>
+        <div class="reviews-grid">
+            <div class="review-card reveal">
+                <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                <p class="review-text">"Deportes, películas y anime todo en un lugar y completamente gratis. Increíble, no lo puedo creer."</p>
+                <div class="review-author">
+                    <div class="review-avatar" style="background:rgba(232,23,58,0.15)">⚽</div>
+                    <span class="review-name">Carlos M. — Guadalajara</span>
+                </div>
             </div>
-            <div class="proof-item">
-                <div class="proof-stars">★★★★★</div>
-                <p class="proof-quote">"Ya no necesito Netflix ni cable. UltraGol tiene todo lo que quiero ver sin pagar nada."</p>
-                <span class="proof-author">— Fernanda R., CDMX</span>
+            <div class="review-card reveal reveal-d1">
+                <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                <p class="review-text">"Ya no necesito Netflix ni cable. UltraGol tiene todo lo que mi familia quiere ver sin pagar nada."</p>
+                <div class="review-author">
+                    <div class="review-avatar" style="background:rgba(124,58,237,0.15)">🎬</div>
+                    <span class="review-name">Fernanda R. — CDMX</span>
+                </div>
             </div>
-            <div class="proof-item">
-                <div class="proof-stars">★★★★★</div>
-                <p class="proof-quote">"Los doramas coreanos y los partidos de fútbol en el mismo sitio. Perfecto para toda la familia."</p>
-                <span class="proof-author">— Diego V., Monterrey</span>
+            <div class="review-card reveal reveal-d2">
+                <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                <p class="review-text">"Los doramas coreanos, los partidos en vivo y la música — todo en un solo lugar. Mi familia está feliz."</p>
+                <div class="review-author">
+                    <div class="review-avatar" style="background:rgba(236,72,153,0.15)">🌸</div>
+                    <span class="review-name">Diego V. — Monterrey</span>
+                </div>
             </div>
         </div>
     </div>
@@ -1026,20 +936,20 @@
     <!-- CTA FINAL -->
     <div class="cta-section">
         <div class="cta-card reveal">
+            <span class="cta-popcorn">🍿</span>
             <span class="cta-eyebrow">Empieza ahora — Es gratis</span>
-            <h2>Tu entretenimiento.<br><span>Sin límites. Sin costo.</span></h2>
-            <p>Sin suscripciones. Sin tarjeta de crédito. Sin registro. Solo abre la página y empieza a disfrutar todo el contenido que quieras.</p>
-            <a href="ULTRA/index.html" class="btn-primary" style="position:relative;display:inline-flex;margin:0 auto;">
-                <div class="btn-ring"></div>
-                <i class="fas fa-play"></i> Entrar a UltraGol — Es gratis
+            <h2>Tu entretenimiento.<br><span class="grad">Sin límites. Sin costo.</span></h2>
+            <p>Sin suscripciones. Sin tarjeta de crédito. Sin registro. Abre la página y empieza a disfrutar deportes, películas, series, anime y música completamente gratis.</p>
+            <a href="ULTRA/index.html" class="btn-hero" style="position:relative;display:inline-flex;margin:0 auto;">
+                <i class="fas fa-play"></i> Entrar gratis ahora
             </a>
-            <p class="cta-note"><i class="fas fa-check-circle"></i> Sin registro · Sin tarjeta · Sin límites · Disponible ahora</p>
+            <p class="cta-note"><i class="fas fa-check-circle"></i> Sin registro · Sin tarjeta · 100% gratis · Para toda la familia</p>
         </div>
     </div>
 
     <!-- FOOTER -->
     <footer>
-        <p>© 2025 UltraGol · Desarrollado por <a href="#">L3HO Interactive</a></p>
+        <p>🍿 © 2025 UltraGol · Desarrollado por <a href="#">L3HO Interactive</a></p>
         <div class="footer-links">
             <a href="ULTRA/privacy-policy.html">Privacidad</a>
             <a href="ULTRA/index.html">Ver en vivo</a>
@@ -1048,13 +958,82 @@
     </footer>
 
     <script>
-        // Nav scroll
+        // ── STAR CANVAS ──────────────────────────────────────────────────────
+        (function(){
+            const canvas = document.getElementById('starsCanvas');
+            const ctx = canvas.getContext('2d');
+            let W, H, stars = [];
+
+            function resize() {
+                W = canvas.width  = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            function createStars() {
+                stars = [];
+                for (let i = 0; i < 180; i++) {
+                    stars.push({
+                        x: Math.random() * W,
+                        y: Math.random() * H,
+                        r: Math.random() * 1.2 + 0.3,
+                        o: Math.random() * 0.6 + 0.2,
+                        speed: Math.random() * 0.3 + 0.05,
+                        phase: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+            createStars();
+
+            let t = 0;
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                t += 0.01;
+                stars.forEach(s => {
+                    const pulse = s.o * (0.7 + 0.3 * Math.sin(t * s.speed + s.phase));
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255,255,255,${pulse})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        // ── FLOATING DECOS ───────────────────────────────────────────────────
+        (function(){
+            const decos = ['🍿','🎬','⭐','🌟','🎵','⚽','🎭','✨','🌸','🎮','🏆','💫'];
+            const container = document.getElementById('decoContainer');
+
+            function spawn() {
+                const el = document.createElement('div');
+                el.className = 'deco-float';
+                el.textContent = decos[Math.floor(Math.random() * decos.length)];
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.fontSize = (1.2 + Math.random() * 1.6) + 'rem';
+                const dur = 12 + Math.random() * 14;
+                el.style.animationDuration = dur + 's';
+                el.style.animationDelay = '0s';
+                container.appendChild(el);
+                setTimeout(() => el.remove(), dur * 1000);
+            }
+
+            // Start after a slight delay, then every 1.5s
+            setTimeout(() => {
+                spawn();
+                setInterval(spawn, 1600);
+            }, 800);
+        })();
+
+        // ── NAV SCROLL ───────────────────────────────────────────────────────
         const nav = document.getElementById('mainNav');
         window.addEventListener('scroll', () => {
             nav.classList.toggle('scrolled', window.scrollY > 50);
         }, { passive: true });
 
-        // Reveal on scroll
+        // ── REVEAL ON SCROLL ─────────────────────────────────────────────────
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(e => {
                 if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
@@ -1062,184 +1041,125 @@
         }, { threshold: 0.12 });
         document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-        // Animated counters
+        // ── STAT COUNTERS ────────────────────────────────────────────────────
         function animateCounter(el, target, suffix) {
-            const duration = 1600;
-            const startTime = performance.now();
-            function update(now) {
-                const t = Math.min((now - startTime) / duration, 1);
-                const ease = 1 - Math.pow(1 - t, 3);
-                const val = Math.round(ease * target);
-                el.textContent = val >= 1000 ? (val / 1000).toFixed(0) + 'K' + suffix : val + suffix;
-                if (t < 1) requestAnimationFrame(update);
+            const dur = 1600, start = performance.now();
+            function upd(now) {
+                const t = Math.min((now - start) / dur, 1);
+                const v = Math.round((1 - Math.pow(1-t,3)) * target);
+                el.textContent = v >= 10000 ? (v/1000).toFixed(0) + 'K' + suffix : v + suffix;
+                if (t < 1) requestAnimationFrame(upd);
             }
-            requestAnimationFrame(update);
+            requestAnimationFrame(upd);
         }
-        const statsObserver = new IntersectionObserver((entries) => {
+        const statsObs = new IntersectionObserver((entries) => {
             entries.forEach(e => {
                 if (!e.isIntersecting) return;
                 e.target.querySelectorAll('.stat-num').forEach(el => {
-                    const count = el.dataset.count;
-                    const suffix = el.dataset.suffix || '';
-                    if (el.dataset.special) return;
-                    if (count) animateCounter(el, parseInt(count), suffix);
+                    const c = el.dataset.count, s = el.dataset.suffix || '';
+                    if (c) animateCounter(el, parseInt(c), s);
                 });
-                statsObserver.unobserve(e.target);
+                statsObs.unobserve(e.target);
             });
         }, { threshold: 0.4 });
         const strip = document.querySelector('.stats-strip');
-        if (strip) statsObserver.observe(strip);
+        if (strip) statsObs.observe(strip);
 
-        // ── SERVICES CAROUSEL ─────────────────────────────────────────────────
-        (function() {
+        // ── CAROUSEL ─────────────────────────────────────────────────────────
+        (function(){
             const track = document.getElementById('carouselTrack');
-            const dotsContainer = document.getElementById('carouselDots');
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
+            const dotsEl = document.getElementById('carouselDots');
+            const prev = document.getElementById('prevBtn');
+            const next = document.getElementById('nextBtn');
             if (!track) return;
-
-            const cards = track.querySelectorAll('.service-card');
+            const cards = track.querySelectorAll('.sc');
             const total = cards.length;
-            let current = 0;
-            let autoTimer = null;
+            let cur = 0, timer;
 
-            // Build dots
-            cards.forEach((_, i) => {
-                const dot = document.createElement('button');
-                dot.className = 'c-dot' + (i === 0 ? ' active' : '');
-                dot.addEventListener('click', () => goTo(i));
-                dotsContainer.appendChild(dot);
+            cards.forEach((_,i) => {
+                const d = document.createElement('button');
+                d.className = 'c-dot' + (i===0?' active':'');
+                d.onclick = () => go(i);
+                dotsEl.appendChild(d);
             });
 
-            function getCardWidth() {
-                if (!cards[0]) return 340;
-                return cards[0].getBoundingClientRect().width + 20; // +gap
+            function cardW() { return (cards[0]?.getBoundingClientRect().width || 310) + 22; }
+
+            function go(idx) {
+                cur = ((idx % total) + total) % total;
+                track.style.transform = `translateX(-${cur * cardW()}px)`;
+                dotsEl.querySelectorAll('.c-dot').forEach((d,i) => d.classList.toggle('active', i===cur));
             }
 
-            function goTo(idx) {
-                current = (idx + total) % total;
-                const cardW = getCardWidth();
-                const padding = parseFloat(getComputedStyle(track).paddingLeft) || 24;
-                track.style.transform = `translateX(-${current * cardW}px)`;
-                dotsContainer.querySelectorAll('.c-dot').forEach((d, i) => {
-                    d.classList.toggle('active', i === current);
-                });
-            }
+            prev.onclick = () => { go(cur-1); reset(); };
+            next.onclick = () => { go(cur+1); reset(); };
 
-            prevBtn.addEventListener('click', () => { goTo(current - 1); resetAuto(); });
-            nextBtn.addEventListener('click', () => { goTo(current + 1); resetAuto(); });
+            function reset() { clearInterval(timer); timer = setInterval(() => go(cur+1), 4000); }
+            reset();
 
-            function startAuto() { autoTimer = setInterval(() => goTo(current + 1), 3800); }
-            function resetAuto() { clearInterval(autoTimer); startAuto(); }
-            startAuto();
-
-            // Touch/swipe support
-            let startX = 0;
-            track.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+            let sx=0;
+            track.addEventListener('touchstart', e => sx=e.touches[0].clientX, {passive:true});
             track.addEventListener('touchend', e => {
-                const diff = startX - e.changedTouches[0].clientX;
-                if (Math.abs(diff) > 40) { diff > 0 ? goTo(current + 1) : goTo(current - 1); resetAuto(); }
-            }, { passive: true });
+                const d = sx - e.changedTouches[0].clientX;
+                if (Math.abs(d)>40) { d>0?go(cur+1):go(cur-1); reset(); }
+            }, {passive:true});
 
-            // Drag support
-            let isDragging = false, dragStartX = 0;
-            track.addEventListener('mousedown', e => { isDragging = true; dragStartX = e.clientX; track.style.cursor = 'grabbing'; });
-            window.addEventListener('mouseup', e => {
-                if (!isDragging) return;
-                const diff = dragStartX - e.clientX;
-                if (Math.abs(diff) > 40) { diff > 0 ? goTo(current + 1) : goTo(current - 1); resetAuto(); }
-                isDragging = false; track.style.cursor = '';
+            let drag=false, dx=0;
+            track.addEventListener('mousedown', e=>{drag=true;dx=e.clientX;track.style.cursor='grabbing';});
+            window.addEventListener('mouseup', e=>{
+                if(!drag) return;
+                const d=dx-e.clientX;
+                if(Math.abs(d)>40){d>0?go(cur+1):go(cur-1);reset();}
+                drag=false;track.style.cursor='';
             });
-
-            window.addEventListener('resize', () => goTo(current));
+            window.addEventListener('resize', ()=>go(cur));
         })();
 
-        // ── LIVE TICKER ──────────────────────────────────────────────────────
+        // ── LIVE TICKER ───────────────────────────────────────────────────────
         const API = 'https://ultra-gol.vercel.app';
-        const LIGA_ENDPOINTS = [
-            { nombre: 'Liga MX',        url: `${API}/marcadores` },
-            { nombre: 'Premier League', url: `${API}/premier/marcadores` },
-            { nombre: 'La Liga',        url: `${API}/laliga/marcadores` },
-            { nombre: 'Serie A',        url: `${API}/seriea/marcadores` },
-            { nombre: 'Bundesliga',     url: `${API}/bundesliga/marcadores` },
-            { nombre: 'Ligue 1',        url: `${API}/ligue1/marcadores` },
+        const LEAGUES = [
+            {nombre:'Liga MX',url:`${API}/marcadores`},
+            {nombre:'Premier',url:`${API}/premier/marcadores`},
+            {nombre:'La Liga',url:`${API}/laliga/marcadores`},
+            {nombre:'Serie A',url:`${API}/seriea/marcadores`},
+            {nombre:'Bundesliga',url:`${API}/bundesliga/marcadores`},
+            {nombre:'Ligue 1',url:`${API}/ligue1/marcadores`},
         ];
-        function getTeamName(p, side) {
-            if (side === 'local') return p.local?.nombreCorto || p.local?.nombre || p.equipo1 || '?';
-            return p.visitante?.nombreCorto || p.visitante?.nombre || p.equipo2 || '?';
+        function tName(p,s){return s==='local'?p.local?.nombreCorto||p.local?.nombre||p.equipo1||'?':p.visitante?.nombreCorto||p.visitante?.nombre||p.equipo2||'?';}
+        function tScore(p){const gl=p.marcador?.local??p.golesLocal??'0',gv=p.marcador?.visitante??p.golesVisitante??'0';return`${gl}-${gv}`;}
+        async function fetchL(l){try{const r=await fetch(l.url,{signal:AbortSignal.timeout(7000)});const d=await r.json();return(d.partidos||d.matches||d.events||[]).map(p=>({...p,_liga:l.nombre}));}catch{return[];}}
+        async function loadTicker(){
+            const all=await Promise.all(LEAGUES.map(fetchL));
+            const flat=all.flat();
+            const live=flat.filter(p=>p.estado?.enVivo);
+            const upcoming=flat.filter(p=>p.estado?.programado&&!p.estado?.finalizado);
+            const finished=flat.filter(p=>p.estado?.finalizado);
+            let matches=live.length?live:upcoming.length?upcoming.slice(0,8):finished.slice(-6);
+            const lbl=document.getElementById('tickerLabel'),items=document.getElementById('tickerItems');
+            if(!matches.length){lbl.textContent='Próximos';items.innerHTML='<span class="ticker-match" style="color:rgba(255,255,255,0.4)">Sin partidos en este momento</span>';return;}
+            lbl.textContent=live.length?`${live.length} En vivo`:'Próximos';
+            const bld=p=>{const h=tName(p,'local'),a=tName(p,'visitante'),isL=p.estado?.enVivo,sc=isL||p.estado?.finalizado?tScore(p):p._liga,min=isL?(p.reloj||p.minuto||'')+'\'':'';return`<span class="ticker-match">${h} <span style="opacity:.4">vs</span> ${a} <span class="score">${sc}${min?' · '+min:''}</span></span>`;};
+            const html=matches.map(bld).join('')+matches.map(bld).join('');
+            items.innerHTML=html;
+            items.style.animation='none';items.offsetHeight;
+            items.style.animation=`tickerScroll ${Math.max(18,matches.length*5)}s linear infinite`;
         }
-        function getScore(p) {
-            const gl = p.marcador?.local    ?? p.golesLocal    ?? p.goles_local    ?? '0';
-            const gv = p.marcador?.visitante ?? p.golesVisitante ?? p.goles_visitante ?? '0';
-            return `${gl} - ${gv}`;
-        }
-        function getMinute(p) { const m = p.reloj || p.minuto || ''; return m ? `${m}'` : 'EN VIVO'; }
-        async function fetchLeague(cfg) {
-            try {
-                const r = await fetch(cfg.url, { signal: AbortSignal.timeout(7000) });
-                const data = await r.json();
-                const partidos = data.partidos || data.matches || data.events || [];
-                return partidos.map(p => ({ ...p, _liga: cfg.nombre }));
-            } catch { return []; }
-        }
-        async function loadTicker() {
-            const all = await Promise.all(LIGA_ENDPOINTS.map(fetchLeague));
-            const flat = all.flat();
-            const live     = flat.filter(p => p.estado?.enVivo);
-            const upcoming = flat.filter(p => p.estado?.programado && !p.estado?.finalizado);
-            const finished = flat.filter(p => p.estado?.finalizado);
-            let matches = live.length ? live : upcoming.length ? upcoming.slice(0, 8) : finished.slice(-6);
-            const tickerLabel = document.getElementById('tickerLabel');
-            const tickerItems = document.getElementById('tickerItems');
-            if (!matches.length) {
-                tickerLabel.textContent = 'Próximos';
-                tickerItems.innerHTML = '<span class="ticker-match" style="color:rgba(255,255,255,0.4)">Sin partidos en este momento — vuelve pronto</span>';
-                return;
-            }
-            tickerLabel.textContent = live.length ? `${live.length} En vivo` : 'Próximos';
-            const buildItem = (p) => {
-                const home   = getTeamName(p, 'local');
-                const away   = getTeamName(p, 'visitante');
-                const isLive = p.estado?.enVivo;
-                const label  = isLive ? getMinute(p) : p.estado?.finalizado ? 'FT' : (p.hora || p.time || '');
-                const score  = isLive || p.estado?.finalizado ? getScore(p) : p._liga;
-                return `<span class="ticker-match">${home} <span style="color:rgba(255,255,255,0.35)">vs</span> ${away} <span class="score">${score}${label ? ' · ' + label : ''}</span></span>`;
-            };
-            const html = matches.map(buildItem).join('') + matches.map(buildItem).join('');
-            tickerItems.innerHTML = html;
-            tickerItems.style.animation = 'none';
-            tickerItems.offsetHeight;
-            const duration = Math.max(18, matches.length * 5);
-            tickerItems.style.animation = `tickerScroll ${duration}s linear infinite`;
-        }
-        loadTicker();
-        setInterval(loadTicker, 60000);
+        loadTicker();setInterval(loadTicker,60000);
 
-        // Live count
-        function updateLiveCount() {
-            const count = 1240 + Math.floor(Math.random() * 180) - 90;
-            const el = document.getElementById('liveCount');
-            if (el) el.textContent = count.toLocaleString('es-MX');
-        }
-        updateLiveCount();
-        setInterval(updateLiveCount, 8000);
+        // ── LIVE COUNT ────────────────────────────────────────────────────────
+        function updateCount(){const c=1240+Math.floor(Math.random()*200)-100;const el=document.getElementById('liveCount');if(el)el.textContent=c.toLocaleString('es-MX');}
+        updateCount();setInterval(updateCount,8000);
     </script>
     <script src="js/tour.js"></script>
 
     <div id="_cf_ts" style="display:none"></div>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
     <script>
-    (function() {
-        if (sessionStorage.getItem('_hv')) return;
-        function runTS() {
-            if (typeof turnstile === 'undefined') { setTimeout(runTS, 300); return; }
-            turnstile.render('#_cf_ts', {
-                sitekey: '0x4AAAAAAdMXFUj4xnnJf5fN', size: 'invisible', execution: 'execute',
-                callback: function(token) {
-                    fetch('/api/turnstile/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token }) })
-                        .then(function(r){return r.json();}).then(function(d){ if (d.success) sessionStorage.setItem('_hv','1'); }).catch(function(){});
-                }
-            });
+    (function(){
+        if(sessionStorage.getItem('_hv'))return;
+        function runTS(){
+            if(typeof turnstile==='undefined'){setTimeout(runTS,300);return;}
+            turnstile.render('#_cf_ts',{sitekey:'0x4AAAAAAdMXFUj4xnnJf5fN',size:'invisible',execution:'execute',callback:function(token){fetch('/api/turnstile/verify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token})}).then(function(r){return r.json();}).then(function(d){if(d.success)sessionStorage.setItem('_hv','1');}).catch(function(){});}});
             turnstile.execute('#_cf_ts');
         }
         runTS();
