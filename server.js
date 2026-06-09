@@ -237,7 +237,6 @@ app.use('/api/', rateLimit);
 // Aplicar origin guard a los endpoints de datos sensibles
 [
     '/api/ultragol/',
-    '/api/mx/',
     '/api/reels',
     '/api/share/',
     '/api/notifications',
@@ -1825,7 +1824,6 @@ app.get('/sitemap.xml', async (req, res) => {
 
     const staticPages = [
         { url: '/',            priority: '1.0', changefreq: 'daily' },
-        { url: '/mx',          priority: '0.9', changefreq: 'hourly' },
         { url: '/rojadirecta', priority: '0.9', changefreq: 'hourly' },
     ];
 
@@ -1833,7 +1831,7 @@ app.get('/sitemap.xml', async (req, res) => {
     try {
         const partidos = await fetchAllPartidos();
         matchPages = [...partidos.values()].map(p => ({
-            url: `/mx/${p.slug}`,
+            url: `/rojadirecta/${p.slug}`,
             priority: p.estado === 'EN VIVO' ? '0.9' : '0.7',
             changefreq: p.estado === 'EN VIVO' ? 'always' : 'hourly',
             lastmod: today,
@@ -1858,26 +1856,8 @@ ${urls}
 </urlset>`);
 });
 
-// Serve static assets from mx/ folder before route handlers
-app.use('/mx', express.static(path.join(__dirname, 'mx'), { index: false }));
-
-// API: all matches from all sources
-app.get('/api/mx/partidos', async (req, res) => {
-    try {
-        const partidos = await fetchAllPartidos();
-        res.json({ total: partidos.length, partidos });
-    } catch (err) {
-        console.error('Error en /api/mx/partidos:', err);
-        res.status(500).json({ error: 'No se pudieron obtener los partidos' });
-    }
-});
-
-// Index: today's matches listing
-app.get('/mx', (req, res) => {
-    res.sendFile(path.join(__dirname, 'mx', 'index.html'));
-});
 app.get('/partidos-hoy', (req, res) => {
-    res.redirect(301, '/mx');
+    res.redirect(301, '/rojadirecta');
 });
 
 // Roja Directa TV Premium — same data, different brand
@@ -1912,31 +1892,7 @@ async function handleMatchDetail(req, res, brand) {
     return { slug, matchData, brand, brandLabel, allPartidos };
 }
 
-app.get('/mx/:slug', async (req, res) => {
-    const ctx = await handleMatchDetail(req, res, 'pelotalibre');
-    const { slug, matchData, brand, brandLabel, allPartidos } = ctx;
-
-    if (!matchData) {
-        const parts = slug.split('-vs-');
-        const t1 = (parts[0] || '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        const t2 = ((parts[1] || '') + (parts.slice(2).join('-') ? '-' + parts.slice(2).join('-') : '')).replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-        const title = `${t1} vs ${t2} EN VIVO HD | ${brandLabel}`;
-        const desc = `Ver ${t1} vs ${t2} en vivo gratis HD en ${brandLabel}. Marcador en tiempo real, goles y transmisión multi-servidor sin cortes.`;
-        return res.send(buildMatchPage({ brand, slug, title, desc, equipo1: t1, equipo2: t2, logo1: null, logo2: null, estado: null, goles: [], detalles: {}, transmisionUrl: null, liga: '', hora: '', allPartidos }));
-    }
-
-    const { equipo1, equipo2, logo1, logo2, estado, marcadorLocal, marcadorVisitante, goles, detalles, transmisionUrl, liga, hora, nombreCortoLocal, nombreCortoVisitante } = matchData;
-    const teamTitle = `${equipo1} vs ${equipo2}`;
-    const hasScore = marcadorLocal !== null && marcadorLocal !== undefined && marcadorLocal !== '';
-    const scoreStr = hasScore && estado && !estado.programado ? ` ${marcadorLocal}-${marcadorVisitante}` : '';
-    const statusStr = estado && estado.enVivo ? ' EN VIVO' : (estado && estado.finalizado ? ' - Resultado Final' : '');
-    const title = `${teamTitle}${scoreStr}${statusStr} HD | ${brandLabel}`;
-    const desc = `${teamTitle}${scoreStr}. Ver en vivo gratis HD en ${brandLabel} con marcador, goles y transmisión multi-servidor sin cortes.`;
-
-    res.send(buildMatchPage({ brand, slug, title, desc, equipo1, equipo2, logo1, logo2, estado, goles: goles || [], detalles: detalles || {}, transmisionUrl, liga, hora, nombreCortoLocal, nombreCortoVisitante, marcadorLocal, marcadorVisitante, allPartidos }));
-});
-
-// Roja Directa TV Premium — match detail (same data, different brand)
+// Roja Directa TV Premium — match detail
 app.get('/rojadirecta/:slug', async (req, res) => {
     const ctx = await handleMatchDetail(req, res, 'rojadirecta');
     const { slug, matchData, brand, brandLabel, allPartidos } = ctx;
@@ -1968,26 +1924,14 @@ function buildMatchPage({ brand = 'pelotalibre', slug, title, desc, equipo1, equ
     const statusLabel = isLive ? (estado.reloj || estado.descripcion || 'En Vivo') : isFinished ? 'Terminado' : (estado ? (estado.descripcion || 'Próximo') : 'Próximo');
     const statusClass = isLive ? 'status-live' : isFinished ? 'status-finished' : 'status-upcoming';
 
-    const brandCfg = brand === 'rojadirecta' ? {
+    const brandCfg = {
         brandHTML: 'ROJA<b>DIRECTA</b><i>PREMIUM</i>',
         brandLabel: 'Roja Directa TV Premium',
         logo: '/rojadirecta/icon.svg',
         themeCSS: '/rojadirecta/theme.css',
         basePath: '/rojadirecta',
         domain: 'https://www.ultragol-l3ho.com.mx',
-        otherLabel: 'PelotaLibre',
-        otherSlugPath: `/mx/${slug}`,
         themeColor: '#e60023'
-    } : {
-        brandHTML: 'PELOTA<b>LIBRE</b><i>PREMIUM</i>',
-        brandLabel: 'Pelota Libre Premium',
-        logo: '/mx/pelotalibre-premium.svg',
-        themeCSS: null,
-        basePath: '/mx',
-        domain: 'https://www.ultragol-l3ho.com.mx',
-        otherLabel: 'RojaDirecta',
-        otherSlugPath: `/rojadirecta/${slug}`,
-        themeColor: '#00d35a'
     };
 
     const localLogoHtml = logo1
@@ -2137,7 +2081,7 @@ function buildMatchPage({ brand = 'pelotalibre', slug, title, desc, equipo1, equ
     <link rel="apple-touch-icon" href="${brandCfg.logo}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/mx/mx.css">
+    <link rel="stylesheet" href="/assets/mx.css">
     ${brandCfg.themeCSS ? `<link rel="stylesheet" href="${brandCfg.themeCSS}">` : ''}
     ${isLive ? '<meta http-equiv="refresh" content="60">' : ''}
 
@@ -2159,7 +2103,6 @@ function buildMatchPage({ brand = 'pelotalibre', slug, title, desc, equipo1, equ
         </div>
         <nav class="topnav">
             <a href="${brandCfg.basePath}" class="active">Partidos</a>
-            <a href="${brandCfg.otherSlugPath}">${brandCfg.otherLabel}</a>
             <a href="/">Inicio</a>
         </nav>
     </div>
@@ -2348,7 +2291,7 @@ function buildMatchPage({ brand = 'pelotalibre', slug, title, desc, equipo1, equ
 </html>`;
 }
 
-console.log('✅ MX section enabled (/mx, /mx/:slug)');
+console.log('✅ RojaDirecta section enabled (/rojadirecta, /rojadirecta/:slug)');
 
 app.use(express.static(path.join(__dirname, 'ultrax'), {
     index: false,
