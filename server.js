@@ -1988,6 +1988,144 @@ app.use('/ultrawidget', express.static(path.join(__dirname, 'ultrawidget'), {
     setHeaders: (res) => res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate')
 }));
 
+// ─── COPA MUNDIAL 2026 — Real-time data endpoints ─────────────────────────────
+const mundialCache = { partidos: null, grupos: null, ts: 0 };
+const MUNDIAL_TTL = 60 * 1000; // 60-second cache
+
+async function espnFetch(url) {
+    try {
+        const r = await fetch(url, {
+            signal: AbortSignal.timeout(8000),
+            headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
+        });
+        if (!r.ok) return null;
+        return await r.json();
+    } catch (_) { return null; }
+}
+
+// GET /api/mundial/partidos — live + upcoming + finished WC matches (ESPN)
+app.get('/api/mundial/partidos', async (req, res) => {
+    const now = Date.now();
+    if (mundialCache.partidos && (now - mundialCache.ts) < MUNDIAL_TTL) {
+        return res.json(mundialCache.partidos);
+    }
+
+    try {
+        const [scoreboard, upcoming] = await Promise.all([
+            espnFetch('https://site.api.espn.com/apis/site/v2/sports/soccer/FIFA.WORLD/scoreboard'),
+            espnFetch('https://site.api.espn.com/apis/site/v2/sports/soccer/FIFA.WORLD/scoreboard?dates=20260611-20260719'),
+        ]);
+
+        const raw = scoreboard?.events || upcoming?.events || [];
+        const partidos = raw.map(ev => {
+            const comp = ev.competitions?.[0] || {};
+            const home = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
+            const away = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
+            const status = ev.status?.type || {};
+            const detail = status.detail || '';
+            const state = status.state || 'pre'; // pre, in, post
+
+            return {
+                id: ev.id,
+                titulo: ev.name || ev.shortName,
+                shortName: ev.shortName || '',
+                home: { name: home.team?.displayName || '', shortName: home.team?.shortDisplayName || '', logo: home.team?.logo || '', score: home.score || null, flag: home.team?.flag || '' },
+                away: { name: away.team?.displayName || '', shortName: away.team?.shortDisplayName || '', logo: away.team?.logo || '', score: away.score || null, flag: away.team?.flag || '' },
+                estado: state,
+                enVivo: state === 'in',
+                finalizado: state === 'post',
+                programado: state === 'pre',
+                minuto: status.displayClock || '',
+                detalle: detail,
+                fecha: ev.date || '',
+                venue: comp.venue?.fullName || '',
+                venueCity: comp.venue?.address?.city || '',
+                group: ev.season?.slug || '',
+                transmisionUrl: null,
+            };
+        });
+
+        // Enrich with transmission URLs from existing APIs
+        try {
+            const allPartidos = await fetchAllPartidos();
+            for (const p of partidos) {
+                if (!p.home.name || !p.away.name) continue;
+                const slug = matchSlug(p.home.name, p.away.name);
+                const match = allPartidos.find(ap => ap.slug === slug || ap.slug === matchSlug(p.home.shortName, p.away.shortName));
+                if (match && match.transmisionUrl) {
+                    p.transmisionUrl = match.transmisionUrl;
+                }
+            }
+        } catch (_) {}
+
+        const result = { ok: true, count: partidos.length, partidos, ts: now };
+        mundialCache.partidos = result;
+        mundialCache.ts = now;
+        res.json(result);
+    } catch (e) {
+        console.error('[/api/mundial/partidos]', e.message);
+        res.status(500).json({ ok: false, error: 'Failed to load mundial matches', partidos: [] });
+    }
+});
+
+// GET /api/mundial/grupos — group standings from ESPN
+app.get('/api/mundial/grupos', async (req, res) => {
+    const now = Date.now();
+    if (mundialCache.grupos && (now - mundialCache.ts) < MUNDIAL_TTL * 5) {
+        return res.json(mundialCache.grupos);
+    }
+
+    try {
+        const data = await espnFetch('https://site.api.espn.com/apis/v2/sports/soccer/FIFA.WORLD/standings?season=2026');
+        if (!data || !data.standings) {
+            return res.json({ ok: false, grupos: [] });
+        }
+
+        const grupos = (data.standings || []).map(grp => ({
+            nombre: grp.name || grp.displayName,
+            equipos: (grp.entries || []).map(e => ({
+                nombre: e.team?.displayName || '',
+                abrev: e.team?.abbreviation || '',
+                logo: e.team?.logos?.[0]?.href || '',
+                pts: e.stats?.find(s => s.name === 'points')?.value ?? 0,
+                pj: e.stats?.find(s => s.name === 'gamesPlayed')?.value ?? 0,
+                pg: e.stats?.find(s => s.name === 'wins')?.value ?? 0,
+                pe: e.stats?.find(s => s.name === 'ties')?.value ?? 0,
+                pp: e.stats?.find(s => s.name === 'losses')?.value ?? 0,
+                gf: e.stats?.find(s => s.name === 'pointsFor')?.value ?? 0,
+                gc: e.stats?.find(s => s.name === 'pointsAgainst')?.value ?? 0,
+                dg: e.stats?.find(s => s.name === 'pointDifferential')?.value ?? 0,
+            }))
+        }));
+
+        const result = { ok: true, grupos };
+        mundialCache.grupos = result;
+        res.json(result);
+    } catch (e) {
+        console.error('[/api/mundial/grupos]', e.message);
+        res.json({ ok: false, grupos: [] });
+    }
+});
+
+// GET /api/mundial/transmisiones — filter all transmissions for World Cup matches
+app.get('/api/mundial/transmisiones', async (req, res) => {
+    try {
+        const all = await fetchAllPartidos();
+        const wc = all.filter(p => {
+            const liga = (p.liga || '').toLowerCase();
+            const titulo = (p.titulo || '').toLowerCase();
+            return liga.includes('mundial') || liga.includes('world cup') || liga.includes('fifa') ||
+                   titulo.includes('mundial') || titulo.includes('world cup');
+        });
+        res.json({ ok: true, count: wc.length, partidos: wc });
+    } catch (e) {
+        console.error('[/api/mundial/transmisiones]', e.message);
+        res.json({ ok: false, partidos: [] });
+    }
+});
+
+console.log('🌍 Copa Mundial 2026 API endpoints enabled');
+
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 UltraGol server started on port ${PORT}`);
     console.log(`🌐 Server available at: http://0.0.0.0:${PORT}`);
