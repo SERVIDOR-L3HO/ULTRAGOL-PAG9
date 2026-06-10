@@ -1992,18 +1992,95 @@ app.use('/ultrawidget', express.static(path.join(__dirname, 'ultrawidget'), {
 const mundialCache = { partidos: null, grupos: null, ts: 0 };
 const MUNDIAL_TTL = 60 * 1000; // 60-second cache
 
-async function espnFetch(url) {
+// ── FIFA Official API helpers ──────────────────────────────────────────────────
+const FIFA_BASE = 'https://api.fifa.com/api/v3';
+const FIFA_COMPETITION = '17';
+const FIFA_SEASON_2026  = '285023';
+const FIFA_HEADERS = {
+    'Origin': 'https://www.fifa.com',
+    'Referer': 'https://www.fifa.com/',
+    'User-Agent': 'Mozilla/5.0 (compatible; UltraGol/2.0)',
+    'Accept': 'application/json',
+};
+
+async function fifaFetch(url) {
     try {
         const r = await fetch(url, {
-            signal: AbortSignal.timeout(8000),
-            headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
+            signal: AbortSignal.timeout(10000),
+            headers: FIFA_HEADERS,
         });
         if (!r.ok) return null;
         return await r.json();
     } catch (_) { return null; }
 }
 
-// GET /api/mundial/partidos — live + upcoming + finished WC matches (ESPN)
+// Map FIFA MatchStatus codes to our state strings
+// 0=Finished  1=Scheduled  2=1st Half  3=HalfTime  4=2nd Half
+// 5=ExtraTime  6=Penalties  7=Final  8=Postponed  9=Abandoned
+function fifaState(statusCode) {
+    if (statusCode === 0 || statusCode === 7) return 'post';
+    if ([2, 3, 4, 5, 6].includes(statusCode)) return 'in';
+    return 'pre'; // 1 = scheduled, 8 = postponed, etc.
+}
+
+function fifaStatusLabel(statusCode) {
+    const map = { 0:'Final', 1:'Programado', 2:'1er Tiempo', 3:'Medio Tiempo', 4:'2do Tiempo', 5:'Tiempo Extra', 6:'Penales', 7:'Final', 8:'Pospuesto', 9:'Suspendido' };
+    return map[statusCode] || '';
+}
+
+function fifaFlagUrl(countryCode) {
+    if (!countryCode) return '';
+    return `https://api.fifa.com/api/v3/picture/flags-sq-1/${countryCode}`;
+}
+
+function fifaLocale(arr, locale = 'en-GB') {
+    if (!Array.isArray(arr) || arr.length === 0) return '';
+    return (arr.find(x => x.Locale === locale) || arr[0])?.Description || '';
+}
+
+function parseMatchRecord(m) {
+    const statusCode = m.MatchStatus ?? 1;
+    const state = fifaState(statusCode);
+    const home = m.Home || {};
+    const away = m.Away || {};
+    const stadium = m.Stadium || {};
+
+    return {
+        id: m.IdMatch,
+        titulo: `${fifaLocale(home.TeamName)} vs ${fifaLocale(away.TeamName)}`,
+        home: {
+            name: fifaLocale(home.TeamName) || home.ShortClubName || '',
+            shortName: home.ShortClubName || home.Abbreviation || '',
+            code: home.IdCountry || '',
+            logo: fifaFlagUrl(home.IdCountry),
+            score: home.Score ?? null,
+        },
+        away: {
+            name: fifaLocale(away.TeamName) || away.ShortClubName || '',
+            shortName: away.ShortClubName || away.Abbreviation || '',
+            code: away.IdCountry || '',
+            logo: fifaFlagUrl(away.IdCountry),
+            score: away.Score ?? null,
+        },
+        estado: state,
+        enVivo: state === 'in',
+        finalizado: state === 'post',
+        programado: state === 'pre',
+        minuto: m.MatchTime || '',
+        detalle: fifaStatusLabel(statusCode),
+        statusCode,
+        periodo: m.Period || null,
+        fecha: m.Date || '',
+        fechaLocal: m.LocalDate || '',
+        venue: fifaLocale(stadium.Name),
+        venueCity: fifaLocale(stadium.CityName),
+        grupo: fifaLocale(m.GroupName),
+        fase: fifaLocale(m.StageName),
+        transmisionUrl: null,
+    };
+}
+
+// GET /api/mundial/partidos — live + upcoming + finished from FIFA official API
 app.get('/api/mundial/partidos', async (req, res) => {
     const now = Date.now();
     if (mundialCache.partidos && (now - mundialCache.ts) < MUNDIAL_TTL) {
@@ -2011,64 +2088,59 @@ app.get('/api/mundial/partidos', async (req, res) => {
     }
 
     try {
-        const [scoreboard, upcoming] = await Promise.all([
-            espnFetch('https://site.api.espn.com/apis/site/v2/sports/soccer/FIFA.WORLD/scoreboard'),
-            espnFetch('https://site.api.espn.com/apis/site/v2/sports/soccer/FIFA.WORLD/scoreboard?dates=20260611-20260719'),
+        // Fetch all 104 scheduled matches + any live ones in parallel
+        const [allData, liveData] = await Promise.all([
+            fifaFetch(`${FIFA_BASE}/calendar/matches?idCompetition=${FIFA_COMPETITION}&idSeason=${FIFA_SEASON_2026}&language=en&count=104`),
+            fifaFetch(`${FIFA_BASE}/live/football/${FIFA_COMPETITION}/${FIFA_SEASON_2026}?language=en`),
         ]);
 
-        const raw = scoreboard?.events || upcoming?.events || [];
-        const partidos = raw.map(ev => {
-            const comp = ev.competitions?.[0] || {};
-            const home = comp.competitors?.find(c => c.homeAway === 'home') || comp.competitors?.[0] || {};
-            const away = comp.competitors?.find(c => c.homeAway === 'away') || comp.competitors?.[1] || {};
-            const status = ev.status?.type || {};
-            const detail = status.detail || '';
-            const state = status.state || 'pre'; // pre, in, post
+        if (!allData?.Results) {
+            return res.status(502).json({ ok: false, error: 'FIFA API unavailable', partidos: [] });
+        }
 
-            return {
-                id: ev.id,
-                titulo: ev.name || ev.shortName,
-                shortName: ev.shortName || '',
-                home: { name: home.team?.displayName || '', shortName: home.team?.shortDisplayName || '', logo: home.team?.logo || '', score: home.score || null, flag: home.team?.flag || '' },
-                away: { name: away.team?.displayName || '', shortName: away.team?.shortDisplayName || '', logo: away.team?.logo || '', score: away.score || null, flag: away.team?.flag || '' },
-                estado: state,
-                enVivo: state === 'in',
-                finalizado: state === 'post',
-                programado: state === 'pre',
-                minuto: status.displayClock || '',
-                detalle: detail,
-                fecha: ev.date || '',
-                venue: comp.venue?.fullName || '',
-                venueCity: comp.venue?.address?.city || '',
-                group: ev.season?.slug || '',
-                transmisionUrl: null,
-            };
+        // Build a live-match lookup keyed by IdMatch for enrichment
+        const liveMap = {};
+        for (const lm of (liveData?.Results || [])) {
+            liveMap[lm.IdMatch] = lm;
+        }
+
+        const partidos = allData.Results.map(m => {
+            // Override with live data when available
+            const live = liveMap[m.IdMatch];
+            const source = live ? { ...m, ...live } : m;
+            return parseMatchRecord(source);
         });
 
-        // Enrich with transmission URLs from existing APIs
+        // Sort: live first, then by date ascending
+        partidos.sort((a, b) => {
+            const ord = s => s === 'in' ? 0 : s === 'pre' ? 1 : 2;
+            return ord(a.estado) - ord(b.estado) || new Date(a.fecha) - new Date(b.fecha);
+        });
+
+        // Enrich with transmission URLs
         try {
             const allPartidos = await fetchAllPartidos();
             for (const p of partidos) {
-                if (!p.home.name || !p.away.name) continue;
                 const slug = matchSlug(p.home.name, p.away.name);
-                const match = allPartidos.find(ap => ap.slug === slug || ap.slug === matchSlug(p.home.shortName, p.away.shortName));
-                if (match && match.transmisionUrl) {
-                    p.transmisionUrl = match.transmisionUrl;
-                }
+                const match = allPartidos.find(ap =>
+                    ap.slug === slug ||
+                    ap.slug === matchSlug(p.home.shortName, p.away.shortName)
+                );
+                if (match?.transmisionUrl) p.transmisionUrl = match.transmisionUrl;
             }
         } catch (_) {}
 
-        const result = { ok: true, count: partidos.length, partidos, ts: now };
+        const result = { ok: true, count: partidos.length, partidos, ts: now, source: 'fifa.com' };
         mundialCache.partidos = result;
         mundialCache.ts = now;
         res.json(result);
     } catch (e) {
         console.error('[/api/mundial/partidos]', e.message);
-        res.status(500).json({ ok: false, error: 'Failed to load mundial matches', partidos: [] });
+        res.status(500).json({ ok: false, error: e.message, partidos: [] });
     }
 });
 
-// GET /api/mundial/grupos — group standings from ESPN
+// GET /api/mundial/grupos — live group standings from FIFA official API
 app.get('/api/mundial/grupos', async (req, res) => {
     const now = Date.now();
     if (mundialCache.grupos && (now - mundialCache.ts) < MUNDIAL_TTL * 5) {
@@ -2076,34 +2148,37 @@ app.get('/api/mundial/grupos', async (req, res) => {
     }
 
     try {
-        const data = await espnFetch('https://site.api.espn.com/apis/v2/sports/soccer/FIFA.WORLD/standings?season=2026');
-        if (!data || !data.standings) {
-            return res.json({ ok: false, grupos: [] });
+        const data = await fifaFetch(`${FIFA_BASE}/groupstanding/${FIFA_COMPETITION}/${FIFA_SEASON_2026}?language=en`);
+
+        if (!data?.Results?.length) {
+            // Tournament hasn't started yet — return empty so UI shows static groups
+            return res.json({ ok: true, grupos: [], source: 'fifa.com', empty: true });
         }
 
-        const grupos = (data.standings || []).map(grp => ({
-            nombre: grp.name || grp.displayName,
-            equipos: (grp.entries || []).map(e => ({
-                nombre: e.team?.displayName || '',
-                abrev: e.team?.abbreviation || '',
-                logo: e.team?.logos?.[0]?.href || '',
-                pts: e.stats?.find(s => s.name === 'points')?.value ?? 0,
-                pj: e.stats?.find(s => s.name === 'gamesPlayed')?.value ?? 0,
-                pg: e.stats?.find(s => s.name === 'wins')?.value ?? 0,
-                pe: e.stats?.find(s => s.name === 'ties')?.value ?? 0,
-                pp: e.stats?.find(s => s.name === 'losses')?.value ?? 0,
-                gf: e.stats?.find(s => s.name === 'pointsFor')?.value ?? 0,
-                gc: e.stats?.find(s => s.name === 'pointsAgainst')?.value ?? 0,
-                dg: e.stats?.find(s => s.name === 'pointDifferential')?.value ?? 0,
+        const grupos = data.Results.map(grp => ({
+            nombre: fifaLocale(grp.Name),
+            equipos: (grp.Teams || []).map(t => ({
+                nombre: fifaLocale(t.Team?.TeamName) || t.Team?.ShortClubName || '',
+                abrev: t.Team?.Abbreviation || '',
+                code: t.Team?.IdCountry || '',
+                logo: fifaFlagUrl(t.Team?.IdCountry),
+                pts: t.Points ?? 0,
+                pj: t.Played ?? 0,
+                pg: t.Won ?? 0,
+                pe: t.Drawn ?? 0,
+                pp: t.Lost ?? 0,
+                gf: t.For ?? 0,
+                gc: t.Against ?? 0,
+                dg: t.GoalsDiference ?? 0,
             }))
         }));
 
-        const result = { ok: true, grupos };
+        const result = { ok: true, grupos, source: 'fifa.com' };
         mundialCache.grupos = result;
         res.json(result);
     } catch (e) {
         console.error('[/api/mundial/grupos]', e.message);
-        res.json({ ok: false, grupos: [] });
+        res.json({ ok: false, grupos: [], error: e.message });
     }
 });
 
