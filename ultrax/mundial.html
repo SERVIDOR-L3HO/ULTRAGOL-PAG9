@@ -899,10 +899,12 @@
                 </div>
             </div>
 
-            <div class="draw-pending">
-                <div class="draw-pending-icon">🎰</div>
-                <div class="draw-pending-title">Sorteo de grupos por confirmarse</div>
-                <div class="draw-pending-desc">El sorteo oficial de la Copa Mundial FIFA 2026 se realizará una vez concluido el proceso de clasificación. Los grupos mostrados son referenciales con los equipos más probables.</div>
+            <div class="groups-intro" style="margin:0 16px 14px;background:rgba(48,209,88,0.06);border-color:rgba(48,209,88,0.2)">
+                <span class="groups-intro-icon">✅</span>
+                <div>
+                    <div class="groups-intro-title" style="color:var(--green)">Sorteo oficial completado</div>
+                    <div class="groups-intro-desc">Los 12 grupos del Mundial 2026 fueron sorteados oficialmente por la FIFA. Los datos reflejan la distribución real confirmada.</div>
+                </div>
             </div>
 
             <div class="groups-grid" id="groupsGrid"></div>
@@ -1499,19 +1501,20 @@ startTxAutoRefresh();
 // ══════════════════════════════════════════════════════════════
 // GROUPS
 // ══════════════════════════════════════════════════════════════
+// Grupos OFICIALES FIFA Copa Mundial 2026™ — sorteo confirmado
 const GROUPS = [
-    {name:'Grupo A',teams:[{flag:'🇲🇽',name:'México',host:true},{flag:'🇵🇱',name:'Polonia'},{flag:'🇸🇦',name:'Arabia Saudita'},{flag:'🇪🇨',name:'Ecuador'}]},
-    {name:'Grupo B',teams:[{flag:'🇺🇸',name:'EE. UU.',host:true},{flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',name:'Inglaterra'},{flag:'🇮🇷',name:'Irán'},{flag:'🏴󠁧󠁢󠁷󠁬󠁳󠁿',name:'Gales'}]},
-    {name:'Grupo C',teams:[{flag:'🇦🇷',name:'Argentina'},{flag:'🇸🇦',name:'Arabia'},{flag:'🇲🇽',name:'México'},{flag:'🇵🇱',name:'Polonia'}]},
-    {name:'Grupo D',teams:[{flag:'🇫🇷',name:'Francia'},{flag:'🇦🇺',name:'Australia'},{flag:'🇩🇰',name:'Dinamarca'},{flag:'🇹🇳',name:'Túnez'}]},
-    {name:'Grupo E',teams:[{flag:'🇪🇸',name:'España'},{flag:'🇩🇪',name:'Alemania'},{flag:'🇯🇵',name:'Japón'},{flag:'🇨🇷',name:'Costa Rica'}]},
-    {name:'Grupo F',teams:[{flag:'🇧🇪',name:'Bélgica'},{flag:'🇨🇦',name:'Canadá',host:true},{flag:'🇲🇦',name:'Marruecos'},{flag:'🇭🇷',name:'Croacia'}]},
-    {name:'Grupo G',teams:[{flag:'🇧🇷',name:'Brasil'},{flag:'🇨🇭',name:'Suiza'},{flag:'🇨🇲',name:'Camerún'},{flag:'🇷🇸',name:'Serbia'}]},
-    {name:'Grupo H',teams:[{flag:'🇵🇹',name:'Portugal'},{flag:'🇺🇾',name:'Uruguay'},{flag:'🇰🇷',name:'Corea del Sur'},{flag:'🇬🇭',name:'Ghana'}]},
-    {name:'Grupo I',teams:[{flag:'🇳🇱',name:'Países Bajos'},{flag:'🇸🇳',name:'Senegal'},{flag:'🇶🇦',name:'Qatar'},{flag:'🇪🇨',name:'Ecuador'}]},
-    {name:'Grupo J',teams:[{flag:'🇺🇾',name:'Uruguay'},{flag:'🇰🇷',name:'Corea del Sur'},{flag:'🇬🇭',name:'Ghana'},{flag:'🇵🇹',name:'Portugal'}]},
-    {name:'Grupo K',teams:[{flag:'🇳🇬',name:'Nigeria'},{flag:'🇷🇸',name:'Serbia'},{flag:'🇨🇲',name:'Camerún'},{flag:'🇧🇷',name:'Brasil'}]},
-    {name:'Grupo L',teams:[{flag:'🇸🇦',name:'Arabia'},{flag:'🇵🇱',name:'Polonia'},{flag:'🇦🇷',name:'Argentina'},{flag:'🇲🇽',name:'México'}]},
+    {name:'Grupo A',teams:[{flag:'🇲🇽',name:'México',host:true},{flag:'🇿🇦',name:'Sudáfrica'},{flag:'🇰🇷',name:'Corea del Sur'},{flag:'🇨🇿',name:'Rep. Checa'}]},
+    {name:'Grupo B',teams:[{flag:'🇨🇦',name:'Canadá',host:true},{flag:'🇧🇦',name:'Bosnia-Herz.'},{flag:'🇶🇦',name:'Qatar'},{flag:'🇨🇭',name:'Suiza'}]},
+    {name:'Grupo C',teams:[{flag:'🇲🇦',name:'Marruecos'},{flag:'🇧🇷',name:'Brasil'},{flag:'🇭🇹',name:'Haití'},{flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',name:'Escocia'}]},
+    {name:'Grupo D',teams:[{flag:'🇺🇸',name:'EE. UU.',host:true},{flag:'🇵🇾',name:'Paraguay'},{flag:'🇦🇺',name:'Australia'},{flag:'🇹🇷',name:'Turquía'}]},
+    {name:'Grupo E',teams:[{flag:'🇩🇪',name:'Alemania'},{flag:'🇨🇮',name:'Costa de Marfil'},{flag:'🇪🇨',name:'Ecuador'},{flag:'🇨🇼',name:'Curazao'}]},
+    {name:'Grupo F',teams:[{flag:'🇳🇱',name:'Países Bajos'},{flag:'🇯🇵',name:'Japón'},{flag:'🇸🇪',name:'Suecia'},{flag:'🇹🇳',name:'Túnez'}]},
+    {name:'Grupo G',teams:[{flag:'🇧🇪',name:'Bélgica'},{flag:'🇪🇬',name:'Egipto'},{flag:'🇮🇷',name:'Irán'},{flag:'🇳🇿',name:'Nueva Zelanda'}]},
+    {name:'Grupo H',teams:[{flag:'🇪🇸',name:'España'},{flag:'🇺🇾',name:'Uruguay'},{flag:'🇸🇦',name:'Arabia Saudita'},{flag:'🇨🇻',name:'Cabo Verde'}]},
+    {name:'Grupo I',teams:[{flag:'🇫🇷',name:'Francia'},{flag:'🇸🇳',name:'Senegal'},{flag:'🇳🇴',name:'Noruega'},{flag:'🇮🇶',name:'Irak'}]},
+    {name:'Grupo J',teams:[{flag:'🇦🇷',name:'Argentina'},{flag:'🇩🇿',name:'Argelia'},{flag:'🇦🇹',name:'Austria'},{flag:'🇯🇴',name:'Jordania'}]},
+    {name:'Grupo K',teams:[{flag:'🇵🇹',name:'Portugal'},{flag:'🇨🇴',name:'Colombia'},{flag:'🇨🇩',name:'Congo DR'},{flag:'🇺🇿',name:'Uzbekistán'}]},
+    {name:'Grupo L',teams:[{flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',name:'Inglaterra'},{flag:'🇭🇷',name:'Croacia'},{flag:'🇬🇭',name:'Ghana'},{flag:'🇵🇦',name:'Panamá'}]},
 ];
 
 function renderGroups() {
@@ -1538,12 +1541,61 @@ renderGroups();
 // ══════════════════════════════════════════════════════════════
 // TEAMS
 // ══════════════════════════════════════════════════════════════
+// 48 equipos clasificados OFICIALES — Copa Mundial FIFA 2026™
 const TEAMS = [
-    {flag:'🇺🇸',name:'EE. UU.',conf:'host',badge:'HOST'},{flag:'🇲🇽',name:'México',conf:'host',badge:'HOST'},{flag:'🇨🇦',name:'Canadá',conf:'host',badge:'HOST'},
-    {flag:'🇦🇷',name:'Argentina',conf:'conmebol',badge:'CAMPEÓN',champion:true},{flag:'🇧🇷',name:'Brasil',conf:'conmebol'},{flag:'🇺🇾',name:'Uruguay',conf:'conmebol'},{flag:'🇨🇴',name:'Colombia',conf:'conmebol'},{flag:'🇨🇱',name:'Chile',conf:'conmebol'},{flag:'🇪🇨',name:'Ecuador',conf:'conmebol'},{flag:'🇵🇾',name:'Paraguay',conf:'conmebol'},{flag:'🇻🇪',name:'Venezuela',conf:'conmebol'},{flag:'🇵🇪',name:'Perú',conf:'conmebol'},
-    {flag:'🇫🇷',name:'Francia',conf:'uefa'},{flag:'🇪🇸',name:'España',conf:'uefa'},{flag:'🇩🇪',name:'Alemania',conf:'uefa'},{flag:'🇵🇹',name:'Portugal',conf:'uefa'},{flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',name:'Inglaterra',conf:'uefa'},{flag:'🇳🇱',name:'Países Bajos',conf:'uefa'},{flag:'🇧🇪',name:'Bélgica',conf:'uefa'},{flag:'🇮🇹',name:'Italia',conf:'uefa'},{flag:'🇭🇷',name:'Croacia',conf:'uefa'},{flag:'🇩🇰',name:'Dinamarca',conf:'uefa'},{flag:'🇦🇹',name:'Austria',conf:'uefa'},{flag:'🇨🇭',name:'Suiza',conf:'uefa'},{flag:'🇹🇷',name:'Turquía',conf:'uefa'},{flag:'🇷🇸',name:'Serbia',conf:'uefa'},{flag:'🇸🇰',name:'Eslovaquia',conf:'uefa'},{flag:'🇺🇦',name:'Ucrania',conf:'uefa'},{flag:'🇬🇷',name:'Grecia',conf:'uefa'},{flag:'🇸🇮',name:'Eslovenia',conf:'uefa'},{flag:'🇷🇴',name:'Rumanía',conf:'uefa'},
-    {flag:'🇯🇲',name:'Jamaica',conf:'concacaf'},{flag:'🇵🇦',name:'Panamá',conf:'concacaf'},{flag:'🇭🇳',name:'Honduras',conf:'concacaf'},{flag:'🇨🇷',name:'Costa Rica',conf:'concacaf'},{flag:'🇸🇻',name:'El Salvador',conf:'concacaf'},
-    {flag:'🇯🇵',name:'Japón',conf:'others'},{flag:'🇰🇷',name:'Corea del Sur',conf:'others'},{flag:'🇦🇺',name:'Australia',conf:'others'},{flag:'🇲🇦',name:'Marruecos',conf:'others'},{flag:'🇸🇳',name:'Senegal',conf:'others'},{flag:'🇳🇬',name:'Nigeria',conf:'others'},{flag:'🇸🇦',name:'Arabia Saudita',conf:'others'},{flag:'🇮🇷',name:'Irán',conf:'others'},{flag:'🇨🇮',name:'Costa de Marfil',conf:'others'},{flag:'🇪🇬',name:'Egipto',conf:'others'},{flag:'🇲🇱',name:'Mali',conf:'others'},{flag:'🇿🇦',name:'Sudáfrica',conf:'others'},
+    // ANFITRIONES
+    {flag:'🇺🇸',name:'EE. UU.',conf:'host',badge:'HOST'},
+    {flag:'🇲🇽',name:'México',conf:'host',badge:'HOST'},
+    {flag:'🇨🇦',name:'Canadá',conf:'host',badge:'HOST'},
+    // CONMEBOL
+    {flag:'🇦🇷',name:'Argentina',conf:'conmebol',badge:'CAMPEÓN',champion:true},
+    {flag:'🇧🇷',name:'Brasil',conf:'conmebol'},
+    {flag:'🇺🇾',name:'Uruguay',conf:'conmebol'},
+    {flag:'🇨🇴',name:'Colombia',conf:'conmebol'},
+    {flag:'🇵🇾',name:'Paraguay',conf:'conmebol'},
+    {flag:'🇪🇨',name:'Ecuador',conf:'conmebol'},
+    // UEFA
+    {flag:'🇫🇷',name:'Francia',conf:'uefa'},
+    {flag:'🇪🇸',name:'España',conf:'uefa'},
+    {flag:'🇩🇪',name:'Alemania',conf:'uefa'},
+    {flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',name:'Inglaterra',conf:'uefa'},
+    {flag:'🇵🇹',name:'Portugal',conf:'uefa'},
+    {flag:'🇳🇱',name:'Países Bajos',conf:'uefa'},
+    {flag:'🇧🇪',name:'Bélgica',conf:'uefa'},
+    {flag:'🇭🇷',name:'Croacia',conf:'uefa'},
+    {flag:'🇦🇹',name:'Austria',conf:'uefa'},
+    {flag:'🇨🇭',name:'Suiza',conf:'uefa'},
+    {flag:'🇸🇪',name:'Suecia',conf:'uefa'},
+    {flag:'🇳🇴',name:'Noruega',conf:'uefa'},
+    {flag:'🇧🇦',name:'Bosnia-Herz.',conf:'uefa'},
+    {flag:'🇨🇿',name:'Rep. Checa',conf:'uefa'},
+    {flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',name:'Escocia',conf:'uefa'},
+    {flag:'🇹🇷',name:'Turquía',conf:'uefa'},
+    // CONCACAF (no anfitriones)
+    {flag:'🇭🇹',name:'Haití',conf:'concacaf'},
+    {flag:'🇨🇼',name:'Curazao',conf:'concacaf'},
+    {flag:'🇵🇦',name:'Panamá',conf:'concacaf'},
+    // OTROS (AFC · CAF · OFC)
+    {flag:'🇰🇷',name:'Corea del Sur',conf:'others'},
+    {flag:'🇶🇦',name:'Qatar',conf:'others'},
+    {flag:'🇦🇺',name:'Australia',conf:'others'},
+    {flag:'🇯🇵',name:'Japón',conf:'others'},
+    {flag:'🇸🇦',name:'Arabia Saudita',conf:'others'},
+    {flag:'🇮🇶',name:'Irak',conf:'others'},
+    {flag:'🇯🇴',name:'Jordania',conf:'others'},
+    {flag:'🇺🇿',name:'Uzbekistán',conf:'others'},
+    {flag:'🇮🇷',name:'Irán',conf:'others'},
+    {flag:'🇿🇦',name:'Sudáfrica',conf:'others'},
+    {flag:'🇲🇦',name:'Marruecos',conf:'others'},
+    {flag:'🇨🇮',name:'Costa de Marfil',conf:'others'},
+    {flag:'🇹🇳',name:'Túnez',conf:'others'},
+    {flag:'🇪🇬',name:'Egipto',conf:'others'},
+    {flag:'🇸🇳',name:'Senegal',conf:'others'},
+    {flag:'🇩🇿',name:'Argelia',conf:'others'},
+    {flag:'🇨🇩',name:'Congo DR',conf:'others'},
+    {flag:'🇨🇻',name:'Cabo Verde',conf:'others'},
+    {flag:'🇬🇭',name:'Ghana',conf:'others'},
+    {flag:'🇳🇿',name:'Nueva Zelanda',conf:'others'},
 ];
 
 function renderTeams(filter) {
