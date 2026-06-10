@@ -171,171 +171,32 @@
 
     <!-- Banner Copa Mundial 2026 -->
     <div class="world-cup-banner" onclick="openWorldCupModal()">
-
-        <!-- Fondo: cancha de fútbol SVG -->
-        <div class="wc-pitch-bg">
-            <svg class="wc-pitch-svg" viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
-                <!-- campo completo -->
-                <rect x="20" y="10" width="360" height="200" rx="6" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="1.5"/>
-                <!-- línea central -->
-                <line x1="200" y1="10" x2="200" y2="210" stroke="rgba(255,255,255,0.13)" stroke-width="1.5"/>
-                <!-- círculo central -->
-                <circle cx="200" cy="110" r="38" fill="none" stroke="rgba(255,255,255,0.13)" stroke-width="1.5"/>
-                <circle cx="200" cy="110" r="2" fill="rgba(255,255,255,0.2)"/>
-                <!-- área grande izquierda -->
-                <rect x="20" y="55" width="60" height="110" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.2"/>
-                <!-- área chica izquierda -->
-                <rect x="20" y="80" width="25" height="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                <!-- área grande derecha -->
-                <rect x="320" y="55" width="60" height="110" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1.2"/>
-                <!-- área chica derecha -->
-                <rect x="355" y="80" width="25" height="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
-                <!-- arco izquierdo penalti -->
-                <path d="M 80 80 A 38 38 0 0 1 80 140" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.2"/>
-                <!-- arco derecho penalti -->
-                <path d="M 320 80 A 38 38 0 0 0 320 140" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.2"/>
-            </svg>
-        </div>
-
-        <!-- Gradiente de color base -->
-        <div class="wc-bg-gradient"></div>
-
-        <!-- Shimmer sweep -->
         <div class="wc-shimmer"></div>
+        <div class="wc-glow-ring"></div>
 
-        <!-- Partículas -->
-        <div class="wc-particles">
-            <span class="wc-particle"></span><span class="wc-particle"></span>
-            <span class="wc-particle"></span><span class="wc-particle"></span>
-            <span class="wc-particle"></span><span class="wc-particle"></span>
-            <span class="wc-particle"></span><span class="wc-particle"></span>
+        <!-- Izquierda: trofeo + texto -->
+        <div class="wc-banner-left">
+            <div class="wc-trophy">🏆</div>
+            <div class="wc-banner-text">
+                <div class="banner-title">COPA MUNDIAL</div>
+                <div class="banner-title-year">FIFA 2026 · 🇺🇸 🇲🇽 🇨🇦</div>
+            </div>
         </div>
 
-        <!-- Candado top-right -->
-        <div class="wc-lock-overlay">
-            <div class="wc-lock-icon">
-                <svg viewBox="0 0 24 24" fill="none">
-                    <rect x="5" y="11" width="14" height="10" rx="2.5" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.9)" stroke-width="1.4"/>
-                    <path d="M8 11V7.5a4 4 0 0 1 8 0V11" stroke="rgba(255,255,255,0.9)" stroke-width="1.4" stroke-linecap="round"/>
-                    <circle cx="12" cy="16" r="1.8" fill="white"/>
-                </svg>
-            </div>
-            <span class="wc-lock-label">BLOQUEADO</span>
+        <!-- Centro: countdown compacto -->
+        <div class="wc-banner-countdown">
+            <div class="wc-cd-item"><span class="countdown-val" id="days">0</span><span class="countdown-label">D</span></div>
+            <div class="wc-cd-sep">:</div>
+            <div class="wc-cd-item"><span class="countdown-val" id="hours">00</span><span class="countdown-label">H</span></div>
+            <div class="wc-cd-sep">:</div>
+            <div class="wc-cd-item"><span class="countdown-val" id="mins">00</span><span class="countdown-label">M</span></div>
         </div>
 
-        <!-- Contenido principal en panel de vidrio -->
-        <div class="banner-content">
-
-            <!-- Trofeo + badge -->
-            <div class="wc-top-row">
-                <div class="wc-trophy">🏆</div>
-                <div class="wc-badge">
-                    <span class="wc-badge-dot"></span>
-                    PRÓXIMAMENTE
-                </div>
-            </div>
-
-            <!-- Título -->
-            <div class="wc-title-glass">
-                <div class="wc-title-inner">
-                    <span class="wc-ball-icon">⚽</span>
-                    <div>
-                        <div class="banner-title">COPA MUNDIAL</div>
-                        <div class="banner-title-year">FIFA 2026</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sedes -->
-            <div class="wc-hosts">
-                <span class="wc-host">🇺🇸 USA</span>
-                <span class="wc-host-sep">·</span>
-                <span class="wc-host">🇲🇽 México</span>
-                <span class="wc-host-sep">·</span>
-                <span class="wc-host">🇨🇦 Canadá</span>
-            </div>
-
-            <!-- Countdown en vidrio -->
-            <div class="countdown-container">
-                <div class="countdown-item">
-                    <span class="countdown-val" id="days">5</span>
-                    <span class="countdown-label">Días</span>
-                </div>
-                <div class="countdown-sep">:</div>
-                <div class="countdown-item">
-                    <span class="countdown-val" id="hours">23</span>
-                    <span class="countdown-label">Horas</span>
-                </div>
-                <div class="countdown-sep">:</div>
-                <div class="countdown-item">
-                    <span class="countdown-val" id="mins">08</span>
-                    <span class="countdown-label">Min</span>
-                </div>
-                <div class="countdown-sep">:</div>
-                <div class="countdown-item">
-                    <span class="countdown-val" id="secs">48</span>
-                    <span class="countdown-label">Seg</span>
-                </div>
-            </div>
-
-            <!-- Carrusel de banderas -->
-            <div class="wc-flags-wrap">
-                <div class="wc-flags-track">
-                    <span class="wc-flag">🇦🇷<span>Argentina</span></span>
-                    <span class="wc-flag">🇧🇷<span>Brasil</span></span>
-                    <span class="wc-flag">🇫🇷<span>Francia</span></span>
-                    <span class="wc-flag">🇪🇸<span>España</span></span>
-                    <span class="wc-flag">🇩🇪<span>Alemania</span></span>
-                    <span class="wc-flag">🇵🇹<span>Portugal</span></span>
-                    <span class="wc-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿<span>Inglaterra</span></span>
-                    <span class="wc-flag">🇳🇱<span>Países Bajos</span></span>
-                    <span class="wc-flag">🇲🇽<span>México</span></span>
-                    <span class="wc-flag">🇺🇸<span>USA</span></span>
-                    <span class="wc-flag">🇨🇦<span>Canadá</span></span>
-                    <span class="wc-flag">🇯🇵<span>Japón</span></span>
-                    <span class="wc-flag">🇲🇦<span>Marruecos</span></span>
-                    <span class="wc-flag">🇺🇾<span>Uruguay</span></span>
-                    <span class="wc-flag">🇨🇴<span>Colombia</span></span>
-                    <span class="wc-flag">🇰🇷<span>Corea del Sur</span></span>
-                    <span class="wc-flag">🇸🇳<span>Senegal</span></span>
-                    <span class="wc-flag">🇭🇷<span>Croacia</span></span>
-                    <span class="wc-flag">🇮🇹<span>Italia</span></span>
-                    <span class="wc-flag">🇧🇪<span>Bélgica</span></span>
-                    <span class="wc-flag">🇹🇷<span>Turquía</span></span>
-                    <span class="wc-flag">🇦🇹<span>Austria</span></span>
-                    <span class="wc-flag">🇩🇰<span>Dinamarca</span></span>
-                    <span class="wc-flag">🇪🇨<span>Ecuador</span></span>
-                    <span class="wc-flag">🇨🇭<span>Suiza</span></span>
-                    <span class="wc-flag">🇦🇺<span>Australia</span></span>
-                    <span class="wc-flag">🇳🇬<span>Nigeria</span></span>
-                    <span class="wc-flag">🇸🇦<span>Arabia Saudita</span></span>
-                    <span class="wc-flag">🇮🇷<span>Irán</span></span>
-                    <span class="wc-flag">🇵🇾<span>Paraguay</span></span>
-                    <span class="wc-flag">🇵🇦<span>Panamá</span></span>
-                    <span class="wc-flag">🇭🇳<span>Honduras</span></span>
-                    <span class="wc-flag">🇨🇷<span>Costa Rica</span></span>
-                    <span class="wc-flag">🇸🇷<span>Serbia</span></span>
-                    <span class="wc-flag">🇸🇰<span>Eslovaquia</span></span>
-                    <span class="wc-flag">🇪🇬<span>Egipto</span></span>
-                    <span class="wc-flag">🇨🇮<span>Costa de Marfil</span></span>
-                    <span class="wc-flag">🇺🇿<span>Uzbekistán</span></span>
-                    <span class="wc-flag">🇳🇿<span>Nueva Zelanda</span></span>
-                    <span class="wc-flag">🇬🇷<span>Grecia</span></span>
-                    <span class="wc-flag">🇺🇦<span>Ucrania</span></span>
-                    <span class="wc-flag">🇲🇱<span>Mali</span></span>
-                    <span class="wc-flag">🇿🇦<span>Sudáfrica</span></span>
-                    <span class="wc-flag">🇮🇶<span>Irak</span></span>
-                    <span class="wc-flag">🇯🇴<span>Jordania</span></span>
-                    <span class="wc-flag">🇸🇻<span>El Salvador</span></span>
-                    <span class="wc-flag">🇯🇲<span>Jamaica</span></span>
-                    <span class="wc-flag">🇷🇴<span>Rumanía</span></span>
-                </div>
-            </div>
-
-            <div class="wc-tap-hint">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                Toca para ver qué viene
-            </div>
+        <!-- Derecha: botón tap -->
+        <div class="wc-tap-btn">
+            <div class="wc-tap-pulse"></div>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="10" rx="2.5" fill="none" stroke="white" stroke-width="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+            <span>VER</span>
         </div>
     </div>
 
