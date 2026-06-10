@@ -444,6 +444,79 @@
     .group-team.host .group-team-name { color: var(--gold); }
     .group-team.host .group-team-seed { background: rgba(255,215,0,0.1); color: var(--gold); }
 
+    /* ─── Posiciones en vivo (dentro del tab Grupos) ─── */
+    .pos-section { padding: 14px 16px 6px; }
+    .pos-section-title {
+        font-size: 11px; font-weight: 900; color: var(--text-dim);
+        text-transform: uppercase; letter-spacing: 0.06em;
+        display: flex; align-items: center; gap: 6px; margin-bottom: 10px;
+    }
+    .pos-section-title .pos-live-dot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: var(--green); animation: pulse 1.4s infinite;
+    }
+    .pos-group-block {
+        background: var(--card); border: 1px solid var(--border);
+        border-radius: 14px; overflow: hidden; margin-bottom: 10px;
+    }
+    .pos-group-header {
+        padding: 7px 12px;
+        background: rgba(255,215,0,0.07);
+        border-bottom: 1px solid rgba(255,215,0,0.1);
+        font-size: 11px; font-weight: 900; color: var(--gold);
+    }
+    .pos-table { width: 100%; border-collapse: collapse; }
+    .pos-table th {
+        font-size: 9px; font-weight: 700; color: var(--text-dim);
+        text-align: center; padding: 4px 4px; text-transform: uppercase;
+    }
+    .pos-table th:first-child { text-align: left; padding-left: 10px; }
+    .pos-table td {
+        font-size: 11px; color: #fff; text-align: center;
+        padding: 5px 4px; border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .pos-table td:first-child { text-align: left; padding-left: 10px; }
+    .pos-team-cell { display: flex; align-items: center; gap: 6px; }
+    .pos-team-flag { font-size: 13px; }
+    .pos-team-name { font-size: 10px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+    .pos-pts { font-weight: 900; color: var(--gold); }
+    .pos-placeholder { color: var(--text-dim); }
+    .pos-pending {
+        margin: 0; padding: 14px 16px;
+        background: rgba(255,255,255,0.03);
+        border: 1px dashed var(--border); border-radius: 14px;
+        text-align: center; font-size: 11px; color: var(--text-dim);
+        line-height: 1.6;
+    }
+
+    /* ─── Goleadores (dentro del tab Estrellas) ─── */
+    .gol-section { padding: 0 16px 10px; }
+    .gol-row {
+        display: flex; align-items: center; gap: 10px;
+        background: var(--card); border: 1px solid var(--border);
+        border-radius: 12px; padding: 9px 12px; margin-bottom: 7px;
+        transition: border-color 0.2s;
+    }
+    .gol-rank { font-size: 14px; font-weight: 900; color: var(--text-dim); min-width: 22px; text-align: center; }
+    .gol-rank.top1 { color: var(--gold); }
+    .gol-rank.top2 { color: #c0c0c0; }
+    .gol-rank.top3 { color: #cd7f32; }
+    .gol-flag { font-size: 20px; flex-shrink: 0; }
+    .gol-info { flex: 1; min-width: 0; }
+    .gol-name { font-size: 12px; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gol-team { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+    .gol-count { text-align: right; }
+    .gol-num { font-size: 20px; font-weight: 900; color: var(--gold); line-height: 1; }
+    .gol-label { font-size: 9px; color: var(--text-dim); }
+    .gol-pending {
+        padding: 20px 16px; text-align: center;
+        background: var(--card); border: 1px dashed var(--border);
+        border-radius: 14px; margin: 0 0 14px;
+    }
+    .gol-pending-icon { font-size: 30px; margin-bottom: 6px; }
+    .gol-pending-title { font-size: 13px; font-weight: 800; color: #fff; }
+    .gol-pending-sub { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
     /* ═══════════════════════════════════
        STADIUMS TAB
     ═══════════════════════════════════ */
@@ -833,6 +906,7 @@
 
             <div class="matches-filter">
                 <button class="mf-btn active" onclick="filterMatches('all',this)">Todos</button>
+                <button class="mf-btn" id="btnHoy" onclick="filterMatches('today',this)">📅 Hoy</button>
                 <button class="mf-btn" onclick="filterMatches('live',this)">🔴 En vivo</button>
                 <button class="mf-btn" onclick="filterMatches('upcoming',this)">⏰ Próximos</button>
                 <button class="mf-btn" onclick="filterMatches('finished',this)">✅ Finalizados</button>
@@ -908,6 +982,20 @@
             </div>
 
             <div class="groups-grid" id="groupsGrid"></div>
+
+            <!-- Posiciones en vivo — carga cuando el torneo inicia -->
+            <div class="pos-section">
+                <div class="pos-section-title">
+                    <span class="pos-live-dot"></span>
+                    Posiciones en tiempo real
+                </div>
+                <div id="posicionesContainer">
+                    <div class="pos-pending">
+                        <div style="font-size:28px;margin-bottom:6px">📊</div>
+                        <div style="font-size:12px;font-weight:800;color:#fff">Cargando posiciones...</div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- ══════════════════════════════════ STADIUMS ══════════════════════════════════ -->
@@ -997,6 +1085,23 @@
                     <div class="section-header-sub">Los jugadores que definirán el torneo</div>
                 </div>
             </div>
+
+            <!-- Goleadores en vivo -->
+            <div class="section-header" style="padding-top:4px">
+                <span class="section-header-icon">⚽</span>
+                <div class="section-header-text">
+                    <div class="section-header-title">Goleadores del Mundial</div>
+                    <div class="section-header-sub">Tabla de goles — datos oficiales FIFA</div>
+                </div>
+                <button class="refresh-btn" style="margin-right:16px" onclick="loadGoleadores(true)"><i class="fas fa-sync-alt"></i></button>
+            </div>
+            <div class="gol-section" id="goleadoresContainer">
+                <div class="gol-pending">
+                    <div class="gol-pending-icon">⚽</div>
+                    <div class="gol-pending-title">Cargando goleadores...</div>
+                </div>
+            </div>
+
             <div class="stars-scroll" id="starsScroll"></div>
 
             <div class="section-header" style="padding-top:6px">
@@ -1069,6 +1174,8 @@ function showSection(id, btn) {
 
     if (id === 'partidos' && !partidosLoaded) loadPartidos();
     if (id === 'transmisiones' && !txLoaded) loadTransmisiones();
+    if (id === 'groups' && !posicionesLoaded) loadPosiciones();
+    if (id === 'stars' && !goleadoresLoaded) loadGoleadores();
 }
 
 // ── Countdown ──────────────────────────────────────────────────
@@ -1193,9 +1300,20 @@ function renderMatches(filter) {
     if (filter === 'live') filtered = allMatches.filter(p => p.enVivo);
     else if (filter === 'upcoming') filtered = allMatches.filter(p => p.programado);
     else if (filter === 'finished') filtered = allMatches.filter(p => p.finalizado);
+    else if (filter === 'today') {
+        // Today in Mexico City time (UTC-6)
+        const mxNow = new Date(Date.now() - 6 * 60 * 60 * 1000);
+        const todayStr = mxNow.toISOString().slice(0, 10);
+        filtered = allMatches.filter(p => {
+            if (!p.fecha) return false;
+            const d = new Date(new Date(p.fecha).getTime() - 6 * 60 * 60 * 1000);
+            return d.toISOString().slice(0, 10) === todayStr;
+        });
+    }
 
     if (filtered.length === 0) {
         const msg = filter === 'live' ? 'No hay partidos en vivo ahora mismo.' :
+                    filter === 'today' ? 'No hay partidos programados para hoy.' :
                     filter === 'upcoming' ? 'No hay partidos próximos programados.' :
                     filter === 'finished' ? 'No hay partidos finalizados aún.' :
                     'No hay partidos disponibles. El Mundial inicia el 11 de junio de 2026.';
@@ -1616,6 +1734,107 @@ function filterTeams(filter, btn) {
     if (btn) btn.classList.add('active');
     renderTeams(filter);
 }
+
+// ══════════════════════════════════════════════════════════════
+// POSICIONES EN VIVO — Tabla de posiciones por grupo
+// ══════════════════════════════════════════════════════════════
+let posicionesLoaded = false;
+
+async function loadPosiciones(force = false) {
+    const container = document.getElementById('posicionesContainer');
+    if (!container) return;
+    try {
+        const r = await fetch('/api/mundial/grupos');
+        const data = await r.json();
+        posicionesLoaded = true;
+
+        if (!data.ok || !data.grupos || data.grupos.length === 0) {
+            container.innerHTML = `
+            <div class="pos-pending">
+                <div style="font-size:26px;margin-bottom:6px">📊</div>
+                <div style="font-weight:800;color:#fff;font-size:12px">Las posiciones en vivo estarán disponibles</div>
+                <div style="margin-top:4px">desde el primer partido · <strong>11 de junio de 2026</strong></div>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = data.grupos.map(g => `
+        <div class="pos-group-block">
+            <div class="pos-group-header">${g.nombre}</div>
+            <table class="pos-table">
+                <thead><tr>
+                    <th>Selección</th>
+                    <th>PJ</th><th>G</th><th>E</th><th>P</th>
+                    <th>GF</th><th>GC</th><th class="pos-pts">Pts</th>
+                </tr></thead>
+                <tbody>
+                ${(g.equipos || []).map(e => `
+                <tr>
+                    <td>
+                        <div class="pos-team-cell">
+                            ${e.logo ? `<img src="${e.logo}" width="18" height="18" alt="${e.abrev}" onerror="this.style.display='none'">` : ''}
+                            <span class="pos-team-name">${e.nombre || e.abrev || '?'}</span>
+                        </div>
+                    </td>
+                    <td class="pos-placeholder">${e.pj}</td>
+                    <td class="pos-placeholder">${e.pg}</td>
+                    <td class="pos-placeholder">${e.pe}</td>
+                    <td class="pos-placeholder">${e.pp}</td>
+                    <td class="pos-placeholder">${e.gf}</td>
+                    <td class="pos-placeholder">${e.gc}</td>
+                    <td class="pos-pts">${e.pts}</td>
+                </tr>`).join('')}
+                </tbody>
+            </table>
+        </div>`).join('');
+    } catch(e) {
+        container.innerHTML = `<div class="pos-pending">Error al cargar posiciones.</div>`;
+    }
+}
+loadPosiciones();
+
+// ══════════════════════════════════════════════════════════════
+// GOLEADORES — Top scorers desde FIFA oficial
+// ══════════════════════════════════════════════════════════════
+let goleadoresLoaded = false;
+const rankIcons = ['🥇','🥈','🥉'];
+
+async function loadGoleadores(force = false) {
+    const container = document.getElementById('goleadoresContainer');
+    if (!container) return;
+    try {
+        const r = await fetch('/api/mundial/goleadores' + (force ? '?force=1' : ''));
+        const data = await r.json();
+        goleadoresLoaded = true;
+
+        if (!data.ok || !data.goleadores || data.goleadores.length === 0) {
+            container.innerHTML = `
+            <div class="gol-pending">
+                <div class="gol-pending-icon">⚽</div>
+                <div class="gol-pending-title">Sin goles aún</div>
+                <div class="gol-pending-sub">La tabla de goleadores se actualiza en tiempo real<br>a partir del <strong>11 de junio de 2026</strong></div>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = data.goleadores.map((g, i) => `
+        <div class="gol-row">
+            <div class="gol-rank ${i===0?'top1':i===1?'top2':i===2?'top3':''}">${rankIcons[i] || (i+1)}</div>
+            ${g.logo ? `<img src="${g.logo}" width="28" height="28" style="border-radius:50%;flex-shrink:0" alt="${g.code}" onerror="this.style.display='none'">` : '<span class="gol-flag">🏳️</span>'}
+            <div class="gol-info">
+                <div class="gol-name">${g.nombre}</div>
+                <div class="gol-team">${g.equipo}${g.penales > 0 ? ` · ${g.penales} pen.` : ''}</div>
+            </div>
+            <div class="gol-count">
+                <div class="gol-num">${g.goles}</div>
+                <div class="gol-label">gol${g.goles !== 1 ? 'es' : ''}</div>
+            </div>
+        </div>`).join('');
+    } catch(e) {
+        container.innerHTML = `<div class="gol-pending"><div class="gol-pending-icon">⚠️</div><div class="gol-pending-title">Error al cargar</div></div>`;
+    }
+}
+loadGoleadores();
 
 // ══════════════════════════════════════════════════════════════
 // STARS

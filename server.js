@@ -1989,7 +1989,7 @@ app.use('/ultrawidget', express.static(path.join(__dirname, 'ultrawidget'), {
 }));
 
 // ─── COPA MUNDIAL 2026 — Real-time data endpoints ─────────────────────────────
-const mundialCache = { partidos: null, grupos: null, ts: 0 };
+const mundialCache = { partidos: null, grupos: null, goleadores: null, ts: 0, goleadoresTs: 0 };
 const MUNDIAL_TTL = 60 * 1000; // 60-second cache
 
 // ── FIFA Official API helpers ──────────────────────────────────────────────────
@@ -2196,6 +2196,81 @@ app.get('/api/mundial/transmisiones', async (req, res) => {
     } catch (e) {
         console.error('[/api/mundial/transmisiones]', e.message);
         res.json({ ok: false, partidos: [] });
+    }
+});
+
+// GET /api/mundial/hoy — today's World Cup matches (Mexico time UTC-6)
+app.get('/api/mundial/hoy', async (req, res) => {
+    try {
+        let partidos = mundialCache.partidos?.partidos;
+        if (!partidos) {
+            const data = await fifaFetch(`${FIFA_BASE}/calendar/matches?idCompetition=${FIFA_COMPETITION}&idSeason=${FIFA_SEASON_2026}&language=en&count=104`);
+            if (!data?.Results) return res.json({ ok: true, partidos: [], count: 0 });
+            partidos = data.Results.map(parseMatchRecord);
+        }
+        // Today in Mexico City time (UTC-6)
+        const mxNow = new Date(Date.now() - 6 * 60 * 60 * 1000);
+        const todayStr = mxNow.toISOString().slice(0, 10);
+        const hoy = partidos.filter(p => {
+            if (!p.fecha) return false;
+            const d = new Date(new Date(p.fecha).getTime() - 6 * 60 * 60 * 1000);
+            return d.toISOString().slice(0, 10) === todayStr;
+        });
+        res.json({ ok: true, count: hoy.length, partidos: hoy, fecha: todayStr, source: 'fifa.com' });
+    } catch (e) {
+        res.json({ ok: false, partidos: [], error: e.message });
+    }
+});
+
+// GET /api/mundial/proximo — next upcoming match (or current live if any)
+app.get('/api/mundial/proximo', async (req, res) => {
+    try {
+        let partidos = mundialCache.partidos?.partidos;
+        if (!partidos) {
+            const data = await fifaFetch(`${FIFA_BASE}/calendar/matches?idCompetition=${FIFA_COMPETITION}&idSeason=${FIFA_SEASON_2026}&language=en&count=104`);
+            if (!data?.Results) return res.json({ ok: true, partido: null });
+            partidos = data.Results.map(parseMatchRecord);
+        }
+        const live = partidos.filter(p => p.enVivo);
+        const next = partidos
+            .filter(p => p.programado && p.fecha)
+            .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+        const partido = live.length > 0 ? live[0] : (next[0] || null);
+        res.json({ ok: true, partido, enVivo: live.length > 0, source: 'fifa.com' });
+    } catch (e) {
+        res.json({ ok: false, partido: null, error: e.message });
+    }
+});
+
+// GET /api/mundial/goleadores — top scorers from FIFA official API
+app.get('/api/mundial/goleadores', async (req, res) => {
+    const now = Date.now();
+    const force = req.query.force === '1';
+    if (!force && mundialCache.goleadores && (now - mundialCache.goleadoresTs) < MUNDIAL_TTL * 5) {
+        return res.json(mundialCache.goleadores);
+    }
+    try {
+        const data = await fifaFetch(`${FIFA_BASE}/topscorers?idCompetition=${FIFA_COMPETITION}&idSeason=${FIFA_SEASON_2026}&language=es&count=20`);
+        if (!data?.Results?.length) {
+            return res.json({ ok: true, goleadores: [], source: 'fifa.com', empty: true });
+        }
+        const goleadores = data.Results.map((r, idx) => ({
+            posicion: idx + 1,
+            nombre: fifaLocale(r.Player?.Name) || r.Player?.ShortName || '',
+            equipo: fifaLocale(r.Team?.TeamName) || r.Team?.ShortClubName || '',
+            code: r.Team?.IdCountry || '',
+            logo: fifaFlagUrl(r.Team?.IdCountry),
+            goles: r.Goals ?? 0,
+            penales: r.PenaltyGoals ?? 0,
+            partidosJugados: r.MatchesPlayed ?? 0,
+        }));
+        const result = { ok: true, count: goleadores.length, goleadores, source: 'fifa.com' };
+        mundialCache.goleadores = result;
+        mundialCache.goleadoresTs = now;
+        res.json(result);
+    } catch (e) {
+        console.error('[/api/mundial/goleadores]', e.message);
+        res.json({ ok: false, goleadores: [], error: e.message });
     }
 });
 
