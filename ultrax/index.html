@@ -170,7 +170,7 @@
         </div>
 
     <!-- Banner Copa Mundial 2026 -->
-    <div class="world-cup-banner" onclick="openWorldCupModal()">
+    <div class="world-cup-banner" onclick="window.location.href='mundial.html'">
         <div class="wc-shimmer"></div>
         <div class="wc-glow-ring"></div>
 
@@ -200,53 +200,6 @@
         </div>
     </div>
 
-    <!-- Modal Copa Mundial Bloqueado -->
-    <div class="wc-modal-backdrop" id="wcModal" onclick="closeWorldCupModal()">
-        <div class="wc-modal" onclick="event.stopPropagation()">
-            <!-- Handle bar -->
-            <div class="wc-modal-handle"></div>
-            <button class="wc-modal-close" onclick="closeWorldCupModal()">✕</button>
-
-            <!-- Header glass panel -->
-            <div class="wc-modal-header">
-                <div class="wc-modal-pitch-lines">
-                    <svg viewBox="0 0 320 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <line x1="160" y1="0" x2="160" y2="90" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-                        <circle cx="160" cy="45" r="30" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
-                        <rect x="10" y="10" width="300" height="70" rx="4" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
-                    </svg>
-                </div>
-                <div class="wc-modal-lock-big">
-                    <svg viewBox="0 0 24 24" fill="none">
-                        <rect x="3" y="11" width="18" height="12" rx="3" fill="rgba(255,215,0,0.15)" stroke="#ffd700" stroke-width="1.5"/>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round"/>
-                        <circle cx="12" cy="17" r="2" fill="#ffd700"/>
-                        <line x1="12" y1="17" x2="12" y2="19.5" stroke="#ffd700" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                </div>
-                <div class="wc-modal-trophy-row">🏆 ⚽ 🏆</div>
-            </div>
-
-            <div class="wc-modal-badge">🔒 CONTENIDO BLOQUEADO</div>
-            <h3 class="wc-modal-title">Copa Mundial FIFA 2026</h3>
-            <p class="wc-modal-desc">Este espacio se activa el 11 de junio. Aquí verás todo del Mundial en un solo lugar:</p>
-
-            <div class="wc-modal-features">
-                <div class="wc-feat"><span class="wc-feat-icon">📺</span><span>Transmisiones en vivo de todos los partidos</span></div>
-                <div class="wc-feat"><span class="wc-feat-icon">⚡</span><span>Goles, tarjetas y estadísticas al instante</span></div>
-                <div class="wc-feat"><span class="wc-feat-icon">🏟️</span><span>Alineaciones confirmadas de cada partido</span></div>
-                <div class="wc-feat"><span class="wc-feat-icon">🏆</span><span>Tabla de grupos y bracket del torneo</span></div>
-                <div class="wc-feat"><span class="wc-feat-icon">🌎</span><span>Noticias y análisis de las 48 selecciones</span></div>
-            </div>
-
-            <div class="wc-modal-timer-box">
-                <div class="wc-modal-countdown-label">SE DESBLOQUEA EN</div>
-                <div class="wc-modal-timer" id="wcModalTimer">5d  23h  08m  48s</div>
-            </div>
-
-            <button class="wc-modal-btn" onclick="closeWorldCupModal()">¡Listo, espero el Mundial! 🔥</button>
-        </div>
-    </div>
 
     <!-- Patrocinadores -->
     <div class="sponsors-strip">
@@ -1291,23 +1244,6 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        function openWorldCupModal() {
-            const backdrop = document.getElementById('wcModal');
-            if (!backdrop) return;
-            backdrop.classList.add('wc-open');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeWorldCupModal() {
-            const backdrop = document.getElementById('wcModal');
-            if (!backdrop) return;
-            backdrop.classList.remove('wc-open');
-            document.body.style.overflow = '';
-        }
-
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeWorldCupModal();
-        });
     </script>
     <script src="https://www.paypal.com/sdk/js?client-id=YOUR_LIVE_CLIENT_ID_HERE&currency=USD"></script>
     <script src="js/donaciones.js"></script>
