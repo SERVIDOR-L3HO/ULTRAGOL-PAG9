@@ -695,9 +695,6 @@
         <button class="mw-tab" onclick="showSection('partidos',this)" id="tabPartidos">
             <span class="tab-live-dot" id="liveDotPartidos"></span>Partidos
         </button>
-        <button class="mw-tab" onclick="showSection('transmisiones',this)" id="tabTx">
-            <span class="tab-live-dot" id="liveDotTx"></span>Transmisiones
-        </button>
         <button class="mw-tab" onclick="showSection('groups',this)">Grupos</button>
         <button class="mw-tab" onclick="showSection('stadiums',this)">Sedes</button>
         <button class="mw-tab" onclick="showSection('teams',this)">Equipos</button>
@@ -920,39 +917,6 @@
             </div>
         </section>
 
-        <!-- ══════════════════════════════════ TRANSMISIONES ══════════════════════════════════ -->
-        <section class="mw-section" id="sec-transmisiones">
-            <div class="section-header">
-                <span class="section-header-icon">📺</span>
-                <div class="section-header-text">
-                    <div class="section-header-title">Dónde ver el Mundial</div>
-                    <div class="section-header-sub">Links de transmisión en vivo</div>
-                </div>
-                <span class="section-badge" id="txBadge">CARGANDO</span>
-            </div>
-
-            <div class="refresh-bar">
-                <span><i class="fas fa-sync-alt"></i> Datos en tiempo real</span>
-                <button class="refresh-btn" id="refreshTxBtn" onclick="loadTransmisiones(true)">
-                    <i class="fas fa-sync-alt"></i> Actualizar
-                </button>
-            </div>
-
-            <div class="tx-info-bar">
-                <span class="tx-info-bar-icon">ℹ️</span>
-                <div class="tx-info-bar-text">
-                    <strong>Transmisiones en vivo</strong>
-                    Los links se actualizan en tiempo real. Cuando un partido esté en curso aparecerá con el botón Ver Ahora.
-                </div>
-            </div>
-
-            <div id="txContainer">
-                <div class="state-loading">
-                    <div class="state-loading-spinner"></div>
-                    <div class="state-text">Buscando transmisiones...</div>
-                </div>
-            </div>
-        </section>
 
         <!-- ══════════════════════════════════ GROUPS ══════════════════════════════════ -->
         <section class="mw-section" id="sec-groups">
