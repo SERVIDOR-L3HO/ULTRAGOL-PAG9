@@ -848,6 +848,17 @@ app.get('/api/notifications', async (req, res) => {
     }
 });
 
+app.get('/api/ultragol/transmisiones1', async (req, res) => {
+    try {
+        const response = await fetch(apiUrl('/gol-1'));
+        const data = await response.json();
+        res.json(data);
+    } catch (error) {
+        console.error('Error proxying gol-1:', error);
+        res.status(500).json({ transmisiones: [] });
+    }
+});
+
 app.get('/api/ultragol/transmisiones3', async (req, res) => {
     try {
         const response = await fetch(apiUrl('/gol-3'));

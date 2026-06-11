@@ -547,7 +547,7 @@ async function loadTransmisiones() {
     try {
         // Cargar las 7 APIs en paralelo con manejo individual de errores y timeouts
         const [data1, data2, data3, data4, data5, data6, data7, data8] = await Promise.all([
-            fetchWithTimeout(`${API_BASE}/gol-1`, 8000)
+            fetchWithTimeout(`/api/ultragol/transmisiones1`, 8000)
                 .then(res => res.json())
                 .catch(err => {
                     _log('⚠️ Error cargando API 1 (rereyano):', err.message);
