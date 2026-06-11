@@ -2065,6 +2065,8 @@ function showChannelSelector(transmision, partidoNombre) {
             let enlace = '';
             if (canal.url) {
                 enlace = canal.url;
+            } else if (canal.embed) {
+                enlace = decodeStreamUrl(canal.embed);
             } else if (canal.enlaces && canal.enlaces.length > 0) {
                 enlace = canal.enlaces[0].url || canal.enlaces[0];
             } else if (canal.links) {
@@ -2072,6 +2074,8 @@ function showChannelSelector(transmision, partidoNombre) {
             } else if (canal.link) {
                 enlace = canal.link;
             }
+
+            if (!enlace) return;
 
             const canalNombre = canal.nombre || `Servidor ${serverNum}`;
             const safeNombre  = partidoNombre.replace(/'/g, "\\'");
