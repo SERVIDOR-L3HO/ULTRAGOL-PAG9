@@ -272,7 +272,7 @@ app.post('/api/turnstile/verify', async (req, res) => {
 });
 
 // UltraGol API Proxy (para evitar problemas de CORS)
-const API_BASE_URL = 'https://ultra-gol.vercel.app';
+const API_BASE_URL = 'https://ultragol-api-3-phi.vercel.app';
 const ULTRAGOL_API_KEY = process.env.ULTRAGOL_API_KEY || '';
 
 function apiUrl(endpoint) {
@@ -1954,7 +1954,7 @@ app.get('/api/ultrawidget-agenda', async (req, res) => {
     if (agendaCache && (now - agendaCacheTime) < AGENDA_TTL) {
         return res.json(agendaCache);
     }
-    const BASE = 'https://ultra-gol.vercel.app';
+    const BASE = 'https://ultragol-api-3-phi.vercel.app';
     const [d1, d2, d3, d4, d5, d6, d7, d8] = await Promise.all([
         fetchAgendaAPI(`${BASE}/gol-1`),
         fetchAgendaAPI(`${BASE}/gol-2`),

@@ -9,7 +9,7 @@ const isGitHubPages = window.location.hostname.includes('github.io') ||
 
 // Usar API directa en GitHub Pages, proxy local en Replit
 const API_BASE_URL = isGitHubPages 
-    ? 'https://ultra-gol.vercel.app' 
+    ? 'https://ultragol-api-3-phi.vercel.app' 
     : '/api/ultragol';
 
 class UltraGolAPI {
