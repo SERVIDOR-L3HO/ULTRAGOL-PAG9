@@ -3183,7 +3183,7 @@ function playStreamInModal(streamUrl, title, isYouTube = false) {
     currentActiveServerIdx = (() => {
         const decoded = streamUrl;
         return currentChannelsList.findIndex(c => {
-            const u = decodeStreamUrl(c.url || (c.enlaces && c.enlaces[0] && (c.enlaces[0].url || c.enlaces[0])) ||
+            const u = decodeStreamUrl(c.url || c.embed || (c.enlaces && c.enlaces[0] && (c.enlaces[0].url || c.enlaces[0])) ||
                 (c.links && (c.links.principal || c.links.backup || c.links.url)) || c.link || '');
             return u && decoded && u === decoded;
         });
@@ -3684,7 +3684,7 @@ function renderServerStrip(channels) {
     if (!scroll) return;
 
     const list = (channels || []).filter(c => {
-        const u = c.url || (c.enlaces && c.enlaces[0] && (c.enlaces[0].url || c.enlaces[0])) ||
+        const u = c.url || c.embed || (c.enlaces && c.enlaces[0] && (c.enlaces[0].url || c.enlaces[0])) ||
                   (c.links && (c.links.principal || c.links.backup || c.links.url)) || c.link || '';
         return !!u;
     });
@@ -3718,6 +3718,7 @@ function loadServerInPlayer(index) {
     const canal = currentChannelsList[index];
 
     let url = canal.url || '';
+    if (!url && canal.embed) url = canal.embed;
     if (!url && canal.enlaces && canal.enlaces.length > 0) url = canal.enlaces[0].url || canal.enlaces[0];
     if (!url && canal.links) url = canal.links.principal || canal.links.backup || canal.links.hoca || canal.links.url || '';
     if (!url && canal.link) url = canal.link;
