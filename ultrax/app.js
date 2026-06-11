@@ -5109,13 +5109,23 @@ function _combinarCanalesDeAPIs(eventoRef, tituloMostrar, fallbackTransmision) {
         }
     }
 
-    // Eliminar canales duplicados (mismo url)
+    // Eliminar canales duplicados (mismo url — también revisamos enlaces[0].url)
     const urlsSeen = new Set();
     canalesCombinados = canalesCombinados.filter(c => {
-        const url = c.url || c.src || c.stream_url || '';
-        if (!url || urlsSeen.has(url)) return !url; // sin url siempre pasa
+        const url = c.url || c.src || c.stream_url || c.embed ||
+                    (c.enlaces && c.enlaces[0] && c.enlaces[0].url) || '';
+        if (!url || urlsSeen.has(url)) return false;
         urlsSeen.add(url);
         return true;
+    });
+
+    // Renumerar canales con el mismo nombre para que sean distinguibles
+    const nombreCount = {};
+    canalesCombinados = canalesCombinados.map(c => {
+        const base = c.nombre || 'Servidor';
+        nombreCount[base] = (nombreCount[base] || 0) + 1;
+        if (nombreCount[base] > 1) return { ...c, nombre: `${base} ${nombreCount[base]}` };
+        return c;
     });
 
     _log(`📺 Total canales combinados de todas las APIs: ${canalesCombinados.length}`);
@@ -6577,12 +6587,22 @@ function selectImportantMatchByTransmision(eventoNombre) {
             if (t.canales?.length) canalesCombinados.push(...t.canales.map(c => ({ ...c, fuente })));
         }
     }
-    // Dedup por URL
+    // Dedup por URL (también revisamos enlaces[0].url)
     const seen = new Set();
     canalesCombinados = canalesCombinados.filter(c => {
-        const url = c.url || c.src || c.stream_url || '';
-        if (!url || seen.has(url)) return !url;
+        const url = c.url || c.src || c.stream_url || c.embed ||
+                    (c.enlaces && c.enlaces[0] && c.enlaces[0].url) || '';
+        if (!url || seen.has(url)) return false;
         seen.add(url); return true;
+    });
+
+    // Renumerar canales con el mismo nombre
+    const nombreCount = {};
+    canalesCombinados = canalesCombinados.map(c => {
+        const base = c.nombre || 'Servidor';
+        nombreCount[base] = (nombreCount[base] || 0) + 1;
+        if (nombreCount[base] > 1) return { ...c, nombre: `${base} ${nombreCount[base]}` };
+        return c;
     });
 
     closeImportantMatchesModal();
