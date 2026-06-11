@@ -1980,7 +1980,7 @@ setTimeout(() => loadPartidos(), 2000);
 function openStreamsModal(slugKey) {
     const p = _matchMap.get(slugKey);
     if (!p) return;
-    const urls = (p.transmisionUrl || '').split(',').map(s => s.trim()).filter(Boolean);
+    const urls = [...new Set((p.transmisionUrl || '').split(',').map(s => s.trim()).filter(Boolean))];
     const overlay = document.getElementById('streamsOverlay');
     const title = document.getElementById('streamsTitle');
     const sub = document.getElementById('streamsSub');
