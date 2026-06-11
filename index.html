@@ -836,11 +836,10 @@
     if(sb)sObs.observe(sb);
 
     // ── LIVE TICKER ───────────────────────────────────────────────────────────
-    const API='https://ultra-gol.vercel.app';
     const LGS=[
-        {n:'Liga MX',u:`${API}/marcadores`},{n:'Premier',u:`${API}/premier/marcadores`},
-        {n:'La Liga',u:`${API}/laliga/marcadores`},{n:'Serie A',u:`${API}/seriea/marcadores`},
-        {n:'Bundesliga',u:`${API}/bundesliga/marcadores`},{n:'Ligue 1',u:`${API}/ligue1/marcadores`}
+        {n:'Liga MX',u:`/api/ultragol/marcadores`},{n:'Premier',u:`/api/ultragol/premier-marcadores`},
+        {n:'La Liga',u:`/api/ultragol/laliga-marcadores`},{n:'Serie A',u:`/api/ultragol/seriea-marcadores`},
+        {n:'Bundesliga',u:`/api/ultragol/bundesliga-marcadores`},{n:'Ligue 1',u:`/api/ultragol/ligue1-marcadores`}
     ];
     function tn(p,s){return s==='local'?p.local?.nombreCorto||p.local?.nombre||p.equipo1||'?':p.visitante?.nombreCorto||p.visitante?.nombre||p.equipo2||'?';}
     function ts(p){return`${p.marcador?.local??p.golesLocal??'0'}-${p.marcador?.visitante??p.golesVisitante??'0'}`;}

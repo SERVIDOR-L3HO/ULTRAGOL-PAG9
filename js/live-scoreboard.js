@@ -1,7 +1,7 @@
 // Live Scoreboard Module
 class LiveScoreboard {
     constructor() {
-        this.apiUrl = 'https://ultra-gol.vercel.app/gol-3';
+        this.apiUrl = '/api/ultragol/partidos';
         this.currentFilter = 'live'; // live, upcoming, all
         this.matches = [];
         this.lastUpdated = null;

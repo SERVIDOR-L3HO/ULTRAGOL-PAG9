@@ -452,69 +452,60 @@ app.get('/api/auth/session', (req, res) => {
 
 console.log('✅ Authentication API proxy enabled');
 
-app.get('/api/ultragol/tabla', async (req, res) => {
+async function safeProxy(res, upstreamPath, fallback = {}) {
     try {
-        const response = await fetch(apiUrl('/tabla'));
+        const response = await fetch(apiUrl(upstreamPath), { signal: AbortSignal.timeout(8000) });
+        if (!response.ok) return res.json(fallback);
         const data = await response.json();
         res.json(data);
-    } catch (error) {
-        console.error('Error proxying tabla:', error);
-        res.status(500).json({ error: 'Error al obtener la tabla' });
+    } catch (_) {
+        res.json(fallback);
     }
-});
+}
 
-app.get('/api/ultragol/goleadores', async (req, res) => {
+app.get('/api/ultragol/tabla', (req, res) => safeProxy(res, '/tabla', { tabla: [] }));
+app.get('/api/ultragol/goleadores', (req, res) => safeProxy(res, '/goleadores', { goleadores: [] }));
+app.get('/api/ultragol/noticias', (req, res) => safeProxy(res, '/Noticias', { noticias: [] }));
+app.get('/api/ultragol/equipos', (req, res) => safeProxy(res, '/Equipos', []));
+app.get('/api/ultragol/videos', (req, res) => safeProxy(res, '/videos', { videos: [] }));
+app.get('/api/ultragol/notificaciones', (req, res) => safeProxy(res, '/notificaciones', { notificaciones: [], total: 0 }));
+
+// League-specific marcadores proxy endpoints (used by ticker and live scoreboard)
+const LEAGUE_ENDPOINTS = [
+    { path: '/api/ultragol/marcadores',            upstream: '/marcadores' },
+    { path: '/api/ultragol/premier-marcadores',    upstream: '/premier/marcadores' },
+    { path: '/api/ultragol/laliga-marcadores',     upstream: '/laliga/marcadores' },
+    { path: '/api/ultragol/seriea-marcadores',     upstream: '/seriea/marcadores' },
+    { path: '/api/ultragol/bundesliga-marcadores', upstream: '/bundesliga/marcadores' },
+    { path: '/api/ultragol/ligue1-marcadores',     upstream: '/ligue1/marcadores' },
+];
+
+for (const { path: routePath, upstream } of LEAGUE_ENDPOINTS) {
+    app.get(routePath, async (req, res) => {
+        try {
+            const response = await fetch(apiUrl(upstream), { signal: AbortSignal.timeout(8000) });
+            if (!response.ok) {
+                return res.json({ partidos: [], matches: [], events: [] });
+            }
+            const data = await response.json();
+            res.json(data);
+        } catch (error) {
+            res.json({ partidos: [], matches: [], events: [] });
+        }
+    });
+}
+
+// /api/ultragol/partidos — returns merged transmissions (used by live-scoreboard)
+app.get('/api/ultragol/partidos', async (req, res) => {
     try {
-        const response = await fetch(apiUrl('/goleadores'));
+        const response = await fetch(apiUrl('/gol-3'), { signal: AbortSignal.timeout(8000) });
+        if (!response.ok) {
+            return res.json({ transmisiones: [], partidos: [] });
+        }
         const data = await response.json();
         res.json(data);
     } catch (error) {
-        console.error('Error proxying goleadores:', error);
-        res.status(500).json({ error: 'Error al obtener goleadores' });
-    }
-});
-
-app.get('/api/ultragol/noticias', async (req, res) => {
-    try {
-        const response = await fetch(apiUrl('/Noticias'));
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error proxying noticias:', error);
-        res.status(500).json({ error: 'Error al obtener noticias' });
-    }
-});
-
-app.get('/api/ultragol/equipos', async (req, res) => {
-    try {
-        const response = await fetch(apiUrl('/Equipos'));
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error proxying equipos:', error);
-        res.status(500).json({ error: 'Error al obtener equipos' });
-    }
-});
-
-app.get('/api/ultragol/videos', async (req, res) => {
-    try {
-        const response = await fetch(apiUrl('/videos'));
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error proxying videos:', error);
-        res.status(500).json({ error: 'Error al obtener videos' });
-    }
-});
-
-app.get('/api/ultragol/notificaciones', async (req, res) => {
-    try {
-        const response = await fetch(apiUrl('/notificaciones'));
-        const data = await response.json();
-        res.json(data);
-    } catch (error) {
-        console.error('Error proxying notificaciones:', error);
-        res.status(500).json({ error: 'Error al obtener notificaciones' });
+        res.json({ transmisiones: [], partidos: [] });
     }
 });
 

@@ -270,7 +270,7 @@ class NotificationManager {
             
             // Try API first with timeout
             try {
-                const response = await fetchWithTimeout('https://ultra-gol.vercel.app/Equipos', 5000);
+                const response = await fetchWithTimeout('/api/ultragol/equipos', 5000);
                 if (response.ok) {
                     const teams = await response.json();
                     console.log('✅ Teams fetched from API:', teams.length);
@@ -348,7 +348,7 @@ class NotificationManager {
         }
 
         console.log(`🔔 Starting notifications for team: ${this.favoriteTeam}`);
-        console.log('📡 Polling API: https://ultra-gol.vercel.app/notificaciones/ligamx');
+        console.log('📡 Polling API: /api/ultragol/notificaciones');
         
         // Check immediately
         this.checkForNotifications();
@@ -363,7 +363,7 @@ class NotificationManager {
         try {
             // Usar el endpoint específico de Liga MX (más eficiente)
             // Endpoints disponibles: ligamx, premier, laliga, series, bundesliga, ligue1
-            const apiUrl = 'https://ultra-gol.vercel.app/notificaciones/ligamx';
+            const apiUrl = '/api/ultragol/notificaciones';
             
             console.log('📡 Checking notifications...', new Date().toLocaleTimeString());
             const response = await fetch(apiUrl);
@@ -371,7 +371,7 @@ class NotificationManager {
             if (!response.ok) {
                 console.error('❌ Error fetching notifications:', response.status);
                 // Fallback a todas las notificaciones si falla
-                const fallbackResponse = await fetch('https://ultra-gol.vercel.app/notificaciones');
+                const fallbackResponse = await fetch('/api/ultragol/notificaciones');
                 if (!fallbackResponse.ok) return;
                 const fallbackData = await fallbackResponse.json();
                 console.log('✅ Fallback data loaded:', fallbackData.total, 'notifications');
