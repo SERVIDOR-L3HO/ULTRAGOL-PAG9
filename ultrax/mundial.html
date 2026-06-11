@@ -317,6 +317,98 @@
     }
     .match-watch-btn i { font-size: 9px; }
 
+    /* ═══════════════════════════════════
+       STREAMS MODAL
+    ═══════════════════════════════════ */
+    .streams-overlay {
+        position: fixed; inset: 0; z-index: 999;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(6px);
+        display: flex; align-items: flex-end; justify-content: center;
+        opacity: 0; pointer-events: none;
+        transition: opacity 0.25s ease;
+    }
+    .streams-overlay.open { opacity: 1; pointer-events: all; }
+    .streams-sheet {
+        width: 100%; max-width: 520px;
+        background: #0d1120;
+        border-top-left-radius: 22px; border-top-right-radius: 22px;
+        border: 1px solid rgba(255,215,0,0.12);
+        border-bottom: none;
+        padding: 0 0 env(safe-area-inset-bottom);
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+        max-height: 80dvh; display: flex; flex-direction: column;
+    }
+    .streams-overlay.open .streams-sheet { transform: translateY(0); }
+    .streams-handle {
+        width: 36px; height: 4px; border-radius: 2px;
+        background: rgba(255,255,255,0.15);
+        margin: 10px auto 0;
+    }
+    .streams-header {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px 18px 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        flex-shrink: 0;
+    }
+    .streams-match-info { display: flex; flex-direction: column; gap: 2px; }
+    .streams-match-title { font-size: 14px; font-weight: 900; color: #fff; }
+    .streams-match-sub { font-size: 10px; color: rgba(255,255,255,0.4); font-weight: 600; }
+    .streams-close {
+        width: 30px; height: 30px; border-radius: 50%;
+        background: rgba(255,255,255,0.07); border: none;
+        color: rgba(255,255,255,0.6); font-size: 14px;
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        -webkit-tap-highlight-color: transparent; flex-shrink: 0;
+    }
+    .streams-close:active { background: rgba(255,255,255,0.14); }
+    .streams-info-bar {
+        margin: 10px 16px 4px;
+        padding: 8px 12px;
+        background: rgba(255,215,0,0.06);
+        border: 1px solid rgba(255,215,0,0.15);
+        border-radius: 10px;
+        font-size: 10px; color: rgba(255,215,0,0.8); font-weight: 600;
+        display: flex; align-items: center; gap: 6px;
+        flex-shrink: 0;
+    }
+    .streams-list {
+        overflow-y: auto; padding: 10px 16px 16px;
+        display: flex; flex-direction: column; gap: 8px;
+    }
+    .streams-list::-webkit-scrollbar { width: 2px; }
+    .streams-list::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.2); border-radius: 2px; }
+    .stream-item {
+        display: flex; align-items: center; gap: 12px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px; padding: 12px 14px;
+        text-decoration: none; color: #fff;
+        transition: all 0.18s; -webkit-tap-highlight-color: transparent;
+        cursor: pointer;
+    }
+    .stream-item:active { background: rgba(255,215,0,0.08); border-color: rgba(255,215,0,0.25); transform: scale(0.98); }
+    .stream-item-icon {
+        width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+        background: linear-gradient(135deg, var(--gold2), var(--gold3));
+        display: flex; align-items: center; justify-content: center;
+        font-size: 15px; color: #000;
+    }
+    .stream-item-info { flex: 1; min-width: 0; }
+    .stream-item-name { font-size: 13px; font-weight: 800; color: #fff; }
+    .stream-item-meta { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; font-weight: 600; }
+    .stream-item-badge {
+        flex-shrink: 0; padding: 3px 8px; border-radius: 20px;
+        font-size: 9px; font-weight: 800; letter-spacing: 0.5px;
+        background: rgba(255,59,48,0.15); border: 1px solid rgba(255,59,48,0.35); color: #ff3b30;
+    }
+    .stream-item-arrow { color: rgba(255,255,255,0.25); font-size: 11px; flex-shrink: 0; }
+    .streams-empty {
+        text-align: center; padding: 32px 16px;
+        color: rgba(255,255,255,0.35); font-size: 13px; font-weight: 600;
+    }
+
     /* Loading / Empty states */
     .state-loading, .state-empty {
         display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -1199,6 +1291,7 @@ let allMatches = [];
 let partidosLoaded = false;
 let matchFilter = 'all';
 let partidosRefreshTimer = null;
+const _matchMap = new Map();
 
 async function loadPartidos(force = false) {
     const btn = document.getElementById('refreshPartidosBtn');
@@ -1331,8 +1424,10 @@ function renderMatchCard(p) {
     const homeLogo = p.home.logo ? `<img src="${p.home.logo}" alt="${p.home.name}" onerror="this.style.display='none'">` : '🏳️';
     const awayLogo = p.away.logo ? `<img src="${p.away.logo}" alt="${p.away.name}" onerror="this.style.display='none'">` : '🏳️';
 
+    const slugKey = p.slug || (p.titulo || '').replace(/\s+/g,'-').toLowerCase();
+    _matchMap.set(slugKey, p);
     const watchBtn = p.transmisionUrl
-        ? `<a href="${encodeURI(p.transmisionUrl.split(',')[0])}" target="_blank" rel="noopener" class="match-watch-btn"><i class="fas fa-play"></i> Ver ahora</a>`
+        ? `<button class="match-watch-btn" onclick="openStreamsModal('${slugKey.replace(/'/g,"\\'")}')"><i class="fas fa-play"></i> Ver ahora</button>`
         : p.enVivo
             ? `<button class="match-watch-btn disabled" disabled><i class="fas fa-search"></i> Sin stream</button>`
             : `<button class="match-watch-btn disabled" disabled><i class="fas fa-clock"></i> Próximamente</button>`;
@@ -1878,6 +1973,67 @@ document.getElementById('historyList').innerHTML = HISTORY.slice().reverse().map
 
 // ── Preload partidos in background for faster tab switch ───────
 setTimeout(() => loadPartidos(), 2000);
+
+// ══════════════════════════════════════════════════════════════
+// STREAMS MODAL
+// ══════════════════════════════════════════════════════════════
+function openStreamsModal(slugKey) {
+    const p = _matchMap.get(slugKey);
+    if (!p) return;
+    const urls = (p.transmisionUrl || '').split(',').map(s => s.trim()).filter(Boolean);
+    const overlay = document.getElementById('streamsOverlay');
+    const title = document.getElementById('streamsTitle');
+    const sub = document.getElementById('streamsSub');
+    const list = document.getElementById('streamsList');
+    const isLive = p.enVivo;
+
+    title.textContent = p.titulo || (p.home && p.away ? `${p.home.name} vs ${p.away.name}` : 'Partido');
+    sub.textContent = isLive ? '🔴 En vivo ahora' : (p.fecha ? new Date(p.fecha).toLocaleString('es-MX', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Copa Mundial 2026');
+
+    if (urls.length === 0) {
+        list.innerHTML = '<div class="streams-empty">⚽ No hay servidores disponibles en este momento.</div>';
+    } else {
+        list.innerHTML = urls.map((url, i) => `
+        <a href="${encodeURI(url)}" target="_blank" rel="noopener" class="stream-item">
+            <div class="stream-item-icon"><i class="fas fa-play"></i></div>
+            <div class="stream-item-info">
+                <div class="stream-item-name">Canal ${i + 1}</div>
+                <div class="stream-item-meta">HD · Gratis</div>
+            </div>
+            ${isLive ? '<span class="stream-item-badge">EN VIVO</span>' : ''}
+            <i class="fas fa-chevron-right stream-item-arrow"></i>
+        </a>`).join('');
+    }
+
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeStreamsModal() {
+    document.getElementById('streamsOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeStreamsModal(); });
 </script>
+
+<!-- STREAMS MODAL -->
+<div class="streams-overlay" id="streamsOverlay" onclick="if(event.target===this)closeStreamsModal()">
+    <div class="streams-sheet">
+        <div class="streams-handle"></div>
+        <div class="streams-header">
+            <div class="streams-match-info">
+                <div class="streams-match-title" id="streamsTitle"></div>
+                <div class="streams-match-sub" id="streamsSub"></div>
+            </div>
+            <button class="streams-close" onclick="closeStreamsModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="streams-info-bar">
+            <i class="fas fa-info-circle"></i>
+            Si un servidor no carga, prueba con el siguiente.
+        </div>
+        <div class="streams-list" id="streamsList"></div>
+    </div>
+</div>
 </body>
 </html>
