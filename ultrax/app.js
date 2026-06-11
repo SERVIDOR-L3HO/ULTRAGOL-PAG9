@@ -718,7 +718,8 @@ async function loadTransmisiones() {
                     if (c.links.backup)    canalesExpand.push({ ...c, nombre: `${c.nombre || 'Canal'} OP2`, url: decodeStreamUrl(c.links.backup), tipoAPI: 'rereyano' });
                     if (c.links.wrapper)   canalesExpand.push({ ...c, nombre: `${c.nombre || 'Canal'} OP3`, url: decodeStreamUrl(c.links.wrapper), tipoAPI: 'rereyano' });
                 } else {
-                    canalesExpand.push({ ...c, url: decodeStreamUrl(c.url), tipoAPI: 'rereyano' });
+                    const streamUrl = c.embed || c.url;
+                    if (streamUrl) canalesExpand.push({ ...c, url: decodeStreamUrl(streamUrl), tipoAPI: 'rereyano' });
                 }
             });
             return { ...t, tipoAPI: 'rereyano', canales: canalesExpand };
