@@ -1099,8 +1099,9 @@ function normalizeTransmision(item, fuente) {
 
 // Fetch and merge all transmission sources + marcadores
 async function fetchAllPartidos() {
-    const [marc, t2, t3, t4, t5, t6, t7, t8] = await Promise.all([
+    const [marc, t1, t2, t3, t4, t5, t6, t7, t8] = await Promise.all([
         safeFetch(apiUrl('/marcadores')),
+        safeFetch(apiUrl('/gol-1')),
         safeFetch(apiUrl('/gol-2')),
         safeFetch(apiUrl('/gol-3')),
         safeFetch(apiUrl('/gol-4')),
@@ -1113,6 +1114,7 @@ async function fetchAllPartidos() {
     const map = new Map();
 
     const sources = [
+        { data: t1, key: 'transmisiones1' },
         { data: t2, key: 'transmisiones2' },
         { data: t3, key: 'transmisiones3' },
         { data: t4, key: 'transmisiones4' },
