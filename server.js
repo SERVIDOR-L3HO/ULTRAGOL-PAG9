@@ -964,6 +964,162 @@ if (process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET) {
 //  MX — SEO Match Pages
 // ============================================================
 
+// Canonical country-name aliases: maps any known variant (EN/ES/short) → canonical ES slug base
+const COUNTRY_ALIASES = {
+    // Korea
+    'korea republic':       'corea del sur',
+    'republic of korea':    'corea del sur',
+    'south korea':          'corea del sur',
+    'corea':                'corea del sur',
+    'korea':                'corea del sur',
+    // USA
+    'united states':        'estados unidos',
+    'united states of america': 'estados unidos',
+    'usa':                  'estados unidos',
+    'us':                   'estados unidos',
+    // England
+    'england':              'inglaterra',
+    // Germany
+    'germany':              'alemania',
+    // France
+    'france':               'francia',
+    // Switzerland
+    'switzerland':          'suiza',
+    // Netherlands
+    'netherlands':          'paises bajos',
+    'holland':              'paises bajos',
+    'the netherlands':      'paises bajos',
+    // Saudi Arabia
+    'saudi arabia':         'arabia saudita',
+    // Ivory Coast
+    'ivory coast':          'costa de marfil',
+    "cote d'ivoire":        'costa de marfil',
+    'cote divoire':         'costa de marfil',
+    // Democratic Republic Congo
+    'dr congo':             'congo dr',
+    'democratic republic of congo': 'congo dr',
+    // IR Iran
+    'ir iran':              'iran',
+    'islamic republic of iran': 'iran',
+    // New Zealand
+    'new zealand':          'nueva zelanda',
+    // North Korea
+    'korea dpr':            'corea del norte',
+    'dpr korea':            'corea del norte',
+    'north korea':          'corea del norte',
+    // Czech Republic
+    'czech republic':       'republica checa',
+    'czechia':              'republica checa',
+    // Serbia
+    'serbia':               'serbia',
+    // Japan
+    'japan':                'japon',
+    // Australia
+    'australia':            'australia',
+    // Portugal
+    'portugal':             'portugal',
+    // Morocco
+    'morocco':              'marruecos',
+    // Egypt
+    'egypt':                'egipto',
+    // Nigeria
+    'nigeria':              'nigeria',
+    // Senegal
+    'senegal':              'senegal',
+    // Cameroon
+    'cameroon':             'camerun',
+    // Ghana
+    'ghana':                'ghana',
+    // Tunisia
+    'tunisia':              'tunez',
+    // Algeria
+    'algeria':              'argelia',
+    // Belgium
+    'belgium':              'belgica',
+    // Poland
+    'poland':               'polonia',
+    // Denmark
+    'denmark':              'dinamarca',
+    // Sweden
+    'sweden':               'suecia',
+    // Norway
+    'norway':               'noruega',
+    // Austria
+    'austria':              'austria',
+    // Romania
+    'romania':              'rumania',
+    // Hungary
+    'hungary':              'hungria',
+    // Slovakia
+    'slovakia':             'eslovaquia',
+    // Slovenia
+    'slovenia':             'eslovenia',
+    // Greece
+    'greece':               'grecia',
+    // Turkey
+    'turkey':               'turquia',
+    'turkiye':              'turquia',
+    // Ukraine
+    'ukraine':              'ucrania',
+    // Russia
+    'russia':               'rusia',
+    // China PR
+    'china pr':             'china',
+    "china people's republic": 'china',
+    // Chinese Taipei
+    'chinese taipei':       'taipei chino',
+    // Uzbekistan
+    'uzbekistan':           'uzbekistan',
+    // India
+    'india':                'india',
+    // Venezuela
+    'venezuela':            'venezuela',
+    // Bolivia
+    'bolivia':              'bolivia',
+    // Ecuador
+    'ecuador':              'ecuador',
+    // Paraguay
+    'paraguay':             'paraguay',
+    // Trinidad and Tobago
+    'trinidad and tobago':  'trinidad y tobago',
+    // Costa Rica
+    'costa rica':           'costa rica',
+    // Honduras
+    'honduras':             'honduras',
+    // El Salvador
+    'el salvador':          'el salvador',
+    // Guatemala
+    'guatemala':            'guatemala',
+    // Jamaica
+    'jamaica':              'jamaica',
+    // Haiti
+    'haiti':                'haiti',
+    // Canada
+    'canada':               'canada',
+    // New Caledonia
+    'new caledonia':        'nueva caledonia',
+    // Tahiti
+    'tahiti':               'tahiti',
+    // Fiji
+    'fiji':                 'fiji',
+    // Solomon Islands
+    'solomon islands':      'islas salomon',
+    // Cuba
+    'cuba':                 'cuba',
+    // Panama
+    'panama':               'panama',
+    // Trinidad
+    'trinidad':             'trinidad y tobago',
+};
+
+function normalizeCountryName(name) {
+    if (!name) return '';
+    const key = (name).toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s]/g, '').trim();
+    return COUNTRY_ALIASES[key] || name;
+}
+
 function slugify(text) {
     return (text || '').toLowerCase()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -973,6 +1129,11 @@ function slugify(text) {
 
 function matchSlug(local, visitante) {
     return `${slugify(local)}-vs-${slugify(visitante)}`;
+}
+
+// Build slug using normalized country names for cross-language matching
+function mundialMatchSlug(home, away) {
+    return matchSlug(normalizeCountryName(home), normalizeCountryName(away));
 }
 
 async function safeFetch(url) {
@@ -2125,10 +2286,21 @@ app.get('/api/mundial/partidos', async (req, res) => {
         try {
             const allPartidos = await fetchAllPartidos();
             for (const p of partidos) {
-                const slug = matchSlug(p.home.name, p.away.name);
+                const slug1 = mundialMatchSlug(p.home.name, p.away.name);
+                const slug2 = mundialMatchSlug(p.home.shortName, p.away.shortName);
+                const slug3 = matchSlug(p.home.name, p.away.name);
+                const slug4 = matchSlug(p.home.shortName, p.away.shortName);
                 const match = allPartidos.find(ap =>
-                    ap.slug === slug ||
-                    ap.slug === matchSlug(p.home.shortName, p.away.shortName)
+                    ap.slug === slug1 ||
+                    ap.slug === slug2 ||
+                    ap.slug === slug3 ||
+                    ap.slug === slug4 ||
+                    // Fuzzy: check if both team names appear in the transmission slug
+                    (ap.slug && slug1 && (() => {
+                        const h = slugify(normalizeCountryName(p.home.name));
+                        const a = slugify(normalizeCountryName(p.away.name));
+                        return ap.slug.includes(h) && ap.slug.includes(a);
+                    })())
                 );
                 if (match?.transmisionUrl) p.transmisionUrl = match.transmisionUrl;
             }
