@@ -69,34 +69,6 @@
 </head>
 <body>
     <div class="app-container">
-        <header class="app-header">
-            <div class="header-left">
-                <button class="icon-btn back-btn" onclick="window.location.href='../index.html'">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <div class="cartoon-clock" id="realTimeClock">--:--</div>
-            </div>
-
-            <div class="header-center">
-            </div>
-
-            <div class="header-right">
-                <div class="online-counter" id="userCount">
-                    <span class="online-dot-mini"></span>
-                    <span id="onlineCountText">...</span>
-                </div>
-                <button id="tvToggleBtn" class="tv-toggle-btn" onclick="toggleTVMode()" title="Activar modo TV (control remoto)" aria-label="Activar modo TV">
-                    <i class="fas fa-tv"></i>
-                </button>
-                <button class="icon-btn settings-btn" onclick="toggleSettings()">
-                    <i class="fas fa-cog"></i>
-                </button>
-                <button class="icon-btn user-btn" id="userBtn" onclick="toggleUserMenu()">
-                    <i class="fas fa-user"></i>
-                </button>
-            </div>
-        </header>
-
         <!-- LEAGUE SELECTOR BAR -->
         <div class="league-bar">
             <button class="lbar-btn active" onclick="selectLeague('Liga MX', this)">
@@ -572,33 +544,6 @@
             </button>
         </div>
 
-        <nav class="bottom-nav" id="bottomNav">
-            <button class="nav-btn active" data-nav="home" onclick="navTo('home', this)">
-                <div class="nav-icon-wrap"><i class="fas fa-house"></i></div>
-                <span class="nav-label">Inicio</span>
-            </button>
-            <button class="nav-btn" data-nav="reels" data-reels-trigger aria-label="Abrir Reels">
-                <div class="nav-icon-wrap"><i class="fas fa-bolt"></i></div>
-                <span class="nav-label">Reels</span>
-            </button>
-            <!-- 🔥 BOTÓN CENTRAL DE BÚSQUEDA — verde + rosa, elevado del nav -->
-            <button class="nav-reels-btn" data-nav="search" onclick="navTo('search', this)" aria-label="Buscar">
-                <span class="nav-reels-glow"></span>
-                <span class="nav-reels-ring"></span>
-                <span class="nav-reels-icon">
-                    <i class="fas fa-magnifying-glass"></i>
-                </span>
-                <span class="nav-reels-label">BUSCAR</span>
-            </button>
-            <button class="nav-btn" data-nav="noticias" onclick="navBounce(this); window.location.href='noticias.html'">
-                <div class="nav-icon-wrap"><i class="fas fa-newspaper"></i></div>
-                <span class="nav-label">Noticias</span>
-            </button>
-            <button class="nav-btn" data-nav="goleadores" onclick="navBounce(this); window.location.href='goleadores.html'">
-                <div class="nav-icon-wrap"><i class="fas fa-ranking-star"></i></div>
-                <span class="nav-label">Goleadores</span>
-            </button>
-        </nav>
     </div>
 
     <div id="playerModal" class="player-modal-fullscreen">
