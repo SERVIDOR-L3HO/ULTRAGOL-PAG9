@@ -5981,15 +5981,15 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
     }
 }
 
-/* ── CHANNEL SELECTOR — BOTTOM SHEET ───────────────────── */
+/* ── CHANNEL SELECTOR — BOTTOM-RIGHT SHEET ─────────────── */
 .channel-selector-modal {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.72);
+    background: rgba(0,0,0,0.55);
     z-index: 2500;
     align-items: flex-end;
-    justify-content: center;
+    justify-content: flex-end;
 }
 
 .channel-selector-modal.active {
@@ -6003,9 +6003,9 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 }
 
 .channel-selector-content {
-    width: 100%;
-    max-width: 540px;
-    max-height: 78vh;
+    width: 76%;
+    max-width: 400px;
+    max-height: 75vh;
     background: #111116;
     border-radius: 22px 22px 0 0;
     overflow: hidden;
@@ -6025,53 +6025,16 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
     height: 4px;
     background: rgba(255,255,255,0.18);
     border-radius: 99px;
-    margin: 12px auto 4px;
+    margin: 12px auto 8px;
     flex-shrink: 0;
 }
 
-/* header */
-.csr-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 20px 14px;
-    flex-shrink: 0;
-}
-
-.csr-header h3,
-#channelSelectorTitle {
-    font-size: 15px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 0.01em;
-    margin: 0;
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.csr-close-btn {
-    background: rgba(255,255,255,0.09);
-    border: none;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: rgba(255,255,255,0.7);
-    font-size: 13px;
-    flex-shrink: 0;
-    transition: background 0.2s;
-}
-
-.csr-close-btn:hover { background: rgba(255,255,255,0.16); }
+/* hidden — kept for JS compat */
+#channelSelectorTitle { display: none; }
 
 /* body scroll area */
 .channel-selector-body {
-    padding: 0 14px 24px;
+    padding: 0 12px 28px;
     overflow-y: auto;
     flex: 1;
 }
@@ -6081,7 +6044,7 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 16px 16px;
+    padding: 15px 14px;
     margin-bottom: 8px;
     background: #1c1c22;
     border: 1.5px solid rgba(255,255,255,0.07);
@@ -6100,7 +6063,7 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 
 /* selected / featured */
 .sr-row.sr-selected {
-    background: rgba(255,107,53,0.1);
+    background: rgba(255,107,53,0.12);
     border-color: #ff6b35;
 }
 
@@ -6172,7 +6135,7 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 }
 
 @media (max-width: 480px) {
-    .channel-selector-content { max-height: 82vh; }
+    .channel-selector-content { width: 80%; max-height: 80vh; }
     .sr-name { font-size: 14px; }
     
     .stream-option-btn {
