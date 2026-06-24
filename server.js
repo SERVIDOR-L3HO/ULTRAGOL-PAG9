@@ -272,7 +272,7 @@ app.post('/api/turnstile/verify', async (req, res) => {
 });
 
 // UltraGol API Proxy (para evitar problemas de CORS)
-const API_BASE_URL = 'https://ultragol-api-3-phi.vercel.app';
+const API_BASE_URL = 'https://ultrago-xi.vercel.app';
 const ULTRAGOL_API_KEY = process.env.ULTRAGOL_API_KEY || '';
 
 function apiUrl(endpoint) {
