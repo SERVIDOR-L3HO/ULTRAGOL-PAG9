@@ -3817,21 +3817,7 @@ function loadServerInPlayer(index) {
     url = decodeStreamUrl(url);
     if (!url) { showToast('Este servidor no tiene señal disponible'); return; }
 
-    currentActiveServerIdx = index;
-    currentStreamUrl = url;
-    currentStreamTitle = currentStreamTitle || (canal.nombre || 'Transmisión en Vivo');
-
-    const iframe = document.getElementById('modalIframe');
-    const loader = document.getElementById('modalLoader');
-    if (loader) loader.style.display = 'flex';
-    if (iframe) {
-        iframe.src = url;
-        iframe.onload = () => { setTimeout(() => { if (loader) loader.style.display = 'none'; }, 600); };
-    }
-
-    _showStreamPlayOverlay();
-    renderServerStrip(currentChannelsList);
-    showToast(`▶ Servidor ${index + 1}: ${canal.nombre || 'HD'}`);
+    window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 function openStreamNewTab() {
