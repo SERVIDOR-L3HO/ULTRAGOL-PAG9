@@ -2249,14 +2249,9 @@ function playChannelFromSelector(url, title, channelName) {
         return;
     }
     const modal = document.getElementById('channelSelectorModal');
-    // Intentar obtener nombre del canal desde la tarjeta si no se pasó
-    if (!channelName && modal) {
-        const featured = modal.querySelector('.sv-card-featured .sv-name, .sv-card .sv-name');
-        if (featured) channelName = featured.textContent.trim();
-    }
     saveRecentChannel(url, title, channelName || '');
     if (modal) modal.classList.remove('active');
-    playStreamInModal(url, title);
+    window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 // ── HISTORIAL DE CANALES VISTOS ──────────────────────────────────────────────
@@ -3745,27 +3740,9 @@ document.addEventListener('visibilitychange', async () => {
 });
 
 function openStream(url) {
+    if (!url) return;
     currentStreamUrl = url;
-    const modal = document.getElementById('playerModal');
-    const iframe = document.getElementById('modalIframe');
-    const modalTitle = document.getElementById('modalTitle');
-    const loader = document.getElementById('modalLoader');
-    
-    const streamName = url.includes('ULTRACANALES') ? 'ULTRACANALES' : 'PANEL PREMIUM';
-    modalTitle.textContent = 'Transmisión en Vivo - ' + streamName;
-    
-    modal.classList.add('active');
-    loader.style.display = 'flex';
-    
-    _showStreamPlayOverlay();
-    
-    // Reset server strip for direct openStream calls
-    currentChannelsList = [];
-    currentActiveServerIdx = 0;
-    renderServerStrip([]);
-    
-    iframe.src = url;
-    iframe.onload = () => { setTimeout(() => { loader.style.display = 'none'; }, 500); };
+    window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 // ── SERVER SELECTOR ────────────────────────────────────────────────────────

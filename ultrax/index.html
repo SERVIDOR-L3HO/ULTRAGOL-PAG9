@@ -431,88 +431,21 @@
 
     </div>
 
-    <div id="playerModal" class="player-modal-fullscreen">
-
-        <!-- ── VIDEO AREA ─────────────────────────────────────── -->
-        <div class="player-video-container">
-            <div class="loading-spinner" id="modalLoader">
-                <div class="spinner"></div>
-            </div>
-            <iframe id="modalIframe" frameborder="0" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"></iframe>
-
-            <!-- Play overlay -->
-            <div class="stream-play-overlay" id="streamPlayOverlay" onclick="onStreamPlayPressed()">
-                <div class="stream-play-btn">
-                    <i class="fas fa-play"></i>
-                </div>
-                <p class="stream-play-label">Presiona para iniciar</p>
-            </div>
-
-            <!-- Radio Visualizer — kept hidden for JS compatibility -->
-            <div id="radioVisualizer" class="radio-visualizer" style="display:none">
-                <div class="visualizer-content">
-                    <div class="radio-waves" id="radioWaves">
-                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
-                    </div>
-                    <div class="radio-info">
-                        <h4 id="radioTitleText">MODO RADIO ACTIVO</h4>
-                    </div>
-                    <div class="radio-controls-advanced">
-                        <button class="radio-adv-btn" onclick="toggleMuteRadio()" id="radioMuteBtn"><i class="fas fa-volume-up"></i></button>
-                        <input type="range" min="0" max="100" value="100" class="volume-slider" id="radioVolumeSlider" oninput="updateRadioVolume(this.value)" style="display:none">
-                        <button id="radioBtnControl" style="display:none"></button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Top glass overlay -->
-            <div class="player-overlay-top">
-                <!-- back button removed -->
-                <div class="player-title-container">
-                    <div class="player-live-badge">
-                        <span class="live-dot"></span>
-                        <span>EN VIVO</span>
-                    </div>
-                    <h3 id="modalTitle" class="player-title">Transmisión en Vivo</h3>
-                </div>
-                <button class="player-close-btn" onclick="closeAllModals()" title="Cerrar">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- ── GLASS PANEL ─────────────────────────────────────── -->
-        <div class="pgl-panel">
-
-            <!-- Server selector -->
-            <div class="pgl-servers" id="pglServers">
-                <div class="pgl-servers-header">
-                    <div class="pgl-srv-label-wrap">
-                        <span class="pgl-srv-pulse"></span>
-                        <span class="pgl-srv-label">Servidores HD</span>
-                    </div>
-                    <span class="pgl-srv-count" id="pglSrvCount">0 disponibles</span>
-                </div>
-                <div class="pgl-servers-scroll" id="pglServersScroll">
-                    <div class="pgl-srv-empty" id="pglSrvEmpty">
-                        <i class="fas fa-satellite-dish"></i>
-                        <span>Cargando servidores…</span>
-                    </div>
-                </div>
-            </div>
-
-
-            <!-- Stats — hidden, kept for JS compatibility -->
-            <div style="display:none">
-                <div class="player-stats-section" id="playerStatsContainer"></div>
-            </div>
-
-            <!-- Hidden utility elements for JS compatibility -->
-            <span id="pglCopyIcon" style="display:none"></span>
-        </div>
-
-    </div>
+    <!-- Hidden stubs for JS compatibility -->
+    <div id="playerModal" style="display:none"></div>
+    <div id="modalLoader" style="display:none"></div>
+    <iframe id="modalIframe" style="display:none"></iframe>
+    <span id="modalTitle" style="display:none"></span>
+    <span id="pglSrvCount" style="display:none"></span>
+    <div id="pglServersScroll" style="display:none"></div>
+    <span id="pglCopyIcon" style="display:none"></span>
+    <div id="playerStatsContainer" style="display:none"></div>
+    <div id="streamPlayOverlay" style="display:none"></div>
+    <div id="radioVisualizer" style="display:none"></div>
+    <div id="radioWaves" style="display:none"></div>
+    <h4 id="radioTitleText" style="display:none"></h4>
+    <button id="radioMuteBtn" style="display:none"></button>
+    <button id="radioBtnControl" style="display:none"></button>
 
     <div id="settingsPanel" class="settings-panel">
         <div class="settings-backdrop"></div>
