@@ -37,7 +37,7 @@ let streakData = {
     claimedRewards: []
 };
 
-const API_BASE = 'https://ultragol-api-3-phi.vercel.app';
+const API_BASE = 'https://ultrago-xi.vercel.app';
 
 // Función para hacer fetch con timeout
 async function fetchWithTimeout(url, timeout = 8000) {
