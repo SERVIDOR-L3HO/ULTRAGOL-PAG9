@@ -2142,17 +2142,14 @@ function showChannelSelector(transmision, partidoNombre) {
         'transmisiones8': 'SERVIDOR 8',
     };
 
-    let cardsHtml = '';
+    let rowsHtml = '';
 
     if (totalCanales > 0) {
         transmision.canales.forEach((canal, index) => {
-            const serverNum  = index + 1;
-            const rawType    = (canal.tipoAPI || canal.fuente || '').toLowerCase();
-            const apiType    = servidorMap[rawType] || `SERVIDOR ${serverNum}`;
-            const pingVal    = Math.floor(Math.random() * 38) + 5;
-            const pingClass  = pingVal < 20 ? 'sv-ping-fast' : pingVal < 35 ? 'sv-ping-medium' : 'sv-ping-slow';
-            const delay      = (index * 55) + 'ms';
-            const isFeatured = index === 0 ? 'sv-card-featured' : '';
+            const serverNum   = index + 1;
+            const rawType     = (canal.tipoAPI || canal.fuente || '').toLowerCase();
+            const apiLabel    = servidorMap[rawType] || 'STREAM';
+            const isSelected  = index === 0 ? 'sr-selected' : '';
 
             let enlace = '';
             if (canal.url) {
@@ -2169,76 +2166,40 @@ function showChannelSelector(transmision, partidoNombre) {
 
             if (!enlace) return;
 
-            const canalNombre = canal.nombre || `Servidor ${serverNum}`;
-            const safeNombre  = partidoNombre.replace(/'/g, "\\'");
-            const numLabel    = String(serverNum).padStart(2, '0');
-
-            const safeEnlace = enlace.replace(/'/g, "\\'");
+            const canalNombre     = canal.nombre || `Servidor ${serverNum}`;
+            const safeNombre      = partidoNombre.replace(/'/g, "\\'");
+            const safeEnlace      = enlace.replace(/'/g, "\\'");
             const safeCanalNombre = canalNombre.replace(/'/g, "\\'");
-            cardsHtml += `
-                <div class="sv-card ${isFeatured}" style="animation-delay:${delay}"
-                     tabindex="0" role="button"
-                     aria-label="Servidor ${serverNum}: ${canalNombre}"
-                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playChannelFromSelector('${safeEnlace}','${safeNombre}','${safeCanalNombre}')}"
-                     onclick="playChannelFromSelector('${safeEnlace}','${safeNombre}','${safeCanalNombre}')">
-                    <div class="sv-num">
-                        ${numLabel}
-                        <div class="sv-online"></div>
-                    </div>
-                    <div class="sv-body">
-                        <div class="sv-name">${canalNombre}</div>
-                        <div class="sv-tags">
-                            <span class="sv-tag">${apiType}</span>
-                            <span class="sv-tag sv-tag-quality">HD PREMIUM</span>
-                            <span class="sv-ping ${pingClass}">${pingVal}ms</span>
-                        </div>
-                        <div class="sv-wave">
-                            <span></span><span></span><span></span><span></span><span></span>
-                        </div>
-                    </div>
-                    <div class="sv-copy" title="Copiar link" onclick="event.stopPropagation();copyChannelLink(this,'${safeEnlace}')">
-                        <i class="fas fa-link"></i>
-                    </div>
-                    <div class="sv-play">
-                        <i class="fas fa-play" style="margin-left:2px;"></i>
+
+            rowsHtml += `
+                <div class="sr-row ${isSelected}" role="button" tabindex="0"
+                     aria-label="${canalNombre}"
+                     onclick="playChannelFromSelector('${safeEnlace}','${safeNombre}','${safeCanalNombre}')"
+                     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();playChannelFromSelector('${safeEnlace}','${safeNombre}','${safeCanalNombre}')}">
+                    <div class="sr-radio"><div class="sr-radio-inner"></div></div>
+                    <div class="sr-info">
+                        <div class="sr-name">${canalNombre}</div>
+                        <div class="sr-type">${apiLabel.toUpperCase()}</div>
                     </div>
                 </div>
             `;
         });
     } else {
-        cardsHtml = `
-            <div class="sv-empty">
-                <div class="sv-empty-icon"><i class="fas fa-satellite"></i></div>
-                <p class="sv-empty-text">No se encontraron señales activas.<br>Intenta de nuevo en unos momentos.</p>
+        rowsHtml = `
+            <div class="sr-empty">
+                <i class="fas fa-satellite-dish"></i>
+                No se encontraron señales activas.
             </div>
         `;
     }
 
-    let channelsHtml = `
-        <div class="sv-wrapper">
-            <div class="sv-meta">
-                <span class="sv-live-dot"></span>
-                <span class="sv-live-label">Señales disponibles</span>
-                <span class="sv-count-pill">${totalCanales} NODO${totalCanales !== 1 ? 'S' : ''}</span>
-            </div>
-            <p class="sv-hint">Selecciona una señal para ver el partido</p>
-            <div class="sv-list">
-                ${cardsHtml}
-            </div>
-            <div class="sv-footer">
-                <div class="sv-footer-waves">
-                    <span></span><span></span><span></span><span></span>
-                </div>
-                <span class="sv-footer-text">Conexión cifrada y optimizada</span>
-            </div>
-        </div>
-    `;
+    let channelsHtml = rowsHtml;
     
     body.innerHTML = channelsHtml;
     modal.classList.add('active');
     // Auto-focus primer canal para navegación TV
     setTimeout(() => {
-        const first = body.querySelector('.sv-card[tabindex]');
+        const first = body.querySelector('.sr-row[tabindex]');
         if (first) first.focus();
     }, 120);
 }

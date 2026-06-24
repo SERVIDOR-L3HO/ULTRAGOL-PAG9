@@ -5981,170 +5981,199 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
     }
 }
 
-/* Modal de Selección de Canales */
+/* ── CHANNEL SELECTOR — BOTTOM SHEET ───────────────────── */
 .channel-selector-modal {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.95);
+    inset: 0;
+    background: rgba(0,0,0,0.72);
     z-index: 2500;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
 }
 
 .channel-selector-modal.active {
     display: flex;
+    animation: csrFadeIn 0.22s ease;
+}
+
+@keyframes csrFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
 }
 
 .channel-selector-content {
-    width: 95%;
-    max-width: 600px;
-    max-height: 80vh;
-    background: var(--secondary);
-    border-radius: 20px;
+    width: 100%;
+    max-width: 540px;
+    max-height: 78vh;
+    background: #111116;
+    border-radius: 22px 22px 0 0;
     overflow: hidden;
-    animation: modalIn 0.3s ease;
     display: flex;
     flex-direction: column;
+    animation: csrSlideUp 0.3s cubic-bezier(0.32,0.72,0,1);
 }
 
-.channel-selector-header {
+@keyframes csrSlideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+
+/* drag handle */
+.csr-handle-bar {
+    width: 38px;
+    height: 4px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 99px;
+    margin: 12px auto 4px;
+    flex-shrink: 0;
+}
+
+/* header */
+.csr-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    background: rgba(0, 0, 0, 0.2);
+    justify-content: space-between;
+    padding: 10px 20px 14px;
+    flex-shrink: 0;
 }
 
-.channel-selector-header h3 {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text);
+.csr-header h3,
+#channelSelectorTitle {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.01em;
+    margin: 0;
     flex: 1;
-    text-align: center;
-    margin: 0 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.close-channel-selector {
-    background: rgba(255, 255, 255, 0.1);
+.csr-close-btn {
+    background: rgba(255,255,255,0.09);
     border: none;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--text);
-    transition: all 0.3s ease;
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    flex-shrink: 0;
+    transition: background 0.2s;
 }
 
-.close-channel-selector:hover {
-    background: var(--primary);
-    transform: rotate(90deg);
-}
+.csr-close-btn:hover { background: rgba(255,255,255,0.16); }
 
+/* body scroll area */
 .channel-selector-body {
-    padding: 15px;
+    padding: 0 14px 24px;
     overflow-y: auto;
     flex: 1;
 }
 
-.channel-option {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
-    padding: 15px;
-    margin-bottom: 12px;
-    border: 1px solid var(--border);
-    transition: all 0.3s ease;
-}
-
-.channel-option:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--primary);
-    transform: translateY(-2px);
-}
-
-.channel-info {
+/* ── individual server row ── */
+.sr-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-
-.channel-number {
-    background: var(--primary);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 14px;
-    min-width: 60px;
-    text-align: center;
-}
-
-.channel-name {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-    flex: 1;
-}
-
-.stream-options {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.stream-option-btn {
-    flex: 1;
-    min-width: 100px;
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-    border: none;
-    padding: 10px 16px;
-    border-radius: 10px;
-    color: white;
-    font-weight: 600;
-    font-size: 13px;
+    gap: 14px;
+    padding: 16px 16px;
+    margin-bottom: 8px;
+    background: #1c1c22;
+    border: 1.5px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background 0.18s, border-color 0.18s, transform 0.12s;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.sr-row:active { transform: scale(0.975); }
+
+.sr-row:hover {
+    background: #222229;
+    border-color: rgba(255,255,255,0.13);
+}
+
+/* selected / featured */
+.sr-row.sr-selected {
+    background: rgba(255,107,53,0.1);
+    border-color: #ff6b35;
+}
+
+/* radio circle */
+.sr-radio {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.28);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    flex-shrink: 0;
+    transition: border-color 0.18s;
 }
 
-.stream-option-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 69, 0, 0.4);
+.sr-radio-inner {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: transparent;
+    transition: background 0.18s;
 }
 
-.stream-option-btn:active {
-    transform: translateY(0);
+.sr-row.sr-selected .sr-radio {
+    border-color: #ff6b35;
 }
 
-.stream-option-btn i {
+.sr-row.sr-selected .sr-radio-inner {
+    background: #ff6b35;
+}
+
+/* text info */
+.sr-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.sr-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sr-type {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: rgba(255,255,255,0.38);
+    margin-top: 2px;
+}
+
+/* empty state */
+.sr-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: rgba(255,255,255,0.35);
     font-size: 14px;
 }
 
+.sr-empty i {
+    font-size: 32px;
+    display: block;
+    margin-bottom: 12px;
+    opacity: 0.4;
+}
+
 @media (max-width: 480px) {
-    .channel-selector-header h3 {
-        font-size: 14px;
-    }
-    
-    .channel-number {
-        min-width: 50px;
-        font-size: 12px;
-        padding: 6px 10px;
-    }
-    
-    .channel-name {
-        font-size: 13px;
-    }
+    .channel-selector-content { max-height: 82vh; }
+    .sr-name { font-size: 14px; }
     
     .stream-option-btn {
         min-width: 80px;
