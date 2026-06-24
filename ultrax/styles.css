@@ -2525,7 +2525,7 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.05);
     padding: 7px 12px;
     position: sticky;
-    top: 60px;
+    top: 0;
     z-index: 90;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
