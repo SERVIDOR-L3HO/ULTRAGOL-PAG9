@@ -33,6 +33,8 @@
     <!-- Tour Guide -->
     <!-- Player Pro Glass -->
     <link rel="stylesheet" href="css/player-pro.css?v=1">
+    <!-- Glass Nav (bottom tab bar / desktop hamburger) -->
+    <link rel="stylesheet" href="css/glass-nav.css?v=1">
     
     <!-- LZ-String para comprimir URLs -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
@@ -1007,6 +1009,27 @@
     <!-- 🔥 ULTRAGOL REELS — TikTok-style viewer triggered by center nav button -->
     <script src="js/reels-viewer.js?v=4" defer></script>
     <!-- Tour Guide -->
+
+    <!-- Glass Nav (bottom tab bar / desktop hamburger) -->
+    <script src="js/glass-nav.js?v=1"></script>
+    <script>
+    (function () {
+        // Deep link support: /ultrax/?openSearch=1 opens the search modal directly
+        try {
+            var params = new URLSearchParams(location.search);
+            if (params.get('openSearch') === '1') {
+                var open = function () {
+                    if (typeof showSearchModal === 'function') showSearchModal();
+                };
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function () { setTimeout(open, 200); });
+                } else {
+                    setTimeout(open, 200);
+                }
+            }
+        } catch (e) {}
+    })();
+    </script>
 
 </body>
 </html>
