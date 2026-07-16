@@ -689,10 +689,10 @@ async function loadTransmisiones() {
                 })
         ]);
         
-        // Convertir API 2 (transmisiones3 - e1link) que usa "enlacesDetalle" → un canal por enlace
+        // Convertir API 2 (transmisiones3 - e1link) que usa "enlacesDetalle" / "canales" → un canal por enlace
         const transmisionesNormalizadasAPI2 = (data2.transmisiones || []).map(t => {
             const detalles = t.enlacesDetalle || t.enlaces || [];
-            const canalesNormalizados = detalles
+            let canalesNormalizados = detalles
                 .filter(e => e && e.url)
                 .map(e => ({
                     numero: '',
@@ -700,6 +700,17 @@ async function loadTransmisiones() {
                     url: decodeStreamUrl(e.url),
                     tipoAPI: 'e1link'
                 }));
+            // gol-3 usa canales[].link en lugar de enlacesDetalle
+            if (canalesNormalizados.length === 0 && Array.isArray(t.canales)) {
+                canalesNormalizados = t.canales
+                    .filter(c => c && (c.url || c.link))
+                    .map(c => ({
+                        numero: '',
+                        nombre: c.nombre || 'Canal',
+                        url: decodeStreamUrl(c.url || c.link),
+                        tipoAPI: 'e1link'
+                    }));
+            }
 
             return {
                 ...t,
