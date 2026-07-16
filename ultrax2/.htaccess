@@ -1,0 +1,27 @@
+# Anti-scraping protections
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Cache-Control "no-cache, no-store, must-revalidate, private"
+</IfModule>
+
+# Prevent access to sensitive files
+<FilesMatch "\.env|\.git|package\.json|\.htaccess">
+    Deny from all
+</FilesMatch>
+
+# Block common scraping tools and bots
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Block curl, wget, and scripting languages
+    RewriteCond %{HTTP_USER_AGENT} "curl|wget|python|java|perl|ruby|php|node|selenium|puppeteer|headless" [NC]
+    RewriteRule .* - [F,L]
+    
+    # Block requests without User-Agent
+    RewriteCond %{HTTP_USER_AGENT} ^$ [OR]
+    RewriteCond %{HTTP_USER_AGENT} "^$"
+    RewriteRule .* - [F,L]
+</IfModule>

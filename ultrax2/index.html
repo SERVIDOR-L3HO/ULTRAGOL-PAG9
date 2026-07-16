@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                registrations.forEach(function(r) { r.unregister(); });
+            });
+            if ('caches' in window) {
+                caches.keys().then(function(keys) {
+                    keys.forEach(function(k) { caches.delete(k); });
+                });
+            }
+        }
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="copyright" content="© 2025 ULTRAGOL. Todos los derechos reservados. La copia, clonación y distribución no autorizada está prohibida.">
+    <meta name="author" content="ULTRAGOL">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <title>ULTRAGOL - Live Streaming</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=20260408btn">
+    <link rel="stylesheet" href="pwa-install-banner.css">
+    <link rel="stylesheet" href="notifications.css?v=20251109c">
+    <link rel="stylesheet" href="tv-styles.css?v=20251109c">
+    <!-- 🔥 Reels CSS — local path so it always deploys with /ultrax/ -->
+    <link rel="stylesheet" href="css/reels-viewer.css?v=4">
+    <!-- 🎯 Featured Match Pro -->
+    <link rel="stylesheet" href="css/featured-match-pro.css?v=3">
+    <!-- Tour Guide -->
+    <!-- Player Pro Glass -->
+    <link rel="stylesheet" href="css/player-pro.css?v=1">
+    <!-- Glass Nav (bottom tab bar / desktop hamburger) -->
+    <link rel="stylesheet" href="css/glass-nav.css?v=1">
+    
+    <!-- LZ-String para comprimir URLs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e94560">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="UltraGol LIVE">
+    <link rel="apple-touch-icon" sizes="180x180" href="app-icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="app-icon.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="app-icon.png">
+    
+    <!-- Verificar codigo promocional antes de cargar anuncios -->
+    <script>
+    (function() {
+        try {
+            var stored = localStorage.getItem('ultragol_promo_status');
+            if (stored) {
+                var status = JSON.parse(stored);
+                if (status.expiresAt && new Date().getTime() < status.expiresAt) {
+                    document.documentElement.classList.add('ads-hidden');
+                    window.promoActive = true;
+                }
+            }
+        } catch(e) {}
+    })();
+    </script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- LEAGUE SELECTOR BAR -->
+        <div class="league-bar">
+            <button class="lbar-btn active" onclick="selectLeague('Liga MX', this)">
+                <div class="lbar-logo liga-mx">
+                    <img src="../attached_assets/974px-MX_logo_1763574296284.png" alt="Liga MX">
+                </div>
+                <span>Liga MX</span>
+            </button>
+            <button class="lbar-btn" onclick="selectLeague('Premier League', this)">
+                <div class="lbar-logo premier">
+                    <img src="../attached_assets/logo-Premier-League_1763574296251.png" alt="Premier League">
+                </div>
+                <span>Premier</span>
+            </button>
+            <button class="lbar-btn" onclick="selectLeague('La Liga', this)">
+                <div class="lbar-logo laliga">
+                    <img src="../attached_assets/Spanish-La-Liga-logo_1763574296217.png" alt="La Liga">
+                </div>
+                <span>La Liga</span>
+            </button>
+            <button class="lbar-btn" onclick="selectLeague('Serie A', this)">
+                <div class="lbar-logo serie-a">
+                    <img src="../attached_assets/1001854184-removebg-preview_1763574296178.png" alt="Serie A">
+                </div>
+                <span>Serie A</span>
+            </button>
+            <button class="lbar-btn" onclick="selectLeague('Bundesliga', this)">
+                <div class="lbar-logo bundesliga">
+                    <img src="../attached_assets/1001854185-removebg-preview_1763574296058.png" alt="Bundesliga">
+                </div>
+                <span>Bundesliga</span>
+            </button>
+            <button class="lbar-btn" onclick="selectLeague('Ligue 1', this)">
+                <div class="lbar-logo ligue1">
+                    <img src="../attached_assets/1001854186-removebg-preview_1763574296139.png" alt="Ligue 1">
+                </div>
+                <span>Ligue 1</span>
+            </button>
+        </div>
+
+        <!-- Featured Match PRO carousel -->
+        <div class="fmp-container" id="fmpContainer">
+            <!-- Skeleton loader -->
+            <!-- Auto-advance progress bar -->
+            <div class="fmp-progress-bar" id="fmpProgressBar"></div>
+
+            <!-- Skeleton loader -->
+            <div class="fmp-skeleton" id="fmpSkeleton">
+                <div class="fmp-skel-inner">
+                    <div class="fmp-skel-circle"></div>
+                    <div class="fmp-skel-score"></div>
+                    <div class="fmp-skel-circle"></div>
+                </div>
+            </div>
+
+            <!-- Slides track -->
+            <div class="fmp-track" id="fmpTrack"></div>
+
+            <!-- Nav arrows -->
+            <button class="fmp-nav fmp-nav-prev" id="fmpPrev" onclick="prevFeaturedMatch()" style="display:none;" aria-label="Partido anterior">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="fmp-nav fmp-nav-next" id="fmpNext" onclick="nextFeaturedMatch()" style="display:none;" aria-label="Siguiente partido">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <!-- Goal celebration overlay -->
+            <div class="fmp-goal-overlay" id="fmpGoalOverlay">
+                <span class="fmp-goal-text">⚽ GOL!</span>
+            </div>
+        </div>
+
+
+    <!-- Modal Tacos Los Pap's -->
+    <div class="tacos-modal-overlay" id="tacosModal" onclick="closeTacosModal(event)">
+        <div class="tacos-modal-card">
+            <button class="tacos-modal-close" onclick="closeTacosModal()">✕</button>
+
+            <div class="tacos-modal-logo-wrap">
+                <img src="/assets/patrocinador-tacos.jpg" alt="De Todo Un Poco - Los Pap's" class="tacos-modal-logo">
+            </div>
+
+            <div class="tacos-modal-body">
+                <div class="tacos-modal-badge">🌮 Patrocinador Oficial</div>
+                <h2 class="tacos-modal-title">De Todo Un Poco<br><span>Los Pap's</span></h2>
+                <p class="tacos-modal-desc">¡La mejor taquería del área! Tacos de suadero y nuestra salsa de la casa para acompañar cada uno de ellos. Comida auténtica, sabor único. Perfecta para ver el partido con amigos.</p>
+
+                <div class="tacos-modal-info">
+                    <div class="tacos-info-row">
+                        <span class="tacos-info-icon">📍</span>
+                        <div>
+                            <strong>Ubicación</strong>
+                            <span>Ver en Google Maps</span>
+                        </div>
+                    </div>
+                    <div class="tacos-info-row">
+                        <span class="tacos-info-icon">🕐</span>
+                        <div>
+                            <strong>Horario</strong>
+                            <span>Vie–Dom: 6:30 pm – 11:30 pm</span>
+                        </div>
+                    </div>
+                    <div class="tacos-info-row">
+                        <span class="tacos-info-icon">🌮</span>
+                        <div>
+                            <strong>Especialidad</strong>
+                            <span>Tacos de suadero y salsa de la casa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <a class="tacos-modal-btn" href="https://maps.app.goo.gl/hhVg4U9TGWivRMKW9?g_st=aw" target="_blank" rel="noopener">
+                    <span>📍</span> Ver ubicación en Maps
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Patrocinadores -->
+    <div class="sponsor-modal-overlay" id="sponsorModal" onclick="closeSponsorModal(event)">
+        <div class="sponsor-modal-card">
+
+            <!-- HERO superior -->
+            <div class="sponsor-modal-hero">
+                <button class="sponsor-modal-close" onclick="closeSponsorModal()">✕</button>
+
+                <div class="sponsor-modal-badge">
+                    <span class="sponsor-badge-dot"></span>
+                    Espacios disponibles
+                </div>
+
+                <div class="sponsor-modal-icon">⚽</div>
+
+                <h2 class="sponsor-modal-title">¿Listo para brillar<br>frente a <em>miles de fans</em>?</h2>
+                <p class="sponsor-modal-subtitle">Tu marca en la plataforma de fútbol favorita de México, activa los 365 días del año.</p>
+            </div>
+
+            <!-- CUERPO inferior -->
+            <div class="sponsor-modal-body">
+
+                <!-- Estadísticas de audiencia -->
+                <div class="sponsor-modal-stats">
+                    <div class="sponsor-stat">
+                        <span class="sponsor-stat-num">8K+</span>
+                        <span class="sponsor-stat-label">Usuarios online</span>
+                    </div>
+                    <div class="sponsor-stat">
+                        <span class="sponsor-stat-num">6</span>
+                        <span class="sponsor-stat-label">Ligas activas</span>
+                    </div>
+                    <div class="sponsor-stat">
+                        <span class="sponsor-stat-num">24/7</span>
+                        <span class="sponsor-stat-label">En vivo</span>
+                    </div>
+                </div>
+
+                <!-- Beneficios -->
+                <div class="sponsor-modal-perks">
+                    <div class="sponsor-perk">
+                        <span class="perk-icon">👁️</span>
+                        <div class="perk-text">
+                            <strong>Visibilidad masiva</strong>
+                            <span>Tu logo frente a miles de aficionados</span>
+                        </div>
+                    </div>
+                    <div class="sponsor-perk">
+                        <span class="perk-icon">🏆</span>
+                        <div class="perk-text">
+                            <strong>Asociación con el fútbol</strong>
+                            <span>Posiciona tu marca en el deporte rey</span>
+                        </div>
+                    </div>
+                    <div class="sponsor-perk">
+                        <span class="perk-icon">📍</span>
+                        <div class="perk-text">
+                            <strong>Presencia permanente</strong>
+                            <span>Banner animado durante todo el Mundial 2026</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Urgencia -->
+                <div class="sponsor-urgency">
+                    <span class="urgency-dot"></span>
+                    Quedan pocos espacios disponibles este mes
+                </div>
+
+                <!-- Botón CTA -->
+                <a class="sponsor-modal-btn" href="mailto:servidorl3ho@gmail.com?subject=Quiero%20ser%20patrocinador%20de%20UltraGol&body=Hola%2C%20me%20interesa%20patrocinar%20UltraGol.%20Por%20favor%20cont%C3%A1ctenme%20para%20m%C3%A1s%20informaci%C3%B3n.">
+                    <span class="sponsor-btn-icon">✉️</span>
+                    Quiero ser patrocinador
+                </a>
+
+                <p class="sponsor-modal-email">servidorl3ho@gmail.com</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Botón Partidos Importantes -->
+        <div class="important-matches-btn-container">
+            <button class="important-matches-btn" onclick="openImportantMatchesModal()">
+                <div class="btn-icon-wrapper">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-futbol"></i>
+                </div>
+                <div class="btn-text-wrapper">
+                    <span class="btn-title">TODOS LOS PARTIDOS</span>
+                    <span class="btn-subtitle">Ver todos los partidos y canales</span>
+                </div>
+                <i class="fas fa-chevron-right btn-arrow"></i>
+            </button>
+        </div>
+
+        <div class="tabs-container">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('live', this)">EN VIVO</button>
+                <button class="tab" onclick="switchTab('upcoming', this)">PROXIMOS PARTIDOS</button>
+                <button class="tab" onclick="switchTab('replays', this)">LOS MEJORES MOMENTOS</button>
+            </div>
+        </div>
+
+        <div class="content-container">
+            <div id="liveContent" class="tab-content active">
+                <div class="matches-grid" id="liveMatches">
+                    <div class="match-card">
+                        <div class="match-card-bg">
+                            <img src="https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=600" alt="Match">
+                        </div>
+                        <div class="match-card-content">
+                            <div class="teams">
+                                <div class="team">
+                                    <img src="https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg" alt="Chelsea" class="team-badge">
+                                    <span>CHEL</span>
+                                </div>
+                                <div class="team">
+                                    <img src="https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg" alt="Arsenal" class="team-badge">
+                                    <span>ARSENAL</span>
+                                </div>
+                            </div>
+                            <div class="match-score-mini">
+                                MODO DEMO
+                                <span class="match-time">MT</span>
+                            </div>
+                            <button class="watch-btn" onclick="watchMatch('chelsea-arsenal')">
+                                <span>WATCH NOW</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="match-card">
+                        <div class="match-card-bg">
+                            <img src="https://images.unsplash.com/photo-1575361204480-aadea25e6e68?w=600" alt="Match">
+                        </div>
+                        <div class="match-card-content">
+                            <div class="teams">
+                                <div class="team">
+                                    <img src="https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg" alt="City" class="team-badge">
+                                    <span>MAN. CITY</span>
+                                </div>
+                                <div class="team">
+                                    <img src="https://upload.wikimedia.org/wikipedia/en/6/6d/West_Ham_United_FC_logo.svg" alt="West Ham" class="team-badge">
+                                    <span>WEST HAM</span>
+                                </div>
+                            </div>
+                            <div class="match-score-mini">
+                                FAVOR DE ESPERAR 1 MIN
+                                <span class="match-time">HT</span>
+                            </div>
+                            <button class="watch-btn" onclick="watchMatch('city-westham')">
+                                <span>WATCH NOW</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="upcomingContent" class="tab-content">
+                <div class="matches-grid" id="upcomingMatches"></div>
+            </div>
+
+            <div id="replaysContent" class="tab-content">
+                <div class="matches-grid" id="replayMatches"></div>
+            </div>
+        </div>
+
+
+        <section class="recientes-section" id="recentesSection" style="display:none">
+            <div class="recientes-head">
+                <span class="recientes-icon"><i class="fas fa-clock-rotate-left"></i></span>
+                <span class="recientes-title">Vistos recientemente</span>
+                <button class="recientes-clear" onclick="clearRecentChannels()" title="Borrar historial">
+                    <i class="fas fa-trash-can"></i>
+                </button>
+            </div>
+            <div class="recientes-track" id="recientesTrack"></div>
+        </section>
+
+        <section class="standings-section">
+            <div class="standings-section-head">
+                <div class="standings-section-title">
+                    <span class="trophy-icon">🏆</span>
+                    <span id="standingsLeagueName">Tabla de Posiciones</span>
+                </div>
+            </div>
+
+            <div class="standings-tabs">
+                <button class="standings-tab active" onclick="switchStandingsTab('table', this)">
+                    <i class="fas fa-list-ol"></i> Tabla
+                </button>
+                <button class="standings-tab" onclick="switchStandingsTab('results', this)">
+                    <i class="fas fa-history"></i> Resultados
+                </button>
+            </div>
+
+            <div class="standings-container">
+                <div class="standings-table" id="standingsTable">
+                    <div class="standings-loading">
+                        <div class="standings-spinner"></div>
+                        <span>Cargando tabla…</span>
+                    </div>
+                </div>
+                <div class="results-container" id="resultsContainer" style="display: none;">
+                    <div class="standings-loading">Cargando resultados...</div>
+                </div>
+            </div>
+
+            <div class="standings-legend">
+                <div class="standings-legend-item">
+                    <div class="legend-dot-s" style="background:#f5b942"></div>
+                    <span>Líder</span>
+                </div>
+                <div class="standings-legend-item">
+                    <div class="legend-dot-s" style="background:#22d3a0"></div>
+                    <span>Liguilla directa</span>
+                </div>
+                <div class="standings-legend-item">
+                    <div class="legend-dot-s" style="background:#ff9500"></div>
+                    <span>Play-In</span>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- Barra de ayuda control remoto — solo visible en modo TV -->
+        <div class="tv-color-bar" id="tvColorBar" aria-hidden="true">
+            <button class="tv-color-btn tv-red"    onclick="navTo('home', document.querySelector('[data-nav=home]'))" title="Inicio">
+                <span class="tv-color-dot"></span><span class="tv-color-label">Inicio</span>
+            </button>
+            <button class="tv-color-btn tv-green"  onclick="openImportantMatchesModal()" title="En Vivo">
+                <span class="tv-color-dot"></span><span class="tv-color-label">En Vivo</span>
+            </button>
+            <button class="tv-color-btn tv-yellow" onclick="showSearchModal()" title="Buscar">
+                <span class="tv-color-dot"></span><span class="tv-color-label">Buscar</span>
+            </button>
+            <button class="tv-color-btn tv-blue"   onclick="toggleTVMode()" title="Modo TV">
+                <span class="tv-color-dot"></span><span class="tv-color-label">Modo TV</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Hidden stubs for JS compatibility -->
+    <div id="playerModal" style="display:none"></div>
+    <div id="modalLoader" style="display:none"></div>
+    <iframe id="modalIframe" style="display:none"></iframe>
+    <span id="modalTitle" style="display:none"></span>
+    <span id="pglSrvCount" style="display:none"></span>
+    <div id="pglServersScroll" style="display:none"></div>
+    <span id="pglCopyIcon" style="display:none"></span>
+    <div id="playerStatsContainer" style="display:none"></div>
+    <div id="streamPlayOverlay" style="display:none"></div>
+    <div id="radioVisualizer" style="display:none"></div>
+    <div id="radioWaves" style="display:none"></div>
+    <h4 id="radioTitleText" style="display:none"></h4>
+    <button id="radioMuteBtn" style="display:none"></button>
+    <button id="radioBtnControl" style="display:none"></button>
+
+    <div id="settingsPanel" class="settings-panel">
+        <div class="settings-backdrop"></div>
+        <div class="settings-content">
+            <div class="settings-header">
+                <div class="settings-header-left">
+                    <div class="settings-header-icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <div>
+                        <h3>Configuración</h3>
+                        <span class="settings-subtitle">Personaliza tu experiencia</span>
+                    </div>
+                </div>
+                <button class="settings-close-btn" onclick="toggleSettings()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="settings-body">
+
+                <!-- SECCIÓN: Canales -->
+                <div class="settings-section-label">
+                    <i class="fas fa-play-circle"></i> Transmisión
+                </div>
+                <div class="settings-channels-grid">
+                    <div class="settings-channel-card" onclick="window.location.href='../ultracanales/'">
+                        <div class="settings-channel-icon" style="background: linear-gradient(135deg, #FF6600, #ff8533); box-shadow: 0 4px 12px rgba(255,102,0,0.4);">
+                            <i class="fas fa-tv"></i>
+                        </div>
+                        <div class="settings-channel-info">
+                            <span class="settings-channel-name">TV en Vivo</span>
+                            <span class="settings-channel-badge" style="color: #FF6600;">ULTRACANALES</span>
+                        </div>
+                        <i class="fas fa-chevron-right settings-channel-arrow"></i>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: Reproducción -->
+                <div class="settings-section-label">
+                    <i class="fas fa-video"></i> Reproducción
+                </div>
+                <div class="setting-item glass-item">
+                    <div class="setting-item-left">
+                        <div class="setting-item-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <span>Ahorro de datos</span>
+                    </div>
+                    <button class="glass-action-btn" onclick="window.location.href='ahorro.html'">
+                        <i class="fas fa-leaf"></i> Activar
+                    </button>
+                </div>
+                <div class="setting-item glass-item">
+                    <div class="setting-item-left">
+                        <div class="setting-item-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <span>Notificaciones</span>
+                    </div>
+                    <button class="glass-action-btn" id="notifToggleBtn" onclick="toggleNotificationsFromSettings()">
+                        <i class="fas fa-bell" id="notifToggleIcon"></i>
+                        <span id="notifToggleText">Activar</span>
+                    </button>
+                </div>
+
+                <!-- SECCIÓN: Sistema -->
+                <div class="settings-section-label">
+                    <i class="fas fa-cog"></i> Sistema
+                </div>
+                <div class="setting-item glass-item setting-item-btn">
+                    <button class="glass-danger-btn" onclick="showClearCacheConfirmation()">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Eliminar caché</span>
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación para Eliminar Caché -->
+    <div id="clearCacheModal" class="clear-cache-modal">
+        <div class="clear-cache-overlay" onclick="closeClearCacheModal()"></div>
+        <div class="clear-cache-container">
+            <div class="clear-cache-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="clear-cache-title">¿Estás seguro?</h3>
+            <p class="clear-cache-message">Al eliminar el caché se perderá el diseño y configuración guardada de esta página. La página se recargará automáticamente.</p>
+            <div class="clear-cache-buttons">
+                <button class="clear-cache-cancel" onclick="closeClearCacheModal()">Cancelar</button>
+                <button class="clear-cache-confirm" onclick="confirmClearCache()">Sí, eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="channelSelectorModal" class="channel-selector-modal" onclick="if(event.target===this)closeAllModals()">
+        <div class="channel-selector-content">
+            <div class="csr-handle-bar"></div>
+            <div class="csr-header">
+                <h3 id="channelSelectorTitle">Seleccionar Servidor</h3>
+                <button class="csr-close-btn" onclick="closeAllModals()" title="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="channel-selector-body" id="channelSelectorBody"></div>
+        </div>
+    </div>
+
+    <!-- Modal de QR Code -->
+    <div id="qrModal" class="qr-modal">
+        <div class="qr-modal-content">
+            <div class="qr-modal-header">
+                <h3>Código QR del Canal</h3>
+                <button class="close-qr-modal" onclick="closeQRModal()" title="Cerrar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="qr-modal-body">
+                <div class="qr-container">
+                    <div id="qrCodeContainer"></div>
+                </div>
+                <p class="qr-info" id="qrChannelInfo">Escanea este código para ver el canal en tu dispositivo</p>
+            </div>
+            <div class="qr-modal-footer">
+                <button class="download-qr-btn" onclick="downloadQRCode()">
+                    <i class="fas fa-download"></i>
+                    <span>Descargar QR</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Partidos Importantes -->
+    <div id="importantMatchesModal" class="important-matches-modal">
+        <div class="important-modal-overlay" onclick="closeImportantMatchesModal()"></div>
+        <div class="important-modal-container">
+            <div class="important-modal-header">
+                <div class="important-modal-header-content">
+                    <div class="important-modal-title-wrapper">
+                        <i class="fas fa-star" style="color: #FFD700;"></i>
+                        <h3 class="important-modal-title">PARTIDOS IMPORTANTES</h3>
+                    </div>
+                    <div class="important-modal-actions">
+                        <button id="liveFilterBtn" class="live-filter-btn" onclick="toggleLiveFilter()">
+                            <span class="live-dot"></span> EN VIVO
+                        </button>
+                        <button class="close-important-modal" onclick="closeImportantMatchesModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="important-modal-body" id="importantMatchesBody">
+                <div class="loading-matches">
+                    <div class="spinner"></div>
+                    <p>Cargando partidos...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buscador: Canvas Browser Style -->
+    <div id="searchModal" class="search-modal">
+        <div class="search-modal-overlay" onclick="closeSearchModal()"></div>
+        <div class="search-modal-container">
+            <!-- Handle -->
+            <div class="sb-handle-bar"></div>
+
+            <!-- Top brand row -->
+            <div class="sb-header">
+                <div class="sb-logo">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="11" fill="#FF6B00"/>
+                        <circle cx="12" cy="12" r="5" fill="rgba(0,0,0,0.25)"/>
+                        <path d="M12 3 L14.5 8.5 L20.5 9 L16.5 13 L17.5 19 L12 16 L6.5 19 L7.5 13 L3.5 9 L9.5 8.5Z" fill="white" opacity="0.9"/>
+                    </svg>
+                    <span>UltraGol</span>
+                </div>
+                <button class="sb-close-btn close-search-modal" onclick="closeSearchModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Address Bar -->
+            <div class="sb-address-row">
+                <div class="sb-address-bar">
+                    <i class="fas fa-search sb-addr-icon"></i>
+                    <input type="search" id="searchInput" class="search-input"
+                        placeholder="Busca equipos, ligas, partidos..."
+                        autocomplete="off" inputmode="text">
+                    <button class="clear-search-btn" onclick="clearSearch()" style="display:none">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                    <button id="voiceSearchBtn" class="voice-search-btn" onclick="startVoiceSearch()" title="Buscar por voz">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sport Chips -->
+            <div class="sb-chips-row">
+                <div class="search-sport-chips">
+                    <button class="sport-chip active" onclick="filterBySport('todos', this)">Todos</button>
+                    <button class="sport-chip" onclick="filterBySport('fútbol', this)"><i class="fas fa-futbol"></i> Fútbol</button>
+                    <button class="sport-chip" onclick="filterBySport('basket', this)"><i class="fas fa-basketball-ball"></i> NBA</button>
+                    <button class="sport-chip" onclick="filterBySport('box', this)"><i class="fas fa-fist-raised"></i> UFC</button>
+                    <button class="sport-chip" onclick="filterBySport('americano', this)"><i class="fas fa-football-ball"></i> NFL</button>
+                </div>
+            </div>
+
+            <!-- Results -->
+            <div class="search-modal-body" id="searchResults"></div>
+        </div>
+    </div>
+
+    <!-- User Menu Dropdown -->
+    <div id="userMenu" class="user-menu">
+        <div class="user-menu-overlay" onclick="closeUserMenu()"></div>
+        <div class="user-menu-content">
+            <div class="user-menu-header" id="userMenuHeader">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name" id="userDisplayName">Invitado</span>
+                    <span class="user-status" id="userStatus">No has iniciado sesión</span>
+                </div>
+            </div>
+            <div class="user-menu-body" id="userMenuBody">
+                <button class="user-menu-item" onclick="openLoginModal()">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Iniciar Sesión</span>
+                </button>
+                <button class="user-menu-item" onclick="openRegisterModal()">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Registrarse</span>
+                </button>
+            </div>
+            <div class="user-menu-body user-menu-logged" id="userMenuLogged" style="display: none;">
+                <button class="user-menu-item" onclick="viewProfile()">
+                    <i class="fas fa-id-card"></i>
+                    <span>Mi Perfil</span>
+                </button>
+                <button class="user-menu-item" onclick="viewFavorites()">
+                    <i class="fas fa-heart"></i>
+                    <span>Mis Favoritos</span>
+                </button>
+                <button class="user-menu-item logout-item" onclick="logoutUser()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="auth-modal">
+        <div class="auth-modal-overlay" onclick="closeLoginModal()"></div>
+        <div class="auth-modal-container">
+            <div class="auth-modal-header">
+                <div class="auth-logo">
+                    <img src="ultragol-logo.png" alt="ULTRAGOL">
+                </div>
+                <h2 class="auth-title">Iniciar Sesión</h2>
+                <p class="auth-subtitle">Accede a tu cuenta ULTRAGOL</p>
+                <button class="close-auth-modal" onclick="closeLoginModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="auth-input-group">
+                        <label for="loginUsername">Usuario</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="loginUsername" name="username" placeholder="Tu nombre de usuario" required>
+                        </div>
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="loginPassword">Contraseña</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="loginPassword" name="password" placeholder="Tu contraseña" required>
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('loginPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="auth-error" id="loginError" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="loginErrorText">Error de autenticación</span>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" id="loginSubmitBtn">
+                        <span>Iniciar Sesión</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+                <div class="auth-divider">
+                    <span>o continúa con</span>
+                </div>
+                <button type="button" class="google-signin-btn" onclick="signInWithGoogle()">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    <span>Continuar con Google</span>
+                </button>
+                <div class="auth-footer">
+                    <p>¿No tienes cuenta? <a href="#" onclick="switchToRegister()">Regístrate aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="auth-modal">
+        <div class="auth-modal-overlay" onclick="closeRegisterModal()"></div>
+        <div class="auth-modal-container">
+            <div class="auth-modal-header">
+                <div class="auth-logo">
+                    <img src="ultragol-logo.png" alt="ULTRAGOL">
+                </div>
+                <h2 class="auth-title">Crear Cuenta</h2>
+                <p class="auth-subtitle">Únete a la comunidad ULTRAGOL</p>
+                <button class="close-auth-modal" onclick="closeRegisterModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="auth-input-group">
+                        <label for="registerUsername">Usuario</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="registerUsername" name="username" placeholder="Elige un nombre de usuario" required minlength="3">
+                        </div>
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="registerEmail">Email (opcional)</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="registerEmail" name="email" placeholder="tu@email.com">
+                        </div>
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="registerPassword">Contraseña</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="registerPassword" name="password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                            <button type="button" class="toggle-password" onclick="togglePasswordVisibility('registerPassword')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="auth-input-group">
+                        <label for="registerTeam">Equipo Favorito (opcional)</label>
+                        <div class="auth-input-wrapper">
+                            <i class="fas fa-futbol"></i>
+                            <select id="registerTeam" name="favoriteTeam">
+                                <option value="">Selecciona tu equipo</option>
+                                <option value="america">América</option>
+                                <option value="chivas">Chivas</option>
+                                <option value="tigres">Tigres</option>
+                                <option value="monterrey">Monterrey</option>
+                                <option value="cruz-azul">Cruz Azul</option>
+                                <option value="pumas">Pumas</option>
+                                <option value="santos">Santos</option>
+                                <option value="toluca">Toluca</option>
+                                <option value="leon">León</option>
+                                <option value="atlas">Atlas</option>
+                                <option value="pachuca">Pachuca</option>
+                                <option value="tijuana">Tijuana</option>
+                                <option value="puebla">Puebla</option>
+                                <option value="queretaro">Querétaro</option>
+                                <option value="necaxa">Necaxa</option>
+                                <option value="mazatlan">Mazatlán</option>
+                                <option value="juarez">Juárez</option>
+                                <option value="san-luis">San Luis</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="auth-error" id="registerError" style="display: none;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span id="registerErrorText">Error en el registro</span>
+                    </div>
+                    <button type="submit" class="auth-submit-btn" id="registerSubmitBtn">
+                        <span>Crear Cuenta</span>
+                        <i class="fas fa-user-plus"></i>
+                    </button>
+                </form>
+                <div class="auth-divider">
+                    <span>o continúa con</span>
+                </div>
+                <button type="button" class="google-signin-btn" onclick="signInWithGoogle()">
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    <span>Continuar con Google</span>
+                </button>
+                <div class="auth-footer">
+                    <p>¿Ya tienes cuenta? <a href="#" onclick="switchToLogin()">Inicia sesión</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="auth.js?v=20251208"></script>
+    <script type="module" src="promo-codes.js?v=20251208"></script>
+    <script src="app.js?v=20260403"></script>
+    <script>
+        // Forzar recarga si hay nueva versión
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for(let registration of registrations) {
+                    registration.update();
+                }
+            });
+        }
+    </script>
+    
+    <!-- PWA Install Banner -->
+    <div id="pwa-install-banner" class="pwa-install-banner">
+        <div class="pwa-banner-content">
+            <div class="pwa-banner-icon">
+                <img src="app-icon.png" alt="UltraGol LIVE">
+            </div>
+            <div class="pwa-banner-text">
+                <h3 class="pwa-banner-title">Instalar UltraGol LIVE</h3>
+                <p class="pwa-banner-description">Accede más rápido a tus partidos en vivo</p>
+            </div>
+        </div>
+        <div class="pwa-banner-actions">
+            <button class="pwa-install-btn" onclick="installPWA()">
+                <i class="fas fa-download"></i>
+                Instalar App
+            </button>
+            <button class="pwa-close-btn" onclick="closePWABanner()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    
+    <!-- PWA Install Script -->
+    <script src="pwa-install.js"></script>
+    
+    <!-- Notifications System -->
+    <script src="notifications.js?v=20251109c"></script>
+    
+    <!-- TV Remote Navigation -->
+    <script src="tv-remote-navigation.js?v=20251109c"></script>
+    
+    <!-- Offline Game -->
+    <link rel="stylesheet" href="offline-game.css">
+    <div id="offlineGameModal">
+        <div class="offline-game-container">
+            <div class="offline-game-header">
+                <h2 class="offline-game-title">⚽ ULTRAJUMPER</h2>
+                <button class="offline-game-close-btn" onclick="document.getElementById('offlineGameModal').style.display='none';">✕</button>
+            </div>
+            <canvas id="offlineGameCanvas" width="400" height="600"></canvas>
+            <div class="offline-status" id="offlineStatus">📡 Sin conexión a internet</div>
+        </div>
+    </div>
+    <script src="offline-game.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('offlineGameCanvas');
+            if (canvas) {
+                canvas.addEventListener('click', () => {
+                    if (window.offlineGameInstance && window.offlineGameInstance.isGameOver) {
+                        window.offlineGameInstance.reset();
+                    }
+                });
+                canvas.addEventListener('touchstart', (e) => {
+                    if (window.offlineGameInstance && window.offlineGameInstance.isGameOver) {
+                        window.offlineGameInstance.reset();
+                    }
+                }, { passive: false });
+            }
+        });
+        
+        window.addEventListener('online', () => {
+            document.getElementById('offlineStatus').textContent = '✓ Conexión restaurada';
+            document.getElementById('offlineStatus').classList.add('online');
+            setTimeout(() => {
+                document.getElementById('offlineGameModal').style.display = 'none';
+            }, 2000);
+        });
+        
+        window.addEventListener('offline', () => {
+            document.getElementById('offlineStatus').textContent = '📡 Sin conexión a internet';
+            document.getElementById('offlineStatus').classList.remove('online');
+            showOfflineGame();
+        });
+    </script>
+
+    <script>
+        const WC_DATE = new Date('June 11, 2026 00:00:00').getTime();
+
+        function updateCountdown() {
+            const now = Date.now();
+            const gap = WC_DATE - now;
+            if (gap <= 0) {
+                ['days','hours','mins','secs'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerText = '00';
+                });
+                return;
+            }
+            const second = 1000, minute = second * 60, hour = minute * 60, day = hour * 24;
+            const d = Math.floor(gap / day);
+            const h = Math.floor((gap % day) / hour);
+            const m = Math.floor((gap % hour) / minute);
+            const s = Math.floor((gap % minute) / second);
+            const pad = n => n < 10 ? '0' + n : n;
+            document.getElementById('days').innerText  = d;
+            document.getElementById('hours').innerText = pad(h);
+            document.getElementById('mins').innerText  = pad(m);
+            document.getElementById('secs').innerText  = pad(s);
+
+            const timerEl = document.getElementById('wcModalTimer');
+            if (timerEl) timerEl.innerText = `${d}d  ${pad(h)}h  ${pad(m)}m  ${pad(s)}s`;
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+    </script>
+    <script src="https://www.paypal.com/sdk/js?client-id=YOUR_LIVE_CLIENT_ID_HERE&currency=USD"></script>
+    <script src="js/donaciones.js"></script>
+
+    <!-- Bottom Nav Animations -->
+    <script>
+    function navBounce(el) {
+        el.classList.remove('is-bouncing');
+        void el.offsetWidth;
+        el.classList.add('is-bouncing');
+        el.classList.remove('nav-tap');
+        void el.offsetWidth;
+        el.classList.add('nav-tap');
+        el.addEventListener('animationend', () => el.classList.remove('is-bouncing'), { once: true });
+        setTimeout(() => el.classList.remove('nav-tap'), 450);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('pointerdown', function() {
+                navBounce(this);
+            });
+        });
+    });
+    </script>
+
+    <!-- 🔥 ULTRAGOL REELS — TikTok-style viewer triggered by center nav button -->
+    <script src="js/reels-viewer.js?v=4" defer></script>
+    <!-- Tour Guide -->
+
+    <!-- Glass Nav (bottom tab bar / desktop hamburger) -->
+    <script src="js/glass-nav.js?v=1"></script>
+    <script>
+    (function () {
+        // Deep link support: /ultrax/?openSearch=1 opens the search modal directly
+        try {
+            var params = new URLSearchParams(location.search);
+            if (params.get('openSearch') === '1') {
+                var open = function () {
+                    if (typeof showSearchModal === 'function') showSearchModal();
+                };
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', function () { setTimeout(open, 200); });
+                } else {
+                    setTimeout(open, 200);
+                }
+            }
+        } catch (e) {}
+    })();
+    </script>
+
+</body>
+</html>
