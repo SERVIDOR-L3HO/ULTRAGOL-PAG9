@@ -710,12 +710,13 @@ async function loadTransmisiones() {
             };
         });
         
-        // Convertir API 3 (transmisiones2 - voodc) que usa "url" directamente a "canales"
+        // Convertir API 3 (transmisiones2 - voodc) que usa "url" o "link" directamente a "canales"
         const transmisionesNormalizadasAPI3 = (data3.transmisiones || []).map(t => {
+            const streamUrl = t.url || t.link;
             const canalesNormalizados = [{
                 numero: '',
-                nombre: t.deporte || 'Canal',
-                enlaces: t.url ? [{ url: decodeStreamUrl(t.url), calidad: 'HD' }] : [],
+                nombre: t.deporte || t.idioma || 'Canal',
+                enlaces: streamUrl ? [{ url: decodeStreamUrl(streamUrl), calidad: 'HD' }] : [],
                 tipoAPI: 'voodc'
             }];
             

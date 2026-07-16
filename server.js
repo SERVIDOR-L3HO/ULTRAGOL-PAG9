@@ -1195,6 +1195,7 @@ function normalizeTransmision(item, fuente) {
     const urls = [];
     const pushUrl = u => { if (u && typeof u === 'string' && /^https?:/i.test(u)) urls.push(u); };
     if (item.url) pushUrl(item.url);
+    if (item.link) pushUrl(item.link);
     if (Array.isArray(item.enlaces)) item.enlaces.forEach(pushUrl);
     if (Array.isArray(item.canales)) {
         item.canales.forEach(c => pushUrl(c && (c.url || c.urlStream || c.link)));
