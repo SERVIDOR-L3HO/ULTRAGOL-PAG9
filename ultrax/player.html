@@ -401,8 +401,15 @@
 (function () {
     'use strict';
 
+    const PROXY = 'https://ultrago-xi.vercel.app/ultragol-l3ho?get=';
+
     function b64decode(str) {
         try { return atob(str); } catch (e) { return str; }
+    }
+
+    function proxyUrl(url) {
+        if (!url) return url;
+        return PROXY + encodeURIComponent(url);
     }
 
     const params = new URLSearchParams(window.location.search);
@@ -434,7 +441,7 @@
         }
         loader.classList.remove('hidden');
         errorState.classList.remove('show');
-        frame.src = url;
+        frame.src = proxyUrl(url);
     }
 
     // Hide loader once iframe responds (best-effort for cross-origin)
@@ -453,7 +460,7 @@
         if (!streamUrl) return;
         loader.classList.remove('hidden');
         frame.src = 'about:blank';
-        setTimeout(() => { frame.src = streamUrl; }, 300);
+        setTimeout(() => { frame.src = proxyUrl(streamUrl); }, 300);
         setTimeout(() => loader.classList.add('hidden'), 8000);
     };
 
