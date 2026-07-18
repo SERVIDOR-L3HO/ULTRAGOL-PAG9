@@ -52,13 +52,6 @@
     function init() {
         var active = currentPage();
 
-        // ── Bottom glass tab bar (mobile/tablet) ──
-        var bottom = document.createElement('nav');
-        bottom.className = 'ugn-bottom';
-        bottom.setAttribute('aria-label', 'Navegación principal');
-        bottom.innerHTML = buildItemsHTML(active);
-        document.body.appendChild(bottom);
-
         // ── Desktop hamburger FAB ──
         var fab = document.createElement('button');
         fab.type = 'button';
@@ -93,7 +86,7 @@
             if (e.key === 'Escape') closePanel();
         });
 
-        [bottom, panel].forEach(function (container) {
+        [panel].forEach(function (container) {
             container.querySelectorAll('.ugn-item').forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     ripple(btn);
@@ -104,10 +97,6 @@
             });
         });
 
-        // Keep body content clear of the floating bottom bar on small screens
-        var style = document.createElement('style');
-        style.textContent = '@media (max-width: 1023px){ body{ padding-bottom: 96px !important; } }';
-        document.head.appendChild(style);
     }
 
     if (document.readyState === 'loading') {
