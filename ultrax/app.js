@@ -7,6 +7,18 @@ function decodeStreamUrl(url) {
     try { return atob(url); } catch(e) { return url; }
 }
 
+// ── PLAYER PAGE ─────────────────────────────────────────────────────────────
+// Abre la URL del stream en la página de reproductor de UltraGol (/ultrax/player.html)
+// en vez de abrir el enlace crudo en otra pestaña.
+let _currentOpenTitle = '';
+function openInPlayer(url, title) {
+    if (!url) return;
+    const r = btoa(unescape(encodeURIComponent(url)));
+    const n = btoa(unescape(encodeURIComponent(title || '')));
+    const playerUrl = '/ultrax/player.html?r=' + r + '&n=' + n;
+    window.open(playerUrl, '_blank', 'noopener,noreferrer');
+}
+
 let currentStreamUrl = '';
 let currentStreamTitle = '';
 let currentChannelsList = [];
@@ -2115,6 +2127,7 @@ function watchMatch(matchId, videoUrl = null, videoTitle = null) {
 }
 
 function showChannelSelector(transmision, partidoNombre) {
+    _currentOpenTitle = partidoNombre || '';
     const modal = document.getElementById('channelSelectorModal');
     const body = document.getElementById('channelSelectorBody');
     const title = document.getElementById('channelSelectorTitle');
@@ -2224,7 +2237,7 @@ function playChannelFromSelector(url, title, channelName) {
     const modal = document.getElementById('channelSelectorModal');
     saveRecentChannel(url, title, channelName || '');
     if (modal) modal.classList.remove('active');
-    window.open(url, '_blank', 'noopener,noreferrer');
+    openInPlayer(url, title);
 }
 
 // ── HISTORIAL DE CANALES VISTOS ──────────────────────────────────────────────
@@ -3715,7 +3728,7 @@ document.addEventListener('visibilitychange', async () => {
 function openStream(url) {
     if (!url) return;
     currentStreamUrl = url;
-    window.open(url, '_blank', 'noopener,noreferrer');
+    openInPlayer(url, _currentOpenTitle);
 }
 
 // ── SERVER SELECTOR ────────────────────────────────────────────────────────
@@ -3767,12 +3780,12 @@ function loadServerInPlayer(index) {
     url = decodeStreamUrl(url);
     if (!url) { showToast('Este servidor no tiene señal disponible'); return; }
 
-    window.open(url, '_blank', 'noopener,noreferrer');
+    openInPlayer(url, _currentOpenTitle);
 }
 
 function openStreamNewTab() {
     if (!currentStreamUrl) { showToast('No hay transmisión activa'); return; }
-    window.open(currentStreamUrl, '_blank', 'noopener,noreferrer');
+    openInPlayer(currentStreamUrl, _currentOpenTitle);
 }
 
 function copyStreamLink() {

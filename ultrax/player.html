@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>UltraGol — En Vivo</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="app-icon.png">
+    <meta name="theme-color" content="#000000">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --orange: #ff6200;
+            --orange-dim: rgba(255, 98, 0, 0.18);
+            --orange-glow: rgba(255, 98, 0, 0.35);
+            --glass-bg: rgba(255,255,255,0.04);
+            --glass-border: rgba(255,255,255,0.09);
+            --text: #f0f0f0;
+            --text-muted: #8a8a8a;
+        }
+
+        html, body {
+            height: 100%;
+            background: #0a0a0a;
+            color: var(--text);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Subtle radial glow top-center */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -160px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 600px;
+            height: 320px;
+            background: radial-gradient(ellipse, rgba(255,98,0,0.14) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page-wrap {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 14px 40px;
+        }
+
+        /* ─── HEADER ─────────────────────────────────────────────────── */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0 12px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 7px 14px;
+            border-radius: 40px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all .2s;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            letter-spacing: .3px;
+            flex-shrink: 0;
+        }
+        .back-btn:hover { color: var(--orange); border-color: var(--orange-glow); }
+        .back-btn svg { width: 12px; height: 12px; fill: currentColor; }
+
+        .logo-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-wrap img {
+            height: 32px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(255,98,0,.3));
+        }
+
+        /* spacer to balance the back btn */
+        .header-spacer { flex-shrink: 0; min-width: 80px; }
+
+        /* ─── MATCH TITLE ───────────────────────────────────────────── */
+        .match-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            min-height: 18px;
+        }
+
+        /* ─── PLAYER CARD ────────────────────────────────────────────── */
+        .player-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 8px 40px rgba(0,0,0,.55), 0 0 0 1px rgba(255,98,0,.06);
+            position: relative;
+        }
+
+        .player-badge {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,0,0,.62);
+            border: 1px solid rgba(255,98,0,.35);
+            border-radius: 30px;
+            padding: 4px 10px 4px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #fff;
+            backdrop-filter: blur(6px);
+        }
+        .live-dot {
+            width: 7px; height: 7px;
+            background: #ff4444;
+            border-radius: 50%;
+            animation: blink 1.2s ease-in-out infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+        .player-number {
+            position: absolute;
+            top: 12px;
+            left: 14px;
+            z-index: 10;
+            background: rgba(0,0,0,.62);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--orange);
+            backdrop-filter: blur(6px);
+        }
+
+        .iframe-wrap {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000;
+        }
+
+        .iframe-wrap iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+
+        /* loading overlay */
+        .iframe-loader {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            z-index: 5;
+            transition: opacity .5s;
+        }
+        .iframe-loader.hidden { opacity: 0; pointer-events: none; }
+        .loader-ring {
+            width: 44px; height: 44px;
+            border: 3px solid rgba(255,98,0,.18);
+            border-top-color: var(--orange);
+            border-radius: 50%;
+            animation: spin .9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-text { font-size: 12px; color: var(--text-muted); letter-spacing: .5px; }
+
+        /* ─── ACTION BUTTONS ─────────────────────────────────────────── */
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+            cursor: pointer;
+            border: none;
+            transition: all .2s;
+        }
+
+        .btn-refresh {
+            background: linear-gradient(135deg, var(--orange) 0%, #e05500 100%);
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(255,98,0,.3);
+        }
+        .btn-refresh:hover { transform: translateY(-1px); box-shadow: 0 6px 26px rgba(255,98,0,.45); }
+        .btn-refresh:active { transform: translateY(0); }
+
+        .btn-fullscreen {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .btn-fullscreen:hover { border-color: rgba(255,98,0,.35); color: var(--orange); }
+
+        .btn-icon { font-size: 15px; }
+
+        /* ─── INFO CARD ──────────────────────────────────────────────── */
+        .info-card {
+            margin-top: 14px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-left: 3px solid var(--orange);
+            border-radius: 14px;
+            padding: 16px 18px;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .info-card-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--orange);
+            letter-spacing: .4px;
+            margin-bottom: 8px;
+        }
+
+        .info-card-body {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .info-card-body strong { color: var(--text); }
+
+        .cf-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 10px 18px;
+            background: transparent;
+            border: 1px solid var(--orange);
+            color: var(--orange);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: all .2s;
+        }
+        .cf-btn:hover { background: var(--orange-dim); }
+
+        /* ─── FOOTER ─────────────────────────────────────────────────── */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 11px;
+            color: rgba(255,255,255,.2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ─── ERROR STATE ────────────────────────────────────────────── */
+        .error-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            gap: 12px;
+        }
+        .error-state.show { display: flex; }
+        .error-icon { font-size: 40px; }
+        .error-title { font-size: 16px; font-weight: 700; color: var(--text); }
+        .error-sub { font-size: 13px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+
+    <!-- HEADER -->
+    <header class="header">
+        <a class="back-btn" href="javascript:history.back()">
+            <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            Inicio
+        </a>
+        <div class="logo-wrap">
+            <img src="ultragol-logo.png" alt="UltraGol" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+            <span style="display:none; font-size:20px; font-weight:900; letter-spacing:-0.5px; color:#ff6200;">ULTRA<span style="color:#fff;">GOL</span></span>
+        </div>
+        <div class="header-spacer"></div>
+    </header>
+
+    <!-- MATCH TITLE -->
+    <div class="match-title" id="matchTitle"></div>
+
+    <!-- PLAYER CARD -->
+    <div class="player-card">
+        <div class="player-badge">
+            <div class="live-dot"></div>
+            LIVE
+        </div>
+        <div class="player-number" id="playerNumber">SEÑAL 1</div>
+
+        <div class="iframe-wrap">
+            <div class="iframe-loader" id="iframeLoader">
+                <div class="loader-ring"></div>
+                <span class="loader-text">Cargando señal...</span>
+            </div>
+            <iframe
+                id="streamFrame"
+                src="about:blank"
+                allowfullscreen
+                allow="autoplay; fullscreen; encrypted-media"
+                scrolling="no"
+                referrerpolicy="no-referrer-when-downgrade"
+            ></iframe>
+            <div class="error-state" id="errorState">
+                <div class="error-icon">📡</div>
+                <div class="error-title">Sin enlace de transmisión</div>
+                <div class="error-sub">No se recibió un enlace válido. Regresa e intenta con otro servidor.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+        <button class="action-btn btn-refresh" onclick="refreshStream()">
+            <span class="btn-icon">⚡</span>
+            Refrescar
+        </button>
+        <button class="action-btn btn-fullscreen" onclick="goFullscreen()">
+            <span class="btn-icon">⛶</span>
+            Pantalla completa
+        </button>
+    </div>
+
+    <!-- INFO CARD -->
+    <div class="info-card">
+        <div class="info-card-title">
+            🔒 Desbloquear señal
+        </div>
+        <div class="info-card-body">
+            Si la señal no carga es porque tu <strong>proveedor de internet bloquea los enlaces externos</strong>. Para ingresar sin restricciones, instala la protección de Cloudflare.
+        </div>
+        <a class="cf-btn" href="https://1.1.1.1" target="_blank" rel="noopener noreferrer">
+            Instalar 1.1.1.1 →
+        </a>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">UltraGol Network © 2026</div>
+
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    function b64decode(str) {
+        try { return atob(str); } catch (e) { return str; }
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const r = params.get('r') || '';
+    const n = params.get('n') || '';
+
+    // Decode stream URL
+    const streamUrl = r ? b64decode(r) : '';
+
+    // Decode match name
+    const matchName = n ? b64decode(n) : '';
+
+    // Set title
+    const titleEl = document.getElementById('matchTitle');
+    if (matchName && titleEl) titleEl.textContent = matchName;
+
+    // Update document title
+    if (matchName) document.title = matchName + ' — UltraGol';
+
+    const frame = document.getElementById('streamFrame');
+    const loader = document.getElementById('iframeLoader');
+    const errorState = document.getElementById('errorState');
+
+    function loadStream(url) {
+        if (!url) {
+            loader.classList.add('hidden');
+            errorState.classList.add('show');
+            return;
+        }
+        loader.classList.remove('hidden');
+        errorState.classList.remove('show');
+        frame.src = url;
+    }
+
+    // Hide loader once iframe responds (best-effort for cross-origin)
+    frame.addEventListener('load', () => {
+        loader.classList.add('hidden');
+    });
+
+    // Timeout fallback — hide loader after 8s regardless
+    setTimeout(() => loader.classList.add('hidden'), 8000);
+
+    // Initial load
+    loadStream(streamUrl);
+
+    // Refresh
+    window.refreshStream = function () {
+        if (!streamUrl) return;
+        loader.classList.remove('hidden');
+        frame.src = 'about:blank';
+        setTimeout(() => { frame.src = streamUrl; }, 300);
+        setTimeout(() => loader.classList.add('hidden'), 8000);
+    };
+
+    // Fullscreen
+    window.goFullscreen = function () {
+        const el = frame;
+        const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen;
+        if (req) req.call(el);
+    };
+})();
+</script>
+</body>
+</html>
