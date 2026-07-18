@@ -1009,15 +1009,18 @@ body {
 
 /* Modal shell override */
 #channelSelectorModal .channel-selector-content {
-    background: #08080c;
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 28px;
+    background: rgba(8,8,14,0.55);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-bottom: none;
+    border-radius: 28px 28px 0 0;
     overflow: hidden;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.75), 0 0 0 1px rgba(255,255,255,0.04);
+    box-shadow: 0 -20px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,98,0,0.06) inset;
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
 }
 
 #channelSelectorModal .channel-selector-header {
-    background: linear-gradient(180deg, rgba(255,255,255,0.035) 0%, transparent 100%);
+    background: transparent;
     padding: 18px 20px 16px;
     border-bottom: 1px solid rgba(255,255,255,0.06);
     display: flex;
@@ -1031,7 +1034,7 @@ body {
     position: absolute;
     bottom: 0; left: 20px; right: 20px;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255,107,53,0.25), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255,98,0,0.4), transparent);
 }
 
 #channelSelectorModal .channel-selector-header h3 {
@@ -5982,11 +5985,17 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 }
 
 /* ── CHANNEL SELECTOR — BOTTOM SHEET ───────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   CHANNEL SELECTOR MODAL — Ultra Glass Redesign
+   ══════════════════════════════════════════════════════════════ */
+
 .channel-selector-modal {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.72);
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     z-index: 2500;
     align-items: flex-end;
     justify-content: center;
@@ -5994,48 +6003,66 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 
 .channel-selector-modal.active {
     display: flex;
-    animation: csrFadeIn 0.22s ease;
+    animation: csrFadeIn 0.25s ease;
 }
 
 @keyframes csrFadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
+    from { opacity: 0; backdrop-filter: blur(0px); }
+    to   { opacity: 1; backdrop-filter: blur(6px); }
 }
 
 .channel-selector-content {
     width: 100%;
-    max-width: 540px;
+    max-width: 560px;
     max-height: 78vh;
-    background: #111116;
-    border-radius: 22px 22px 0 0;
+    /* ultra-transparent glass */
+    background: rgba(10,10,18,0.52);
+    backdrop-filter: blur(32px) saturate(180%) brightness(1.1);
+    -webkit-backdrop-filter: blur(32px) saturate(180%) brightness(1.1);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-bottom: none;
+    border-radius: 26px 26px 0 0;
+    box-shadow:
+        0 -8px 60px rgba(0,0,0,0.55),
+        0 0 0 1px rgba(255,98,0,0.08) inset,
+        0 -1px 0 rgba(255,98,0,0.18) inset;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    animation: csrSlideUp 0.3s cubic-bezier(0.32,0.72,0,1);
+    animation: csrSlideUp 0.35s cubic-bezier(0.22,1,0.36,1);
 }
 
 @keyframes csrSlideUp {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
+    from { transform: translateY(100%); opacity: 0.6; }
+    to   { transform: translateY(0);    opacity: 1; }
 }
 
-/* drag handle */
+/* ── drag handle ── */
 .csr-handle-bar {
-    width: 38px;
-    height: 4px;
-    background: rgba(255,255,255,0.18);
+    width: 36px;
+    height: 3.5px;
+    background: linear-gradient(90deg, transparent, rgba(255,98,0,0.55), transparent);
     border-radius: 99px;
-    margin: 12px auto 4px;
+    margin: 14px auto 6px;
     flex-shrink: 0;
 }
 
-/* header */
+/* ── header ── */
 .csr-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px 14px;
+    padding: 8px 20px 16px;
     flex-shrink: 0;
+    position: relative;
+}
+
+.csr-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 16px; right: 16px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,98,0,0.35), transparent);
 }
 
 .csr-header h3,
@@ -6049,11 +6076,18 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-shadow: 0 0 20px rgba(255,98,0,0.25);
+}
+
+.csr-header h3 i,
+#channelSelectorTitle i {
+    color: #ff6200;
+    margin-right: 6px;
 }
 
 .csr-close-btn {
-    background: rgba(255,255,255,0.09);
-    border: none;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -6061,19 +6095,44 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: rgba(255,255,255,0.7);
-    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    font-size: 12px;
     flex-shrink: 0;
-    transition: background 0.2s;
+    transition: all 0.2s;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.csr-close-btn:hover {
+    background: rgba(255,98,0,0.18);
+    border-color: rgba(255,98,0,0.4);
+    color: #ff6200;
+    transform: rotate(90deg);
 }
 
-.csr-close-btn:hover { background: rgba(255,255,255,0.16); }
-
-/* body scroll area */
+/* ── body scroll area ── */
 .channel-selector-body {
-    padding: 0 14px 24px;
+    padding: 16px 14px 28px;
     overflow-y: auto;
     flex: 1;
+    /* custom scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,98,0,0.3) transparent;
+}
+.channel-selector-body::-webkit-scrollbar { width: 3px; }
+.channel-selector-body::-webkit-scrollbar-track { background: transparent; }
+.channel-selector-body::-webkit-scrollbar-thumb { background: rgba(255,98,0,0.35); border-radius: 99px; }
+
+/* ── server count label ── */
+.channel-selector-body::before {
+    content: attr(data-count);
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.28);
+    margin-bottom: 12px;
+    padding: 0 4px;
 }
 
 /* ── individual server row ── */
@@ -6081,59 +6140,92 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
     display: flex;
     align-items: center;
     gap: 14px;
-    padding: 16px 16px;
-    margin-bottom: 8px;
-    background: #1c1c22;
-    border: 1.5px solid rgba(255,255,255,0.07);
-    border-radius: 14px;
+    padding: 15px 16px;
+    margin-bottom: 9px;
+    /* glass card */
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
     cursor: pointer;
-    transition: background 0.18s, border-color 0.18s, transform 0.12s;
+    transition: background 0.18s, border-color 0.18s, transform 0.12s, box-shadow 0.18s;
     -webkit-tap-highlight-color: transparent;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* counter index shown via CSS */
+    counter-increment: server-counter;
+}
+
+/* shimmer line on top */
+.sr-row::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+    pointer-events: none;
+}
+
+.channel-selector-body {
+    counter-reset: server-counter;
 }
 
 .sr-row:active { transform: scale(0.975); }
 
 .sr-row:hover {
-    background: #222229;
-    border-color: rgba(255,255,255,0.13);
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
 }
 
-/* selected / featured */
+/* ── selected / active ── */
 .sr-row.sr-selected {
-    background: rgba(255,107,53,0.1);
-    border-color: #ff6b35;
+    background: rgba(255,98,0,0.10);
+    border-color: rgba(255,98,0,0.50);
+    box-shadow:
+        0 0 0 1px rgba(255,98,0,0.18) inset,
+        0 4px 28px rgba(255,98,0,0.14);
+}
+/* orange top-glow via ::before on selected rows */
+.sr-row.sr-selected::before {
+    background: linear-gradient(90deg, transparent, rgba(255,98,0,0.22), transparent);
 }
 
-/* radio circle */
+/* ── radio circle ── */
 .sr-radio {
     width: 22px;
     height: 22px;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.28);
+    border: 2px solid rgba(255,255,255,0.22);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: border-color 0.18s;
+    transition: border-color 0.18s, box-shadow 0.18s;
+    background: rgba(255,255,255,0.03);
 }
 
 .sr-radio-inner {
-    width: 10px;
-    height: 10px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: transparent;
-    transition: background 0.18s;
+    transition: background 0.18s, transform 0.18s;
+    transform: scale(0);
 }
 
 .sr-row.sr-selected .sr-radio {
-    border-color: #ff6b35;
+    border-color: #ff6200;
+    box-shadow: 0 0 10px rgba(255,98,0,0.4);
 }
 
 .sr-row.sr-selected .sr-radio-inner {
-    background: #ff6b35;
+    background: #ff6200;
+    transform: scale(1);
 }
 
-/* text info */
+/* ── text info ── */
 .sr-info {
     flex: 1;
     min-width: 0;
@@ -6142,37 +6234,76 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 .sr-name {
     font-size: 15px;
     font-weight: 700;
-    color: #fff;
+    color: rgba(255,255,255,0.92);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: -0.1px;
+}
+
+.sr-row.sr-selected .sr-name {
+    color: #fff;
 }
 
 .sr-type {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    color: rgba(255,255,255,0.38);
-    margin-top: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.30);
+    margin-top: 3px;
+    text-transform: uppercase;
 }
 
-/* empty state */
+.sr-row.sr-selected .sr-type {
+    color: rgba(255,98,0,0.75);
+}
+
+/* ── HD badge on right ── */
+.sr-row::after {
+    content: 'HD';
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    padding: 2px 5px;
+    pointer-events: none;
+}
+
+.sr-row.sr-selected::after {
+    content: '● EN VIVO';
+    color: rgba(255,98,0,0.85);
+    background: rgba(255,98,0,0.08);
+    border-color: rgba(255,98,0,0.25);
+    letter-spacing: 0.5px;
+    font-size: 8px;
+}
+
+/* ── empty state ── */
 .sr-empty {
     text-align: center;
-    padding: 40px 20px;
-    color: rgba(255,255,255,0.35);
-    font-size: 14px;
+    padding: 48px 20px;
+    color: rgba(255,255,255,0.28);
+    font-size: 13px;
+    letter-spacing: 0.3px;
 }
 
 .sr-empty i {
-    font-size: 32px;
+    font-size: 34px;
     display: block;
-    margin-bottom: 12px;
-    opacity: 0.4;
+    margin-bottom: 14px;
+    opacity: 0.35;
+    color: #ff6200;
 }
 
 @media (max-width: 480px) {
-    .channel-selector-content { max-height: 82vh; }
+    .channel-selector-content { max-height: 84vh; }
     .sr-name { font-size: 14px; }
     
     .stream-option-btn {
@@ -7594,19 +7725,18 @@ body.dark-mode .settings-option p {
 }
 
 body.dark-mode .modal-content,
-body.dark-mode .player-modal-content,
-body.dark-mode .channel-selector-content {
+body.dark-mode .player-modal-content {
     background: var(--bg-secondary);
 }
 
-body.dark-mode .modal-header,
-body.dark-mode .channel-selector-header {
+/* channel-selector-content keeps its glass background in all modes */
+
+body.dark-mode .modal-header {
     border-bottom: 1px solid var(--border);
     color: var(--text);
 }
 
-body.dark-mode .modal-body,
-body.dark-mode .channel-selector-body {
+body.dark-mode .modal-body {
     color: var(--text-secondary);
 }
 
