@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "oAx7-D7QakGzO3_7DHyAR"
+uri = "file://attached_assets/screenshot_sin_navbar.jpg"
+type = "image"
+title = "Screenshot sin navbar"
