@@ -2077,6 +2077,20 @@ app.use('/ultrax', express.static(path.join(__dirname, 'ultrax'), {
     }
 }));
 
+// ultrax2
+app.get('/ultrax2', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ultrax2', 'index.html'));
+});
+app.get('/ultrax2/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'ultrax2', 'index.html'));
+});
+app.use('/ultrax2', express.static(path.join(__dirname, 'ultrax2'), {
+    index: false,
+    setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    }
+}));
+
 
 app.get('/test-notifications', (req, res) => {
     res.sendFile(path.join(__dirname, 'test-notifications.html'));
