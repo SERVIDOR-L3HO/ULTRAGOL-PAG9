@@ -6076,17 +6076,15 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
     flex: 1;
 }
 
-/* ── individual server row — glass movie style ── */
+/* ── individual server row — movies app style ── */
 .sr-row {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 15px 18px;
+    padding: 16px 18px;
     margin-bottom: 10px;
-    background: rgba(255,255,255,0.05);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1.5px solid rgba(255,255,255,0.08);
+    background: #1e1e1e;
+    border: 1.5px solid rgba(255,255,255,0.06);
     border-radius: 16px;
     cursor: pointer;
     transition: background 0.18s, border-color 0.18s, transform 0.12s;
@@ -6096,16 +6094,14 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 .sr-row:active { transform: scale(0.975); }
 
 .sr-row:hover {
-    background: rgba(255,255,255,0.09);
-    border-color: rgba(255,255,255,0.15);
+    background: #252525;
+    border-color: rgba(255,255,255,0.10);
 }
 
-/* selected / featured — dark red glass like movies app */
+/* selected — dark crimson exactly like movies app */
 .sr-row.sr-selected {
-    background: rgba(180,20,20,0.35);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-color: #c0392b;
+    background: #5c1212;
+    border: 2px solid #b91c1c;
 }
 
 /* radio circle */
@@ -6113,12 +6109,12 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.35);
+    border: 2px solid rgba(255,255,255,0.4);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: border-color 0.18s, background 0.18s;
+    transition: border-color 0.18s;
 }
 
 .sr-radio-inner {
@@ -6131,7 +6127,6 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 
 .sr-row.sr-selected .sr-radio {
     border-color: #fff;
-    background: transparent;
 }
 
 .sr-row.sr-selected .sr-radio-inner {
@@ -6156,9 +6151,9 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 
 .sr-type {
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 600;
     letter-spacing: 0.1em;
-    color: rgba(220,80,80,0.9);
+    color: rgba(255,255,255,0.38);
     margin-top: 3px;
     text-transform: uppercase;
 }
