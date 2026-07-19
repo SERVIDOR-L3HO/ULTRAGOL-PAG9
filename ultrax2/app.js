@@ -1178,10 +1178,6 @@ function _fmpBuildSlide(partido, index, bgUrl, leagueName) {
             <!-- BOTTOM ACTION STRIP -->
             <div class="fmp-bottom">
                 <div class="fmp-dots" id="fmpDots${index}"></div>
-                <button class="fmp-watch-btn fmp-has-stream" onclick="openFeaturedMatchChannels(${index})">
-                    <span class="fmp-play-icon"><i class="fas fa-tv"></i></span>
-                    VER CANALES
-                </button>
             </div>
         </div>`;
 }
