@@ -6076,16 +6076,18 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
     flex: 1;
 }
 
-/* ── individual server row ── */
+/* ── individual server row — glass movie style ── */
 .sr-row {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 16px 16px;
-    margin-bottom: 8px;
-    background: #1c1c22;
-    border: 1.5px solid rgba(255,255,255,0.07);
-    border-radius: 14px;
+    gap: 16px;
+    padding: 15px 18px;
+    margin-bottom: 10px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
     cursor: pointer;
     transition: background 0.18s, border-color 0.18s, transform 0.12s;
     -webkit-tap-highlight-color: transparent;
@@ -6094,43 +6096,46 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 .sr-row:active { transform: scale(0.975); }
 
 .sr-row:hover {
-    background: #222229;
-    border-color: rgba(255,255,255,0.13);
+    background: rgba(255,255,255,0.09);
+    border-color: rgba(255,255,255,0.15);
 }
 
-/* selected / featured */
+/* selected / featured — dark red glass like movies app */
 .sr-row.sr-selected {
-    background: rgba(255,107,53,0.1);
-    border-color: #ff6b35;
+    background: rgba(180,20,20,0.35);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-color: #c0392b;
 }
 
 /* radio circle */
 .sr-radio {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.28);
+    border: 2px solid rgba(255,255,255,0.35);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    transition: border-color 0.18s;
+    transition: border-color 0.18s, background 0.18s;
 }
 
 .sr-radio-inner {
-    width: 10px;
-    height: 10px;
+    width: 11px;
+    height: 11px;
     border-radius: 50%;
     background: transparent;
     transition: background 0.18s;
 }
 
 .sr-row.sr-selected .sr-radio {
-    border-color: #ff6b35;
+    border-color: #fff;
+    background: transparent;
 }
 
 .sr-row.sr-selected .sr-radio-inner {
-    background: #ff6b35;
+    background: #fff;
 }
 
 /* text info */
@@ -6140,20 +6145,22 @@ body.ads-hidden div[style*="position: fixed"][style*="bottom: 0"] {
 }
 
 .sr-name {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    letter-spacing: 0.01em;
 }
 
 .sr-type {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    color: rgba(255,255,255,0.38);
-    margin-top: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(220,80,80,0.9);
+    margin-top: 3px;
+    text-transform: uppercase;
 }
 
 /* empty state */
