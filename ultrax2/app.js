@@ -1182,11 +1182,6 @@ function _fmpBuildSlide(partido, index, bgUrl, leagueName) {
                     <span class="fmp-play-icon"><i class="fas fa-tv"></i></span>
                     VER CANALES
                 </button>
-                <button class="fmp-share-btn"
-                        onclick="_fmpShare(${index},'${localName} vs ${visitName}')"
-                        title="Compartir">
-                    <i class="fas fa-share-alt"></i>
-                </button>
             </div>
         </div>`;
 }
